@@ -71,7 +71,10 @@ class Individual:
 
     #I would like to make theses three functions, where the last calls the second and the second calls the first faster:
     def calc_chi(self, a, P_L, A, omega, sigma, p, m):
-        part_one = ((a[m] * P_L[p] * A[m] * omega[p]**(1/sigma[p]))/(a[p] * P_L[m] * A[p] * omega[m]**(1/sigma[m])))**(self.service_substitutability/(1+self.service_substitutability))
+        try:
+            part_one = ((a[m] * P_L[p] * A[m] * omega[p]**(1/sigma[p]))/(a[p] * P_L[m] * A[p] * omega[m]**(1/sigma[m])))**(self.service_substitutability/(1+self.service_substitutability))
+        except:
+            print("the bits", (a[m] * P_L[p] * A[m] * omega[p]**(1/sigma[p])) ,(a[p] * P_L[m] * A[p] * omega[m]**(1/sigma[m])))
         #print("part_one", part_one)
         part_two = (A[p] * omega[p]**((sigma[p]-1)/sigma[p]) + (1 - A[p]))**((sigma[p] - self.service_substitutability)/((sigma[p] - 1) * self.service_substitutability))
         #print("part_two", part_two)
