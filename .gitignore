@@ -1,0 +1,12 @@
+results/
+venv/
+package/results/
+package/".ipynb_checkpoints"/
+package/.ipynb_checkpoints/
+package/.ipynb_checkpoints
+".ipynb_checkpoints"/
+.ipynb_checkpoints/
+.ipynb_checkpoints
+**/__pychache__/
+__pycache__/
+package/generating_data/__pychache__/
