@@ -81,12 +81,12 @@ class Network:
         
         self.a_low_carbon_preference = parameters["a_low_carbon_preference"]
         self.b_low_carbon_preference = parameters["b_low_carbon_preference"]
-        self.a_service_preference = parameters["a_service_preference"]
-        self.b_service_preference = parameters["b_service_preference"]
+        #self.a_service_preference = parameters["a_service_preference"]
+        #self.b_service_preference = parameters["b_service_preference"]
         self.a_individual_budget = parameters["a_individual_budget"]
         self.b_individual_budget = parameters["b_individual_budget"]
-        self.a_low_carbon_substitutability = parameters["a_low_carbon_substitutability"]
-        self.b_low_carbon_substitutability = parameters["b_low_carbon_substitutability"]
+        #self.a_low_carbon_substitutability = parameters["a_low_carbon_substitutability"]
+        #self.b_low_carbon_substitutability = parameters["b_low_carbon_substitutability"]
 
 
         (
@@ -234,17 +234,17 @@ class Network:
         #print("inital preferences", low_carbon_preference_list)
         #quit()
 
-        service_preference_list = [
-            np.random.beta(self.a_service_preference, self.b_service_preference, size=self.M)
-            for n in range(self.N)
-        ]
+        service_preference_list = [1/self.M]*self.M#[
+        #    np.random.beta(self.a_service_preference, self.b_service_preference, size=self.M)
+        #    for n in range(self.N)
+        #]
 
-        individual_budget_list = [
-            np.random.beta(self.a_individual_budget, self.b_individual_budget, size=1)*self.budget_multiplier
-            for n in range(self.N)
-        ]
+        individual_budget_array = np.random.beta(self.a_individual_budget, self.b_individual_budget, size=self.N)
+        norm_individual_budget_array = self.normlize_matrix(
+            individual_budget_array
+        )
 
-        low_carbon_substitutability_list = np.random.beta(self.a_low_carbon_substitutability, self.b_low_carbon_substitutability, size=self.M)#this is a single list that is used by all individuals
+        low_carbon_substitutability_list = [1/self.M]*self.M #np.random.beta(self.a_low_carbon_substitutability, self.b_low_carbon_substitutability, size=self.M)#this is a single list that is used by all individuals
 
         low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)#NEEDS TO ADD UP TO ONE SO NORMALIZE EACH ROW
         service_preference_matrix = np.asarray(service_preference_list)#NEEDS TO ADD UP TO ONE SO NORMALIZE EACH ROW
@@ -258,9 +258,11 @@ class Network:
         #print("norm_service_preference_matrix", norm_service_preference_matrix)
         #quit()
 
-        individual_budget_matrix = np.asarray(individual_budget_list)
+        individual_budget_matrix = np.asarray(norm_individual_budget_array)*self.budget_multiplier
         low_carbon_substitutability_matrix = np.asarray(low_carbon_substitutability_list)
 
+        print("YOOO",low_carbon_preference_matrix, norm_service_preference_matrix, individual_budget_matrix, low_carbon_substitutability_matrix)
+        quit()
         return low_carbon_preference_matrix, norm_service_preference_matrix, individual_budget_matrix, low_carbon_substitutability_matrix
 
     def create_agent_list(self) -> list[Individual]:
