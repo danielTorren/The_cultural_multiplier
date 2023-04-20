@@ -58,6 +58,7 @@ class Network:
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
         self.learning_error_scale = parameters["learning_error_scale"]
+        self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
 
         # social influence of behaviours
         self.phi_lower = parameters["phi_lower"]
@@ -312,8 +313,21 @@ class Network:
             behavioural attitude opinions, this influence is weighted by the weighting_matrix
         """
 
-        low_carbon_preferences_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
-        neighbour_influence = np.matmul(self.weighting_matrix, low_carbon_preferences_matrix)
+        if self.ratio_preference_or_consumption < 1:
+            low_carbon_preferences_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+            #print("low_carbon_preferences_matrix", low_carbon_preferences_matrix)
+            low_high_consumption_ratio_matrix = np.asarray([(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
+            #print("low_high_consumption_ratio_matrix", low_high_consumption_ratio_matrix)
+            #print("self.ratio_preference_or_consumption",self.ratio_preference_or_consumption)
+            #print("self.ratio_preference_or_consumption*low_carbon_preferences_matrix",self.ratio_preference_or_consumption*low_carbon_preferences_matrix)
+            #print("(1 - self.ratio_preference_or_consumption)*low_high_consumption_ratio_matrix", (1 - self.ratio_preference_or_consumption)*low_high_consumption_ratio_matrix)
+            #quit()
+            attribute_matrix = self.ratio_preference_or_consumption*low_carbon_preferences_matrix + (1 - self.ratio_preference_or_consumption)*low_high_consumption_ratio_matrix
+            #print("attribute_matrix", attribute_matrix, np.isnan(attribute_matrix))
+        else:
+            attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+
+        neighbour_influence = np.matmul(self.weighting_matrix, attribute_matrix)
         
         return neighbour_influence
 
@@ -397,9 +411,7 @@ class Network:
         total_network_emissions: float
             total network emissions from each Individual object
         """
-        total_network_emissions = sum(
-            [x.total_carbon_emissions for x in self.agent_list]
-        )
+        total_network_emissions = sum([x.total_carbon_emissions for x in self.agent_list])
         return total_network_emissions
 
     def calc_network_identity(self) -> tuple[float, float, float, float]:

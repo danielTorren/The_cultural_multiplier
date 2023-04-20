@@ -1,6 +1,6 @@
 {
-    "save_timeseries_data": 0, 
-    "time_steps_max": 3000,
+    "save_timeseries_data": 1, 
+    "time_steps_max": 1000,
     "phi_lower": 0.01,
     "phi_upper": 0.05,
     "compression_factor": 10,
@@ -29,5 +29,6 @@
     "carbon_price_time": 10000,
     "carbon_price_increased" : 0.0,
     "budget_multiplier": 1,
-    "price_high_carbon_factor": 1.0
+    "price_high_carbon_factor": 1.0,
+    "ratio_preference_or_consumption": 1.0
 }

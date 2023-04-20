@@ -799,3 +799,62 @@ def live_animate_identity_network_weighting_matrix(
         ani.save(f, writer=writervideo)
 
     return ani
+
+##################################################################################
+#NEW PLOTS
+def plot_total_carbon_emissions_timeseries_sweep(
+    fileName: str, Data_list, dpi_save: int,latex_bool = False
+):
+    if latex_bool:
+        set_latex()
+    y_title = "Carbon Emissions"
+    property = "history_total_carbon_emissions"
+
+    fig, ax = plt.subplots(figsize=(10,6))
+
+    cmap = get_cmap("plasma")
+
+    c = np.asarray([i.ratio_preference_or_consumption for i in Data_list])
+    #print("yooo",c)
+    #colour_adjust = Normalize(vmin=c.min(), vmax=c.max())
+    ani_step_colours = cmap(c)
+    #cmap(colour_adjust)
+    #print("yo?")
+
+    for i, Data in enumerate(Data_list):
+        #print("YO", Data.history_total_carbon_emissions)
+        ax.plot(Data.history_time, Data.history_total_carbon_emissions, color = ani_step_colours[i])
+        ax.set_xlabel(r"Time")
+        ax.set_ylabel(r"%s" % y_title)
+
+    #print("excurese me")
+
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap), ax=ax
+    )
+    cbar.set_label(r"Ratio of preference to consumption")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/" + property + "_timeseries"
+    #fig.savefig(f+ ".png", dpi=dpi_save, format="png")
+
+def plot_end_points_emissions(
+    fileName: str, Data_list, dpi_save: int,latex_bool = False
+):
+    if latex_bool:
+        set_latex()
+    y_title = "Carbon Emissions"
+
+    c = np.asarray([i.ratio_preference_or_consumption for i in Data_list])
+    emissions_final = np.asarray([i.total_carbon_emissions for i in Data_list])
+    print(c,emissions_final)
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.plot(c, emissions_final)
+    ax.set_xlabel(r"Ratio of preferences to consumption")
+    ax.set_ylabel(r"%s" % y_title)
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/finalemission"
+    #fig.savefig(f+ ".png", dpi=dpi_save, format="png")     

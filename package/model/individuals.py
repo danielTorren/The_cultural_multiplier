@@ -39,8 +39,6 @@ class Individual:
 
         self.carbon_price = individual_params["carbon_price"]
 
-        
-
         self.M = individual_params["M"]
         self.t = individual_params["t"]
         self.save_timeseries_data = individual_params["save_timeseries_data"]
@@ -56,7 +54,7 @@ class Individual:
         self.id = id_n
 
         self.Omega_m = self.calc_omega()
-        self.chi_matrix = self.calc_chi_list()
+        self.chi_matrix = self.calc_chi_matrix()
         self.H_m, self.L_m = self.calc_consumption_quantities()
 
         self.identity = self.calc_identity()
@@ -68,7 +66,15 @@ class Individual:
             self.history_carbon_emissions = [self.total_carbon_emissions]
 
     def calc_omega(self):
-        return ((self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_matrix)
+        #print("PERSON AND TIMESTEP", self.id)
+        #print("self.low_carbon_preferences", self.low_carbon_preferences)
+        #print("inside", (self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))
+        #print("denomentator", (self.prices_low_carbon*(1- self.low_carbon_preferences )))
+        #print("power", self.low_carbon_substitutability_matrix)
+
+        omega_vector = ((self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_matrix)
+        #print("omega_vector nan", np.isnan(omega_vector), self.t)
+        return omega_vector
 
     #I would like to make theses three functions, where the last calls the second and the second calls the first faster:
     def calc_chi(self, a, P_L, A, omega, sigma, p, m):
@@ -85,18 +91,20 @@ class Individual:
         #print("chi", chi)
         return chi
 
-    def calc_chi_list(self):
+    def calc_chi_matrix(self):
         chi_matrix = []
         for i in range(self.M):
             chi_row = []
             for j in range(self.M):
-                chi_row.append(self.calc_chi(self.service_preferences, self.prices_low_carbon, self.low_carbon_preferences, self.Omega_m, self.low_carbon_substitutability_matrix, i, j))#goes p then m
+                value_chi = self.calc_chi(self.service_preferences, self.prices_low_carbon, self.low_carbon_preferences, self.Omega_m, self.low_carbon_substitutability_matrix, i, j)
+                chi_row.append(value_chi)#goes p then m
             chi_matrix.append(chi_row)
 
         return np.asarray(chi_matrix)
 
     def calc_H_m_denominator(self, m):
-        return sum([self.chi_matrix[i][m]*(self.Omega_m*self.prices_low_carbon + self.prices_high_carbon_instant) for i in range(self.M)])
+        return sum([self.chi_matrix[p][m]*(self.Omega_m[p]*self.prices_low_carbon[p] + self.prices_high_carbon_instant[p]) for p in range(self.M)])
+         
 
     def calc_consumption_quantities(self):
         H_m_denominators = np.asarray([self.calc_H_m_denominator(m) for m in range(self.M)])
@@ -112,7 +120,9 @@ class Individual:
         #print("HELLO",self.low_carbon_preferences )
         self.low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
 
-    def calc_total_emissions(self):        
+    def calc_total_emissions(self): 
+        #print("emissions", self.H_m, sum(self.H_m))
+        #quit()       
         return sum(self.H_m)
 
     def save_timeseries_data_individual(self):
@@ -147,7 +157,7 @@ class Individual:
 
         #calculate consumption
         self.Omega_m = self.calc_omega()
-        self.chi_matrix = self.calc_chi_list()
+        self.chi_matrix = self.calc_chi_matrix()
         self.H_m, self.L_m = self.calc_consumption_quantities()
 
         #calc_emissions
