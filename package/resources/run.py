@@ -109,10 +109,10 @@ def parallel_run_sa(
 
     #print("params_dict", params_dict)
     num_cores = multiprocessing.cpu_count()
-    res = [generate_sensitivity_output(i) for i in params_dict]
-    #res = Parallel(n_jobs=num_cores, verbose=10)(
-    #    delayed(generate_sensitivity_output)(i) for i in params_dict
-    #)
+    #res = [generate_sensitivity_output(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_sensitivity_output)(i) for i in params_dict
+    )
     results_emissions, results_mean, results_var, results_coefficient_variance, results_emissions_change = zip(
         *res
     )
