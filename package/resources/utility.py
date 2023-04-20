@@ -8,9 +8,7 @@ Created: 10/10/2022
 import pickle
 import os
 import numpy as np
-from scipy.signal import argrelextrema
 import datetime
-from sklearn.neighbors import KernelDensity
 
 # modules
 def produce_name_datetime(root):
@@ -97,34 +95,3 @@ def load_object(fileName, objectName) -> dict:
     with open(fileName + "/" + objectName + ".pkl", "rb") as f:
         data = pickle.load(f)
     return data
-
-def calc_pos_clusters_set_bandwidth(identity_data,s,bandwidth):
-    kde, e = calc_num_clusters_set_bandwidth(identity_data,s,bandwidth)
-    ma = argrelextrema(e, np.greater)[0]
-    list_identity_clusters = s[ma]
-    return list_identity_clusters
-
-def calc_num_clusters_set_bandwidth(identity_data,s,bandwidth):
-    X_reshape = identity_data.reshape(-1, 1)
-    kde = KernelDensity(kernel='gaussian', bandwidth=bandwidth).fit(X_reshape)
-    e = kde.score_samples(s.reshape(-1,1))
-    return kde, e
-    
-def get_cluster_list(identity_data,s, N, mi):
-
-    index_list = np.arange(N)
-
-    #left edge
-    left_mask = (identity_data < s[mi][0])
-    clusters_index_lists = [list(index_list[left_mask])]
-
-    #  all middle cluster
-    for i_cluster in range(len(mi)-1):
-        center_mask = ((identity_data >= s[mi][i_cluster])*(identity_data <= s[mi][i_cluster+1]))
-        clusters_index_lists.append(list(index_list[center_mask]))
-
-    # most right cluster
-    right_mask = (identity_data >= s[mi][-1])
-    clusters_index_lists.append(list(index_list[right_mask]))
-
-    return clusters_index_lists

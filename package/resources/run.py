@@ -48,23 +48,6 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
         )
     return social_network
 
-def generate_first_behaviour_lists_one_seed_output(params):
-    """For birfurcation just need attitude of first behaviour"""
-    data = generate_data(params)
-    return [x.attitudes[0] for x in data.agent_list]
-
-def generate_multi_output_individual_emissions_list(params):
-    """Individual specific emission and associated id to compare runs with and without behavioural interdependence"""
-
-    emissions_list = []
-    carbon_emissions_not_influencer = []
-    for v in params["seed_list"]:
-        params["set_seed"] = v
-        data = generate_data(params)
-        emissions_list.append(data.total_carbon_emissions)
-        carbon_emissions_not_influencer.append(sum(x.total_carbon_emissions for x in data.agent_list if not x.green_fountain_state))
-    return (emissions_list, carbon_emissions_not_influencer)
-
 def generate_sensitivity_output(params: dict):
     """
     Generate data from a set of parameter contained in a dictionary. Average results over multiple stochastic seeds contained in params["seed_list"]
@@ -115,34 +98,6 @@ def parallel_run(params_dict: dict[dict]) -> list[Network]:
     )
     return data_parallel
 
-def multi_stochstic_emissions_run_all_individual(
-        params_dict: list[dict]
-) -> npt.NDArray:
-    num_cores = multiprocessing.cpu_count()
-    #res = [generate_multi_output_individual_emissions_list(i) for i in params_dict]
-    res = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_multi_output_individual_emissions_list)(i) for i in params_dict
-    )
-    emissions_list, carbon_emissions_not_influencer = zip(
-        *res
-    )
-
-    return np.asarray(emissions_list),np.asarray(carbon_emissions_not_influencer)
-
-def one_seed_identity_data_run(
-        params_dict: list[dict]
-) -> npt.NDArray:
-
-    num_cores = multiprocessing.cpu_count()
-    #res = [generate_sensitivity_output(i) for i in params_dict]
-    results_identity_lists = Parallel(n_jobs=num_cores, verbose=10)(
-
-        delayed(generate_first_behaviour_lists_one_seed_output)(i) for i in params_dict
-    )
-
-    return np.asarray(results_identity_lists)#can't run with multiple different network sizes
-
-
 def parallel_run_sa(
     params_dict: dict[dict],
 ) -> tuple[npt.NDArray, npt.NDArray, npt.NDArray, npt.NDArray]:
@@ -154,10 +109,10 @@ def parallel_run_sa(
 
     #print("params_dict", params_dict)
     num_cores = multiprocessing.cpu_count()
-    #res = [generate_sensitivity_output(i) for i in params_dict]
-    res = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_sensitivity_output)(i) for i in params_dict
-    )
+    res = [generate_sensitivity_output(i) for i in params_dict]
+    #res = Parallel(n_jobs=num_cores, verbose=10)(
+    #    delayed(generate_sensitivity_output)(i) for i in params_dict
+    #)
     results_emissions, results_mean, results_var, results_coefficient_variance, results_emissions_change = zip(
         *res
     )

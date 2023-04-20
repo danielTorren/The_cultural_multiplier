@@ -45,7 +45,7 @@ class Network:
 
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
-        self.prices_high_carbon = self.prices_low_carbon*parameters["price_high_carbon_factor"]   #np.random.uniform(0.5,1,self.M)
+        #self.prices_high_carbon = self.prices_low_carbon*parameters["price_high_carbon_factor"]   #np.random.uniform(0.5,1,self.M)
 
         self.carbon_price = parameters["init_carbon_price"]
         self.rebate_progressiveness = parameters["rebate_progressiveness"]
@@ -81,19 +81,22 @@ class Network:
         
         self.a_low_carbon_preference = parameters["a_low_carbon_preference"]
         self.b_low_carbon_preference = parameters["b_low_carbon_preference"]
-        #self.a_service_preference = parameters["a_service_preference"]
-        #self.b_service_preference = parameters["b_service_preference"]
+        self.a_service_preference = parameters["a_service_preference"]
+        self.b_service_preference = parameters["b_service_preference"]
+        self.a_low_carbon_substitutability = parameters["a_low_carbon_substitutability"]
+        self.b_low_carbon_substitutability = parameters["b_low_carbon_substitutability"]
         self.a_individual_budget = parameters["a_individual_budget"]
         self.b_individual_budget = parameters["b_individual_budget"]
-        #self.a_low_carbon_substitutability = parameters["a_low_carbon_substitutability"]
-        #self.b_low_carbon_substitutability = parameters["b_low_carbon_substitutability"]
+        self.a_prices_high_carbon = parameters["a_prices_high_carbon"]
+        self.b_prices_high_carbon = parameters["b_prices_high_carbon"]
 
 
         (
             self.low_carbon_preference_matrix_init,
             self.service_preference_matrix_init,
-            self.individual_budget_matrix_init,
-            self.low_carbon_substitutability_matrix
+            self.individual_budget_array,
+            self.low_carbon_substitutability_array,
+            self.prices_high_carbon_array
         ) = self.generate_init_data_preferences()
         
 
@@ -226,44 +229,27 @@ class Network:
             NxM array of behavioural thresholds, represents the barriers to entry to performing a behaviour e.g the distance of a
             commute or disposable income of an individual
         """
-        
-        low_carbon_preference_list = [
-            np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M)
-            for n in range(self.N)
-        ]
-        #print("inital preferences", low_carbon_preference_list)
-        #quit()
-
-        service_preference_list = [1/self.M]*self.M#[
-        #    np.random.beta(self.a_service_preference, self.b_service_preference, size=self.M)
-        #    for n in range(self.N)
-        #]
-
-        individual_budget_array = np.random.beta(self.a_individual_budget, self.b_individual_budget, size=self.N)
-        norm_individual_budget_array = self.normlize_matrix(
-            individual_budget_array
-        )
-
-        low_carbon_substitutability_list = [1/self.M]*self.M #np.random.beta(self.a_low_carbon_substitutability, self.b_low_carbon_substitutability, size=self.M)#this is a single list that is used by all individuals
-
-        low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)#NEEDS TO ADD UP TO ONE SO NORMALIZE EACH ROW
+        #A_m 
+        low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M)for n in range(self.N)]
+        low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)
+        #a_m - normalized
+        service_preference_list = [np.random.beta(self.a_service_preference, self.b_service_preference, size=self.M) for n in range(self.N)]
         service_preference_matrix = np.asarray(service_preference_list)#NEEDS TO ADD UP TO ONE SO NORMALIZE EACH ROW
-
-        #print("BEFORE",low_carbon_preference_matrix, service_preference_matrix )
-        #print("norm_low_carbon_preference_matrix ",norm_low_carbon_preference_matrix )
         norm_service_preference_matrix = self.normlize_matrix(
             service_preference_matrix
-        )  # normalize the matrix row wise
-        #print("norm_low_carbon_preference_matrix", norm_low_carbon_preference_matrix)
-        #print("norm_service_preference_matrix", norm_service_preference_matrix)
-        #quit()
-
-        individual_budget_matrix = np.asarray(norm_individual_budget_array)*self.budget_multiplier
+        )
+        #sigma_m - 1 dimentional
+        low_carbon_substitutability_list = np.random.beta(self.a_low_carbon_substitutability, self.b_low_carbon_substitutability, size=self.M)#this is a single list that is used by all individuals
         low_carbon_substitutability_matrix = np.asarray(low_carbon_substitutability_list)
+        #B_i - normalized, 1 dimentional
+        individual_budget_array = np.random.beta(self.a_individual_budget, self.b_individual_budget, size=self.N)
+        norm_individual_budget_array = individual_budget_array/ np.linalg.norm(individual_budget_array)
+        individual_budget_matrix = np.asarray(norm_individual_budget_array)*self.budget_multiplier
+        #P_H
+        prices_high_carbon_list = np.random.beta(self.a_prices_high_carbon, self.b_prices_high_carbon, size=self.M)#this is a single list that is used by all individuals
+        prices_high_carbon_matrix = np.asarray(prices_high_carbon_list)
 
-        print("YOOO",low_carbon_preference_matrix, norm_service_preference_matrix, individual_budget_matrix, low_carbon_substitutability_matrix)
-        quit()
-        return low_carbon_preference_matrix, norm_service_preference_matrix, individual_budget_matrix, low_carbon_substitutability_matrix
+        return low_carbon_preference_matrix, norm_service_preference_matrix, individual_budget_matrix, low_carbon_substitutability_matrix ,prices_high_carbon_matrix
 
     def create_agent_list(self) -> list[Individual]:
         """
@@ -287,6 +273,9 @@ class Network:
             "compression_factor": self.compression_factor,
             "service_substitutability": self.service_substitutability,
             "carbon_price": self.carbon_price,
+            "low_carbon_substitutability": self.low_carbon_substitutability_array,
+            "prices_low_carbon": self.prices_low_carbon,
+            "prices_high_carbon":self.prices_high_carbon_array
         }
 
         agent_list = [
@@ -294,10 +283,7 @@ class Network:
                 individual_params,
                 self.low_carbon_preference_matrix_init[n],
                 self.service_preference_matrix_init[n],
-                self.individual_budget_matrix_init[n],
-                self.low_carbon_substitutability_matrix,
-                self.prices_low_carbon,
-                self.prices_high_carbon,
+                self.individual_budget_array[n],
                 n
             )
             for n in range(self.N)

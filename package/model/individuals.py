@@ -25,9 +25,6 @@ class Individual:
         low_carbon_preferences,
         service_preferences,
         budget,
-        low_carbon_substitutability_matrix,
-        prices_low_carbon,
-        prices_high_carbon,
         id_n,
     ):
 
@@ -35,15 +32,14 @@ class Individual:
 
         #print("low carb preferece", low_carbon_preferences, np.mean(low_carbon_preferences))
         self.service_preferences = service_preferences
-        self.low_carbon_substitutability_matrix = low_carbon_substitutability_matrix
+        
         self.init_budget = budget
         self.instant_budget = self.init_budget
-        self.prices_low_carbon = prices_low_carbon
-        self.prices_high_carbon = prices_high_carbon
+
 
         self.carbon_price = individual_params["carbon_price"]
 
-        self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
+        
 
         self.M = individual_params["M"]
         self.t = individual_params["t"]
@@ -51,6 +47,11 @@ class Individual:
         self.compression_factor = individual_params["compression_factor"]
         self.phi_array = individual_params["phi_array"]
         self.service_substitutability = individual_params["service_substitutability"]
+        self.low_carbon_substitutability_matrix = individual_params["low_carbon_substitutability"]
+        self.prices_low_carbon = individual_params["prices_low_carbon"]
+        self.prices_high_carbon = individual_params["prices_high_carbon"]
+
+        self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
 
         self.id = id_n
 
