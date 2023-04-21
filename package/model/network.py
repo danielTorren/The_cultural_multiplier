@@ -320,16 +320,7 @@ class Network:
         """
 
         if self.ratio_preference_or_consumption < 1:
-            low_carbon_preferences_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
-            #print("low_carbon_preferences_matrix", low_carbon_preferences_matrix)
-            low_high_consumption_ratio_matrix = np.asarray([(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
-            #print("low_high_consumption_ratio_matrix", low_high_consumption_ratio_matrix)
-            #print("self.ratio_preference_or_consumption",self.ratio_preference_or_consumption)
-            #print("self.ratio_preference_or_consumption*low_carbon_preferences_matrix",self.ratio_preference_or_consumption*low_carbon_preferences_matrix)
-            #print("(1 - self.ratio_preference_or_consumption)*low_high_consumption_ratio_matrix", (1 - self.ratio_preference_or_consumption)*low_high_consumption_ratio_matrix)
-            #quit()
-            attribute_matrix = self.ratio_preference_or_consumption*low_carbon_preferences_matrix + (1 - self.ratio_preference_or_consumption)*low_high_consumption_ratio_matrix
-            #print("attribute_matrix", attribute_matrix, np.isnan(attribute_matrix))
+            attribute_matrix = np.asarray([self.ratio_preference_or_consumption*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
         else:
             attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
 

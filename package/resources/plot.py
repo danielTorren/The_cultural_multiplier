@@ -871,14 +871,14 @@ def plot_emissions_flat_versus_linear(fileName, data_flat,data_linear, carbon_pr
 
 
     mu_emissions_flat =  data_flat.mean(axis=1)
-    print("    mu_emissions_flat",     mu_emissions_flat)
+    #print("    mu_emissions_flat",     mu_emissions_flat)
     min_emissions_flat =  data_flat.min(axis=1)
     max_emissions_flat=  data_flat.max(axis=1)
 
     mu_emissions_linear =  data_linear.mean(axis=1)
-    print("    mu_emissions_linear",     mu_emissions_linear)
-    print("difference",mu_emissions_flat -  mu_emissions_linear)
-    quit()
+    #print("    mu_emissions_linear",     mu_emissions_linear)
+    #print("difference",mu_emissions_flat -  mu_emissions_linear)
+    #quit()
     min_emissions_linear =  data_linear.min(axis=1)
     max_emissions_linear=  data_linear.max(axis=1)
         
