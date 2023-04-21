@@ -159,7 +159,10 @@ def main(
 
     problem, fileName, param_values = generate_problem(
         variable_parameters_dict, N_samples, AV_reps, calc_second_order
-    )
+    )   
+
+    print("YO", param_values, len(param_values))
+    quit()
 
     params_list_sa = produce_param_list_SA(
         param_values, base_params, variable_parameters_dict

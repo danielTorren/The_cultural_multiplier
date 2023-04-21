@@ -43,6 +43,6 @@ def main(
     plt.show()
 if __name__ == '__main__':
     plots = main(
-        fileName="results/one_param_sweep_single_16_27_28__20_04_2023"
+        fileName="results/one_param_sweep_single_16_33_00__20_04_2023"
     )
 

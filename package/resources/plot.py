@@ -185,6 +185,9 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
 
     for i, ax in enumerate(axes.flat):
         if order == "First":
+            print("heyyyyyyyy")
+            print("data", data_dict[dict_list[i]]["data"]["S1"].tolist())
+            print("errr",data_dict[dict_list[i]]["yerr"]["S1"].tolist())
             ax.errorbar(
                 data_dict[dict_list[i]]["data"]["S1"].tolist(),
                 names,
@@ -224,8 +227,8 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
         + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot.png"
         % (len(names), N_samples, order)
     )
-    fig.savefig(f, dpi=dpi_save, format="eps")
-    fig.savefig(f_png, dpi=dpi_save, format="png")
+    #fig.savefig(f, dpi=dpi_save, format="eps")
+    #fig.savefig(f_png, dpi=dpi_save, format="png")
 
 def live_print_identity_timeseries_with_weighting(
     fileName, Data_list, property_varied, title_list, dpi_save, cmap,latex_bool = False
@@ -836,8 +839,8 @@ def plot_total_carbon_emissions_timeseries_sweep(
 
     #print("what worong")
     plotName = fileName + "/Plots"
-    f = plotName + "/" + property + "_timeseries"
-    #fig.savefig(f+ ".png", dpi=dpi_save, format="png")
+    f = plotName + "/emissions_timeseries"
+    fig.savefig(f+ ".png", dpi=dpi_save, format="png")
 
 def plot_end_points_emissions(
     fileName: str, Data_list, dpi_save: int,latex_bool = False
@@ -848,7 +851,7 @@ def plot_end_points_emissions(
 
     c = np.asarray([i.ratio_preference_or_consumption for i in Data_list])
     emissions_final = np.asarray([i.total_carbon_emissions for i in Data_list])
-    print(c,emissions_final)
+    #print(c,emissions_final)
     fig, ax = plt.subplots(figsize=(10,6))
     ax.plot(c, emissions_final)
     ax.set_xlabel(r"Ratio of preferences to consumption")
@@ -857,4 +860,4 @@ def plot_end_points_emissions(
     #print("what worong")
     plotName = fileName + "/Plots"
     f = plotName + "/finalemission"
-    #fig.savefig(f+ ".png", dpi=dpi_save, format="png")     
+    fig.savefig(f+ ".png", dpi=dpi_save, format="png")     

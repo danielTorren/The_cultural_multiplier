@@ -256,7 +256,10 @@ def main(
 
 
     problem = load_object(fileName + "/Data", "problem")
+    print(problem)
     Y_emissions = load_object(fileName + "/Data", "Y_emissions")
+    print(Y_emissions)
+    quit()
     Y_mu = load_object(fileName + "/Data", "Y_mu")
     Y_var = load_object(fileName + "/Data", "Y_var")
     Y_coefficient_of_variance = load_object(fileName + "/Data", "Y_coefficient_of_variance")
@@ -274,4 +277,9 @@ def main(
     multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first,plot_outputs, titles, dpi_save, N_samples, "First", latex_bool = latex_bool)
 
     plt.show()
+if __name__ == '__main__':
+    plots = main(
+        fileName="results/sensitivity_analysis_16_38_19__20_04_2023"
+    )
+
 
