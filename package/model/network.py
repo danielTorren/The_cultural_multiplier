@@ -53,6 +53,11 @@ class Network:
         self.carbon_price_increased = parameters["carbon_price_increased"]
         self.budget_multiplier = parameters["budget_multiplier"]
 
+        self.carbon_tax_implementation = parameters["carbon_tax_implementation"]
+        if  self.carbon_tax_implementation == "linear":
+            self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_time)
+            #print("carbon_price_gradient", self.carbon_price_gradient)
+
         self.service_substitutability = parameters["service_substitutability"]
 
         # social learning and bias
@@ -455,6 +460,17 @@ class Network:
         mean_wealth = np.mean(wealth_list)
         carbon_rebate_list = [self.rebate_progressiveness*(wealth_list[i] - mean_wealth) + tax_income/self.N for i in range(self.N)]
         return np.asarray(carbon_rebate_list)
+    
+    def calc_carbon_price(self):
+        if self.carbon_tax_implementation == "flat":
+            carbon_price = self.carbon_price_increased
+        elif self.carbon_tax_implementation == "linear":
+            carbon_price = self.carbon_price + self.carbon_price_gradient
+        else:
+            raise("INVALID CARBON TAX IMPLEMENTATION")
+
+        return carbon_price
+
 
     def update_individuals(self):
         """
@@ -535,4 +551,4 @@ class Network:
             self.save_timeseries_data_network()
 
         if self.t > self.carbon_price_time:
-            self.carbon_price = self.carbon_price_increased
+            self.carbon_price = self.calc_carbon_price()

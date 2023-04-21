@@ -45,7 +45,7 @@ class Individual:
         self.compression_factor = individual_params["compression_factor"]
         self.phi_array = individual_params["phi_array"]
         self.service_substitutability = individual_params["service_substitutability"]
-        self.low_carbon_substitutability_matrix = individual_params["low_carbon_substitutability"]
+        self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
         self.prices_low_carbon = individual_params["prices_low_carbon"]
         self.prices_high_carbon = individual_params["prices_high_carbon"]
 
@@ -70,10 +70,11 @@ class Individual:
         #print("self.low_carbon_preferences", self.low_carbon_preferences)
         #print("inside", (self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))
         #print("denomentator", (self.prices_low_carbon*(1- self.low_carbon_preferences )))
-        #print("power", self.low_carbon_substitutability_matrix)
-
-        omega_vector = ((self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_matrix)
-        #print("omega_vector nan", np.isnan(omega_vector), self.t)
+        #print("power", self.low_carbon_substitutability_array)
+        try:
+            omega_vector = ((self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
+        except:
+            print("omega_vector nan", self.low_carbon_preferences,self.low_carbon_substitutability_array)
         return omega_vector
 
     #I would like to make theses three functions, where the last calls the second and the second calls the first faster:
@@ -96,7 +97,7 @@ class Individual:
         for i in range(self.M):
             chi_row = []
             for j in range(self.M):
-                value_chi = self.calc_chi(self.service_preferences, self.prices_low_carbon, self.low_carbon_preferences, self.Omega_m, self.low_carbon_substitutability_matrix, i, j)
+                value_chi = self.calc_chi(self.service_preferences, self.prices_low_carbon, self.low_carbon_preferences, self.Omega_m, self.low_carbon_substitutability_array, i, j)
                 chi_row.append(value_chi)#goes p then m
             chi_matrix.append(chi_row)
 

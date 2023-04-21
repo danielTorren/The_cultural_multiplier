@@ -864,3 +864,31 @@ def plot_end_points_emissions(
     plotName = fileName + "/Plots"
     f = plotName + "/finalemission"
     fig.savefig(f+ ".png", dpi=600, format="png")     
+
+def plot_emissions_flat_versus_linear(fileName, data_flat,data_linear, carbon_prices):
+
+    fig, ax = plt.subplots(figsize=(10,6))
+
+
+    mu_emissions_flat =  data_flat.mean(axis=1)
+    min_emissions_flat =  data_flat.min(axis=1)
+    max_emissions_flat=  data_flat.max(axis=1)
+
+    mu_emissions_linear =  data_linear.mean(axis=1)
+    min_emissions_linear =  data_linear.min(axis=1)
+    max_emissions_linear=  data_linear.max(axis=1)
+        
+
+    ax.plot(carbon_prices, mu_emissions_flat, c= "red", label = "flat")
+    ax.fill_between(carbon_prices, min_emissions_flat, max_emissions_flat, facecolor='red', alpha=0.5)
+    ax.plot(carbon_prices,mu_emissions_linear, c="blue",label = "linear")
+    ax.fill_between(carbon_prices, min_emissions_linear, max_emissions_linear, facecolor='blue', alpha=0.5)
+
+    ax.set_xlabel(r"Final carbon price")
+    ax.set_ylabel(r"Total carbon Emissions")
+    ax.legend()
+    ax.grid()
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/flat_versus_linear_carbon_tax"
+    fig.savefig(f+ ".png", dpi=600, format="png")  

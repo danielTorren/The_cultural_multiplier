@@ -124,3 +124,22 @@ def parallel_run_sa(
         np.asarray(results_coefficient_variance),
         np.asarray(results_emissions_change)
     )
+
+def generate_multi_output_individual_emissions_list(params):
+
+    emissions_list = []
+    for v in params["seed_list"]:
+        params["set_seed"] = v
+        data = generate_data(params)
+        emissions_list.append(data.total_carbon_emissions)
+    return (emissions_list)
+
+def multi_stochstic_emissions_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_multi_output_individual_emissions_list(i) for i in params_dict]
+    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_multi_output_individual_emissions_list)(i) for i in params_dict
+    )
+    return np.asarray(emissions_list)
