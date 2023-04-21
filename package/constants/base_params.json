@@ -30,6 +30,6 @@
     "carbon_price_increased" : 0.5,
     "budget_multiplier": 1,
     "price_high_carbon_factor": 1.0,
-    "ratio_preference_or_consumption": 1.0,
+    "ratio_preference_or_consumption": 0.95,
     "carbon_tax_implementation": "flat"
 }

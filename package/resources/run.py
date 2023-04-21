@@ -131,7 +131,7 @@ def generate_multi_output_individual_emissions_list(params):
     for v in params["seed_list"]:
         params["set_seed"] = v
         data = generate_data(params)
-        emissions_list.append(data.total_carbon_emissions)
+        emissions_list.append(data.total_carbon_emissions_stock)#LOOK AT STOCK
     return (emissions_list)
 
 def multi_stochstic_emissions_run(

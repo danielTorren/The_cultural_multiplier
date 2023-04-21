@@ -114,6 +114,7 @@ class Network:
 
         self.init_total_carbon_emissions  = self.calc_total_emissions()
         self.total_carbon_emissions = self.init_total_carbon_emissions
+        self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
         self.carbon_rebate_list = self.calc_carbon_rebate_list()
 
@@ -529,6 +530,7 @@ class Network:
 
         self.social_component_matrix = self.calc_social_component_matrix()
         self.total_carbon_emissions = self.calc_total_emissions()
+        self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions
         (
                 self.identity_list,
                 self.average_identity,

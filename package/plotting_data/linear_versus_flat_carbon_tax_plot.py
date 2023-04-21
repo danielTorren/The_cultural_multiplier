@@ -25,5 +25,5 @@ def main(
     plt.show()
 if __name__ == '__main__':
     plots = main(
-        fileName="results/linear_versus_flat_carbon_tax_14_47_05__21_04_2023"
+        fileName="results/linear_versus_flat_carbon_tax_14_59_42__21_04_2023"
     )
