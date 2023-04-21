@@ -227,7 +227,6 @@ def analyze_results(
 def main(
     fileName = "results\SA_AV_reps_5_samples_15360_D_vars_13_N_samples_1024",
     plot_outputs = ['emissions','var',"emissions_change"],
-    dpi_save = 1200,
     latex_bool = 0
     ) -> None: 
     
@@ -240,26 +239,20 @@ def main(
     }
 
     titles = [
-        r"Number of individuals, $N$", 
-        r"Number of behaviours, $M$", 
-        r"Mean neighbours, $K$",
-        r"Cultural inertia, $\rho$",
-        r"Social learning error, $ \sigma_{ \varepsilon}$ ",
-        r"Initial attitude Beta, $a_A$",
-        r"Initial attitude Beta, $b_A$",
-        r"Initial threshold Beta, $a_T$",
-        r"Initial threshold Beta, $b_T$",
-        r"Discount factor, $\delta$",
-        r"Attribute homophily, $h$",
-        r"Confirmation bias, $\theta$"
+    r"$\nu$",
+    r"Initial low carbon preference Beta $a_A$",
+    r"Service preference Beta $a_A$",
+    r"Low carbon substitutability Beta $a_A$",
+    r"Individuals' budget Beta $a_A$",
+    r"High carbon goods prices' Beta $a_A$"
     ]
 
 
     problem = load_object(fileName + "/Data", "problem")
-    print(problem)
+    #print(problem)
     Y_emissions = load_object(fileName + "/Data", "Y_emissions")
-    print(Y_emissions)
-    quit()
+    #print(Y_emissions)
+    #quit()
     Y_mu = load_object(fileName + "/Data", "Y_mu")
     Y_var = load_object(fileName + "/Data", "Y_var")
     Y_coefficient_of_variance = load_object(fileName + "/Data", "Y_coefficient_of_variance")
@@ -274,12 +267,12 @@ def main(
     
     ###############################
 
-    multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first,plot_outputs, titles, dpi_save, N_samples, "First", latex_bool = latex_bool)
+    multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first,plot_outputs, titles, N_samples, "First", latex_bool = latex_bool)
 
     plt.show()
 if __name__ == '__main__':
     plots = main(
-        fileName="results/sensitivity_analysis_16_38_19__20_04_2023"
+        fileName="results/sensitivity_analysis_12_07_30__21_04_2023"
     )
 
 

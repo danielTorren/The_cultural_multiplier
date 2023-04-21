@@ -1,6 +1,6 @@
 {
     "save_timeseries_data": 0, 
-    "time_steps_max": 2000,
+    "time_steps_max": 1000,
     "phi_lower": 0.01,
     "phi_upper": 0.05,
     "compression_factor": 10,
@@ -26,7 +26,7 @@
     "service_substitutability": 10,
     "init_carbon_price": 0,
     "rebate_progressiveness": 0,
-    "carbon_price_time": 1000,
+    "carbon_price_time": 500,
     "carbon_price_increased" : 0.5,
     "budget_multiplier": 1,
     "price_high_carbon_factor": 1.0,

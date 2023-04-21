@@ -108,7 +108,7 @@ def plot_discount_factors_delta(
     ax.set_xticks(np.arange(0, -cultural_inertia, step=-20))
     ax.legend()
 
-    fig.savefig(f, dpi=dpi_save, format="eps")
+    fig.savefig(f, dpi=600, format="eps")
 
 def live_print_identity_timeseries(
     fileName, Data_list, property_varied, dpi_save,latex_bool = False
@@ -137,7 +137,7 @@ def live_print_identity_timeseries(
 
     plotName = fileName + "/Prints"
     f = plotName + "/live_plot_identity_timeseries_%s.eps" % property_varied
-    fig.savefig(f, dpi=dpi_save, format="eps")
+    fig.savefig(f, dpi=600, format="eps")
 
 def bifurcation_plot_identity_or_not(fileName,cluster_pos_matrix_identity,cluster_pos_matrix_no_identity,vals_list, dpi_save,latex_bool = False):
     if latex_bool:
@@ -166,11 +166,11 @@ def bifurcation_plot_identity_or_not(fileName,cluster_pos_matrix_identity,cluste
     
     plotName = fileName + "/Plots"
     f = plotName + "/bifurcation_plot_%s" % (len(vals_list))
-    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
 
 def multi_scatter_seperate_total_sensitivity_analysis_plot(
-    fileName, data_dict, dict_list, names, dpi_save, N_samples, order,latex_bool = False
+    fileName, data_dict, dict_list, names, N_samples, order,latex_bool = False
 ):
     """
     Create scatter chart of results.
@@ -186,8 +186,11 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
     for i, ax in enumerate(axes.flat):
         if order == "First":
             print("heyyyyyyyy")
-            print("data", data_dict[dict_list[i]]["data"]["S1"].tolist())
-            print("errr",data_dict[dict_list[i]]["yerr"]["S1"].tolist())
+            print("data", data_dict[dict_list[i]]["data"]["S1"].tolist() ,len(data_dict[dict_list[i]]["data"]["S1"].tolist()))
+            print("errr",data_dict[dict_list[i]]["yerr"]["S1"].tolist(), len(data_dict[dict_list[i]]["yerr"]["S1"].tolist()))
+            print(data_dict[dict_list[i]]["colour"], len(data_dict[dict_list[i]]["colour"]))
+            print(data_dict[dict_list[i]]["title"], len(data_dict[dict_list[i]]["title"]))
+            print("names", names)
             ax.errorbar(
                 data_dict[dict_list[i]]["data"]["S1"].tolist(),
                 names,
@@ -209,7 +212,7 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
             )
         ax.legend()
         ax.set_xlim(left=0)
-
+    print("out?")
     fig.supxlabel(r"%s order Sobol index" % (order))
 
     plt.tight_layout()
@@ -227,8 +230,8 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
         + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot.png"
         % (len(names), N_samples, order)
     )
-    #fig.savefig(f, dpi=dpi_save, format="eps")
-    #fig.savefig(f_png, dpi=dpi_save, format="png")
+    fig.savefig(f, dpi=600, format="eps")
+    fig.savefig(f_png, dpi=600, format="png")
 
 def live_print_identity_timeseries_with_weighting(
     fileName, Data_list, property_varied, title_list, dpi_save, cmap,latex_bool = False
@@ -274,7 +277,7 @@ def live_print_identity_timeseries_with_weighting(
         + "/lowres_live_print_identity_timeseries_with_weighting_%s.png"
         % property_varied
     )
-    fig.savefig(f, dpi=dpi_save, format="png")
+    fig.savefig(f, dpi=600, format="png")
 
 def print_live_initial_identity_networks_and_identity_timeseries(
     fileName: str,
@@ -341,14 +344,14 @@ def print_live_initial_identity_networks_and_identity_timeseries(
         + "/%s_print_live_initial_identity_networks_and_identity_timeseries.png"
         % (property)
     )
-    fig.savefig(f, dpi=dpi_save)
+    fig.savefig(f, dpi=600)
 
     f_eps = (
         plotName
         + "/%s_print_live_initial_identity_networks_and_identity_timeseries.eps"
         % (property)
     )
-    fig.savefig(f_eps, dpi=dpi_save, format="eps")
+    fig.savefig(f_eps, dpi=600, format="eps")
 
 def plot_single(data_dict_list,fileName_list, dpi_save, latex_bool = 1):
     if latex_bool:
@@ -375,8 +378,8 @@ def plot_single(data_dict_list,fileName_list, dpi_save, latex_bool = 1):
     for fileName in fileName_list:
         plotName = fileName + "/Plots"
         f = plotName + "/plot_single_%s" % (len(mean_list))
-        fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-        fig.savefig(f + ".png", dpi=dpi_save, format="png")
+        fig.savefig(f + ".eps", dpi=600, format="eps")
+        fig.savefig(f + ".png", dpi=600, format="png")
 
 def plot_diff_emissions_comparison(data_dict_list,fileName_list, dpi_save, latex_bool = 0):
     if latex_bool:
@@ -446,8 +449,8 @@ def plot_diff_emissions_comparison(data_dict_list,fileName_list, dpi_save, latex
     for fileName in fileName_list:
         plotName = fileName + "/Plots"
         f = plotName + "/plot_diff_emissions_comparison_%s" % (len(mean_list))
-        fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-        fig.savefig(f + ".png", dpi=dpi_save, format="png")
+        fig.savefig(f + ".eps", dpi=600, format="eps")
+        fig.savefig(f + ".png", dpi=600, format="png")
 
 
 def plot_beta_alt(f:str, a_b_combo_list: list,latex_bool = False ):
@@ -477,8 +480,8 @@ def double_phase_diagram(
     col_dict = variable_parameters_dict["col"]
     row_dict = variable_parameters_dict["row"]
 
-    ax.set_xlabel(r"Initial attitude Beta, $b_A$")
-    ax.set_ylabel(r"Initial attitude Beta, $a_A$")
+    ax.set_xlabel(col_dict["title"])
+    ax.set_ylabel(row_dict["title"])
 
     X, Y = np.meshgrid(col_dict["vals"], row_dict["vals"])
 
@@ -491,8 +494,8 @@ def double_phase_diagram(
 
     plotName = fileName + "/Plots"
     f = plotName + "/live_average_multirun_double_phase_diagram_%s" % (Y_param)
-    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+    #fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
     
 def plot_joint_cluster_micro(fileName, Data, clusters_index_lists,cluster_example_identity_list, vals_time_data, dpi_save, auto_bandwidth, bandwidth,cmap_multi, norm_zero_one,shuffle_colours,latex_bool = False) -> None:
     if latex_bool:
@@ -544,8 +547,8 @@ def plot_joint_cluster_micro(fileName, Data, clusters_index_lists,cluster_exampl
 
     plotName = fileName + "/Prints"
     f = plotName + "/plot_joint_cluster_micro_%s_%s" % (auto_bandwidth, bandwidth)
-    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
 
 
 ##############################################################
@@ -566,8 +569,8 @@ def plot_identity_timeseries(fileName, Data, dpi_save,latex_bool = False):
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_identity_timeseries"
-    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
 
 def plot_individual_timeseries(
     fileName: str,
@@ -597,7 +600,7 @@ def plot_individual_timeseries(
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_%s_timeseries.eps" % property
-    fig.savefig(f, dpi=dpi_save, format="eps")
+    fig.savefig(f, dpi=600, format="eps")
 
 def plot_value_timeseries(fileName: str, Data , dpi_save: int,latex_bool = False):
     if latex_bool:
@@ -657,8 +660,8 @@ def print_live_initial_identity_network(
 
     plotName = fileName + "/Prints"
     f = plotName + "/print_live_initial_identity_network"
-    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
 
 def plot_network_timeseries(
     fileName: str, Data: Network, y_title: str, property: str, dpi_save: int,latex_bool = False
@@ -675,7 +678,7 @@ def plot_network_timeseries(
 
     plotName = fileName + "/Plots"
     f = plotName + "/" + property + "_timeseries.eps"
-    fig.savefig(f, dpi=dpi_save, format="eps")
+    fig.savefig(f, dpi=600, format="eps")
 
 def plot_cultural_range_timeseries(fileName: str, Data, dpi_save: int,latex_bool = False):
     if latex_bool:
@@ -840,7 +843,7 @@ def plot_total_carbon_emissions_timeseries_sweep(
     #print("what worong")
     plotName = fileName + "/Plots"
     f = plotName + "/emissions_timeseries"
-    fig.savefig(f+ ".png", dpi=dpi_save, format="png")
+    fig.savefig(f+ ".png", dpi=600, format="png")
 
 def plot_end_points_emissions(
     fileName: str, Data_list, dpi_save: int,latex_bool = False
@@ -860,4 +863,4 @@ def plot_end_points_emissions(
     #print("what worong")
     plotName = fileName + "/Plots"
     f = plotName + "/finalemission"
-    fig.savefig(f+ ".png", dpi=dpi_save, format="png")     
+    fig.savefig(f+ ".png", dpi=600, format="png")     
