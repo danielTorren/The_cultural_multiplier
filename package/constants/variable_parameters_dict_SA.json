@@ -1,8 +1,7 @@
 {
-    "service_substitutability":{"property":"service_substitutability","min":0,"max": 50, "title": "$\nu$", "round":0},
-    "a_low_carbon_preference":{"property":"a_low_carbon_preference","min":0.05, "max": 8, "title": "Initial low carbon preference Beta $a_A$", "round":0},
-    "a_service_preference":{"property":"a_service_preference","min":0.05, "max": 8, "title": "Service preference Beta $a_A$", "round":0},
-    "a_low_carbon_substitutability":{"property":"a_low_carbon_substitutability","min":0.05, "max": 8, "title": "Low carbon substitutability Beta $a_A$", "round":0},
-    "a_individual_budgete":{"property":"a_individual_budget","min":0.05, "max": 8, "title": "Individuals' budget Beta $a_A$", "round":0},
-    "a_prices_high_carbon":{"property":"a_prices_high_carbon","min":0.05, "max": 8, "title": "High carbon goods prices' Beta $a_A$", "round":0}
+    "service_substitutability":{"property":"service_substitutability","min":0,"max": 50, "round":0},
+    "b_low_carbon_preference":{"property":"b_low_carbon_preference","min":0.05, "max": 8, "round":0},
+    "b_service_preference":{"property":"b_service_preference","min":0.05, "max": 8, "round":0},
+    "b_low_carbon_substitutability":{"property":"b_low_carbon_substitutability","min":0.05, "max": 8, "round":0},
+    "b_prices_high_carbon":{"property":"b_prices_high_carbon","min":0.05, "max": 8, "round":0}
 }

@@ -53,8 +53,10 @@ def generate_sensitivity_output(params: dict):
     Generate data from a set of parameter contained in a dictionary. Average results over multiple stochastic seeds contained in params["seed_list"]
 
     """
+    #print("params", params)
 
-    emissions_list = []
+    emissions_stock_list = []
+    emissions_flow_list = []
     mean_list = []
     var_list = []
     coefficient_variance_list = []
@@ -65,20 +67,31 @@ def generate_sensitivity_output(params: dict):
         data = generate_data(params)
         norm_factor = data.N * data.M
         # Insert more measures below that want to be used for evaluating the
-        emissions_list.append(data.total_carbon_emissions / norm_factor)
+        emissions_stock_list.append(data.total_carbon_emissions_stock/norm_factor)
+        emissions_flow_list.append(data.total_carbon_emissions_flow)
         mean_list.append(data.average_identity)
         var_list.append(data.var_identity)
         coefficient_variance_list.append(data.std_identity / (data.average_identity))
-        emissions_change_list.append(np.abs(data.total_carbon_emissions - data.init_total_carbon_emissions)/norm_factor)
+        emissions_change_list.append(np.abs(data.total_carbon_emissions_stock - data.init_total_carbon_emissions)/norm_factor)
 
-    stochastic_norm_emissions = np.mean(emissions_list)
+    stochastic_norm_emissions_stock = np.mean(emissions_stock_list)
+    stochastic_norm_emissions_flow = np.mean(emissions_flow_list)
     stochastic_norm_mean = np.mean(mean_list)
     stochastic_norm_var = np.mean(var_list)
     stochastic_norm_coefficient_variance = np.mean(coefficient_variance_list)
     stochastic_norm_emissions_change = np.mean(emissions_change_list)
 
+    #print("outputs",         stochastic_norm_emissions_stock,
+    #    stochastic_norm_emissions_flow,
+    #    stochastic_norm_mean,
+    #    stochastic_norm_var,
+    #    stochastic_norm_coefficient_variance,
+    #    stochastic_norm_emissions_change
+    #    )
+
     return (
-        stochastic_norm_emissions,
+        stochastic_norm_emissions_stock,
+        stochastic_norm_emissions_flow,
         stochastic_norm_mean,
         stochastic_norm_var,
         stochastic_norm_coefficient_variance,
@@ -113,12 +126,13 @@ def parallel_run_sa(
     res = Parallel(n_jobs=num_cores, verbose=10)(
         delayed(generate_sensitivity_output)(i) for i in params_dict
     )
-    results_emissions, results_mean, results_var, results_coefficient_variance, results_emissions_change = zip(
+    results_emissions_stock, results_emissions_flow, results_mean, results_var, results_coefficient_variance, results_emissions_change = zip(
         *res
     )
 
     return (
-        np.asarray(results_emissions),
+        np.asarray(results_emissions_stock),
+        np.asarray(results_emissions_flow),
         np.asarray(results_mean),
         np.asarray(results_var),
         np.asarray(results_coefficient_variance),

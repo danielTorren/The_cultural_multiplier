@@ -1,0 +1,4 @@
+{
+    "row":{"property":"a_individual_budget","min":0.1, "max": 10, "title": "Individual budget Beta $a_B$","divisions": "linear", "reps": 32}, 
+    "col":{"property":"b_individual_budget","min":0.1, "max": 10, "title": "Individual budget Beta $b_B$","divisions": "linear", "reps": 32} 
+}

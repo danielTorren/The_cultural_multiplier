@@ -190,7 +190,7 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
             print("errr",data_dict[dict_list[i]]["yerr"]["S1"].tolist(), len(data_dict[dict_list[i]]["yerr"]["S1"].tolist()))
             print(data_dict[dict_list[i]]["colour"], len(data_dict[dict_list[i]]["colour"]))
             print(data_dict[dict_list[i]]["title"], len(data_dict[dict_list[i]]["title"]))
-            print("names", names)
+            print("names", names, len(names))
             ax.errorbar(
                 data_dict[dict_list[i]]["data"]["S1"].tolist(),
                 names,
@@ -846,23 +846,27 @@ def plot_total_carbon_emissions_timeseries_sweep(
     fig.savefig(f+ ".png", dpi=600, format="png")
 
 def plot_end_points_emissions(
-    fileName: str, Data_list, dpi_save: int,latex_bool = False
+    fileName: str, Data_list, property_title, property_save, property_vals, dpi_save: int,latex_bool = False 
 ):
     if latex_bool:
         set_latex()
-    y_title = "Carbon Emissions"
 
-    c = np.asarray([i.ratio_preference_or_consumption for i in Data_list])
-    emissions_final = np.asarray([i.total_carbon_emissions for i in Data_list])
     #print(c,emissions_final)
     fig, ax = plt.subplots(figsize=(10,6))
-    ax.plot(c, emissions_final)
-    ax.set_xlabel(r"Ratio of preferences to consumption")
-    ax.set_ylabel(r"%s" % y_title)
+
+    mu_emissions =  Data_list.mean(axis=1)
+    min_emissions =  Data_list.min(axis=1)
+    max_emissions=  Data_list.max(axis=1)
+
+    ax.plot(property_vals, mu_emissions, c= "red", label = "flat")
+    ax.fill_between(property_vals, min_emissions, max_emissions, facecolor='red', alpha=0.5)
+
+    ax.set_xlabel(property_title)
+    ax.set_ylabel(r"Carbon Emissions")
 
     #print("what worong")
     plotName = fileName + "/Plots"
-    f = plotName + "/finalemission"
+    f = plotName + "/" + property_save + "_emissions"
     fig.savefig(f+ ".png", dpi=600, format="png")     
 
 def plot_emissions_flat_versus_linear(fileName, data_flat,data_linear, carbon_prices):

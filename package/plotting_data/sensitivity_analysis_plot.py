@@ -16,7 +16,8 @@ from package.resources.plot import (
 
 def get_plot_data(
     problem: dict,
-    Y_emissions: npt.NDArray,
+    Y_emissions_stock: npt.NDArray,
+    Y_emissions_flow: npt.NDArray,
     Y_mu: npt.NDArray,
     Y_var: npt.NDArray,
     Y_coefficient_of_variance: npt.NDArray,
@@ -55,9 +56,10 @@ def get_plot_data(
         dictionary containing dictionaries each with data regarding the first order sobol analysis results for each output measure
     """
 
-    Si_emissions , Si_mu , Si_var , Si_coefficient_of_variance, Si_emissions_change = analyze_results(problem,Y_emissions,Y_mu,Y_var,Y_coefficient_of_variance,Y_emissions_change,calc_second_order) 
+    Si_emissions_stock,Si_emissions_flow , Si_mu , Si_var , Si_coefficient_of_variance, Si_emissions_change = analyze_results(problem,Y_emissions_stock,Y_emissions_flow ,Y_mu,Y_var,Y_coefficient_of_variance,Y_emissions_change,calc_second_order) 
 
-    total_emissions, first_emissions = Si_emissions.to_df()
+    total_emissions_stock, first_emissions_stock = Si_emissions_stock.to_df()
+    total_emissions_flow, first_emissions_flow = Si_emissions_flow.to_df()
     total_mu, first_mu = Si_mu.to_df()
     total_var, first_var = Si_var.to_df()
     (
@@ -66,7 +68,8 @@ def get_plot_data(
     ) = Si_coefficient_of_variance.to_df()
     total_emissions_change, first_emissions_change = Si_emissions_change.to_df()
 
-    total_data_sa_emissions, total_yerr_emissions = get_data_bar_chart(total_emissions)
+    total_data_sa_emissions_stock, total_yerr_emissions_stock = get_data_bar_chart(total_emissions_stock)
+    total_data_sa_emissions_flow, total_yerr_emissions_flow = get_data_bar_chart(total_emissions_flow)
     total_data_sa_mu, total_yerr_mu = get_data_bar_chart(total_mu)
     total_data_sa_var, total_yerr_var = get_data_bar_chart(total_var)
     (
@@ -75,7 +78,8 @@ def get_plot_data(
     ) = get_data_bar_chart(total_coefficient_of_variance)
     total_data_sa_emissions_change, total_yerr_emissions_change = get_data_bar_chart(total_emissions_change)
 
-    first_data_sa_emissions, first_yerr_emissions = get_data_bar_chart(first_emissions)
+    first_data_sa_emissions_stock, first_yerr_emissions_stock= get_data_bar_chart(first_emissions_stock)
+    first_data_sa_emissions_flow, first_yerr_emissions_flow = get_data_bar_chart(first_emissions_flow)
     first_data_sa_mu, first_yerr_mu = get_data_bar_chart(first_mu)
     first_data_sa_var, first_yerr_var = get_data_bar_chart(first_var)
     (
@@ -85,9 +89,13 @@ def get_plot_data(
     first_data_sa_emissions_change, first_yerr_emissions_change = get_data_bar_chart(first_emissions_change)
 
     data_sa_dict_total = {
-        "emissions": {
-            "data": total_data_sa_emissions,
-            "yerr": total_yerr_emissions,
+        "emissions_stock": {
+            "data": total_data_sa_emissions_stock,
+            "yerr": total_yerr_emissions_stock,
+        },
+        "emissions_flow": {
+            "data": total_data_sa_emissions_flow,
+            "yerr": total_yerr_emissions_flow,
         },
         "mu": {
             "data": total_data_sa_mu,
@@ -107,9 +115,13 @@ def get_plot_data(
         },
     }
     data_sa_dict_first = {
-        "emissions": {
-            "data": first_data_sa_emissions,
-            "yerr": first_yerr_emissions,
+        "emissions_stock": {
+            "data": first_data_sa_emissions_stock,
+            "yerr": first_yerr_emissions_stock,
+        },
+        "emissions_flow": {
+            "data": first_data_sa_emissions_flow,
+            "yerr": first_yerr_emissions_flow,
         },
         "mu": {
             "data": first_data_sa_mu,
@@ -185,7 +197,8 @@ def Merge_dict_SA(data_sa_dict: dict, plot_dict: dict) -> dict:
 
 def analyze_results(
     problem: dict,
-    Y_emissions: npt.NDArray,
+    Y_emissions_stock: npt.NDArray,
+    Y_emissions_flow: npt.NDArray,
     Y_mu: npt.NDArray,
     Y_var: npt.NDArray,
     Y_coefficient_of_variance: npt.NDArray,
@@ -196,9 +209,16 @@ def analyze_results(
     Perform sobol analysis on simulation results
     """
     
-    Si_emissions = sobol.analyze(
+    Si_emissions_stock = sobol.analyze(
         problem,
-        Y_emissions,
+        Y_emissions_stock,
+        calc_second_order=calc_second_order,
+        print_to_console=False,
+    )
+    
+    Si_emissions_flow = sobol.analyze(
+        problem,
+        Y_emissions_flow,
         calc_second_order=calc_second_order,
         print_to_console=False,
     )
@@ -222,37 +242,35 @@ def analyze_results(
         print_to_console=False,
     )
 
-    return Si_emissions , Si_mu , Si_var , Si_coefficient_of_variance,Si_emissions_change
+    return Si_emissions_stock ,Si_emissions_flow, Si_mu , Si_var , Si_coefficient_of_variance,Si_emissions_change
 
 def main(
     fileName = "results\SA_AV_reps_5_samples_15360_D_vars_13_N_samples_1024",
-    plot_outputs = ['emissions','var',"emissions_change"],
-    latex_bool = 0
-    ) -> None: 
-    
-    plot_dict = {
-        "emissions": {"title": r"$E/NM$", "colour": "red", "linestyle": "--"},
+    plot_outputs = ['emissions_stock','emissions_flow','var',"emissions_change"],
+    plot_dict= {
+        "emissions_stock": {"title": r"$E/NM$", "colour": "red", "linestyle": "--"},
+        "emissions_flow": {"title": r"$E_t/NM$", "colour": "black", "linestyle": ":"},
         "mu": {"title": r"$\mu_{I}$", "colour": "blue", "linestyle": "-"},
         "var": {"title": r"$\sigma^{2}_{I}$", "colour": "green", "linestyle": "*"},
         "coefficient_of_variance": {"title": r"$\sigma/\mu$","colour": "orange","linestyle": "-.",},
         "emissions_change": {"title": r"$\Delta E/NM$", "colour": "brown", "linestyle": "-*"},
-    }
-
-    titles = [
-    r"$\nu$",
-    r"Initial low carbon preference Beta $a_A$",
-    r"Service preference Beta $a_A$",
-    r"Low carbon substitutability Beta $a_A$",
-    r"Individuals' budget Beta $a_A$",
-    r"High carbon goods prices' Beta $a_A$"
-    ]
-
+    },
+    titles= [
+    r"Service  substitutability $\nu$",
+    r"Initial low carbon preference Beta $b_A$",
+    r"Service preference Beta $b_{a}$",
+    r"Low carbon substitutability Beta $b_{\\sigma}$",
+    r"High carbon goods prices Beta $b_{P_H}$"
+    ],
+    latex_bool = 0
+    ) -> None: 
 
     problem = load_object(fileName + "/Data", "problem")
-    #print(problem)
-    Y_emissions = load_object(fileName + "/Data", "Y_emissions")
-    #print(Y_emissions)
-    #quit()
+
+
+    Y_emissions_stock = load_object(fileName + "/Data", "Y_emissions_stock")
+    #print("emissions_stock",Y_emissions_stock)
+    Y_emissions_flow = load_object(fileName + "/Data", "Y_emissions_flow")
     Y_mu = load_object(fileName + "/Data", "Y_mu")
     Y_var = load_object(fileName + "/Data", "Y_var")
     Y_coefficient_of_variance = load_object(fileName + "/Data", "Y_coefficient_of_variance")
@@ -261,18 +279,36 @@ def main(
     N_samples = load_object(fileName + "/Data","N_samples" )
     calc_second_order = load_object(fileName + "/Data", "calc_second_order")
 
-    data_sa_dict_total, data_sa_dict_first = get_plot_data(problem, Y_emissions, Y_mu, Y_var, Y_coefficient_of_variance,Y_emissions_change, calc_second_order)
+    data_sa_dict_total, data_sa_dict_first = get_plot_data(problem, Y_emissions_stock,Y_emissions_flow, Y_mu, Y_var, Y_coefficient_of_variance,Y_emissions_change, calc_second_order)
+
 
     data_sa_dict_first = Merge_dict_SA(data_sa_dict_first, plot_dict)
-    
+    #print(data_sa_dict_first)
     ###############################
 
     multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first,plot_outputs, titles, N_samples, "First", latex_bool = latex_bool)
 
     plt.show()
 if __name__ == '__main__':
+
     plots = main(
-        fileName="results/sensitivity_analysis_12_07_30__21_04_2023"
+        fileName="results/sensitivity_analysis_21_21_53__24_04_2023",
+        plot_outputs = ['emissions_stock','emissions_flow','var',"emissions_change"],
+        plot_dict = {
+            "emissions_stock": {"title": r"$E/NM$", "colour": "red", "linestyle": "--"},
+            "emissions_flow": {"title": r"$E_t/NM$", "colour": "black", "linestyle": ":"},
+            "mu": {"title": r"$\mu_{I}$", "colour": "blue", "linestyle": "-"},
+            "var": {"title": r"$\sigma^{2}_{I}$", "colour": "green", "linestyle": "*"},
+            "coefficient_of_variance": {"title": r"$\sigma/\mu$","colour": "orange","linestyle": "-.",},
+            "emissions_change": {"title": r"$\Delta E/NM$", "colour": "brown", "linestyle": "-*"},
+        },
+        titles = [
+        r"Service substitutability $\nu$",
+        r"Initial low carbon preference Beta $b_A$",
+        r"Service preference Beta $b_{a}$",
+        r"Low carbon substitutability Beta $b_{\sigma}$",
+        r"High carbon goods prices Beta $b_{P_H}$"
+        ]
     )
 
 

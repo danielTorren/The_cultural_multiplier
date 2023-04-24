@@ -30,5 +30,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_average_13_14_10__21_04_2023"
+        fileName="results/two_param_sweep_average_13_25_28__21_04_2023"
     )

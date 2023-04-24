@@ -64,6 +64,7 @@ class Network:
         self.confirmation_bias = parameters["confirmation_bias"]
         self.learning_error_scale = parameters["learning_error_scale"]
         self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
+        self.clipping_epsilon = parameters["clipping_epsilon"]
 
         # social influence of behaviours
         self.phi_lower = parameters["phi_lower"]
@@ -96,6 +97,8 @@ class Network:
         self.a_prices_high_carbon = parameters["a_prices_high_carbon"]
         self.b_prices_high_carbon = parameters["b_prices_high_carbon"]
 
+        self.multiplier_low_carbon_substitutability = parameters["multiplier_low_carbon_substitutability"]
+
 
         (
             self.low_carbon_preference_matrix_init,
@@ -113,7 +116,7 @@ class Network:
         self.social_component_matrix = self.calc_social_component_matrix()
 
         self.init_total_carbon_emissions  = self.calc_total_emissions()
-        self.total_carbon_emissions = self.init_total_carbon_emissions
+        self.total_carbon_emissions_flow = self.init_total_carbon_emissions
         self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
         self.carbon_rebate_list = self.calc_carbon_rebate_list()
@@ -139,7 +142,8 @@ class Network:
             self.history_var_identity = [self.var_identity]
             self.history_min_identity = [self.min_identity]
             self.history_max_identity = [self.max_identity]
-            self.history_total_carbon_emissions = [self.total_carbon_emissions]
+            self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
+            self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
 
     def normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
         """
@@ -247,7 +251,7 @@ class Network:
         )
         #sigma_m - 1 dimentional
         low_carbon_substitutability_list = np.random.beta(self.a_low_carbon_substitutability, self.b_low_carbon_substitutability, size=self.M)#this is a single list that is used by all individuals
-        low_carbon_substitutability_matrix = np.asarray(low_carbon_substitutability_list)
+        low_carbon_substitutability_matrix = np.asarray(low_carbon_substitutability_list)*self.multiplier_low_carbon_substitutability#multiplier sets the maximum value
         #B_i - normalized, 1 dimentional
         individual_budget_array = np.random.beta(self.a_individual_budget, self.b_individual_budget, size=self.N)
         norm_individual_budget_array = individual_budget_array/ np.linalg.norm(individual_budget_array)
@@ -282,7 +286,8 @@ class Network:
             "carbon_price": self.carbon_price,
             "low_carbon_substitutability": self.low_carbon_substitutability_array,
             "prices_low_carbon": self.prices_low_carbon,
-            "prices_high_carbon":self.prices_high_carbon_array
+            "prices_high_carbon":self.prices_high_carbon_array,
+            "clipping_epsilon" :self.clipping_epsilon
         }
 
         agent_list = [
@@ -408,7 +413,7 @@ class Network:
         total_network_emissions: float
             total network emissions from each Individual object
         """
-        total_network_emissions = sum([x.total_carbon_emissions for x in self.agent_list])
+        total_network_emissions = sum([x.flow_carbon_emissions for x in self.agent_list])
         return total_network_emissions
 
     def calc_network_identity(self) -> tuple[float, float, float, float]:
@@ -495,7 +500,8 @@ class Network:
         self.history_var_identity.append(self.var_identity)
         self.history_min_identity.append(self.min_identity)
         self.history_max_identity.append(self.max_identity)
-        self.history_total_carbon_emissions.append(self.total_carbon_emissions)
+        self.history_stock_carbon_emissions.append(self.total_carbon_emissions_stock)
+        self.history_flow_carbon_emissions.append(self.total_carbon_emissions_flow)
 
     def next_step(self):
         """
@@ -520,8 +526,10 @@ class Network:
         self.weighting_matrix = self.update_weightings()
 
         self.social_component_matrix = self.calc_social_component_matrix()
-        self.total_carbon_emissions = self.calc_total_emissions()
-        self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions
+        self.total_carbon_emissions_flow = self.calc_total_emissions()
+        self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
+        #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
+
         (
                 self.identity_list,
                 self.average_identity,
@@ -530,13 +538,6 @@ class Network:
                 self.min_identity,
                 self.max_identity,
         ) = self.calc_network_identity()
-
-        #update carbon price
-        #self.carbon_price = self.carbon_price + 
-
-        #redistributed funds
-        #calc how much was paid 
-        # divide i then redistibute it accordingly
 
         self.carbon_rebate_list = self.calc_carbon_rebate_list()
 

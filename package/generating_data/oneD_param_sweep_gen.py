@@ -12,7 +12,7 @@ Created: 10/10/2022
 import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import parallel_run
+from package.resources.run import multi_stochstic_emissions_run
 
 # modules
 def produce_param_list(params: dict, property_list: list, property: str) -> list[dict]:
@@ -45,28 +45,34 @@ def produce_param_list(params: dict, property_list: list, property: str) -> list
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        property_varied = "ratio_preference_or_consumption",
-        property_min = 0,
-        property_max = 1,
-        property_reps = 10,
-        property_varied_title = "A to Omega ratio"
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json"
+
          ) -> str: 
+
+    f_var = open(VARIABLE_PARAMS_LOAD)
+    var_params = json.load(f_var) 
+
+    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    property_min = var_params["property_min"]#0,
+    property_max = var_params["property_max"]#1,
+    property_reps = var_params["property_reps"]#10,
+    property_varied_title = var_params["property_varied_title"]# #"A to Omega ratio"
 
     property_values_list = np.linspace(property_min, property_max, property_reps)
 
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
 
-    root = "one_param_sweep_single"
+    root = "one_param_sweep_multi"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
     
     params_list = produce_param_list(params, property_values_list, property_varied)
 
-    data_list = parallel_run(params_list) 
+    emissions_array = multi_stochstic_emissions_run(params_list) 
     createFolder(fileName)
 
-    save_object(data_list, fileName + "/Data", "data_list")
+    save_object(emissions_array, fileName + "/Data", "emissions_array")
     save_object(params, fileName + "/Data", "base_params")
     save_object(property_varied, fileName + "/Data", "property_varied")
     save_object(property_varied_title, fileName + "/Data", "property_varied_title")
@@ -77,10 +83,6 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        property_varied = "ratio_preference_or_consumption",
-        property_min = 0,
-        property_max = 1,
-        property_reps = 16,
-        property_varied_title = "A to Omega ratio"
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_mu.json"
 )
 

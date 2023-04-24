@@ -104,7 +104,8 @@ def main(
 
     params_list = produce_param_list_n_double(base_params, variable_parameters_dict)
     (
-        results_emissions,
+        results_emissions_stock,
+        results_emissions_flow,
         results_mu,
         results_var,
         results_coefficient_of_variance,
@@ -116,7 +117,8 @@ def main(
     save_object(base_params, fileName + "/Data", "base_params")
     # save the data and params_list
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
-    save_object(results_emissions, fileName + "/Data", "results_emissions")
+    save_object(results_emissions_stock, fileName + "/Data", "results_emissions_stock")
+    save_object(results_emissions_flow, fileName + "/Data", "results_emissions_flow")
     save_object(results_mu, fileName + "/Data", "results_mu")
     save_object(results_var, fileName + "/Data", "results_var")
     save_object(results_coefficient_of_variance,fileName + "/Data","results_coefficient_of_variance")

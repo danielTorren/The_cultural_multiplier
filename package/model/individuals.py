@@ -48,6 +48,7 @@ class Individual:
         self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
         self.prices_low_carbon = individual_params["prices_low_carbon"]
         self.prices_high_carbon = individual_params["prices_high_carbon"]
+        self.clipping_epsilon = individual_params["clipping_epsilon"]
 
         self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
 
@@ -59,11 +60,11 @@ class Individual:
 
         self.identity = self.calc_identity()
         self.initial_carbon_emissions = self.calc_total_emissions()
-        self.total_carbon_emissions = self.initial_carbon_emissions
+        self.flow_carbon_emissions = self.initial_carbon_emissions
 
         if self.save_timeseries_data:
             self.history_identity = [self.identity]
-            self.history_carbon_emissions = [self.total_carbon_emissions]
+            self.history_flow_carbon_emissions = [self.flow_carbon_emissions]
 
     def calc_omega(self):
         #print("PERSON AND TIMESTEP", self.id)
@@ -71,24 +72,40 @@ class Individual:
         #print("inside", (self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))
         #print("denomentator", (self.prices_low_carbon*(1- self.low_carbon_preferences )))
         #print("power", self.low_carbon_substitutability_array)
-        try:
-            omega_vector = ((self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
-        except:
-            print("omega_vector nan", self.low_carbon_preferences,self.low_carbon_substitutability_array)
+        
+        omega_vector = ((self.prices_high_carbon_instant* self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
+        #if np.isnan(np.sum(omega_vector)):
+        #    print("self.low_carbon_preferences", self.low_carbon_preferences)
+        #    print("self.prices_high_carbon_instant", self.prices_high_carbon_instant)
+        #    quit()
         return omega_vector
 
     #I would like to make theses three functions, where the last calls the second and the second calls the first faster:
     def calc_chi(self, a, P_L, A, omega, sigma, p, m):
-        try:
-            part_one = ((a[m] * P_L[p] * A[m] * omega[p]**(1/sigma[p]))/(a[p] * P_L[m] * A[p] * omega[m]**(1/sigma[m])))**(self.service_substitutability/(1+self.service_substitutability))
-        except:
-            print("the bits", (a[m] * P_L[p] * A[m] * omega[p]**(1/sigma[p])) ,(a[p] * P_L[m] * A[p] * omega[m]**(1/sigma[m])))
+        
+        part_one = ((a[m] * P_L[p] * A[m] * omega[p]**(1/sigma[p]))/(a[p] * P_L[m] * A[p] * omega[m]**(1/sigma[m])))**(self.service_substitutability/(1+self.service_substitutability))
+
+        #if np.isnan(np.sum(part_one)):
+        #    print("part one bits", (a[m] * P_L[p] * A[m] * omega[p]**(1/sigma[p])) ,(a[p] * P_L[m] * A[p] * omega[m]**(1/sigma[m])))
+        #    print("self.low_carbon_preferences", self.low_carbon_preferences)
+        #    print("self.prices_high_carbon_instant", self.prices_high_carbon_instant)
+        #    quit()
         #print("part_one", part_one)
         part_two = (A[p] * omega[p]**((sigma[p]-1)/sigma[p]) + (1 - A[p]))**((sigma[p] - self.service_substitutability)/((sigma[p] - 1) * self.service_substitutability))
+        #if np.isnan(np.sum(part_two)):
+        #    print("part one bits",A[p] * omega[p]**((sigma[p]-1)/sigma[p]) + (1 - A[p]) ,((sigma[p] - self.service_substitutability)/((sigma[p] - 1) * self.service_substitutability)))
+        #    print("self.low_carbon_preferences", self.low_carbon_preferences)
+        #    print("self.prices_high_carbon_instant", self.prices_high_carbon_instant)
+        #    quit()
         #print("part_two", part_two)
-        pat_three = (A[m] * omega[m]**((sigma[m]-1)/sigma[m]) + (1 - A[m]))**((sigma[m] - self.service_substitutability)/((sigma[m] - 1) * self.service_substitutability))
+        part_three = (A[m] * omega[m]**((sigma[m]-1)/sigma[m]) + (1 - A[m]))**((sigma[m] - self.service_substitutability)/((sigma[m] - 1) * self.service_substitutability))
+        #if np.isnan(np.sum(part_three)):
+        #    print("part one bits",  (A[m] * omega[m]**((sigma[m]-1)/sigma[m]) + (1 - A[m])) ,((sigma[m] - self.service_substitutability)/((sigma[m] - 1) * self.service_substitutability)))
+        #    print("self.low_carbon_preferences", self.low_carbon_preferences)
+        #    print("self.prices_high_carbon_instant", self.prices_high_carbon_instant)
+        #    quit()
         #print("part_three", pat_three)
-        chi = part_one*part_two/pat_three
+        chi = part_one*part_two/part_three
         #print("chi", chi)
         return chi
 
@@ -119,7 +136,8 @@ class Individual:
 
     def update_preferences(self, social_component):
         #print("HELLO",self.low_carbon_preferences )
-        self.low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
+        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
+        self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
 
     def calc_total_emissions(self): 
         #print("emissions", self.H_m, sum(self.H_m))
@@ -140,7 +158,7 @@ class Individual:
         """
 
         self.history_identity.append(self.identity)
-        self.history_carbon_emissions.append(self.total_carbon_emissions)
+        self.history_flow_carbon_emissions.append(self.flow_carbon_emissions)
 
     def next_step(self, t: int, social_component: npt.NDArray, carbon_rebate, carbon_price):
 
@@ -162,7 +180,7 @@ class Individual:
         self.H_m, self.L_m = self.calc_consumption_quantities()
 
         #calc_emissions
-        self.total_carbon_emissions = self.calc_total_emissions()
+        self.flow_carbon_emissions = self.calc_total_emissions()
 
         if (self.save_timeseries_data) and (self.t % self.compression_factor == 0):
             self.save_timeseries_data_individual()
