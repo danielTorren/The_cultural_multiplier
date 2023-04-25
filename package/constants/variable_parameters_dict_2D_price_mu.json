@@ -1,0 +1,4 @@
+{
+    "row":{"property":"carbon_price_increased","min":0, "max": 1, "title": "Carbon price","divisions": "linear", "reps": 16}, 
+    "col":{"property":"ratio_preference_or_consumption","min":0, "max": 1, "title": "ratio_preference_or_consumption, $\\mu$","divisions": "linear", "reps": 16} 
+}
