@@ -292,8 +292,8 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_22_19_45__24_04_2023",
-        plot_outputs = ['emissions_stock','emissions_flow','var',"emissions_change"],
+        fileName="results/sensitivity_analysis_13_13_24__25_04_2023",
+        plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"$E/NM$", "colour": "red", "linestyle": "--"},
             "emissions_flow": {"title": r"$E_t/NM$", "colour": "black", "linestyle": ":"},

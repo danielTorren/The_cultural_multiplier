@@ -1,5 +1,5 @@
 {
-    "service_substitutability":{"property":"service_substitutability","min":0,"max": 50, "round":0},
+    "service_substitutability":{"property":"service_substitutability","min":1,"max": 50, "round":0},
     "b_low_carbon_preference":{"property":"b_low_carbon_preference","min":0.05, "max": 8, "round":0},
     "b_service_preference":{"property":"b_service_preference","min":0.05, "max": 8, "round":0},
     "b_low_carbon_substitutability":{"property":"b_low_carbon_substitutability","min":0.05, "max": 8, "round":0},

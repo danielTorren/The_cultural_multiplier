@@ -31,6 +31,8 @@ def main(
         reduc_property_values_list = property_values_list[:-1]
         #plot how the emission change for each one
         plot_end_points_emissions(fileName, reduc_emissions_array, property_varied_title, property_varied, reduc_property_values_list, dpi_save)
+    elif PLOT_TYPE == 2:
+        plot_end_points_emissions(fileName, emissions_array, "Preference to consumption ratio, $\\mu$", property_varied, property_values_list, dpi_save)
     else:
          plot_end_points_emissions(fileName, emissions_array, property_varied_title, property_varied, property_values_list, dpi_save)
     
@@ -38,7 +40,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/one_param_sweep_multi_22_18_17__24_04_2023",
-        PLOT_TYPE = 0
+        fileName="results/one_param_sweep_multi_13_33_41__25_04_2023",
+        PLOT_TYPE = 2
     )
 
