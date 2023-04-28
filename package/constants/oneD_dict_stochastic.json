@@ -1,0 +1,6 @@
+{
+    "property_varied" : "set_seed",
+    "property_min" : 1,
+    "property_max" :51,
+    "property_varied_title" : "Seed"
+}

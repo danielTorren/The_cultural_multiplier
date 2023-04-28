@@ -11,7 +11,7 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib.colors import Normalize, LinearSegmentedColormap, SymLogNorm
+from matplotlib.colors import Normalize, LinearSegmentedColormap, SymLogNorm, BoundaryNorm
 from matplotlib.cm import get_cmap
 from matplotlib.collections import LineCollection
 from typing import Union
@@ -897,7 +897,36 @@ def plot_end_points_emissions(
     #print("what worong")
     plotName = fileName + "/Plots"
     f = plotName + "/" + property_save + "_emissions"
-    fig.savefig(f+ ".png", dpi=600, format="png")     
+    fig.savefig(f+ ".png", dpi=600, format="png")    
+
+
+def plot_emissions_timeseries(
+    fileName: str, Data_list,  property_vals, time_array
+):
+
+    y_title = 
+    cmap = get_cmap("plasma")
+
+    fig, ax = plt.subplots(figsize=(10,6))
+
+    xs = np.tile(time_array, (len(property_vals), 1))
+    ys = Data_list
+    c = property_vals
+    
+
+
+    lc = multiline(xs, ys, c, cmap=cmap, lw=2)
+    axcb = fig.colorbar(lc)
+
+    axcb.set_label("Seed")
+    ax.set_ylabel("Carbon emissions stock")
+    ax.set_xlabel("Time")
+    
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/seed_emissions_timeseries"
+    fig.savefig(f+ ".png", dpi=600, format="png")    
 
 def plot_emissions_flat_versus_linear(fileName, data_flat,data_linear, carbon_prices):
 
