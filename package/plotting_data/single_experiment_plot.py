@@ -21,6 +21,7 @@ from package.resources.plot import (
     plot_joint_cluster_micro,
     print_live_initial_identity_network,
     live_animate_identity_network_weighting_matrix,
+    plot_low_carbon_preferences_timeseries
 )
 
 
@@ -51,8 +52,16 @@ def main(
     Data = load_object(fileName + "/Data", "social_network")
 
     ###PLOTS
+    plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
     plot_identity_timeseries(fileName, Data, dpi_save)
     plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
        
 
     plt.show()
+
+if __name__ == '__main__':
+    plots = main(
+        fileName = "results/single_experiment_19_12_36__04_05_2023"
+    )
+
+

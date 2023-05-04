@@ -48,7 +48,7 @@ class Network:
         #self.prices_high_carbon = self.prices_low_carbon*parameters["price_high_carbon_factor"]   #np.random.uniform(0.5,1,self.M)
 
         self.carbon_price = parameters["init_carbon_price"]
-        self.rebate_progressiveness = parameters["rebate_progressiveness"]
+        self.dividend_progressiveness = parameters["dividend_progressiveness"]
         self.carbon_price_time = parameters["carbon_price_time"]
         self.carbon_price_increased = parameters["carbon_price_increased"]
         self.budget_multiplier = parameters["budget_multiplier"]
@@ -119,7 +119,7 @@ class Network:
         self.total_carbon_emissions_flow = self.init_total_carbon_emissions
         self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
-        self.carbon_rebate_list = self.calc_carbon_rebate_list()
+        self.carbon_dividend_array = self.calc_carbon_dividend_array()
 
         (
                 self.identity_list,
@@ -323,13 +323,18 @@ class Network:
             NxM array where each row represents the influence of an Individual listening to its neighbours regarding their
             behavioural attitude opinions, this influence is weighted by the weighting_matrix
         """
-
-        if self.ratio_preference_or_consumption < 1:
+        if self.ratio_preference_or_consumption == 1.0:
+            attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        elif self.ratio_preference_or_consumption == 0.0:
+            attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
+        elif self.ratio_preference_or_consumption > 0.0 and self.ratio_preference_or_consumption < 1.0:
             attribute_matrix = np.asarray([self.ratio_preference_or_consumption*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
         else:
-            attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+            raise("Invalid ratio_preference_or_consumption = [0,1]", self.ratio_preference_or_consumption)
 
         neighbour_influence = np.matmul(self.weighting_matrix, attribute_matrix)
+        #print("neighbour_influence",neighbour_influence)
+        
         
         return neighbour_influence
 
@@ -349,22 +354,18 @@ class Network:
 
         ego_influence = self.calc_ego_influence_degroot()           
 
-        social_influence = ego_influence + np.random.normal(
-            loc=0, scale=self.learning_error_scale, size=(self.N, self.M)
-        )
+        social_influence = ego_influence #+ np.random.normal(loc=0, scale=self.learning_error_scale, size=(self.N, self.M))
         return social_influence
 
     def calc_weighting_matrix_attribute(self,attribute_array):
 
-        #print("attribute array", attribute_array,attribute_array.shape)
+        #print("attribute array", attribute_array,attribute_array.shape, np.mean(attribute_array))
 
         difference_matrix = np.subtract.outer(attribute_array, attribute_array) #euclidean_distances(attribute_array,attribute_array)# i think this actually not doing anything? just squared at the moment
-        #print("difference matrix", difference_matrix.shape)
+        #print("difference matrix", difference_matrix,difference_matrix.shape)
         #quit()
 
-        alpha_numerator = np.exp(
-            -np.multiply(self.confirmation_bias, difference_matrix)
-        )
+        alpha_numerator = np.exp(-np.multiply(self.confirmation_bias, np.abs(difference_matrix)))
         #print("alpha numerator", alpha_numerator)
 
         non_diagonal_weighting_matrix = (
@@ -396,6 +397,7 @@ class Network:
             total element wise difference between the previous weighting arrays
         """
         identity_array = np.array([x.identity for x in self.agent_list])
+
         norm_weighting_matrix = self.calc_weighting_matrix_attribute(identity_array)
 
         return norm_weighting_matrix
@@ -450,13 +452,25 @@ class Network:
         identity_min = min(identity_list)
         return (identity_list,identity_mean, identity_std, identity_variance, identity_max, identity_min)
 
-    def calc_carbon_rebate_list(self):
-        wealth_list = [x.instant_budget for x in self.agent_list]
-        tax_income = sum([x.H_m*self.carbon_price for x in self.agent_list])
+    def calc_carbon_dividend_array(self):
+        
+        wealth_list_B = np.asarray([x.instant_budget for x in self.agent_list])
+        tax_income_R = sum([x.H_m*self.carbon_price for x in self.agent_list])
 
-        mean_wealth = np.mean(wealth_list)
-        carbon_rebate_list = [self.rebate_progressiveness*(wealth_list[i] - mean_wealth) + tax_income/self.N for i in range(self.N)]
-        return np.asarray(carbon_rebate_list)
+        mean_wealth = np.mean(wealth_list_B)
+        if self.dividend_progressiveness == 0:#percapita
+             carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
+        elif self.dividend_progressiveness > 0 and self.dividend_progressiveness <= 1:#regressive
+            d_max = - tax_income_R/(self.N*(np.max(wealth_list_B) - mean_wealth))#max value d can be
+            div_prog_t = min(self.dividend_progressiveness, d_max)
+            carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
+        elif self.dividend_progressiveness >= -1 and self.dividend_progressiveness <0:#progressive
+            d_min = - tax_income_R/(self.N*(np.min(wealth_list_B) - mean_wealth))#most negative value d can be
+            div_prog_t = max(self.dividend_progressiveness, d_min)
+            carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
+        else:
+            raise("Invalid self.dividend_progressiveness d = [-1,1]")
+        return carbon_dividend_array
     
     def calc_carbon_price(self):
         if self.carbon_tax_implementation == "flat":
@@ -471,11 +485,11 @@ class Network:
 
     def update_individuals(self):
         """
-        Update Individual objects with new information regarding social interactions, prices and rebate
+        Update Individual objects with new information regarding social interactions, prices and dividend
         """
         for i in range(self.N):
             self.agent_list[i].next_step(
-                self.t, self.social_component_matrix[i], self.carbon_rebate_list[i], self.carbon_price
+                self.t, self.social_component_matrix[i], self.carbon_dividend_array[i], self.carbon_price
             )
     
     def save_timeseries_data_network(self):
@@ -524,8 +538,10 @@ class Network:
 
         # update network parameters for next step
         self.weighting_matrix = self.update_weightings()
+        #print("self.weighting_matrix", self.weighting_matrix)
 
         self.social_component_matrix = self.calc_social_component_matrix()
+
         self.total_carbon_emissions_flow = self.calc_total_emissions()
         self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
         #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
@@ -539,7 +555,9 @@ class Network:
                 self.max_identity,
         ) = self.calc_network_identity()
 
-        self.carbon_rebate_list = self.calc_carbon_rebate_list()
+        #print("self.average_identity", self.average_identity)
+
+        self.carbon_dividend_array = self.calc_carbon_dividend_array()
 
         if (self.t % self.compression_factor == 0) and (self.save_timeseries_data):
             self.save_timeseries_data_network()

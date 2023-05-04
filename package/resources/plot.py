@@ -732,7 +732,7 @@ def plot_total_carbon_emissions_timeseries(
     if latex_bool:
         set_latex()
     y_title = "Carbon Emissions"
-    property = "history_total_carbon_emissions"
+    property = "history_stock_carbon_emissions"
     plot_network_timeseries(fileName, Data, y_title, property, dpi_save)
 
 def plot_average_identity_timeseries(fileName: str, Data, dpi_save: int,latex_bool = False):
@@ -904,7 +904,6 @@ def plot_emissions_timeseries(
     fileName: str, Data_list,  property_vals, time_array
 ):
 
-    y_title = 
     cmap = get_cmap("plasma")
 
     fig, ax = plt.subplots(figsize=(10,6))
@@ -912,16 +911,12 @@ def plot_emissions_timeseries(
     xs = np.tile(time_array, (len(property_vals), 1))
     ys = Data_list
     c = property_vals
-    
-
-
     lc = multiline(xs, ys, c, cmap=cmap, lw=2)
     axcb = fig.colorbar(lc)
 
     axcb.set_label("Seed")
     ax.set_ylabel("Carbon emissions stock")
     ax.set_xlabel("Time")
-    
 
     #print("what worong")
     plotName = fileName + "/Plots"
@@ -1041,3 +1036,31 @@ def multiline(xs, ys, c, ax=None, **kwargs):
     ax.add_collection(lc)
     ax.autoscale()
     return lc
+
+def plot_low_carbon_preferences_timeseries(
+    fileName, 
+    data, 
+    dpi_save,
+    ):
+
+    y_title = r"Low carbon preference"
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M, sharey=True)
+
+    for v in range(data.N):
+        data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)
+        for j in range(data.M):
+            axes[j].plot(
+                np.asarray(data.history_time),
+                data_indivdiual[:,j]
+            )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_preference"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+

@@ -24,6 +24,7 @@ def main(
     print("fileName:", fileName)
 
     Data = generate_data(base_params)  # run the simulation
+    print(Data.average_identity)
 
     createFolder(fileName)
     save_object(Data, fileName + "/Data", "social_network")
@@ -34,25 +35,39 @@ def main(
 if __name__ == '__main__':
     base_params = {
     "save_timeseries_data": 1, 
-    "alpha_change" : "dynamic_culturally_determined_weights",
-    "time_steps_max": 100,
+    "time_steps_max": 2000,
+    "carbon_price_time": 1000,
     "phi_lower": 0.01,
     "phi_upper": 0.05,
     "compression_factor": 10,
-    "set_seed": 2,
-    "N": 50,
+    "seed_list": [1,2,3,4,5],
+    "set_seed": 1,
+    "N": 200,
     "M": 3,
-    "K": 5,
+    "K": 20,
     "prob_rewire": 0.1,
-    "cultural_inertia": 1000,
-    "learning_error_scale": 0.02,
-    "discount_factor": 0.95,
+    "learning_error_scale": 0.00,
     "homophily": 0.95,
-    "confirmation_bias": 40,
-    "a_attitude": 1,
-    "b_attitude": 1,
-    "a_threshold": 1,
-    "b_threshold": 1,
-    "green_N": 0,
+    "confirmation_bias": 20,
+    "a_low_carbon_preference": 1,
+    "b_low_carbon_preference": 1,
+    "a_service_preference": 1,
+    "b_service_preference": 1,
+    "a_low_carbon_substitutability":1,
+    "b_low_carbon_substitutability":1,
+    "multiplier_low_carbon_substitutability":10,
+    "a_individual_budget": 1,
+    "b_individual_budget": 1,
+    "a_prices_high_carbon": 1,
+    "b_prices_high_carbon": 1,
+    "service_substitutability": 10,
+    "init_carbon_price": 0,
+    "dividend_progressiveness": 0.0,
+    "carbon_price_increased" : 1.0,
+    "budget_multiplier": 1,
+    "price_high_carbon_factor": 1.0,
+    "ratio_preference_or_consumption": 0.98,
+    "carbon_tax_implementation": "flat",
+    "clipping_epsilon": 1e-5
 }
     fileName = main(base_params=base_params)

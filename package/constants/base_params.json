@@ -27,7 +27,7 @@
     "b_prices_high_carbon": 1,
     "service_substitutability": 10,
     "init_carbon_price": 0,
-    "rebate_progressiveness": 0,
+    "dividend_progressiveness": 0,
     "carbon_price_increased" : 0.5,
     "budget_multiplier": 1,
     "price_high_carbon_factor": 1.0,
