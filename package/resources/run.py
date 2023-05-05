@@ -196,3 +196,21 @@ def multi_stochstic_emissions_flow_stock_run(
     )
 
     return np.asarray(emissions_stock), np.asarray(emissions_flow)
+
+def generate_emissions_stock_flow(params):
+    data = generate_data(params)
+    return (np.asarray(data.history_stock_carbon_emissions), np.asarray(data.history_flow_carbon_emissions))
+
+def multi_emissions_flow_stock_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_multi_output_individual_emissions_list(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_emissions_stock_flow)(i) for i in params_dict
+    )
+    emissions_stock, emissions_flow = zip(
+        *res
+    )
+
+    return np.asarray(emissions_stock), np.asarray(emissions_flow)

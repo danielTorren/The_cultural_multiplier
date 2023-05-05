@@ -12,7 +12,7 @@ Created: 10/10/2022
 import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import multi_stochstic_emissions_flow_stock_run
+from package.resources.run import multi_stochstic_emissions_flow_stock_run,multi_emissions_flow_stock_run
 
 # modules
 def produce_param_list(params: dict, property_list: list, property: str) -> list[dict]:
@@ -43,6 +43,17 @@ def produce_param_list(params: dict, property_list: list, property: str) -> list
         )  # have to make a copy so that it actually appends a new dict and not just the location of the params dict
     return params_list
 
+def produce_param_list_stochastic(params: dict, property_list: list, property: str) -> list[dict]:
+    params_list = []
+    for i in property_list:
+        params[property] = i
+        for v in params["seed_list"]:
+            params["set_seed"] = v
+            params_list.append(
+                params.copy()
+            )  
+    return params_list
+
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
         VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
@@ -57,12 +68,13 @@ def main(
     property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,
     property_varied_title = var_params["property_varied_title"]# #"A to Omega ratio"
-
     property_values_list = np.linspace(property_min, property_max, property_reps)
 
 
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
+
+    time_array = np.arange(0,params["time_steps_max"] + params["compression_factor"],params["compression_factor"])
 
     f_carbon_prices = open(CARBON_PRICES_LOAD)
     carbon_prices = json.load(f_carbon_prices)
@@ -70,22 +82,17 @@ def main(
     root = "mu_sweep_carbon_price"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
-    
-    emissions_stock_data_list = []
-    emissions_flow_data_list = []
+
+    stocH_params_list = []
     for price in carbon_prices["carbon_prices"]:
         params["carbon_price_increased"] = price
-        print("price", price)
-        params_list = produce_param_list(params, property_values_list, property_varied)
-        emissions_stock_array, emissions_flow_array = multi_stochstic_emissions_flow_stock_run(params_list)
-        emissions_stock_data_list.append(emissions_stock_array)
-        emissions_flow_data_list.append(emissions_flow_array)
-        #print("emissions_array", emissions_stock_array)
-  
-    
-    emissions_stock_data_list = np.asarray(emissions_stock_data_list)
-    emissions_flow_data_list = np.asarray(emissions_flow_data_list)
-    print("emissions_data_list",emissions_stock_data_list.shape)
+        stocH_params_list = stocH_params_list  + produce_param_list_stochastic(params, property_values_list, property_varied)
+
+    emissions_stock_array, emissions_flow_array = multi_emissions_flow_stock_run(stocH_params_list)
+
+    emissions_stock_data_list = emissions_stock_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array)))
+    emissions_flow_data_list = emissions_flow_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array)))
+
     createFolder(fileName)
 
     save_object(emissions_stock_data_list, fileName + "/Data", "emissions_stock_data_list")
@@ -95,6 +102,7 @@ def main(
     save_object(property_varied_title, fileName + "/Data", "property_varied_title")
     save_object(property_values_list, fileName + "/Data", "property_values_list")
     save_object(carbon_prices, fileName + "/Data", "carbon_prices")
+    save_object(time_array, fileName + "/Data", "time_array")
 
     return fileName
 

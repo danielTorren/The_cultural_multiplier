@@ -1,7 +1,7 @@
 {
     "save_timeseries_data": 1, 
     "time_steps_max": 2000,
-    "carbon_price_time": 1000,
+    "carbon_price_time": 0,
     "phi_lower": 0.01,
     "phi_upper": 0.05,
     "low_carbon_substitutability_lower":0.5,
@@ -33,6 +33,6 @@
     "budget_multiplier": 1,
     "price_high_carbon_factor": 1.0,
     "ratio_preference_or_consumption": 1.0,
-    "carbon_tax_implementation": "flat",
+    "carbon_tax_implementation": "linear",
     "clipping_epsilon": 1e-3
 }

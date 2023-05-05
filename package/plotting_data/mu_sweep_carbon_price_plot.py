@@ -6,7 +6,8 @@ Created: 10/10/2022
 import matplotlib.pyplot as plt
 import numpy as np
 from package.resources.plot import (
-    multi_emissions_timeseries_carbon_price
+    multi_emissions_timeseries_carbon_price,
+    multi_emissions_timeseries_carbon_price_quantile
 )
 from package.resources.utility import (
     load_object
@@ -20,14 +21,16 @@ def main(
     #print("emissions_stock_data_list", emissions_stock_data_list.shape)
     emissions_flow_data_list = load_object(fileName + "/Data","emissions_flow_data_list")
     carbon_prices_dict = load_object(fileName + "/Data", "carbon_prices") 
-    property_values_list = load_object(fileName + "/Data", "property_values_list")    
-    base_params = load_object(fileName + "/Data", "base_params")    
-    time_array = np.arange(0,base_params["time_steps_max"] + base_params["compression_factor"],base_params["compression_factor"])
-    multi_emissions_timeseries_carbon_price(fileName,emissions_stock_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions stock")
-    multi_emissions_timeseries_carbon_price(fileName,emissions_flow_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions flow")
+    property_values_list = load_object(fileName + "/Data", "property_values_list")       
+    time_array = load_object(fileName + "/Data", "time_array") 
+    #multi_emissions_timeseries_carbon_price(fileName,emissions_stock_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions stock", "stock")
+    #multi_emissions_timeseries_carbon_price(fileName,emissions_flow_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions flow","flow")
+    
+    multi_emissions_timeseries_carbon_price_quantile(fileName,emissions_stock_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions stock", "stock")
+    multi_emissions_timeseries_carbon_price_quantile(fileName,emissions_flow_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions flow","flow")
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/mu_sweep_carbon_price_13_25_45__05_05_2023",
+        fileName="results/mu_sweep_carbon_price_13_45_53__05_05_2023",
     )

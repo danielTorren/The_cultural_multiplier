@@ -839,7 +839,7 @@ def live_animate_identity_network_weighting_matrix(
 ##################################################################################
 #NEW PLOTS
 def multi_emissions_timeseries_carbon_price(
-    fileName,emissions_data_list, carbon_prices,property_values_list, time, title
+    fileName,emissions_data_list, carbon_prices,property_values_list, time, title,type_em
 ):
 
     fig, axes = plt.subplots(nrows = 1, ncols = len(carbon_prices),figsize=(10,6), sharey=True)
@@ -875,7 +875,47 @@ def multi_emissions_timeseries_carbon_price(
 
     #print("what worong")
     plotName = fileName + "/Plots"
-    f = plotName + "/multi_emissions_stock_timeseries"
+    f = plotName + "/multi_emissions_stock_timeseries_%s" % (type_em)
+    fig.savefig(f+ ".png", dpi=600, format="png")
+
+def multi_emissions_timeseries_carbon_price_quantile(
+    fileName,emissions_data_list, carbon_prices,property_values_list, time, title,type_em
+):
+
+    fig, axes = plt.subplots(nrows = 1, ncols = len(carbon_prices),figsize=(10,6), sharey=True)
+    #print(axes)
+    cmap = get_cmap("plasma")
+
+    #print("emissions_data_list",emissions_data_list.shape)
+    #quit()
+    axes[0].set_ylabel(title)
+
+    ani_step_colours = cmap(property_values_list)
+
+    for i, ax in enumerate(fig.axes):
+        for j, Data in enumerate(emissions_data_list[i]):#mu
+            #print("Data",Data, Data.shape)
+            mu_emissions = Data.mean(axis=0)
+            min_emissions =   np.quantile(Data, 0.25,axis=0)#Data.min(axis=0)
+            max_emissions=   np.quantile(Data, 0.75,axis=0)#Data.max(axis=0)
+            #print("stuff mu",mu_emissions)
+            #print("stuff min",min_emissions)
+
+            ax.plot(time, mu_emissions, c= ani_step_colours[j])
+            ax.fill_between(time, min_emissions, max_emissions, facecolor=ani_step_colours[j], alpha=0.5)
+            #ax.plot(Data.history_time, Data, color = ani_step_colours[j])
+        ax.set_xlabel(r"Time")
+        
+        ax.set_title(r"Carbon price = %s" % (carbon_prices[i]))
+        
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap), ax=axes.ravel().tolist()
+    )
+    cbar.set_label(r"Ratio of preference to consumption")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_emissions_stock_timeseries_quantile_%s" % (type_em)
     fig.savefig(f+ ".png", dpi=600, format="png")
 
 def plot_total_carbon_emissions_timeseries_sweep(

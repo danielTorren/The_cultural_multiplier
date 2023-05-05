@@ -26,8 +26,8 @@ class Network:
             Dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters
 
         """
-
         self.set_seed = parameters["set_seed"]
+        
         np.random.seed(self.set_seed)
 
         self.K = int(round(parameters["K"]))  # round due to the sampling method producing floats in the Sobol Sensitivity Analysis
@@ -132,16 +132,16 @@ class Network:
 
         ## LOW CARBON SUBSTITUTABLILITY
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
-        #np.random.shuffle(self.low_carbon_substitutability_array)
+        np.random.shuffle(self.low_carbon_substitutability_array)
 
         #HIGH CARBON PRICE
         self.prices_high_carbon_array = np.linspace(parameters["prices_high_carbon_lower"], parameters["prices_high_carbon_upper"], num=self.M)
-        #np.random.shuffle(self.prices_high_carbon_array)    
+        np.random.shuffle(self.prices_high_carbon_array)    
 
         ##SERVICE SUB
         no_norm_service_preference_matrix_init = np.linspace(parameters["service_preference_lower"], parameters["service_preference_upper"], num=self.M)
         norm_service_preference =  no_norm_service_preference_matrix_init/np.linalg.norm(no_norm_service_preference_matrix_init)
-        #np.random.shuffle(norm_service_preference)
+        np.random.shuffle(norm_service_preference)
         self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
 
         ###### BUDGET
