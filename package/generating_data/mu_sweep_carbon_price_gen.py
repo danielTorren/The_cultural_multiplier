@@ -88,15 +88,17 @@ def main(
         params["carbon_price_increased"] = price
         stocH_params_list = stocH_params_list  + produce_param_list_stochastic(params, property_values_list, property_varied)
 
-    emissions_stock_array, emissions_flow_array = multi_emissions_flow_stock_run(stocH_params_list)
+    emissions_stock_array, emissions_flow_array, identity_array = multi_emissions_flow_stock_run(stocH_params_list)
 
     emissions_stock_data_list = emissions_stock_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array)))
     emissions_flow_data_list = emissions_flow_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array)))
-
+    identity_array_data_list = identity_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array),params["N"]))
+    
     createFolder(fileName)
 
     save_object(emissions_stock_data_list, fileName + "/Data", "emissions_stock_data_list")
     save_object(emissions_flow_data_list, fileName + "/Data", "emissions_flow_data_list")
+    save_object(identity_array_data_list,fileName + "/Data", "identity_array_data_list")
     save_object(params, fileName + "/Data", "base_params")
     save_object(property_varied, fileName + "/Data", "property_varied")
     save_object(property_varied_title, fileName + "/Data", "property_varied_title")

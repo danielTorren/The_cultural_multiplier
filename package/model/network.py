@@ -187,7 +187,7 @@ class Network:
             self.history_max_identity = [self.max_identity]
             self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
             self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
-
+            self.history_identity_list = [self.identity_list]
     def normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
         """
         Row normalize an array
@@ -564,6 +564,7 @@ class Network:
         self.history_max_identity.append(self.max_identity)
         self.history_stock_carbon_emissions.append(self.total_carbon_emissions_stock)
         self.history_flow_carbon_emissions.append(self.total_carbon_emissions_flow)
+        self.history_identity_list.append(self.identity_list)
 
     def next_step(self):
         """
