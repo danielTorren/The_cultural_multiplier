@@ -199,7 +199,7 @@ def multi_stochstic_emissions_flow_stock_run(
 
 def generate_emissions_stock_flow(params):
     data = generate_data(params)
-    return (np.asarray(data.history_stock_carbon_emissions), np.asarray(data.history_flow_carbon_emissions)), np.asarray(data.history_identity_listy)
+    return (np.asarray(data.history_stock_carbon_emissions), np.asarray(data.history_flow_carbon_emissions), np.asarray(data.history_identity_list))
 
 def multi_emissions_flow_stock_run(
         params_dict: list[dict]

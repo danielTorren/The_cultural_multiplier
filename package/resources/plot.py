@@ -840,32 +840,41 @@ def live_animate_identity_network_weighting_matrix(
 #NEW PLOTS
 
 def multi_identity_timeseries_carbon_price(
-    fileName,emissions_data_list, carbon_prices,property_values_list, time, title, av_reps, N
+    fileName,emissions_data_list, carbon_prices,property_values_list, time, title, seed_list, N
 ):
 
-    fig, axes = plt.subplots(nrows = av_reps, ncols = len(carbon_prices),figsize=(10,6), sharey=True)
+    fig, axes = plt.subplots(nrows = len(seed_list), ncols = len(carbon_prices),figsize=(10,6), sharey="row",sharex="row", constrained_layout=True)
     #print(axes)
     cmap = get_cmap("plasma")
 
     #print("emissions_data_list",emissions_data_list.shape)
     #quit()
-    axes[0].set_ylabel(title)
+    
+    #axes[1][0].set_ylabel(title)
+    
+    #axes[k][i].set_title(r"Carbon price = %s" % (carbon_prices[i]))
 
     ani_step_colours = cmap(property_values_list)
 
-    for v in range(av_reps):
-        for i in range(len(carbon_prices)):
-            for j, Data in enumerate(emissions_data_list[i]):#mu
+    for i in range(len(carbon_prices)):#carbon price
+        axes[len(seed_list)-1][i].set_xlabel(r"Time")
+        axes[0][i].set_title(r"Carbon price = %s" % (carbon_prices[i]))
+        for j in range(len(property_values_list)):#mu
+            for k, seed in enumerate(seed_list):#seed, and rows!
+                axes[k][0].set_ylabel(title)
+                ax2 = axes[k][len(carbon_prices)-1].twinx()
+                ax2.set_ylabel("Seed = %s" % (seed))
+                data_t_n = emissions_data_list[i][j][k]
+                data_n_t = data_t_n.T
                 # the people plot the history
                 for n in range(N):
-                    print("time series",Data[i][v][:][n] )
-                    quit()
-                    axes[v][i].plot(time, Data[i][v][:][n], c= ani_step_colours[j])
+                    #print("time series",data_n_t[n])
+                    #quit()
+
+                    axes[k][i].plot(time, data_n_t[n], c= ani_step_colours[j])
                 #ax.fill_between(time, min_emissions, max_emissions, facecolor=ani_step_colours[j], alpha=0.5)
                 #ax.plot(Data.history_time, Data, color = ani_step_colours[j])
-            axes[v][i].set_xlabel(r"Time")
-            
-            axes[v][i].set_title(r"Carbon price = %s" % (carbon_prices[i]))
+
         
     cbar = fig.colorbar(
         plt.cm.ScalarMappable(cmap=cmap), ax=axes.ravel().tolist()

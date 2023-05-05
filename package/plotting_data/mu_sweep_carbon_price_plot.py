@@ -33,11 +33,11 @@ def main(
     
     #multi_emissions_timeseries_carbon_price_quantile(fileName,emissions_stock_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions stock", "stock")
     #multi_emissions_timeseries_carbon_price_quantile(fileName,emissions_flow_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Carbon emissions flow","flow")
-    multi_identity_timeseries_carbon_price(fileName,identity_array_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Identity", len(base_params["seed_list"]), base_params["N"])
+    multi_identity_timeseries_carbon_price(fileName,identity_array_data_list, carbon_prices_dict["carbon_prices"] ,property_values_list,time_array,"Identity", base_params["seed_list"], base_params["N"])
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/mu_sweep_carbon_price_15_33_42__05_05_2023",
+        fileName="results/mu_sweep_carbon_price_19_56_04__05_05_2023",
     )
