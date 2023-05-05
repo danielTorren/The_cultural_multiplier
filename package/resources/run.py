@@ -140,7 +140,6 @@ def parallel_run_sa(
     )
 
 def generate_multi_output_individual_emissions_list(params):
-
     emissions_list = []
     for v in params["seed_list"]:
         params["set_seed"] = v
@@ -158,6 +157,8 @@ def multi_stochstic_emissions_run(
     )
     return np.asarray(emissions_list)
 
+
+
 def stochastic_generate_emissions(params):
     data = generate_data(params)
     return data.history_stock_carbon_emissions
@@ -171,3 +172,27 @@ def sweep_stochstic_emissions_run(
         delayed(stochastic_generate_emissions)(i) for i in params_dict
     )
     return np.asarray(emissions_list)
+
+def stochastic_generate_emissions_stock_flow(params):
+    emissions_stock_list = []
+    emissions_flow_list = []
+    for v in params["seed_list"]:
+        params["set_seed"] = v
+        data = generate_data(params)
+        emissions_stock_list.append(data.history_stock_carbon_emissions)#LOOK AT STOCK
+        emissions_flow_list.append(data.history_flow_carbon_emissions)#LOOK AT STOCK
+    return (np.asarray(emissions_stock_list), np.asarray(emissions_flow_list))
+
+def multi_stochstic_emissions_flow_stock_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_multi_output_individual_emissions_list(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(stochastic_generate_emissions_stock_flow)(i) for i in params_dict
+    )
+    emissions_stock, emissions_flow = zip(
+        *res
+    )
+
+    return np.asarray(emissions_stock), np.asarray(emissions_flow)

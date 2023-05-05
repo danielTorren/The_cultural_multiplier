@@ -46,7 +46,7 @@ if __name__ == '__main__':
     "M": 3,
     "K": 20,
     "prob_rewire": 0.1,
-    "learning_error_scale": 0.00,
+    "learning_error_scale": 0.02,
     "homophily": 0.95,
     "confirmation_bias": 20,
     "a_low_carbon_preference": 1,
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     "carbon_price_increased" : 1.0,
     "budget_multiplier": 1,
     "price_high_carbon_factor": 1.0,
-    "ratio_preference_or_consumption": 0.98,
+    "ratio_preference_or_consumption": 1.00,
     "carbon_tax_implementation": "flat",
     "clipping_epsilon": 1e-5
 }
