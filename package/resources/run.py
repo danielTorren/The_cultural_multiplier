@@ -50,7 +50,7 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
 
 def generate_sensitivity_output(params: dict):
     """
-    Generate data from a set of parameter contained in a dictionary. Average results over multiple stochastic seeds contained in params["seed_list"]
+    Generate data from a set of parameter contained in a dictionary. Average results over multiple stochastic seeds 
 
     """
     #print("params", params)
@@ -62,8 +62,8 @@ def generate_sensitivity_output(params: dict):
     coefficient_variance_list = []
     emissions_change_list = []
 
-    for v in params["seed_list"]:
-        params["set_seed"] = v
+    for v in range(params["seed_reps"]):
+        params["set_seed"] = int(v)
         data = generate_data(params)
         norm_factor = data.N * data.M
         # Insert more measures below that want to be used for evaluating the
@@ -141,8 +141,8 @@ def parallel_run_sa(
 
 def generate_multi_output_individual_emissions_list(params):
     emissions_list = []
-    for v in params["seed_list"]:
-        params["set_seed"] = v
+    for v in range(params["seed_reps"]):
+        params["set_seed"] = int(v)
         data = generate_data(params)
         emissions_list.append(data.total_carbon_emissions_stock)#LOOK AT STOCK
     return (emissions_list)
@@ -176,8 +176,8 @@ def sweep_stochstic_emissions_run(
 def stochastic_generate_emissions_stock_flow(params):
     emissions_stock_list = []
     emissions_flow_list = []
-    for v in params["seed_list"]:
-        params["set_seed"] = v
+    for v in range(params["seed_reps"]):
+        params["set_seed"] = int(v)
         data = generate_data(params)
         emissions_stock_list.append(data.history_stock_carbon_emissions)#LOOK AT STOCK
         emissions_flow_list.append(data.history_flow_carbon_emissions)#LOOK AT STOCK
@@ -214,3 +214,18 @@ def multi_emissions_flow_stock_run(
     )
 
     return np.asarray(emissions_stock), np.asarray(emissions_flow), np.asarray(identity)
+
+def generate_emissions_stock(params):
+    data = generate_data(params)
+    return np.asarray(data.total_carbon_emissions_stock) 
+
+def multi_emissions_stock(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_multi_output_individual_emissions_list(i) for i in params_dict]
+    emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_emissions_stock)(i) for i in params_dict
+    )
+
+    return np.asarray(emissions_stock)

@@ -6,61 +6,44 @@ Created: 10/10/2022
 import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import multi_stochstic_emissions_run
-
-# modules
-def produce_param_list(params: dict, property_list: list, property: str) -> list[dict]:
-    """
-    Produce a list of the dicts for each experiment
-
-    Parameters
-    ----------
-    params: dict
-        base parameters from which we vary e.g
-            params["time_steps_max"] = int(params["total_time"] / params["delta_t"])
-    porperty_list: list
-        list of values for the property to be varied
-    property: str
-        property to be varied
-
-    Returns
-    -------
-    params_list: list[dict]
-        list of parameter dicts, each entry corresponds to one experiment to be tested
-    """
-
-    params_list = []
-    for i in property_list:
-        params[property] = i
-        params_list.append(
-            params.copy()
-        )  # have to make a copy so that it actually appends a new dict and not just the location of the params dict
-    return params_list
+from package.resources.run import multi_stochstic_emissions_run,multi_emissions_stock
+from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        property_min = 0,
-        property_max = 2,
-        property_reps = 16,
+        CARBON_PRICES_LOAD = "package/carbon_prices.json"
          ) -> str: 
 
+    f_var = open(CARBON_PRICES_LOAD)
+    var_params = json.load(f_var) 
+
+    property_varied = var_params["property"]
+    property_min = var_params["min"]
+    property_max = var_params["max"]
+    property_reps = var_params["reps"]
+
+    property_values_list = np.linspace(property_min, property_max, property_reps)
 
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
 
-    root = "linear_versus_flat_carbon_tax"
+    root = "flat_linear_sweep_carbon_price"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
-    
-    property_values_list = np.linspace(property_min, property_max, property_reps)
 
     params["carbon_tax_implementation"] = "flat"
-    params_list_flat = produce_param_list(params, property_values_list, "carbon_price_increased")
+    params_list_flat = produce_param_list_stochastic(params, property_values_list, property_varied)#produce_param_list(params, property_values_list,property_varied)
     params["carbon_tax_implementation"] = "linear"
-    params_list_linear = produce_param_list(params, property_values_list, "carbon_price_increased")
+    params_list_linear = produce_param_list_stochastic(params, property_values_list, property_varied)#produce_param_list(params, property_values_list, property_varied)
 
-    data_flat = multi_stochstic_emissions_run(params_list_flat) 
-    data_linear = multi_stochstic_emissions_run(params_list_linear) 
+    stocH_params_list = params_list_flat + params_list_linear
+
+    emissions_stock_array = multi_emissions_stock(stocH_params_list)
+
+    emissions_stock_data_list = emissions_stock_array.reshape(2,property_reps, params["seed_reps"])
+
+    data_flat = emissions_stock_data_list[0] 
+    data_linear = emissions_stock_data_list[1]
 
     createFolder(fileName)
 
@@ -75,9 +58,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        property_min = 0,
-        property_max = 2,
-        property_reps = 16,
+        BASE_PARAMS_LOAD = "package/constants/base_params_carbon_prices_linear_versus_flat.json",
+        CARBON_PRICES_LOAD = "package/constants/carbon_prices_linear_versus_flat.json"
 )
 

@@ -66,7 +66,8 @@ class Network:
         self.clipping_epsilon = parameters["clipping_epsilon"]
 
         # setting arrays with lin space
-        self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_upper"], num=self.M)
+        self.phi_array = np.asarray([parameters["phi"]]*self.M)
+        #self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_upper"], num=self.M)
 
         #print("self.low_carbon_substitutability_array", self.low_carbon_substitutability_array)
         #print("self.prices_high_carbon_array", self.prices_high_carbon_array)
@@ -90,8 +91,8 @@ class Network:
         
         self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
         self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
-        self.a_individual_budget = parameters["a_individual_budget"]#B
-        self.b_individual_budget = parameters["b_individual_budget"]#B
+        #self.a_individual_budget = parameters["a_individual_budget"]#B
+        #self.b_individual_budget = parameters["b_individual_budget"]#B
         
         """
         "a_service_preference": 1,
@@ -119,12 +120,12 @@ class Network:
             self.prices_high_carbon_array
         ) = self.generate_init_data_preferences()
         
-
-        (
-            self.low_carbon_preference_matrix_init,
-            self.individual_budget_array,
-        ) = self.generate_init_data_preferences_alt()
         """
+        #(
+        #    self.low_carbon_preference_matrix_init,
+        #) = self.generate_init_data_preferences_alt()
+        ##    self.individual_budget_array,
+        
 
         (
             self.low_carbon_preference_matrix_init
@@ -144,11 +145,13 @@ class Network:
         np.random.shuffle(norm_service_preference)
         self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
 
-        ###### BUDGET
-        no_norm_individual_budget_array = np.exp(np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
-        #print("no_norm_individual_budget_array",no_norm_individual_budget_array)
-        #print("linspace",np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
-        self.individual_budget_array =  no_norm_individual_budget_array/np.linalg.norm(no_norm_individual_budget_array)
+        ####### BUDGET
+        #Uniform budget
+        self.individual_budget_array =  np.asarray([parameters["individual_budget"]]*self.N)
+        
+        #Inequality in budget
+        #no_norm_individual_budget_array = np.exp(np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
+        #self.individual_budget_array =  no_norm_individual_budget_array/np.linalg.norm(no_norm_individual_budget_array)
 
         #np.random.shuffle(norm_service_preference)
 

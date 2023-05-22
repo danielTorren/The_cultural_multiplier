@@ -47,8 +47,8 @@ def produce_param_list_stochastic(params: dict, property_list: list, property: s
     params_list = []
     for i in property_list:
         params[property] = i
-        for v in params["seed_list"]:
-            params["set_seed"] = v
+        for v in range(params["seed_reps"]):
+            params["set_seed"] = int(v)
             params_list.append(
                 params.copy()
             )  
@@ -90,9 +90,9 @@ def main(
 
     emissions_stock_array, emissions_flow_array, identity_array = multi_emissions_flow_stock_run(stocH_params_list)
 
-    emissions_stock_data_list = emissions_stock_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array)))
-    emissions_flow_data_list = emissions_flow_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array)))
-    identity_array_data_list = identity_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, len(params["seed_list"]),len(time_array),params["N"]))
+    emissions_stock_data_list = emissions_stock_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, params["seed_reps"],len(time_array)))
+    emissions_flow_data_list = emissions_flow_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, params["seed_reps"],len(time_array)))
+    identity_array_data_list = identity_array.reshape((len(carbon_prices["carbon_prices"]),property_reps, params["seed_reps"],len(time_array),params["N"]))
     
     createFolder(fileName)
 

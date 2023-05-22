@@ -40,7 +40,7 @@ if __name__ == '__main__':
     "phi_lower": 0.01,
     "phi_upper": 0.05,
     "compression_factor": 10,
-    "seed_list": [1,2,3,4,5],
+    "seed_reps": 5,
     "set_seed": 1,
     "N": 200,
     "M": 3,

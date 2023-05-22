@@ -13,7 +13,7 @@
     "individual_budget_array_lower":0.05,
     "individual_budget_array_upper":0.95,
     "compression_factor": 10,
-    "seed_list": [1,2,3],
+    "seed_reps": 3,
     "set_seed": 1,
     "N": 200,
     "M": 5,

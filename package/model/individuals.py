@@ -140,7 +140,7 @@ class Individual:
         H_m_clipped = np.clip(H_m, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
         L_m_clipped = np.clip(L_m, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
         
-        return H_m,L_m
+        return H_m_clipped,L_m_clipped
 
     def calc_identity(self) -> float:
         #print("self.low_carbon_preferences", self.low_carbon_preferences)
@@ -151,9 +151,7 @@ class Individual:
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
 
-    def calc_total_emissions(self): 
-        #print("emissions", self.H_m, sum(self.H_m))
-        #quit()       
+    def calc_total_emissions(self):      
         return sum(self.H_m)
 
     def save_timeseries_data_individual(self):
