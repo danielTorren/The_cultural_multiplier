@@ -125,6 +125,8 @@ class Individual:
     
     def calc_chi_matrix(self):
         chi_components = self.calc_chi_components(self.service_preferences, self.prices_high_carbon_instant, self.low_carbon_preferences, self.Omega_m, self.low_carbon_substitutability_array)      
+        if np.isnan(np.sum(chi_components)):
+            print(" chi_components", chi_components)
         A, B = np.meshgrid(chi_components, chi_components)
         chi_matrix = A/B
 
@@ -186,12 +188,8 @@ class Individual:
 
         #calculate consumption
         self.Omega_m = self.calc_omega()
-
         self.chi_matrix = self.calc_chi_matrix()
         self.H_m, self.L_m = self.calc_consumption_quantities()
-
-        #self.chi_matrix = self.calc_chi_matrix_old()
-        #self.H_m, self.L_m = self.calc_consumption_quantities_old()
 
         #calc_emissions
         self.flow_carbon_emissions = self.calc_total_emissions()
