@@ -77,7 +77,9 @@ class Individual:
         #print("chi_components", chi_components)
 
         A, B = np.meshgrid(chi_components, chi_components)
+        print(A-B)
         chi_matrix = A/B
+
         if (np.isnan(chi_matrix).any()):
             print("chi_matrix",chi_matrix)
             print("chi_components", chi_components)
