@@ -74,10 +74,14 @@ class Individual:
 
         chi_components = ((self.prices_high_carbon_instant/self.service_preferences)**(self.service_substitutability))*((self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences))**((1-self.service_substitutability)*((self.low_carbon_substitutability_array)/((self.low_carbon_substitutability_array - 1)))))
 
-        print("chi_components", chi_components)
+        #print("chi_components", chi_components)
 
         A, B = np.meshgrid(chi_components, chi_components)
         chi_matrix = A/B
+        if (np.isnan(chi_matrix).any()):
+            print("chi_matrix",chi_matrix)
+            print("chi_components", chi_components)
+            quit()
 
         return chi_matrix
          
