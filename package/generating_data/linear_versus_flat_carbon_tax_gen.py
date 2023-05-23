@@ -37,6 +37,7 @@ def main(
     params_list_linear = produce_param_list_stochastic(params, property_values_list, property_varied)#produce_param_list(params, property_values_list, property_varied)
 
     stocH_params_list = params_list_flat + params_list_linear
+    #print(len(stocH_params_list), len(params_list_flat), len(params_list_linear))
 
     emissions_stock_array = multi_emissions_stock(stocH_params_list)
 

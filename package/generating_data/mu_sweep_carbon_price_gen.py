@@ -48,7 +48,7 @@ def produce_param_list_stochastic(params: dict, property_list: list, property: s
     for i in property_list:
         params[property] = i
         for v in range(params["seed_reps"]):
-            params["set_seed"] = int(v)
+            params["set_seed"] = int(v+1)
             params_list.append(
                 params.copy()
             )  

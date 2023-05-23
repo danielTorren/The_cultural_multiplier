@@ -63,7 +63,7 @@ def generate_sensitivity_output(params: dict):
     emissions_change_list = []
 
     for v in range(params["seed_reps"]):
-        params["set_seed"] = int(v)
+        params["set_seed"] = int(v+1)#plus one is because seed 0 and 1 are the same, so want to avoid them 
         data = generate_data(params)
         norm_factor = data.N * data.M
         # Insert more measures below that want to be used for evaluating the
@@ -142,7 +142,7 @@ def parallel_run_sa(
 def generate_multi_output_individual_emissions_list(params):
     emissions_list = []
     for v in range(params["seed_reps"]):
-        params["set_seed"] = int(v)
+        params["set_seed"] = int(v+1)
         data = generate_data(params)
         emissions_list.append(data.total_carbon_emissions_stock)#LOOK AT STOCK
     return (emissions_list)
@@ -177,7 +177,7 @@ def stochastic_generate_emissions_stock_flow(params):
     emissions_stock_list = []
     emissions_flow_list = []
     for v in range(params["seed_reps"]):
-        params["set_seed"] = int(v)
+        params["set_seed"] = int(v+1)
         data = generate_data(params)
         emissions_stock_list.append(data.history_stock_carbon_emissions)#LOOK AT STOCK
         emissions_flow_list.append(data.history_flow_carbon_emissions)#LOOK AT STOCK

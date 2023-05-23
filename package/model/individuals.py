@@ -71,25 +71,16 @@ class Individual:
         return omega_vector
 
     def calc_chi_matrix(self):
-
         chi_components = ((self.prices_high_carbon_instant/self.service_preferences)**(self.service_substitutability))*((self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences))**((1-self.service_substitutability)*((self.low_carbon_substitutability_array)/((self.low_carbon_substitutability_array - 1)))))
-
-        #print("chi_components", chi_components)
-
         A, B = np.meshgrid(chi_components, chi_components)
-        print(A-B)
-        chi_matrix = A/B
-
-        if (np.isnan(chi_matrix).any()):
-            print("chi_matrix",chi_matrix)
-            print("chi_components", chi_components)
-            quit()
+        chi_matrix = B/A
 
         return chi_matrix
          
     def calc_consumption_quantities(self):
         common_vector_denominator = self.Omega_m*self.prices_low_carbon + self.prices_high_carbon_instant
-        H_m_denominators = np.matmul(self.chi_matrix.T, common_vector_denominator)#CAN I DO THIS WITHOUT THE TRANSPOSE
+
+        H_m_denominators = np.matmul(self.chi_matrix, common_vector_denominator)
 
         H_m = self.instant_budget/H_m_denominators
         L_m = H_m*self.Omega_m
