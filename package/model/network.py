@@ -92,45 +92,25 @@ class Network:
         
         self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
         self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
-        #self.a_individual_budget = parameters["a_individual_budget"]#B
-        #self.b_individual_budget = parameters["b_individual_budget"]#B
-        
-        """
-        "a_service_preference": 1,
-        "b_service_preference": 1,
-        "a_low_carbon_substitutability":1,
-        "b_low_carbon_substitutability":1,
-        "multiplier_low_carbon_substitutability":10,
-        "a_prices_high_carbon": 1,
-        "b_prices_high_carbon": 1
-
-        self.a_service_preference = parameters["a_service_preference"]#a
-        self.b_service_preference = parameters["b_service_preference"]#a
-        self.a_low_carbon_substitutability = parameters["a_low_carbon_substitutability"]#sigma
-        self.b_low_carbon_substitutability = parameters["b_low_carbon_substitutability"]#sigma
-        self.a_prices_high_carbon = parameters["a_prices_high_carbon"]#P_H
-        self.b_prices_high_carbon = parameters["b_prices_high_carbon"]
-
-        self.multiplier_low_carbon_substitutability = parameters["multiplier_low_carbon_substitutability"]#sigma can be more than 1
-
-        (
-            self.low_carbon_preference_matrix_init,
-            self.individual_budget_array,
-            self.service_preference_matrix_init,
-            self.low_carbon_substitutability_array,
-            self.prices_high_carbon_array
-        ) = self.generate_init_data_preferences()
-        
-        """
-        #(
-        #    self.low_carbon_preference_matrix_init,
-        #) = self.generate_init_data_preferences_alt()
-        ##    self.individual_budget_array,
-        
-
         (
             self.low_carbon_preference_matrix_init
         ) = self.generate_init_data_preferences_alt_alt()
+        
+        if parameters["budget_inequality_state"] == 1:
+
+            #Inequality in budget
+            self.budget_inequality_const = parameters["budget_inequality_const"]
+            #print("self.budget_inequality_const", self.budget_inequality_const)
+            no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
+            #print("no_norm_individual_budget_array", no_norm_individual_budget_array)
+            #np.exp(-parameters["individual_budget_array_lower"]*np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
+            self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
+            #print("self.individual_budget_array", self.individual_budget_array,self.budget_inequality_const)
+
+        else:
+            #Uniform budget
+            self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
+            
 
         ## LOW CARBON SUBSTITUTABLILITY
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
@@ -145,16 +125,6 @@ class Network:
         norm_service_preference =  self.normalize_vector_sum(no_norm_service_preference_matrix_init)
         np.random.shuffle(norm_service_preference)
         self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
-
-        ####### BUDGET
-        #Uniform budget
-        self.individual_budget_array =  np.asarray([parameters["individual_budget"]]*self.N)
-        
-        #Inequality in budget
-        #no_norm_individual_budget_array = np.exp(np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
-        #self.individual_budget_array =  no_norm_individual_budget_array/np.linalg.norm(no_norm_individual_budget_array)
-
-        #np.random.shuffle(norm_service_preference)
 
         self.agent_list = self.create_agent_list()
 
@@ -509,23 +479,25 @@ class Network:
         return (identity_list,identity_mean, identity_std, identity_variance, identity_max, identity_min)
 
     def calc_carbon_dividend_array(self):
-        
-        wealth_list_B = np.asarray([x.instant_budget for x in self.agent_list])
-        tax_income_R = sum([x.H_m*self.carbon_price for x in self.agent_list])
-
-        mean_wealth = np.mean(wealth_list_B)
-        if self.dividend_progressiveness == 0:#percapita
-             carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
-        elif self.dividend_progressiveness > 0 and self.dividend_progressiveness <= 1:#regressive
-            d_max = - tax_income_R/(self.N*(np.max(wealth_list_B) - mean_wealth))#max value d can be
-            div_prog_t = min(self.dividend_progressiveness, d_max)
-            carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
-        elif self.dividend_progressiveness >= -1 and self.dividend_progressiveness <0:#progressive
-            d_min = - tax_income_R/(self.N*(np.min(wealth_list_B) - mean_wealth))#most negative value d can be
-            div_prog_t = max(self.dividend_progressiveness, d_min)
-            carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
+        if self.t < self.carbon_price_time:
+            carbon_dividend_array = [0]*self.N
         else:
-            raise("Invalid self.dividend_progressiveness d = [-1,1]")
+            wealth_list_B = np.asarray([x.instant_budget for x in self.agent_list])
+            tax_income_R = sum(sum(x.H_m*self.carbon_price) for x in self.agent_list)
+            mean_wealth = np.mean(wealth_list_B)
+            
+            if self.dividend_progressiveness == 0:#percapita
+                carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
+            elif self.dividend_progressiveness > 0 and self.dividend_progressiveness <= 1:#regressive
+                d_max = - tax_income_R/(self.N*(np.max(wealth_list_B) - mean_wealth))#max value d can be
+                div_prog_t = min(self.dividend_progressiveness, d_max)
+                carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
+            elif self.dividend_progressiveness >= -1 and self.dividend_progressiveness <0:#progressive
+                d_min = - tax_income_R/(self.N*(np.min(wealth_list_B) - mean_wealth))#most negative value d can be
+                div_prog_t = max(self.dividend_progressiveness, d_min)
+                carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
+            else:
+                raise("Invalid self.dividend_progressiveness d = [-1,1]")
         return carbon_dividend_array
     
     def calc_carbon_price(self):
@@ -611,8 +583,6 @@ class Network:
                 self.min_identity,
                 self.max_identity,
         ) = self.calc_network_identity()
-
-        #print("self.average_identity", self.average_identity)
 
         self.carbon_dividend_array = self.calc_carbon_dividend_array()
 

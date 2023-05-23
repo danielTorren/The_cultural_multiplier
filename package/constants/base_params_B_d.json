@@ -1,10 +1,10 @@
 {
     "save_timeseries_data": 0, 
+    "budget_inequality_state":1,
     "compression_factor":10,
-    "budget_inequality_state":0,
     "time_steps_max": 2000,
     "carbon_price_time": 500,
-    "seed_reps": 20,
+    "seed_reps": 10,
     "N": 200,
     "M": 3,
     "K": 20,
@@ -25,5 +25,7 @@
     "init_carbon_price": 0,
     "dividend_progressiveness": 0,
     "ratio_preference_or_consumption": 1.0,
-    "clipping_epsilon": 1e-4
+    "clipping_epsilon": 1e-4,
+    "carbon_tax_implementation": "flat",
+    "carbon_price_increased" : 0.5
 }

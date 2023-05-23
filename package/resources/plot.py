@@ -18,6 +18,8 @@ from typing import Union
 from package.model.network import Network
 from scipy.stats import beta
 import numpy.typing as npt
+import seaborn
+from pydlc import dense_lines
 
 ###########################################################
 #Setting fonts and font sizes
@@ -1083,6 +1085,114 @@ def plot_emissions_flat_versus_linear(fileName, data_flat,data_linear, carbon_pr
     f = plotName + "/flat_versus_linear_carbon_tax"
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
+
+def plot_emissions_flat_versus_linear_quintile(fileName, data_flat,data_linear, carbon_prices):
+
+    fig, ax = plt.subplots(figsize=(10,6))
+
+
+    mu_emissions_flat =  data_flat.mean(axis=1)
+    #print("    mu_emissions_flat",     mu_emissions_flat)
+    min_emissions_flat =    np.quantile(data_flat, 0.25,axis=1)#data_flat.min(axis=1)
+    max_emissions_flat=     np.quantile(data_flat, 0.75,axis=1)#data_flat.max(axis=1)
+
+    mu_emissions_linear =  data_linear.mean(axis=1)
+    min_emissions_linear =  np.quantile(data_linear, 0.25,axis=1)
+    max_emissions_linear=  np.quantile(data_linear, 0.75,axis=1)
+        
+
+    ax.plot(carbon_prices, mu_emissions_flat, c= "red", label = "flat")
+    ax.fill_between(carbon_prices, min_emissions_flat, max_emissions_flat, facecolor='red', alpha=0.5)
+    ax.plot(carbon_prices,mu_emissions_linear, c="blue",label = "linear")
+    ax.fill_between(carbon_prices, min_emissions_linear, max_emissions_linear, facecolor='blue', alpha=0.5)
+
+    ax.set_xlabel(r"Final carbon price")
+    ax.set_ylabel(r"Normlised total carbon emissions, E/NM")
+    ax.legend()
+    ax.grid()
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/flat_versus_linear_carbon_tax_quintile"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+
+def plot_emissions_flat_versus_linear_density(fileName, data_flat,data_linear, carbon_prices):
+
+    fig, axs = plt.subplots(1, 2, figsize=(10, 6), sharey=True, sharex=True)
+    #print(data_flat)
+    im_flat = dense_lines(data_flat.T, x=carbon_prices, ax=axs[0], cmap='Reds', ny = 200)
+    im_linear = dense_lines(data_linear.T, x=carbon_prices, ax=axs[1], cmap='Blues', ny = 200)
+
+    axs[0].set_title("Flat")
+    axs[1].set_title("Linear")
+
+    fig.colorbar(im_flat)
+    fig.colorbar(im_linear)
+    fig.tight_layout()
+    #seaborn.boxplot(x = carbon_prices, 
+    #            y = data_linear, 
+    #            ax = ax)
+    
+    #ax.boxplot(carbon_prices, data_flat)
+    #ax.boxplot(carbon_prices, data_linear)
+    #ax.plot(carbon_prices, mu_emissions_flat, c= "red", label = "flat")
+    #ax.fill_between(carbon_prices, min_emissions_flat, max_emissions_flat, facecolor='red', alpha=0.5)
+    #ax.plotm
+    #ax.fill_between(carbon_prices, min_emissions_linear, max_emissions_linear, facecolor='blue', alpha=0.5)
+
+    axs[0].set_xlabel(r"Final carbon price")
+    axs[1].set_xlabel(r"Final carbon price")
+    axs[0].set_ylabel(r"Normlised total carbon emissions, E/NM")
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/flat_versus_linear_carbon_tax_density"
+    fig.savefig(f+ ".png", dpi=600, format="png")  
+
+def plot_emissions_flat_versus_linear_scatter(fileName, data_flat,data_linear, carbon_prices):
+
+    fig, axs = plt.subplots(1, 2, figsize=(10, 6), sharey=True, sharex=True)
+
+    for i in range(len(carbon_prices)):
+        x = [carbon_prices[i]]*(len(data_flat[i]))
+        axs[0].scatter(x, data_flat[i], c= "red", linewidth = 0.5)
+        axs[1].scatter(x, data_linear[i], c="blue", linewidth = 0.5)
+
+    axs[0].set_title("Flat")
+    axs[1].set_title("Linear")
+
+    fig.tight_layout()
+
+    axs[0].set_xlabel(r"Final carbon price")
+    axs[1].set_xlabel(r"Final carbon price")
+    axs[0].set_ylabel(r"Normlised total carbon emissions, E/NM")
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/flat_versus_linear_carbon_tax_scatter"
+    fig.savefig(f+ ".png", dpi=600, format="png")  
+
+def plot_emissions_flat_versus_linear_lines(fileName, data_flat,data_linear, carbon_prices):
+
+    fig, axs = plt.subplots(1, 2, figsize=(10, 6), sharey=True, sharex=True)
+    
+    t_data_flat = data_flat.T
+    t_data_linear = data_linear.T
+    for i in range(len(data_flat)):
+        axs[0].plot(carbon_prices,  t_data_flat[i])
+        axs[1].plot(carbon_prices, t_data_linear[i])
+
+    axs[0].set_title("Flat")
+    axs[1].set_title("Linear")
+
+    fig.tight_layout()
+
+    axs[0].set_xlabel(r"Final carbon price")
+    axs[1].set_xlabel(r"Final carbon price")
+    axs[0].set_ylabel(r"Normlised total carbon emissions, E/NM")
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/flat_versus_linear_carbon_tax_scatter"
+    fig.savefig(f+ ".png", dpi=600, format="png")  
+ 
+
 def multi_line_matrix_plot(
     fileName, Z, col_vals, row_vals,  Y_param, cmap, dpi_save, col_axis_x, col_label, row_label, y_label
     ):
@@ -1129,7 +1239,113 @@ def multi_line_matrix_plot(
     plotName = fileName + "/Plots"
     f = plotName + "/multi_line_matrix_plot_%s_%s" % (Y_param, col_axis_x)
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
-    fig.savefig(f + ".png", dpi=dpi_save, format="png")        
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")     
+
+def multi_line_matrix_plot_stoch(
+    fileName, Z, col_vals, row_vals,  Y_param, cmap, dpi_save, col_axis_x, col_label, row_label, y_label
+    ):
+
+    fig, ax = plt.subplots( constrained_layout=True)#figsize=(14, 7)
+
+    if col_axis_x:
+        xs = np.tile(col_vals, (len(row_vals), 1))
+        ys = Z.mean(axis=1)
+        c = row_vals
+
+    else:
+        xs = np.tile(row_vals, (len(col_vals), 1))
+        ys = np.transpose(Z).mean(axis=1)
+        c = col_vals
+    
+    #print("after",xs.shape, ys.shape, c.shape)
+
+    ax.set_ylabel(y_label)#(r"First behaviour attitude variance, $\sigma^2$")
+    
+    #plt.xticks(x_ticks_pos, x_ticks_label)
+
+    lc = multiline(xs, ys, c, cmap=cmap, lw=2)
+    axcb = fig.colorbar(lc)
+
+    if col_axis_x:
+        axcb.set_label(row_label)#(r"Number of behaviours per agent, M")
+        ax.set_xlabel(col_label)#(r'Confirmation bias, $\theta$')
+        #ax.set_xticks(col_ticks_pos)
+        #ax.set_xticklabels(col_ticks_label)
+        #print("x ticks", col_label,col_ticks_pos, col_ticks_label)
+        #ax.set_xlim(left = 0.0, right = 60)
+        #ax.set_xlim(left = -10.0, right = 90)
+
+    else:
+        axcb.set_label(col_label)#)(r'Confirmation bias, $\theta$')
+        ax.set_xlabel(row_label)#(r"Number of behaviours per agent, M")
+        #ax.set_xticks(row_ticks_pos)
+        #ax.set_xticklabels(row_ticks_label)
+        #print("x ticks", row_label, row_ticks_pos, row_ticks_label)
+        #ax.set_xlim(left = 1.0)
+        #ax.set_xlim(left = 0.0, right = 2.0)
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_line_matrix_plot_stoch_%s_%s" % (Y_param, col_axis_x)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")  
+
+def multi_line_matrix_plot_stoch_bands(
+    fileName, Z, col_vals, row_vals,  Y_param, cmap, dpi_save, col_axis_x, col_label, row_label, y_label
+    ):
+    
+    fig, ax = plt.subplots( constrained_layout=True)#figsize=(14, 7)
+
+    if col_axis_x:
+        c = row_vals
+        print("c", c)
+        ani_step_colours = cmap(c)
+        print("ani_step_colours", ani_step_colours)
+        print("first ",ani_step_colours[0])
+        print("second ",ani_step_colours[1])
+        for i in range(len(Z)):
+            #col_vals is the x
+            #xs = np.tile(col_vals, (len(row_vals), 1))
+            ys_mean = Z[i].mean(axis=1)
+            ys_min = Z[i].min(axis=1)
+            ys_max= Z[i].max(axis=1)
+
+            ax.plot(col_vals, ys_mean, ls="-", linewidth = 0.5, color = ani_step_colours[i])
+            ax.fill_between(col_vals, ys_min, ys_max, facecolor=ani_step_colours[i], alpha=0.5)
+
+    else:
+        c = col_vals
+        ani_step_colours = cmap(c)
+        print("c", c)
+        print("ani_step_colours", ani_step_colours)
+        print("first ",ani_step_colours[0])
+        print("second ",ani_step_colours[1])
+
+        for i in range(len(Z)):
+            #row_vals is the x
+            ys_mean = Z[:][i].mean(axis=1)
+            ys_min = Z[:][i].min(axis=1)
+            ys_max= Z[:][i].max(axis=1)
+
+            ax.plot(row_vals, ys_mean, ls="-", linewidth = 0.5, color = ani_step_colours[i])
+            ax.fill_between(row_vals, ys_min, ys_max, facecolor=ani_step_colours[i], alpha=0.5)
+
+    ax.set_ylabel(y_label)#(r"First behaviour attitude variance, $\sigma^2$")
+
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap), ax=ax
+    )
+    
+    if col_axis_x:
+        cbar.set_label(row_label)#(r"Number of behaviours per agent, M")
+        ax.set_xlabel(col_label)#(r'Confirmation bias, $\theta$')
+    else:
+        cbar.set_label(col_label)#)(r'Confirmation bias, $\theta$')
+        ax.set_xlabel(row_label)#(r"Number of behaviours per agent, M")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_line_matrix_plot_stoch_fill_%s_%s" % (Y_param, col_axis_x)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")  
 
 def multiline(xs, ys, c, ax=None, **kwargs):
     """Plot lines with different colorings

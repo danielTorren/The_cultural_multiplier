@@ -1,4 +1,4 @@
 {
-    "row":{"property":"b_individual_budget","min":0.1, "max": 10, "title": "Individual budget Beta $b_A$","divisions": "linear", "reps": 32}, 
-    "col":{"property":"dividend_progressiveness","min":-1, "max": 1, "title": "dividend progressiveness, d","divisions": "linear", "reps": 32} 
+    "row":{"property":"budget_inequality_const","min":0.1, "max": 10, "title": "Budget decay","divisions": "linear", "reps": 20}, 
+    "col":{"property":"dividend_progressiveness","min":-1, "max": 1, "title": "dividend progressiveness, d","divisions": "linear", "reps": 20} 
 }

@@ -18,55 +18,25 @@ from package.resources.utility import (
     produce_name_datetime,
 )
 from package.resources.run import (
-    parallel_run_sa,
+    multi_emissions_stock,
 )
 
 # modules
-def produce_param_list_n_double(
-    params_dict: dict, variable_parameters_dict: dict[dict]
-) -> list[dict]:
-    """Creates a list of the param dictionaries. This only varies both parameters at the same time in a grid like fashion.
-
-    Parameters
-    ----------
-    params_dict: dict,
-        dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters.
-    variable_parameters_dict: dict[dict]
-        dictionary of dictionaries containing details for range of parameters to vary.
-
-    Returns
-    -------
-    params_list: list[dict]
-        list of parameter dicts, each entry corresponds to one experiment to be tested
-    """
-
+def produce_param_list_stochastic_n_double(params_dict: dict, variable_parameters_dict: dict[dict]) -> list[dict]:
     params_list = []
 
     for i in variable_parameters_dict["row"]["vals"]:
         for j in variable_parameters_dict["col"]["vals"]:
             params_dict[variable_parameters_dict["row"]["property"]] = i
             params_dict[variable_parameters_dict["col"]["property"]] = j
-            params_list.append(params_dict.copy())
-
+            for v in range(params_dict["seed_reps"]):
+                params_dict["set_seed"] = int(v+1)#as 0 and 1 are the same seed
+                params_list.append(params_dict.copy())
+ 
     return params_list
 
 def generate_vals_variable_parameters_and_norms(variable_parameters_dict):
-    """using minimum and maximum values for the variation of a parameter generate a list of
-     data and what type of distribution it uses
 
-     Parameters
-    ----------
-    variable_parameters_dict: dict[dict]
-        dictionary of dictionaries  with parameters used to generate attributes, dict used for readability instead of super
-        long list of input parameters. Each key in this out dictionary gives the names of the parameter to be varied with details
-        of the range and type of distribution of these values found in the value dictionary of each entry.
-
-    Returns
-    -------
-    variable_parameters_dict: dict[dict]
-        Same dictionary but now with extra entries of "vals" and "norm" in the subset dictionaries
-
-    """
     for i in variable_parameters_dict.values():
         if i["divisions"] == "linear":
             i["vals"] = np.linspace(i["min"], i["max"], i["reps"])
@@ -102,32 +72,22 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
-    params_list = produce_param_list_n_double(base_params, variable_parameters_dict)
-    (
-        results_emissions_stock,
-        results_emissions_flow,
-        results_mu,
-        results_var,
-        results_coefficient_of_variance,
-        results_emissions_change
-    ) = parallel_run_sa(params_list)
+    params_list = produce_param_list_stochastic_n_double(base_params, variable_parameters_dict)
+    
+    results_emissions_stock_series = multi_emissions_stock(params_list)
+
+    results_emissions_stock = results_emissions_stock_series.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], base_params["seed_reps"]))
 
     createFolder(fileName)
 
     save_object(base_params, fileName + "/Data", "base_params")
-    # save the data and params_list
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
     save_object(results_emissions_stock, fileName + "/Data", "results_emissions_stock")
-    save_object(results_emissions_flow, fileName + "/Data", "results_emissions_flow")
-    save_object(results_mu, fileName + "/Data", "results_mu")
-    save_object(results_var, fileName + "/Data", "results_var")
-    save_object(results_coefficient_of_variance,fileName + "/Data","results_coefficient_of_variance")
-    save_object(results_emissions_change, fileName + "/Data", "results_emissions_change")
 
     return fileName
 
 if __name__ == '__main__':
     fileName_Figure_11 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_B_d.json",
         VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_B_d.json"
     )

@@ -60,10 +60,13 @@ class Individual:
         self.initial_carbon_emissions = self.calc_total_emissions()
         self.flow_carbon_emissions = self.initial_carbon_emissions
 
+        self.utility = self.calc_utility()
+
         if self.save_timeseries_data:
             self.history_low_carbon_preferences = [self.low_carbon_preferences]
             self.history_identity = [self.identity]
             self.history_flow_carbon_emissions = [self.flow_carbon_emissions]
+            self.history_utility = [self.utility]
 
     def calc_omega(self):        
         omega_vector = ((self.prices_high_carbon_instant*self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
@@ -74,7 +77,7 @@ class Individual:
         power_second = (1-self.service_substitutability)*((self.low_carbon_substitutability_array)/((self.low_carbon_substitutability_array - 1)))
         first_bit = ((self.prices_high_carbon_instant/self.service_preferences)**(self.service_substitutability))
         second_bit = (self.low_carbon_preferences*(self.Omega_m**power_omega) + (1 - self.low_carbon_preferences))**power_second
-        #print("bits,", first_bit, second_bit,power_omega,power_second)
+        
         chi_components = first_bit*second_bit
 
         A, B = np.meshgrid(chi_components, chi_components)
@@ -104,6 +107,11 @@ class Individual:
 
     def calc_total_emissions(self):      
         return sum(self.H_m)
+    
+    def calc_utility(self):
+        psuedo_utility = (self.low_carbon_preferences*(self.L_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences)*(self.H_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+        sum_U = (sum(self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))))**(self.service_preferences/(self.service_preferences-1))
+        return sum_U
 
     def save_timeseries_data_individual(self):
         """
@@ -120,6 +128,7 @@ class Individual:
         self.history_low_carbon_preferences.append(self.low_carbon_preferences)
         self.history_identity.append(self.identity)
         self.history_flow_carbon_emissions.append(self.flow_carbon_emissions)
+        self.history_utility.append(self.utility)
 
     def next_step(self, t: int, social_component: npt.NDArray, carbon_dividend, carbon_price):
 
@@ -144,4 +153,6 @@ class Individual:
         self.flow_carbon_emissions = self.calc_total_emissions()
 
         if (self.save_timeseries_data) and (self.t % self.compression_factor == 0):
+            #calc utility
+            self.utility = self.calc_utility()
             self.save_timeseries_data_individual()
