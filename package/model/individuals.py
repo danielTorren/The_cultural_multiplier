@@ -30,7 +30,6 @@ class Individual:
 
         self.low_carbon_preferences = low_carbon_preferences
 
-        #print("low carb preferece", low_carbon_preferences, np.mean(low_carbon_preferences))
         self.service_preferences = service_preferences
         
         self.init_budget = budget
@@ -71,7 +70,13 @@ class Individual:
         return omega_vector
 
     def calc_chi_matrix(self):
-        chi_components = ((self.prices_high_carbon_instant/self.service_preferences)**(self.service_substitutability))*((self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences))**((1-self.service_substitutability)*((self.low_carbon_substitutability_array)/((self.low_carbon_substitutability_array - 1)))))
+        power_omega = (self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array
+        power_second = (1-self.service_substitutability)*((self.low_carbon_substitutability_array)/((self.low_carbon_substitutability_array - 1)))
+        first_bit = ((self.prices_high_carbon_instant/self.service_preferences)**(self.service_substitutability))
+        second_bit = (self.low_carbon_preferences*(self.Omega_m**power_omega) + (1 - self.low_carbon_preferences))**power_second
+        #print("bits,", first_bit, second_bit,power_omega,power_second)
+        chi_components = first_bit*second_bit
+
         A, B = np.meshgrid(chi_components, chi_components)
         chi_matrix = B/A
 
@@ -91,11 +96,9 @@ class Individual:
         return H_m_clipped,L_m_clipped
 
     def calc_identity(self) -> float:
-        #print("self.low_carbon_preferences", self.low_carbon_preferences)
         return np.mean(self.low_carbon_preferences)
 
     def update_preferences(self, social_component):
-        #print("HELLO",self.low_carbon_preferences )
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
 

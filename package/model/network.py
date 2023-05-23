@@ -12,6 +12,7 @@ import numpy as np
 import networkx as nx
 import numpy.typing as npt
 from package.model.individuals import Individual
+from sklearn.preprocessing import normalize
 
 # modules
 class Network:
@@ -139,9 +140,9 @@ class Network:
         self.prices_high_carbon_array = np.linspace(parameters["prices_high_carbon_lower"], parameters["prices_high_carbon_upper"], num=self.M)
         np.random.shuffle(self.prices_high_carbon_array)    
 
-        ##SERVICE SUB
+        ##SERVICE PREFERENCE
         no_norm_service_preference_matrix_init = np.linspace(parameters["service_preference_lower"], parameters["service_preference_upper"], num=self.M)
-        norm_service_preference =  no_norm_service_preference_matrix_init/np.linalg.norm(no_norm_service_preference_matrix_init)
+        norm_service_preference =  self.normalize_vector_sum(no_norm_service_preference_matrix_init)
         np.random.shuffle(norm_service_preference)
         self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
 
@@ -191,6 +192,10 @@ class Network:
             self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
             self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
             self.history_identity_list = [self.identity_list]
+    
+    def normalize_vector_sum(self, vec):
+        return vec/sum(vec)
+    
     def normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
         """
         Row normalize an array
