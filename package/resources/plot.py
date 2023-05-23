@@ -1075,7 +1075,7 @@ def plot_emissions_flat_versus_linear(fileName, data_flat,data_linear, carbon_pr
     ax.fill_between(carbon_prices, min_emissions_linear, max_emissions_linear, facecolor='blue', alpha=0.5)
 
     ax.set_xlabel(r"Final carbon price")
-    ax.set_ylabel(r"Total carbon Emissions")
+    ax.set_ylabel(r"Normlised total carbon emissions, E/NM")
     ax.legend()
     ax.grid()
     

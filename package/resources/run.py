@@ -217,7 +217,8 @@ def multi_emissions_flow_stock_run(
 
 def generate_emissions_stock(params):
     data = generate_data(params)
-    return np.asarray(data.total_carbon_emissions_stock) 
+    norm = params["N"]*params["M"]
+    return np.asarray(data.total_carbon_emissions_stock/norm) 
 
 def multi_emissions_stock(
         params_dict: list[dict]
