@@ -49,6 +49,7 @@ class Network:
         #self.prices_high_carbon = self.prices_low_carbon*parameters["price_high_carbon_factor"]   #np.random.uniform(0.5,1,self.M)
 
         self.carbon_price = parameters["init_carbon_price"]
+        self.redistribution_state = parameters["redistribution_state"]
         self.dividend_progressiveness = parameters["dividend_progressiveness"]
         self.carbon_price_time = parameters["carbon_price_time"]
         self.carbon_price_increased = parameters["carbon_price_increased"]
@@ -100,9 +101,11 @@ class Network:
 
             #Inequality in budget
             self.budget_inequality_const = parameters["budget_inequality_const"]
+            self.budget_gen_min = parameters["budget_gen_min"]
             #print("self.budget_inequality_const", self.budget_inequality_const)
             #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
-            u = np.random.uniform(size=self.N)
+            u = np.linspace(self.budget_gen_min,1,self.N) #np.random.uniform(size=self.N) #NO LONGER STOCHASTIC
+            #print(u,np.random.uniform(size=self.N))
             no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
             #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
             #print("no_norm_individual_budget_array", no_norm_individual_budget_array)
@@ -110,7 +113,7 @@ class Network:
             self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
             #print("self.individual_budget_array", self.individual_budget_array,self.budget_inequality_const)
             self.gini = self.calc_gini(self.individual_budget_array)
-            print("gini", self.gini, self.budget_inequality_const)
+            #print("gini", self.gini, self.budget_inequality_const)
             #quit()
 
         else:
@@ -120,7 +123,7 @@ class Network:
 
         ## LOW CARBON SUBSTITUTABLILITY
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
-        np.random.shuffle(self.low_carbon_substitutability_array)
+        #np.random.shuffle(self.low_carbon_substitutability_array)
 
         #HIGH CARBON PRICE
         self.prices_high_carbon_array = np.linspace(parameters["prices_high_carbon_lower"], parameters["prices_high_carbon_upper"], num=self.M)
@@ -142,7 +145,10 @@ class Network:
         self.total_carbon_emissions_flow = self.init_total_carbon_emissions
         self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
-        self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        if self.redistribution_state:
+            self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        else:
+            self.carbon_dividend_array = np.asarray([0]*self.N)
 
         (
                 self.identity_list,
@@ -555,7 +561,8 @@ class Network:
         self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
         #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
 
-        self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        if self.redistribution_state:
+            self.carbon_dividend_array = self.calc_carbon_dividend_array()
         #a = [x.instant_budget for x in self.agent_list]
         #self.gini = self.calc_gini(a)
         

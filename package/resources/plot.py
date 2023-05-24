@@ -1029,7 +1029,7 @@ def plot_end_points_emissions(
     f = plotName + "/" + property_save + "_emissions"
     fig.savefig(f+ ".png", dpi=600, format="png")   
 
-def plot_end_points_emissions_stoch(
+def plot_end_points_emissions_scatter(
     fileName: str, Data_list, property_title, property_save, property_vals, gini_array,dpi_save: int,latex_bool = False 
 ):
     if latex_bool:
@@ -1055,7 +1055,36 @@ def plot_end_points_emissions_stoch(
 
     #print("what worong")
     plotName = fileName + "/Plots"
-    f = plotName + "/" + property_save + "_emissions"
+    f = plotName + "/" + property_save + "_scatter_emissions"
+    fig.savefig(f+ ".png", dpi=600, format="png")   
+
+def plot_end_points_emissions_lines(
+    fileName: str, Data_list, property_title, property_save, property_vals, gini_array,dpi_save: int,latex_bool = False 
+):
+    if latex_bool:
+        set_latex()
+
+    #print(c,emissions_final)
+    fig, ax = plt.subplots(figsize=(10,6))
+
+    print("Data_list.shape[2]", Data_list.shape)
+
+    colors = iter(rainbow(np.linspace(0, 1, Data_list.shape[1])))
+
+    data = Data_list.T
+    gini_array_t = gini_array.T
+    print("gini_array",gini_array_t, gini_array)
+    print("Data_list",property_vals,  Data_list[:][0],data,Data_list.shape)
+
+    for i in range(len(Data_list[0])):
+        ax.plot(gini_array_t[i],  data[i], c = next(colors))
+
+    ax.set_xlabel(property_title)
+    ax.set_ylabel(r"Carbon Emissions")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/" + property_save + "_lines_emissions"
     fig.savefig(f+ ".png", dpi=600, format="png")   
 
 def plot_emissions_timeseries(

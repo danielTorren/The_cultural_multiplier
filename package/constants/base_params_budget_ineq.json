@@ -1,13 +1,14 @@
 {
     "save_timeseries_data": 0, 
     "budget_inequality_state":1,
+    "redistribution_state":0,
     "compression_factor":10,
-    "time_steps_max": 200,
-    "carbon_price_time": 50,
-    "seed_reps": 3,
+    "time_steps_max": 2000,
+    "carbon_price_time": 500,
+    "seed_reps": 20,
     "N": 200,
     "M": 3,
-    "K": 50,
+    "K": 20,
     "prob_rewire": 0.1,
     "learning_error_scale": 0.02,
     "homophily": 0.95,
@@ -27,5 +28,6 @@
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "flat",
     "carbon_price_increased" : 0.5,
-    "dividend_progressiveness": 0
+    "dividend_progressiveness": 0,
+    "budget_gen_min":1e-3
 }
