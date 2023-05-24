@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.colors import Normalize, LinearSegmentedColormap, SymLogNorm, BoundaryNorm
-from matplotlib.cm import get_cmap
+from matplotlib.cm import get_cmap,rainbow
 from matplotlib.collections import LineCollection
 from typing import Union
 from package.model.network import Network
@@ -1027,8 +1027,36 @@ def plot_end_points_emissions(
     #print("what worong")
     plotName = fileName + "/Plots"
     f = plotName + "/" + property_save + "_emissions"
-    fig.savefig(f+ ".png", dpi=600, format="png")    
+    fig.savefig(f+ ".png", dpi=600, format="png")   
 
+def plot_end_points_emissions_stoch(
+    fileName: str, Data_list, property_title, property_save, property_vals, gini_array,dpi_save: int,latex_bool = False 
+):
+    if latex_bool:
+        set_latex()
+
+    #print(c,emissions_final)
+    fig, ax = plt.subplots(figsize=(10,6))
+
+    print("Data_list.shape[2]", Data_list.shape)
+
+    colors = iter(rainbow(np.linspace(0, 1, Data_list.shape[1])))
+
+    data = Data_list.T
+    gini_array_t = gini_array.T
+    print("gini_array",gini_array_t, gini_array)
+    print("Data_list",property_vals,  Data_list[:][0],data,Data_list.shape)
+
+    for i in range(len(Data_list[0])):
+        ax.scatter(gini_array_t[i],  data[i], c = next(colors))
+
+    ax.set_xlabel(property_title)
+    ax.set_ylabel(r"Carbon Emissions")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/" + property_save + "_emissions"
+    fig.savefig(f+ ".png", dpi=600, format="png")   
 
 def plot_emissions_timeseries(
     fileName: str, Data_list,  property_vals, time_array
@@ -1294,14 +1322,11 @@ def multi_line_matrix_plot_stoch_bands(
     ):
     
     fig, ax = plt.subplots( constrained_layout=True)#figsize=(14, 7)
-
+    #print("Z", Z, Z.shape)
+    #quit()
     if col_axis_x:
         c = row_vals
-        print("c", c)
         ani_step_colours = cmap(c)
-        print("ani_step_colours", ani_step_colours)
-        print("first ",ani_step_colours[0])
-        print("second ",ani_step_colours[1])
         for i in range(len(Z)):
             #col_vals is the x
             #xs = np.tile(col_vals, (len(row_vals), 1))
@@ -1311,14 +1336,9 @@ def multi_line_matrix_plot_stoch_bands(
 
             ax.plot(col_vals, ys_mean, ls="-", linewidth = 0.5, color = ani_step_colours[i])
             ax.fill_between(col_vals, ys_min, ys_max, facecolor=ani_step_colours[i], alpha=0.5)
-
     else:
         c = col_vals
         ani_step_colours = cmap(c)
-        print("c", c)
-        print("ani_step_colours", ani_step_colours)
-        print("first ",ani_step_colours[0])
-        print("second ",ani_step_colours[1])
 
         for i in range(len(Z)):
             #row_vals is the x

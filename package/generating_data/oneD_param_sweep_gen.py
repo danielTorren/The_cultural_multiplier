@@ -12,41 +12,13 @@ Created: 10/10/2022
 import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import multi_stochstic_emissions_run
-
-# modules
-def produce_param_list(params: dict, property_list: list, property: str) -> list[dict]:
-    """
-    Produce a list of the dicts for each experiment
-
-    Parameters
-    ----------
-    params: dict
-        base parameters from which we vary e.g
-            params["time_steps_max"] = int(params["total_time"] / params["delta_t"])
-    porperty_list: list
-        list of values for the property to be varied
-    property: str
-        property to be varied
-
-    Returns
-    -------
-    params_list: list[dict]
-        list of parameter dicts, each entry corresponds to one experiment to be tested
-    """
-
-    params_list = []
-    for i in property_list:
-        params[property] = i
-        params_list.append(
-            params.copy()
-        )  # have to make a copy so that it actually appends a new dict and not just the location of the params dict
-    return params_list
+from package.resources.run import multi_emissions_stock, multi_emissions_stock_ineq
+from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json"
-
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
+        RUN_TYPE = 1
          ) -> str: 
 
     f_var = open(VARIABLE_PARAMS_LOAD)
@@ -66,10 +38,17 @@ def main(
     root = "one_param_sweep_multi"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
-    
-    params_list = produce_param_list(params, property_values_list, property_varied)
 
-    emissions_array = multi_stochstic_emissions_run(params_list) 
+    params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+
+    if RUN_TYPE == 1:
+        emissions_stock_array, gini_list = multi_emissions_stock_ineq(params_list)
+        emissions_array= emissions_stock_array.reshape(property_reps, params["seed_reps"])
+        gini_array= gini_list.reshape(property_reps, params["seed_reps"])
+    else:
+        emissions_stock_array = multi_emissions_stock(params_list)
+        emissions_array= emissions_stock_array.reshape(property_reps, params["seed_reps"])
+
     createFolder(fileName)
 
     save_object(emissions_array, fileName + "/Data", "emissions_array")
@@ -77,12 +56,15 @@ def main(
     save_object(property_varied, fileName + "/Data", "property_varied")
     save_object(property_varied_title, fileName + "/Data", "property_varied_title")
     save_object(property_values_list, fileName + "/Data", "property_values_list")
+    if RUN_TYPE == 1:
+        save_object(gini_array, fileName + "/Data", "gini_array")
 
     return fileName
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_mu.json"
+        BASE_PARAMS_LOAD = "package/constants/base_params_budget_ineq.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_budget_ineq.json",
+        RUN_TYPE = 1
 )
 

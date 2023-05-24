@@ -24,16 +24,19 @@ from package.resources.run import (
 # modules
 def produce_param_list_stochastic_n_double(params_dict: dict, variable_parameters_dict: dict[dict]) -> list[dict]:
     params_list = []
-
+    key_param_array = []
     for i in variable_parameters_dict["row"]["vals"]:
+        key_param_row = []
         for j in variable_parameters_dict["col"]["vals"]:
             params_dict[variable_parameters_dict["row"]["property"]] = i
             params_dict[variable_parameters_dict["col"]["property"]] = j
+            key_param_row.append((i,j))
             for v in range(params_dict["seed_reps"]):
                 params_dict["set_seed"] = int(v+1)#as 0 and 1 are the same seed
                 params_list.append(params_dict.copy())
+        key_param_array.append(key_param_row)
  
-    return params_list
+    return params_list,key_param_array
 
 def generate_vals_variable_parameters_and_norms(variable_parameters_dict):
 
@@ -72,7 +75,7 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
-    params_list = produce_param_list_stochastic_n_double(base_params, variable_parameters_dict)
+    params_list,key_param_array = produce_param_list_stochastic_n_double(base_params, variable_parameters_dict)
     
     results_emissions_stock_series = multi_emissions_stock(params_list)
 
@@ -80,11 +83,11 @@ def main(
 
     createFolder(fileName)
 
-    
     save_object(params_list, fileName + "/Data", "params_list")
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
     save_object(results_emissions_stock, fileName + "/Data", "results_emissions_stock")
+    save_object(key_param_array, fileName + "/Data","key_param_array")
 
     return fileName
 

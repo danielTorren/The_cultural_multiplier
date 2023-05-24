@@ -94,7 +94,7 @@ class Network:
         self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
         (
             self.low_carbon_preference_matrix_init
-        ) = self.generate_init_data_preferences_alt_alt()
+        ) = self.generate_init_data_preferences()
         
         if parameters["budget_inequality_state"] == 1:
 
@@ -109,8 +109,8 @@ class Network:
             #np.exp(-parameters["individual_budget_array_lower"]*np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
             self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
             #print("self.individual_budget_array", self.individual_budget_array,self.budget_inequality_const)
-            self.init_gini = self.gini(self.individual_budget_array)
-            #print("gini", self.init_gini, self.budget_inequality_const)
+            self.gini = self.calc_gini(self.individual_budget_array)
+            print("gini", self.gini, self.budget_inequality_const)
             #quit()
 
         else:
@@ -168,6 +168,7 @@ class Network:
             self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
             self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
             self.history_identity_list = [self.identity_list]
+            self.history_gini = [self.gini]
     
     def normalize_vector_sum(self, vec):
         return vec/sum(vec)
@@ -193,7 +194,7 @@ class Network:
 
     #define function to calculate Gini coefficient
     # take from: https://www.statology.org/gini-coefficient-python/
-    def gini(self,x):
+    def calc_gini(self,x):
         total = 0
         for i, xi in enumerate(x[:-1], 1):
             total += np.sum(np.abs(xi - x[i:]))
@@ -260,41 +261,6 @@ class Network:
             self.agent_list[b], self.agent_list[a] = self.agent_list[a], self.agent_list[b]
 
     def generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
-        #A_m 
-        low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M)for n in range(self.N)]
-        low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)
-        #a_m - normalized
-        service_preference_list = [np.random.beta(self.a_service_preference, self.b_service_preference, size=self.M) for n in range(self.N)]
-        service_preference_matrix = np.asarray(service_preference_list)#NEEDS TO ADD UP TO ONE SO NORMALIZE EACH ROW
-        norm_service_preference_matrix = self.normlize_matrix(
-            service_preference_matrix
-        )
-        #sigma_m - 1 dimentional SAME FOR EVERYONE
-        low_carbon_substitutability_list = np.random.beta(self.a_low_carbon_substitutability, self.b_low_carbon_substitutability, size=self.M)#this is a single list that is used by all individuals
-        low_carbon_substitutability_matrix = np.asarray(low_carbon_substitutability_list)*self.multiplier_low_carbon_substitutability#multiplier sets the maximum value
-        #B_i - normalized, 1 dimentional
-        individual_budget_array = np.random.beta(self.a_individual_budget, self.b_individual_budget, size=self.N)
-        norm_individual_budget_array = individual_budget_array/ np.linalg.norm(individual_budget_array)
-        individual_budget_matrix = np.asarray(norm_individual_budget_array)
-        #P_H
-        prices_high_carbon_list = np.random.beta(self.a_prices_high_carbon, self.b_prices_high_carbon, size=self.M)#this is a single list that is used by all individuals
-        prices_high_carbon_matrix = np.asarray(prices_high_carbon_list)
-
-        return low_carbon_preference_matrix,individual_budget_matrix, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
-
-    def generate_init_data_preferences_alt(self) -> tuple[npt.NDArray, npt.NDArray]:
-
-        #A_m 
-        low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M)for n in range(self.N)]
-        low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)
-        #B_i - normalized, 1 dimentional
-        individual_budget_array = np.random.beta(self.a_individual_budget, self.b_individual_budget, size=self.N)
-        norm_individual_budget_array = individual_budget_array/ np.linalg.norm(individual_budget_array)
-        individual_budget_matrix = np.asarray(norm_individual_budget_array)
-
-        return low_carbon_preference_matrix,individual_budget_matrix#, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
-
-    def generate_init_data_preferences_alt_alt(self) -> tuple[npt.NDArray, npt.NDArray]:
 
         #A_m 
         low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M)for n in range(self.N)]
@@ -483,8 +449,6 @@ class Network:
         """
         identity_list = [x.identity for x in self.agent_list]
 
-        #print("idntity list", identity_list )
-        #quit()
         identity_mean = np.mean(identity_list)
         identity_std = np.std(identity_list)
         identity_variance = np.var(identity_list)
@@ -512,6 +476,7 @@ class Network:
                 carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
             else:
                 raise("Invalid self.dividend_progressiveness d = [-1,1]")
+        #print("carbon_dividend_array",carbon_dividend_array,self.dividend_progressiveness)
         return carbon_dividend_array
     
     def calc_carbon_price(self):
@@ -559,6 +524,7 @@ class Network:
         self.history_stock_carbon_emissions.append(self.total_carbon_emissions_stock)
         self.history_flow_carbon_emissions.append(self.total_carbon_emissions_flow)
         self.history_identity_list.append(self.identity_list)
+        self.history_gini.append(self.gini)
 
     def next_step(self):
         """
@@ -589,19 +555,22 @@ class Network:
         self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
         #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
 
-        (
-                self.identity_list,
-                self.average_identity,
-                self.std_identity,
-                self.var_identity,
-                self.min_identity,
-                self.max_identity,
-        ) = self.calc_network_identity()
-
         self.carbon_dividend_array = self.calc_carbon_dividend_array()
-
+        #a = [x.instant_budget for x in self.agent_list]
+        #self.gini = self.calc_gini(a)
+        
         if (self.t % self.compression_factor == 0) and (self.save_timeseries_data):
+            (
+                    self.identity_list,
+                    self.average_identity,
+                    self.std_identity,
+                    self.var_identity,
+                    self.min_identity,
+                    self.max_identity,
+            ) = self.calc_network_identity()
+            self.gini = self.calc_gini([x.instant_budget for x in self.agent_list])
             self.save_timeseries_data_network()
 
         if self.t > self.carbon_price_time:
+            #print("CARBON ON")
             self.carbon_price = self.calc_carbon_price()

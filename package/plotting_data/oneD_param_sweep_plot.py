@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 from package.resources.utility import load_object
 from package.resources.plot import (
-    plot_end_points_emissions
-
+    plot_end_points_emissions,
+    plot_end_points_emissions_stoch
 )
 
 def main(
@@ -33,14 +33,19 @@ def main(
         plot_end_points_emissions(fileName, reduc_emissions_array, property_varied_title, property_varied, reduc_property_values_list, dpi_save)
     elif PLOT_TYPE == 2:
         plot_end_points_emissions(fileName, emissions_array, "Preference to consumption ratio, $\\mu$", property_varied, property_values_list, dpi_save)
+    elif PLOT_TYPE == 3:
+        gini_array = load_object(fileName + "/Data", "gini_array")
+
+        #plot_end_points_emissions(fileName, emissions_array, "Budget inequality (Pareto distribution constant)", property_varied, property_values_list, dpi_save)
+        plot_end_points_emissions_stoch(fileName, emissions_array, "Initial Gini index", property_varied, property_values_list,gini_array, dpi_save)
     else:
-         plot_end_points_emissions(fileName, emissions_array, property_varied_title, property_varied, property_values_list, dpi_save)
+        plot_end_points_emissions(fileName, emissions_array, property_varied_title, property_varied, property_values_list, dpi_save)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/one_param_sweep_multi_13_33_41__25_04_2023",
-        PLOT_TYPE = 2
+        fileName="results/one_param_sweep_multi_12_42_31__24_05_2023",
+        PLOT_TYPE = 3
     )
 

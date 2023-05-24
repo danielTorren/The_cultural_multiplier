@@ -230,3 +230,24 @@ def multi_emissions_stock(
     )
 
     return np.asarray(emissions_stock)
+    
+
+def generate_emissions_stock_ineq(params):
+    data = generate_data(params)
+    norm = params["N"]*params["M"]
+    return np.asarray(data.total_carbon_emissions_stock/norm) , data.gini
+
+def multi_emissions_stock_ineq(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_emissions_stock_ineq)(i) for i in params_dict
+    )
+    emissions_stock, gini_list= zip(
+        *res
+    )
+
+    return np.asarray(emissions_stock), np.asarray(gini_list)
+
