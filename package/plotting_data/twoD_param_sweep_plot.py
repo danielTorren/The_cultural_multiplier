@@ -35,6 +35,9 @@ def main(
         col_label = col_dict["title"]#r'Confirmation bias, $\theta$'
         y_label = "Emissions stock, $E/(NM)$"#col_dict["title"]#r"Identity variance, $\sigma^2$"
         
+        print("variable_parameters_dict",variable_parameters_dict)
+        #print("results_emissions", results_emissions)
+        quit()
                             #fileName, Z, col_vals, row_vals,  Y_param, cmap, dpi_save, col_axis_x, col_label, row_label, y_label
         multi_line_matrix_plot_stoch(fileName, results_emissions, col_dict["vals"], row_dict["vals"], "emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label)
         multi_line_matrix_plot_stoch_bands(fileName,results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label)
@@ -62,6 +65,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_average_19_51_26__23_05_2023",
+        fileName="results/two_param_sweep_average_20_14_06__23_05_2023",
         PLOT_TYPE=2
     )

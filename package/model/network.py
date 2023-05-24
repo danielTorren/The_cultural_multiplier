@@ -101,11 +101,17 @@ class Network:
             #Inequality in budget
             self.budget_inequality_const = parameters["budget_inequality_const"]
             #print("self.budget_inequality_const", self.budget_inequality_const)
-            no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
+            #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
+            u = np.random.uniform(size=self.N)
+            no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
+            #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
             #print("no_norm_individual_budget_array", no_norm_individual_budget_array)
             #np.exp(-parameters["individual_budget_array_lower"]*np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
             self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
             #print("self.individual_budget_array", self.individual_budget_array,self.budget_inequality_const)
+            self.init_gini = self.gini(self.individual_budget_array)
+            #print("gini", self.init_gini, self.budget_inequality_const)
+            #quit()
 
         else:
             #Uniform budget
@@ -184,6 +190,14 @@ class Network:
         norm_matrix = matrix / row_sums[:, np.newaxis]
 
         return norm_matrix
+
+    #define function to calculate Gini coefficient
+    # take from: https://www.statology.org/gini-coefficient-python/
+    def gini(self,x):
+        total = 0
+        for i, xi in enumerate(x[:-1], 1):
+            total += np.sum(np.abs(xi - x[i:]))
+        return total / (len(x)**2 * np.mean(x))
 
     def create_weighting_matrix(self) -> tuple[npt.NDArray, npt.NDArray, nx.Graph]:
         """

@@ -80,6 +80,8 @@ def main(
 
     createFolder(fileName)
 
+    
+    save_object(params_list, fileName + "/Data", "params_list")
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
     save_object(results_emissions_stock, fileName + "/Data", "results_emissions_stock")
