@@ -76,8 +76,8 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_budget_ineq.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_budget_ineq.json",
-        RUN_TYPE = 1
+        BASE_PARAMS_LOAD = "package/constants/base_params_d.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_d.json",
+        RUN_TYPE = 0
 )
 

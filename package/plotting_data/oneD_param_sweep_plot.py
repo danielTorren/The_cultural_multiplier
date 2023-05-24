@@ -10,7 +10,9 @@ from package.resources.utility import load_object
 from package.resources.plot import (
     plot_end_points_emissions,
     plot_end_points_emissions_scatter,
-    plot_end_points_emissions_lines
+    plot_end_points_emissions_lines,
+    plot_end_points_emissions_scatter_gini,
+    plot_end_points_emissions_lines_gini
 )
 
 def main(
@@ -42,8 +44,13 @@ def main(
         gini_array = load_object(fileName + "/Data", "gini_array")
 
         plot_end_points_emissions(fileName, emissions_array, "Budget inequality (Pareto distribution constant)", property_varied, property_values_list, dpi_save)
-        plot_end_points_emissions_scatter(fileName, emissions_array, "Initial Gini index", property_varied, property_values_list,gini_array, dpi_save)
-        plot_end_points_emissions_lines(fileName, emissions_array, "Initial Gini index", property_varied, property_values_list,gini_array, dpi_save)
+        plot_end_points_emissions_scatter_gini(fileName, emissions_array, "Initial Gini index", property_varied, property_values_list,gini_array, dpi_save)
+        plot_end_points_emissions_lines_gini(fileName, emissions_array, "Initial Gini index", property_varied, property_values_list,gini_array, dpi_save)
+    elif PLOT_TYPE == 4:
+        #gini_array = load_object(fileName + "/Data", "gini_array")
+        plot_end_points_emissions(fileName, emissions_array, "redistribution val", property_varied, property_values_list, dpi_save)
+        plot_end_points_emissions_scatter(fileName, emissions_array, "redistribution val", property_varied, property_values_list, dpi_save)
+        plot_end_points_emissions_lines(fileName, emissions_array, "redistribution val", property_varied, property_values_list, dpi_save)
     else:
         plot_end_points_emissions(fileName, emissions_array, property_varied_title, property_varied, property_values_list, dpi_save)
     
@@ -51,7 +58,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/one_param_sweep_multi_13_41_52__24_05_2023",
-        PLOT_TYPE = 3
+        fileName="results/one_param_sweep_multi_15_50_53__24_05_2023",
+        PLOT_TYPE = 4
     )
 

@@ -463,10 +463,11 @@ class Network:
         return (identity_list,identity_mean, identity_std, identity_variance, identity_max, identity_min)
 
     def calc_carbon_dividend_array(self):
+
         if self.t < self.carbon_price_time:
             carbon_dividend_array = [0]*self.N
         else:
-            wealth_list_B = np.asarray([x.instant_budget for x in self.agent_list])
+            wealth_list_B = np.asarray([x.init_budget for x in self.agent_list])
             tax_income_R = sum(sum(x.H_m*self.carbon_price) for x in self.agent_list)
             mean_wealth = np.mean(wealth_list_B)
             
@@ -477,6 +478,7 @@ class Network:
                 div_prog_t = min(self.dividend_progressiveness, d_max)
                 carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
             elif self.dividend_progressiveness >= -1 and self.dividend_progressiveness <0:#progressive
+                #print("d_min", np.min(wealth_list_B) - mean_wealth)
                 d_min = - tax_income_R/(self.N*(np.min(wealth_list_B) - mean_wealth))#most negative value d can be
                 div_prog_t = max(self.dividend_progressiveness, d_min)
                 carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
