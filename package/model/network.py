@@ -91,11 +91,16 @@ class Network:
 
         self.network_density = nx.density(self.network)
         
-        self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
-        self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
-        (
-            self.low_carbon_preference_matrix_init
-        ) = self.generate_init_data_preferences()
+        if parameters["heterogenous_preferences"] == 1:
+            self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
+            self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
+            (
+                self.low_carbon_preference_matrix_init
+            ) = self.generate_init_data_preferences()
+        else:
+            self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
+            np.random.shuffle(self.low_carbon_preference_matrix_init)
+            print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
         
         if parameters["budget_inequality_state"] == 1:
 

@@ -1048,7 +1048,7 @@ def plot_end_points_emissions_scatter_gini(
     print("Data_list",property_vals,  Data_list[:][0],data,Data_list.shape)
 
     for i in range(len(Data_list[0])):
-        ax.scatter(gini_array_t[i],  data[i], c = next(colors))
+        ax.scatter(gini_array_t[i],  data[i], color = next(colors))
 
     ax.set_xlabel(property_title)
     ax.set_ylabel(r"Carbon Emissions")
@@ -1077,7 +1077,7 @@ def plot_end_points_emissions_lines_gini(
     print("Data_list",property_vals,  Data_list[:][0],data,Data_list.shape)
 
     for i in range(len(Data_list[0])):
-        ax.plot(gini_array_t[i],  data[i], c = next(colors))
+        ax.plot(gini_array_t[i],  data[i], color = next(colors))
 
     ax.set_xlabel(property_title)
     ax.set_ylabel(r"Carbon Emissions")
@@ -1103,7 +1103,7 @@ def plot_end_points_emissions_scatter(
     data = Data_list.T
 
     for i in range(len(Data_list[0])):
-        ax.scatter(property_vals,  data[i], c = next(colors))
+        ax.scatter(property_vals,  data[i], color = next(colors))
 
     ax.set_xlabel(property_title)
     ax.set_ylabel(r"Carbon Emissions")
@@ -1129,7 +1129,7 @@ def plot_end_points_emissions_lines(
     data = Data_list.T
 
     for i in range(len(Data_list[0])):
-        ax.plot(property_vals,  data[i], c = next(colors))
+        ax.plot(property_vals,  data[i], color = next(colors))
 
     ax.set_xlabel(property_title)
     ax.set_ylabel(r"Carbon Emissions")
