@@ -1,11 +1,11 @@
 {
     "save_timeseries_data": 0, 
-    "budget_inequality_state":0,
+    "budget_inequality_state":1,
     "redistribution_state":1,
     "compression_factor":10,
     "time_steps_max": 2000,
     "carbon_price_time": 500,
-    "seed_reps": 20,
+    "seed_reps": 1,
     "N": 200,
     "M": 3,
     "K": 20,
@@ -29,5 +29,6 @@
     "carbon_tax_implementation": "flat",
     "carbon_price_increased" : 0.5,
     "dividend_progressiveness": 0,
-    "budget_gen_min":1e-3
+    "budget_gen_min":1e-3,
+    "budget_inequality_const": 2
 }

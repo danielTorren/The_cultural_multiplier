@@ -139,6 +139,8 @@ class Individual:
         self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
         #update_budget
         self.instant_budget = self.init_budget + carbon_dividend
+
+        #print("self.instant_budget", self.instant_budget, carbon_dividend ,self.init_budget)
         
         #update preferences 
         self.update_preferences(social_component)

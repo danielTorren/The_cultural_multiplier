@@ -58,7 +58,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/one_param_sweep_multi_15_50_53__24_05_2023",
+        fileName="results/one_param_sweep_multi_15_57_44__24_05_2023",
         PLOT_TYPE = 4
     )
 

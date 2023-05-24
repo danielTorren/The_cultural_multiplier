@@ -475,11 +475,13 @@ class Network:
                 carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
             elif self.dividend_progressiveness > 0 and self.dividend_progressiveness <= 1:#regressive
                 d_max = - tax_income_R/(self.N*(np.max(wealth_list_B) - mean_wealth))#max value d can be
+                #print("choisng min",self.dividend_progressiveness, d_max,min(self.dividend_progressiveness, d_max))
                 div_prog_t = min(self.dividend_progressiveness, d_max)
                 carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
             elif self.dividend_progressiveness >= -1 and self.dividend_progressiveness <0:#progressive
                 #print("d_min", np.min(wealth_list_B) - mean_wealth)
                 d_min = - tax_income_R/(self.N*(np.min(wealth_list_B) - mean_wealth))#most negative value d can be
+                #print("choisng max",self.dividend_progressiveness, d_min, max(self.dividend_progressiveness, d_min))
                 div_prog_t = max(self.dividend_progressiveness, d_min)
                 carbon_dividend_array = div_prog_t*(wealth_list_B - mean_wealth) + tax_income_R/self.N
             else:
