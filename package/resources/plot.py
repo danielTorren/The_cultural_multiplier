@@ -928,6 +928,46 @@ def multi_emissions_timeseries_carbon_price(
     f = plotName + "/multi_emissions_stock_timeseries_%s" % (type_em)
     fig.savefig(f+ ".png", dpi=600, format="png")
 
+def multi_emissions_timeseries_carbon_price(
+    fileName,emissions_data_list, carbon_prices,property_values_list, time, title,type_em
+):
+
+    fig, axes = plt.subplots(nrows = 1, ncols = len(carbon_prices),figsize=(10,6), sharey=True)
+    #print(axes)
+    cmap = get_cmap("plasma")
+
+    #print("emissions_data_list",emissions_data_list.shape)
+    #quit()
+    axes[0].set_ylabel(title)
+
+    ani_step_colours = cmap(property_values_list)
+
+    for i, ax in enumerate(fig.axes):
+        for j, Data in enumerate(emissions_data_list[i]):#mu
+            #print("Data",Data, Data.shape)
+            mu_emissions =  Data.mean(axis=0)
+            min_emissions =  Data.min(axis=0)
+            max_emissions=  Data.max(axis=0)
+            #print("stuff mu",mu_emissions)
+            #print("stuff min",min_emissions)
+
+            ax.plot(time, mu_emissions, c= ani_step_colours[j])
+            ax.fill_between(time, min_emissions, max_emissions, facecolor=ani_step_colours[j], alpha=0.5)
+            #ax.plot(Data.history_time, Data, color = ani_step_colours[j])
+        ax.set_xlabel(r"Time")
+        
+        ax.set_title(r"Carbon price = %s" % (carbon_prices[i]))
+        
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap), ax=axes.ravel().tolist()
+    )
+    cbar.set_label(r"Ratio of preference to consumption")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_emissions_stock_timeseries_%s" % (type_em)
+    fig.savefig(f+ ".png", dpi=600, format="png")
+
 def multi_emissions_timeseries_carbon_price_quantile(
     fileName,emissions_data_list, carbon_prices,property_values_list, time, title,type_em
 ):
@@ -1506,6 +1546,152 @@ def plot_low_carbon_preferences_timeseries(
     plotName = fileName + "/Prints"
 
     f = plotName + "/timeseries_preference"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
+def plot_low_carbon_preferences_timeseries_compare_culture(
+    fileName, 
+    data_list, 
+    dpi_save,
+    culture_list
+    ):
+
+    y_title = r"Low carbon preference"
+
+    fig, axes = plt.subplots(nrows=1,ncols=len(culture_list), sharey=True)
+
+    for i, data in enumerate(data_list):
+        axes[i].set_title(culture_list[i])
+        for v in range(data.N):
+            data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)
+            for j in range(data.M):
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_low_carbon_preference"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
+def plot_identity_timeseries_compare_culture(
+    fileName, 
+    data_list, 
+    dpi_save,
+    culture_list
+    ):
+
+    y_title = r"Identity, I"
+
+    fig, axes = plt.subplots(nrows=1,ncols=len(culture_list), sharey=True)
+
+    for i, data in enumerate(data_list):
+        axes[i].set_title(culture_list[i])
+        for v in range(data.N):
+            data_indivdiual = np.asarray(data.agent_list[v].history_identity)
+            axes[i].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual
+                )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_history_identity"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_emissions_timeseries_compare_culture(
+    fileName, 
+    data_list, 
+    dpi_save,
+    culture_list
+    ):
+
+    y_title = r"Flow emissions"
+
+    fig, axes = plt.subplots(nrows=1,ncols=len(culture_list), sharey=True)
+
+    for i, data in enumerate(data_list):
+        axes[i].set_title(culture_list[i])
+        for v in range(data.N):
+            data_indivdiual = np.asarray(data.agent_list[v].history_flow_carbon_emissions)
+            axes[i].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual
+                )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_history_flow_carbon_emissions"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_stock_emissions_timeseries_compare_culture(
+    fileName, 
+    data_list, 
+    dpi_save,
+    culture_list
+    ):
+
+    y_title = r"Stock emissions"
+
+    fig, ax = plt.subplots()
+
+    for i, data in enumerate(data_list):
+            ax.plot(
+                    np.asarray(data.history_time),
+                    np.asarray(data.history_stock_carbon_emissions), 
+                    label = culture_list[i]
+                )
+    #ax.vlines(x = data_list[0].carbon_price_time, linestyles="-", ymax=10000, ymin=0)
+    ax.set_xlabel(r"Time")
+    ax.set_ylabel(r"%s" % y_title)
+    ax.legend()
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_history_stock_carbon_emissions"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_flow_emissions_timeseries_compare_culture(
+    fileName, 
+    data_list, 
+    dpi_save,
+    culture_list
+    ):
+
+    y_title = r"Flow emissions"
+
+    fig, ax = plt.subplots()
+
+    for i, data in enumerate(data_list):
+            ax.plot(
+                    np.asarray(data.history_time),
+                    np.asarray(data.history_flow_carbon_emissions), 
+                    label = culture_list[i]
+                )
+    #ax.vlines(x = data_list[0].carbon_price_time, linestyles="-", ymax=10000, ymin=0)
+    ax.set_xlabel(r"Time")
+    ax.set_ylabel(r"%s" % y_title)
+    ax.legend()
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_history_flow_carbon_emissions"
     #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 

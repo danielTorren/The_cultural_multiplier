@@ -40,6 +40,7 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
     #### RUN TIME STEPS
     while social_network.t < parameters["time_steps_max"]:
         social_network.next_step()
+        #print("step", social_network.t)
 
     if print_simu:
         print(

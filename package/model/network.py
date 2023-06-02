@@ -33,7 +33,7 @@ class Network:
 
         self.K = int(round(parameters["K"]))  # round due to the sampling method producing floats in the Sobol Sensitivity Analysis
         self.prob_rewire = parameters["prob_rewire"]
-
+        self.alpha_change = parameters["alpha_change"]
         self.save_timeseries_data = parameters["save_timeseries_data"]
         self.compression_factor = parameters["compression_factor"]
 
@@ -89,9 +89,14 @@ class Network:
             self.network,
         ) = self.create_weighting_matrix()
 
+        if self.alpha_change == "behavioural_independence":
+            self.weighting_matrix_list = [self.weighting_matrix]*self.M
+
         self.network_density = nx.density(self.network)
         
-        if parameters["heterogenous_preferences"] == 1:
+        self.heterogenous_preferences = parameters["heterogenous_preferences"]
+
+        if self.heterogenous_preferences == 1:
             self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
             self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
             (
@@ -100,10 +105,11 @@ class Network:
         else:
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
             np.random.shuffle(self.low_carbon_preference_matrix_init)
-            print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
+            #print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
         
-        if parameters["budget_inequality_state"] == 1:
+        self.budget_inequality_state = parameters["budget_inequality_state"]
 
+        if self.budget_inequality_state == 1:
             #Inequality in budget
             self.budget_inequality_const = parameters["budget_inequality_const"]
             self.budget_gen_min = parameters["budget_gen_min"]
@@ -120,7 +126,6 @@ class Network:
             self.gini = self.calc_gini(self.individual_budget_array)
             #print("gini", self.gini, self.budget_inequality_const)
             #quit()
-
         else:
             #Uniform budget
             self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
@@ -144,7 +149,17 @@ class Network:
 
         self.shuffle_agent_list()#partial shuffle of the list based on identity
 
-        self.social_component_matrix = self.calc_social_component_matrix()
+        if self.alpha_change == "static_preferences":
+            self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+            #do nothing? or feed it the same thing
+        else:
+            self.social_component_matrix = self.calc_social_component_matrix()
+
+        if self.alpha_change == ("static_culturally_determined_weights" or "dynamic_culturally_determined_weights"):#update the weightings once and thats it
+            self.weighting_matrix = self.update_weightings()
+        elif self.alpha_change == "behavioural_independence":#independent behaviours
+            self.weighting_matrix_list = self.update_weightings_list()
+        
 
         self.init_total_carbon_emissions  = self.calc_total_emissions()
         self.total_carbon_emissions_flow = self.init_total_carbon_emissions
@@ -179,7 +194,8 @@ class Network:
             self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
             self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
             self.history_identity_list = [self.identity_list]
-            self.history_gini = [self.gini]
+            if self.budget_inequality_state == 1:
+                self.history_gini = [self.gini]
     
     def normalize_vector_sum(self, vec):
         return vec/sum(vec)
@@ -326,20 +342,28 @@ class Network:
         self.circular_agent_list()#agent list is now circular in terms of identity
         self.partial_shuffle_agent_list()#partial shuffle of the list
 
+    def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
+ 
+
+        if self.ratio_preference_or_consumption == 1.0:
+            attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        elif self.ratio_preference_or_consumption == 0.0:
+            attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
+        elif self.ratio_preference_or_consumption > 0.0 and self.ratio_preference_or_consumption < 1.0:
+            attribute_matrix = np.asarray([self.ratio_preference_or_consumption*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
+        else:
+            raise("Invalid ratio_preference_or_consumption = [0,1]", self.ratio_preference_or_consumption)
+
+        #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
+        neighbour_influence = np.zeros((self.N, self.M))
+
+        for m in range(self.M):
+            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], attribute_matrix[:,m])
+        
+        return neighbour_influence
+    
     def calc_ego_influence_degroot(self) -> npt.NDArray:
-        """
-        Calculate the influence of neighbours using the Degroot model of weighted aggregation
 
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        neighbour_influence: npt.NDArray
-            NxM array where each row represents the influence of an Individual listening to its neighbours regarding their
-            behavioural attitude opinions, this influence is weighted by the weighting_matrix
-        """
         if self.ratio_preference_or_consumption == 1.0:
             attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
         elif self.ratio_preference_or_consumption == 0.0:
@@ -369,9 +393,14 @@ class Network:
             NxM array giving the influence of social learning from neighbours for that time step
         """
 
-        ego_influence = self.calc_ego_influence_degroot()           
+        if self.alpha_change == "behavioural_independence":
+            ego_influence = self.calc_ego_influence_degroot_independent()
+        else:
+            ego_influence = self.calc_ego_influence_degroot()           
+         
 
-        social_influence = ego_influence #+ np.random.normal(loc=0, scale=self.learning_error_scale, size=(self.N, self.M))
+        social_influence = ego_influence + np.random.normal(loc=0, scale=self.learning_error_scale, size=(self.N, self.M))
+
         return social_influence
 
     def calc_weighting_matrix_attribute(self,attribute_array):
@@ -418,6 +447,19 @@ class Network:
         norm_weighting_matrix = self.calc_weighting_matrix_attribute(identity_array)
 
         return norm_weighting_matrix
+    
+    def update_weightings_list(self):
+
+        weighting_matrix_list = []
+
+        for m in range(self.M):
+            low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
+
+            norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
+
+            weighting_matrix_list.append(norm_weighting_matrix)
+
+        return weighting_matrix_list
 
     def calc_total_emissions(self) -> int:
         """
@@ -539,7 +581,8 @@ class Network:
         self.history_stock_carbon_emissions.append(self.total_carbon_emissions_stock)
         self.history_flow_carbon_emissions.append(self.total_carbon_emissions_flow)
         self.history_identity_list.append(self.identity_list)
-        self.history_gini.append(self.gini)
+        if self.budget_inequality_state == 1:
+            self.history_gini.append(self.gini)
 
     def next_step(self):
         """
@@ -554,6 +597,9 @@ class Network:
         -------
         None
         """
+
+        print("Hello!")
+
         # advance a time step
         self.t += 1
 
@@ -561,10 +607,13 @@ class Network:
         self.update_individuals()
 
         # update network parameters for next step
-        self.weighting_matrix = self.update_weightings()
-        #print("self.weighting_matrix", self.weighting_matrix)
+        if self.alpha_change != "static_preferences":
+            if self.alpha_change == "dynamic_culturally_determined_weights":
+                self.weighting_matrix = self.update_weightings()
+            elif self.alpha_change == "behavioural_independence":#independent behaviours
+                self.weighting_matrix_list = self.update_weightings_list()
 
-        self.social_component_matrix = self.calc_social_component_matrix()
+            self.social_component_matrix = self.calc_social_component_matrix()
 
         self.total_carbon_emissions_flow = self.calc_total_emissions()
         self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
@@ -584,7 +633,8 @@ class Network:
                     self.min_identity,
                     self.max_identity,
             ) = self.calc_network_identity()
-            self.gini = self.calc_gini([x.instant_budget for x in self.agent_list])
+            if self.budget_inequality_state == 1:
+                self.gini = self.calc_gini([x.instant_budget for x in self.agent_list])
             self.save_timeseries_data_network()
 
         if self.t > self.carbon_price_time:

@@ -7,7 +7,6 @@
     "time_steps_max": 2000,
     "carbon_price_time": 500,
     "set_seed": 1,
-    "seed_reps": 3,
     "N": 200,
     "M": 3,
     "K": 50,
