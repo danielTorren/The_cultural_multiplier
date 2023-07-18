@@ -141,14 +141,14 @@ def main(
     scenarios= load_object(fileName + "/Data", "scenarios")
 
 
-    ##plot_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning","attitude")
-    #plot_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning","consumption")
+    plot_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning","attitude")
+    plot_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning","consumption")
 
-    #scatter_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"],"attitude")
-    #scatter_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning", base_params["seed_reps"],"consumption")
+    scatter_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"],"attitude")
+    scatter_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning", base_params["seed_reps"],"consumption")
 
-    #plot_seperate_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios,"Consumption learning", base_params["seed_reps"],"consumption" )
-    #plot_seperate_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"], "attitude")
+    plot_seperate_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios,"Consumption learning", base_params["seed_reps"],"consumption" )
+    plot_seperate_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"], "attitude")
 
     plot_consumption_impact(fileName,data_holder,  data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, base_params["seed_reps"])
     
@@ -156,6 +156,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/scenario_comparison_20_09_04__18_07_2023"
+        fileName="results/scenario_comparison_20_14_41__18_07_2023"
     )
 
