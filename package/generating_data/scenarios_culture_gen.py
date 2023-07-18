@@ -49,9 +49,10 @@ def main(
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
         params_list.extend(params_sub_list)#append to an emply list!
 
-    print("HEYEYU",params_list)
-    emissions_stock_array = multi_emissions_stock(params_list)
+    #print("HEYEYU",params_list)
+    emissions_stock_array, init_emissions_stock_array = multi_emissions_stock(params_list)
     data_holder = emissions_stock_array.reshape(len(scenarios),property_reps, params["seed_reps"])
+    init_data_holder = init_emissions_stock_array.reshape(len(scenarios),property_reps, params["seed_reps"])
 
     # CONSUMPTION BASED
     data_holder_consumption_based = []
@@ -61,14 +62,17 @@ def main(
         params["alpha_change"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
         params_list_consumption_based.extend(params_sub_list)
-    print("adfsdf", params_list_consumption_based)
-    emissions_stock_array_consumption_based = multi_emissions_stock(params_list_consumption_based)
+    #print("adfsdf", params_list_consumption_based)
+    emissions_stock_array_consumption_based, init_emissions_stock_array_consumption_based= multi_emissions_stock(params_list_consumption_based)
     data_holder_consumption_based = emissions_stock_array_consumption_based.reshape(len(scenarios),property_reps, params["seed_reps"])
+    init_data_holder_consumption_based = init_emissions_stock_array_consumption_based.reshape(len(scenarios),property_reps, params["seed_reps"])
 
     createFolder(fileName)
 
     save_object(data_holder, fileName + "/Data", "data_holder")
     save_object(data_holder_consumption_based, fileName + "/Data", "data_holder_consumption_based")
+    save_object(init_data_holder, fileName + "/Data", "init_data_holder")
+    save_object(init_data_holder_consumption_based, fileName + "/Data", "init_data_holder_consumption_based")
     save_object(params, fileName + "/Data", "base_params")
     save_object(scenarios, fileName + "/Data", "scenarios")
     save_object(var_params, fileName + "/Data", "var_params")
