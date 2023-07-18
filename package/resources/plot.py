@@ -733,8 +733,17 @@ def plot_total_carbon_emissions_timeseries(
 ):
     if latex_bool:
         set_latex()
-    y_title = "Carbon Emissions"
+    y_title = "Carbon Emissions Stock"
     property = "history_stock_carbon_emissions"
+    plot_network_timeseries(fileName, Data, y_title, property, dpi_save)
+
+def plot_total_flow_carbon_emissions_timeseries(
+    fileName: str, Data, dpi_save: int,latex_bool = False
+):
+    if latex_bool:
+        set_latex()
+    y_title = "Carbon Emissions Flow"
+    property = "history_flow_carbon_emissions"
     plot_network_timeseries(fileName, Data, y_title, property, dpi_save)
 
 def plot_average_identity_timeseries(fileName: str, Data, dpi_save: int,latex_bool = False):

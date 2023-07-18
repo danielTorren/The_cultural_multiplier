@@ -49,17 +49,20 @@ class Network:
         #self.prices_high_carbon = self.prices_low_carbon*parameters["price_high_carbon_factor"]   #np.random.uniform(0.5,1,self.M)
 
         self.carbon_price = parameters["init_carbon_price"]
-        self.redistribution_state = parameters["redistribution_state"]
-        self.dividend_progressiveness = parameters["dividend_progressiveness"]
+        #self.redistribution_state = parameters["redistribution_state"]
+        #self.dividend_progressiveness = parameters["dividend_progressiveness"]
         self.carbon_price_time = parameters["carbon_price_time"]
         self.carbon_price_increased = parameters["carbon_price_increased"]
-
         self.carbon_tax_implementation = parameters["carbon_tax_implementation"]
-        if  self.carbon_tax_implementation == "linear":
-            self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_time)
+        
+        #if  self.carbon_tax_implementation == "linear":
+        #    self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_time)
             #print("carbon_price_gradient", self.carbon_price_gradient)
+        self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_time)
 
         self.service_substitutability = parameters["service_substitutability"]
+        self.budget_inequality_state = parameters["budget_inequality_state"]
+        self.heterogenous_preferences = parameters["heterogenous_preferences"]
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
@@ -93,8 +96,10 @@ class Network:
             self.weighting_matrix_list = [self.weighting_matrix]*self.M
 
         self.network_density = nx.density(self.network)
-        
-        self.heterogenous_preferences = parameters["heterogenous_preferences"]
+
+
+        #THIS IS THE DIFFERNCE BETWEEN INDIVIDUALS AND THE STOCHASTIC MODEL COMPONENT
+
 
         if self.heterogenous_preferences == 1:
             self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
@@ -107,8 +112,9 @@ class Network:
             np.random.shuffle(self.low_carbon_preference_matrix_init)
             #print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
         
-        self.budget_inequality_state = parameters["budget_inequality_state"]
-
+        
+        
+        """
         if self.budget_inequality_state == 1:
             #Inequality in budget
             self.budget_inequality_const = parameters["budget_inequality_const"]
@@ -129,21 +135,31 @@ class Network:
         else:
             #Uniform budget
             self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
-            
 
-        ## LOW CARBON SUBSTITUTABLILITY
+        """
+        
+        #Uniform budget
+        self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
+            
+        ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
         #np.random.shuffle(self.low_carbon_substitutability_array)
 
         #HIGH CARBON PRICE
-        self.prices_high_carbon_array = np.linspace(parameters["prices_high_carbon_lower"], parameters["prices_high_carbon_upper"], num=self.M)
-        np.random.shuffle(self.prices_high_carbon_array)    
+        #self.prices_high_carbon_array = np.linspace(parameters["prices_high_carbon_lower"], parameters["prices_high_carbon_upper"], num=self.M)
+        #np.random.shuffle(self.prices_high_carbon_array)   
+        #Uniform prices
+        self.prices_high_carbon_array =  np.asarray([0.75]*self.M)
 
         ##SERVICE PREFERENCE
-        no_norm_service_preference_matrix_init = np.linspace(parameters["service_preference_lower"], parameters["service_preference_upper"], num=self.M)
-        norm_service_preference =  self.normalize_vector_sum(no_norm_service_preference_matrix_init)
-        np.random.shuffle(norm_service_preference)
-        self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
+        #no_norm_service_preference_matrix_init = np.linspace(parameters["service_preference_lower"], parameters["service_preference_upper"], num=self.M)
+        #norm_service_preference =  self.normalize_vector_sum(no_norm_service_preference_matrix_init)
+        #np.random.shuffle(norm_service_preference)
+        #self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
+        
+        #uniform service preferences
+        self.service_preference_matrix_init =np.asarray([1/self.M]*self.M)
+        
 
         self.agent_list = self.create_agent_list()
 
@@ -165,10 +181,11 @@ class Network:
         self.total_carbon_emissions_flow = self.init_total_carbon_emissions
         self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
-        if self.redistribution_state:
-            self.carbon_dividend_array = self.calc_carbon_dividend_array()
-        else:
-            self.carbon_dividend_array = np.asarray([0]*self.N)
+        #if self.redistribution_state:
+        #    self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        #else:
+            #self.carbon_dividend_array = np.asarray([0]*self.N)
+        self.carbon_dividend_array = np.asarray([0]*self.N)
 
         (
                 self.identity_list,
@@ -178,6 +195,8 @@ class Network:
                 self.min_identity,
                 self.max_identity,
         ) = self.calc_network_identity()
+
+        self.welfare = self.calc_welfare()
 
         if self.save_timeseries_data:
             self.history_weighting_matrix = [self.weighting_matrix]
@@ -194,6 +213,7 @@ class Network:
             self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
             self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
             self.history_identity_list = [self.identity_list]
+            self.history_welfare = [self.welfare]
             if self.budget_inequality_state == 1:
                 self.history_gini = [self.gini]
     
@@ -327,7 +347,7 @@ class Network:
             Individual(
                 individual_params,
                 self.low_carbon_preference_matrix_init[n],
-                self.service_preference_matrix_init[n],
+                self.service_preference_matrix_init,
                 self.individual_budget_array[n],
                 n
             )
@@ -545,7 +565,10 @@ class Network:
             raise("INVALID CARBON TAX IMPLEMENTATION")
 
         return carbon_price
-
+    
+    def calc_welfare(self):
+        welfare = sum(i.utility for i in self.agent_list)
+        return welfare
 
     def update_individuals(self):
         """
@@ -581,6 +604,7 @@ class Network:
         self.history_stock_carbon_emissions.append(self.total_carbon_emissions_stock)
         self.history_flow_carbon_emissions.append(self.total_carbon_emissions_flow)
         self.history_identity_list.append(self.identity_list)
+        self.history_welfare.append(self.welfare)
         if self.budget_inequality_state == 1:
             self.history_gini.append(self.gini)
 
@@ -597,8 +621,6 @@ class Network:
         -------
         None
         """
-
-        print("Hello!")
 
         # advance a time step
         self.t += 1
@@ -617,10 +639,11 @@ class Network:
 
         self.total_carbon_emissions_flow = self.calc_total_emissions()
         self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
+        
         #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
 
-        if self.redistribution_state:
-            self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        #if self.redistribution_state:
+        #    self.carbon_dividend_array = self.calc_carbon_dividend_array()
         #a = [x.instant_budget for x in self.agent_list]
         #self.gini = self.calc_gini(a)
         
@@ -633,6 +656,7 @@ class Network:
                     self.min_identity,
                     self.max_identity,
             ) = self.calc_network_identity()
+            self.welfare = self.calc_welfare()
             if self.budget_inequality_state == 1:
                 self.gini = self.calc_gini([x.instant_budget for x in self.agent_list])
             self.save_timeseries_data_network()

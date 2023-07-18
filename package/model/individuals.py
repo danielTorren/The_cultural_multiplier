@@ -53,7 +53,7 @@ class Individual:
         self.id = id_n
 
         self.Omega_m = self.calc_omega()
-        self.chi_matrix = self.calc_chi_matrix()
+        self.chi_m = self.calc_chi_m()
         self.H_m, self.L_m = self.calc_consumption_quantities()
 
         self.identity = self.calc_identity()
@@ -71,39 +71,42 @@ class Individual:
     def calc_omega(self):        
         omega_vector = ((self.prices_high_carbon_instant*self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
         return omega_vector
-
-    def calc_chi_matrix(self):
+    
+    def calc_chi_m(self):
         power_omega = (self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array
-        power_second = (1-self.service_substitutability)*((self.low_carbon_substitutability_array)/((self.low_carbon_substitutability_array - 1)))
-        first_bit = ((self.prices_high_carbon_instant/self.service_preferences)**(self.service_substitutability))
+        power_second = (self.service_substitutability-1)*((self.low_carbon_substitutability_array)/((self.low_carbon_substitutability_array - 1)))
+        
+        first_bit = (self.service_preferences/self.prices_high_carbon_instant)**(self.service_substitutability)
         second_bit = (self.low_carbon_preferences*(self.Omega_m**power_omega) + (1 - self.low_carbon_preferences))**power_second
         
         chi_components = first_bit*second_bit
 
-        A, B = np.meshgrid(chi_components, chi_components)
-        chi_matrix = B/A
-
-        return chi_matrix
+        return chi_components
          
     def calc_consumption_quantities(self):
         common_vector_denominator = self.Omega_m*self.prices_low_carbon + self.prices_high_carbon_instant
 
-        H_m_denominators = np.matmul(self.chi_matrix, common_vector_denominator)
+        H_m_denominators = np.matmul(self.chi_m, common_vector_denominator)
 
-        H_m = self.instant_budget/H_m_denominators
+        H_m = self.instant_budget*self.chi_m/H_m_denominators
         L_m = H_m*self.Omega_m
 
+        ###NOT SURE I NEED THE LINE BELOW
         H_m_clipped = np.clip(H_m, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
         L_m_clipped = np.clip(L_m, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
         
         return H_m_clipped,L_m_clipped
+        #return H_m,L_m
 
     def calc_identity(self) -> float:
         return np.mean(self.low_carbon_preferences)
 
     def update_preferences(self, social_component):
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
+        
+        ###NOT SURE I NEED THE LINE BELOW
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
+        #self.low_carbon_preferences = low_carbon_preferences
 
     def calc_total_emissions(self):      
         return sum(self.H_m)
@@ -148,13 +151,16 @@ class Individual:
 
         #calculate consumption
         self.Omega_m = self.calc_omega()
-        self.chi_matrix = self.calc_chi_matrix()
+        self.chi_m = self.calc_chi_m()
         self.H_m, self.L_m = self.calc_consumption_quantities()
 
         #calc_emissions
         self.flow_carbon_emissions = self.calc_total_emissions()
+        
+        #calc_utility
+        self.utility = self.calc_utility()
 
         if (self.save_timeseries_data) and (self.t % self.compression_factor == 0):
             #calc utility
-            self.utility = self.calc_utility()
+            
             self.save_timeseries_data_individual()

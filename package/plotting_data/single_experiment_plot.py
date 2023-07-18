@@ -21,7 +21,8 @@ from package.resources.plot import (
     plot_joint_cluster_micro,
     print_live_initial_identity_network,
     live_animate_identity_network_weighting_matrix,
-    plot_low_carbon_preferences_timeseries
+    plot_low_carbon_preferences_timeseries,
+    plot_total_flow_carbon_emissions_timeseries
 )
 
 
@@ -55,7 +56,7 @@ def main(
     plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
     plot_identity_timeseries(fileName, Data, dpi_save)
     plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
-       
+    plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
 
     plt.show()
 
