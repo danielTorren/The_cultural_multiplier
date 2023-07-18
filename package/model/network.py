@@ -108,8 +108,9 @@ class Network:
                 self.low_carbon_preference_matrix_init
             ) = self.generate_init_data_preferences()
         else:
+            #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
-            np.random.shuffle(self.low_carbon_preference_matrix_init)
+            #np.random.shuffle(self.low_carbon_preference_matrix_init)
             #print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
         
         
@@ -310,7 +311,11 @@ class Network:
     def generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
 
         #A_m 
-        low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M)for n in range(self.N)]
+        low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M) for n in range(self.N)]
+        test = np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=(self.M,self.N))
+        #print("asdasd")
+        #print(low_carbon_preference_list, test)
+        #quit()
         low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)
 
         return low_carbon_preference_matrix#,individual_budget_matrix#, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix

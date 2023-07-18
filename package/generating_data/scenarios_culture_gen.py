@@ -42,6 +42,7 @@ def main(
 
     # Attitude BASED
     data_holder = []
+    params["ratio_preference_or_consumption"] = 1.0
     for i in scenarios:
         params["alpha_change"] = i
         params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
@@ -54,7 +55,7 @@ def main(
 
     # CONSUMPTION BASED
     data_holder_consumption_based = []
-    params["ratio_preference_or_consumption"] = 1.0
+    params["ratio_preference_or_consumption"] = 0.0
     for i in scenarios:
         params["alpha_change"] = i
         params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
