@@ -40,39 +40,72 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
-    # Attitude BASED
-    data_holder = []
-    params_list= []
+    # Attitude BASED learning and identity
+    data_holder_attitude_learn_attitude_identity = []
+    params_list_attitude_learn_attitude_identity= []
     params["ratio_preference_or_consumption"] = 1.0
+    params["ratio_preference_or_consumption_identity"] = 1.0
     for i in scenarios:
         params["alpha_change"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
-        params_list.extend(params_sub_list)#append to an emply list!
+        params_list_attitude_learn_attitude_identity.extend(params_sub_list)#append to an emply list!
 
-    #print("HEYEYU",params_list)
-    emissions_stock_array, init_emissions_stock_array = multi_emissions_stock(params_list)
-    data_holder = emissions_stock_array.reshape(len(scenarios),property_reps, params["seed_reps"])
-    init_data_holder = init_emissions_stock_array.reshape(len(scenarios),property_reps, params["seed_reps"])
+    emissions_stock_array_attitude_learn_attitude_identity, init_emissions_stock_array_attitude_learn_attitude_identity = multi_emissions_stock(params_list_attitude_learn_attitude_identity)
+    data_holder_attitude_learn_attitude_identity = emissions_stock_array_attitude_learn_attitude_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
+    #init_data_holder_attitude_learn_attitude_identity = init_emissions_stock_array_attitude_learn_attitude_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
 
-    # CONSUMPTION BASED
-    data_holder_consumption_based = []
-    params_list_consumption_based = []
+    # Attitude BASED learning and consumption based identity
+    data_holder_attitude_learn_consumption_identity = []
+    params_list_attitude_learn_consumption_identity= []
+    params["ratio_preference_or_consumption"] = 1.0
+    params["ratio_preference_or_consumption_identity"] = 0.0
+    for i in scenarios:
+        params["alpha_change"] = i
+        params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+        params_list_attitude_learn_consumption_identity.extend(params_sub_list)#append to an emply list!
+
+    emissions_stock_array_attitude_learn_consumption_identity, init_emissions_stock_array_attitude_learn_consumption_identity = multi_emissions_stock(params_list_attitude_learn_consumption_identity)
+    data_holder_attitude_learn_consumption_identity = emissions_stock_array_attitude_learn_consumption_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
+    #init_data_holder_attitude_learn_consumption_identity = init_emissions_stock_array_attitude_learn_consumption_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
+
+    # CONSUMPTION BASED learning and attitude based identity
+
+    data_holder_consumption_learn_attitude_identity = []
+    params_list_consumption_learn_attitude_identity = []
     params["ratio_preference_or_consumption"] = 0.0
+    params["ratio_preference_or_consumption_identity"] = 1.0
     for i in scenarios:
         params["alpha_change"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
-        params_list_consumption_based.extend(params_sub_list)
+        params_list_consumption_learn_attitude_identity.extend(params_sub_list)
     #print("adfsdf", params_list_consumption_based)
-    emissions_stock_array_consumption_based, init_emissions_stock_array_consumption_based= multi_emissions_stock(params_list_consumption_based)
-    data_holder_consumption_based = emissions_stock_array_consumption_based.reshape(len(scenarios),property_reps, params["seed_reps"])
-    init_data_holder_consumption_based = init_emissions_stock_array_consumption_based.reshape(len(scenarios),property_reps, params["seed_reps"])
+    emissions_stock_array_consumption_learn_attitude_identity, init_emissions_stock_array_consumption_learn_attitude_identity= multi_emissions_stock(params_list_consumption_learn_attitude_identity)
+    data_holder_consumption_learn_attitude_identity = emissions_stock_array_consumption_learn_attitude_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
+    #init_data_holder_consumption_learn_attitude_identity = init_emissions_stock_array_consumption_learn_attitude_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
+
+    # CONSUMPTION BASED learning and consumption based identity
+
+    data_holder_consumption_learn_consumption_identity = []
+    params_list_consumption_learn_consumption_identity = []
+    params["ratio_preference_or_consumption"] = 0.0
+    params["ratio_preference_or_consumption_identity"] = 0.0
+    for i in scenarios:
+        params["alpha_change"] = i
+        params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+        params_list_consumption_learn_consumption_identity.extend(params_sub_list)
+    #print("adfsdf", params_list_consumption_based)
+    emissions_stock_array_consumption_learn_consumption_identity, init_emissions_stock_array_consumption_learn_consumption_identity= multi_emissions_stock(params_list_consumption_learn_consumption_identity)
+    data_holder_consumption_learn_consumption_identity = emissions_stock_array_consumption_learn_consumption_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
+    #init_data_holder_consumption_learn_consumption_identity = init_emissions_stock_array_consumption_learn_consumption_identity.reshape(len(scenarios),property_reps, params["seed_reps"])
+
 
     createFolder(fileName)
 
-    save_object(data_holder, fileName + "/Data", "data_holder")
-    save_object(data_holder_consumption_based, fileName + "/Data", "data_holder_consumption_based")
-    save_object(init_data_holder, fileName + "/Data", "init_data_holder")
-    save_object(init_data_holder_consumption_based, fileName + "/Data", "init_data_holder_consumption_based")
+    save_object(data_holder_attitude_learn_attitude_identity, fileName + "/Data", "data_holder_attitude_learn_attitude_identity")
+    save_object(data_holder_attitude_learn_consumption_identity, fileName + "/Data", "data_holder_attitude_learn_consumption_identity")
+    save_object(data_holder_consumption_learn_attitude_identity, fileName + "/Data", "data_holder_consumption_learn_attitude_identity")
+    save_object(data_holder_consumption_learn_consumption_identity, fileName + "/Data", "data_holder_consumption_learn_consumption_identity")
+
     save_object(params, fileName + "/Data", "base_params")
     save_object(scenarios, fileName + "/Data", "scenarios")
     save_object(var_params, fileName + "/Data", "var_params")

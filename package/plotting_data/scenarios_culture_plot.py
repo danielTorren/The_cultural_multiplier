@@ -193,6 +193,40 @@ def plot_seperate_end_points_emissions_scenarios(
     f = plotName + "/" + property_save + "seperate_scenarios_emissions_" + learn_type
     fig.savefig(f+ ".png", dpi=600, format="png") 
 
+def plot_end_points_emissions_scenarios_joint_four(
+    fileName: str, Data_set, property_title, property_save, property_vals, scenarios,titles, labels
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,6), sharey=True, constrained_layout=True)
+
+    axes[0][0].grid()
+    axes[0][1].grid()
+    axes[1][0].grid()
+    axes[1][1].grid()
+
+    for j, ax in enumerate(axes.flat):
+        for i, scenario  in enumerate(scenarios):
+            Data_list = Data_set[j][i]
+            mu_emissions =  Data_list.mean(axis=1)
+            min_emissions =  Data_list.min(axis=1)
+            max_emissions=  Data_list.max(axis=1)
+
+            ax.plot(property_vals, mu_emissions, label = labels[i])
+            ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.5)
+            ax.legend()
+            ax.set_title(titles[j])
+
+    axes[0][0].set_xlabel(property_title)
+    axes[0][1].set_xlabel(property_title)
+    axes[0][0].set_ylabel(r"Carbon Emissions stock")
+    axes[1][0].set_ylabel(r"Carbon Emissions stock")    
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/" + property_save + "scenarios_emissions_joint_four" 
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+
 def plot_end_points_emissions_scenarios_joint(
     fileName: str, Data_holder,Data_holder_consum, property_title, property_save, property_vals, scenarios,title, title_consum, labels
 ):
@@ -306,10 +340,15 @@ def main(
 
     ############################
 
-    data_holder = load_object(fileName + "/Data", "data_holder")
-    data_holder_consumption_based = load_object(fileName + "/Data", "data_holder_consumption_based")
-    init_data_holder = load_object(fileName + "/Data", "init_data_holder")
-    init_data_holder_consumption_based = load_object(fileName + "/Data", "init_data_holder_consumption_based")
+    data_holder_attitude_learn_attitude_identity = load_object(fileName + "/Data", "data_holder_attitude_learn_attitude_identity")
+    data_holder_attitude_learn_consumption_identity = load_object( fileName + "/Data", "data_holder_attitude_learn_consumption_identity")
+    data_holder_consumption_learn_attitude_identity = load_object( fileName + "/Data", "data_holder_consumption_learn_attitude_identity")
+    data_holder_consumption_learn_consumption_identity = load_object( fileName + "/Data", "data_holder_consumption_learn_consumption_identity")
+
+    data_set = [data_holder_attitude_learn_attitude_identity,data_holder_attitude_learn_consumption_identity,data_holder_consumption_learn_attitude_identity,data_holder_consumption_learn_consumption_identity]
+
+    titles = ["Attitude learning, Attitude identity", "Attitude learning, Consumption identity", "Consumption learning, Attitude identity","Consumption learning, Consumption identity" ]
+
     property_varied = load_object(fileName + "/Data", "property_varied")
     property_varied_title = load_object(fileName + "/Data", "property_varied_title")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
@@ -318,9 +357,14 @@ def main(
 
 
     labels = ["Static preferences", "Static weightings","Social multiplier", "Cultural multiplier"]
-    plot_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning","attitude")
-    plot_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning","consumption")
-    plot_end_points_emissions_scenarios_joint(fileName, data_holder, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Attitude learning", "Consumption learning",labels)
+    #plot_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning","attitude")
+    #plot_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning","consumption")
+    
+    #plot_end_points_emissions_scenarios_joint(fileName, data_holder, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Attitude learning", "Consumption learning",labels)
+
+    plot_end_points_emissions_scenarios_joint_four(
+        fileName,  data_set, property_varied_title, property_varied, property_values_list,scenarios,titles, labels
+        )
 
     #scatter_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"],"attitude")
     #scatter_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning", base_params["seed_reps"],"consumption")
@@ -347,6 +391,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/scenario_comparison_16_19_11__20_07_2023"
+        fileName="results/scenario_comparison_18_15_06__20_07_2023"
     )
 

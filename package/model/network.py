@@ -69,6 +69,7 @@ class Network:
         self.learning_error_scale = parameters["learning_error_scale"]
         self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
         self.clipping_epsilon = parameters["clipping_epsilon"]
+        self.ratio_preference_or_consumption_identity = parameters["ratio_preference_or_consumption_identity"]
 
         # setting arrays with lin space
         self.phi_array = np.asarray([parameters["phi"]]*self.M)
@@ -345,7 +346,8 @@ class Network:
             "low_carbon_substitutability": self.low_carbon_substitutability_array,
             "prices_low_carbon": self.prices_low_carbon,
             "prices_high_carbon":self.prices_high_carbon_array,
-            "clipping_epsilon" :self.clipping_epsilon
+            "clipping_epsilon" :self.clipping_epsilon,
+            "ratio_preference_or_consumption_identity": self.ratio_preference_or_consumption_identity,
         }
 
         agent_list = [

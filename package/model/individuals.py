@@ -47,6 +47,7 @@ class Individual:
         self.prices_low_carbon = individual_params["prices_low_carbon"]
         self.prices_high_carbon = individual_params["prices_high_carbon"]
         self.clipping_epsilon = individual_params["clipping_epsilon"]
+        self.ratio_preference_or_consumption_identity = individual_params["ratio_preference_or_consumption_identity"]
 
         self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
 
@@ -99,7 +100,15 @@ class Individual:
         #return H_m,L_m
 
     def calc_identity(self) -> float:
-        return np.mean(self.low_carbon_preferences)
+        if self.ratio_preference_or_consumption_identity == 1.0:
+            identity = np.mean(self.low_carbon_preferences)
+        elif self.ratio_preference_or_consumption_identity == 0.0:
+            identity = np.mean(self.L_m/(self.L_m + self.H_m))
+        elif self.ratio_preference_or_consumption_identity > 0.0 and self.ratio_preference_or_consumption_identity < 1.0:
+            identity = self.ratio_preference_or_consumption_identity*np.mean(self.low_carbon_preferences) + (1-self.ratio_preference_or_consumption_identity)*np.mean(self.L_m/(self.L_m + self.H_m))
+        else:
+            raise("Invalid ratio_preference_or_consumption_identity = [0,1]", self.ratio_preference_or_consumption_identity)
+        return identity
 
     def update_preferences(self, social_component):
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
