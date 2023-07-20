@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from package.resources.utility import load_object
 from package.resources.utility import get_cmap_colours
 import numpy as np
+
 def plot_consumption_impact(
     fileName: str, Data_holder, Data_holder_consumption_based,property_title, property_save, property_vals, scenarios, seed_reps
 ):
@@ -192,6 +193,51 @@ def plot_seperate_end_points_emissions_scenarios(
     f = plotName + "/" + property_save + "seperate_scenarios_emissions_" + learn_type
     fig.savefig(f+ ".png", dpi=600, format="png") 
 
+def plot_end_points_emissions_scenarios_joint(
+    fileName: str, Data_holder,Data_holder_consum, property_title, property_save, property_vals, scenarios,title, title_consum, labels
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10,6), sharey=True, constrained_layout=True)
+
+    axes[0].grid()
+    axes[1].grid()
+
+    for i, scenario  in enumerate(scenarios):
+        Data_list = Data_holder[i]
+        mu_emissions =  Data_list.mean(axis=1)
+        min_emissions =  Data_list.min(axis=1)
+        max_emissions=  Data_list.max(axis=1)
+
+        axes[0].plot(property_vals, mu_emissions, label = labels[i])
+        axes[0].fill_between(property_vals, min_emissions, max_emissions, alpha=0.5)
+
+    axes[0].set_xlabel(property_title)
+    axes[0].set_ylabel(r"Carbon Emissions stock")
+
+    axes[0].set_title(title)
+    axes[0].legend()
+    
+    
+    for i, scenario  in enumerate(scenarios):
+        Data_list = Data_holder_consum[i]
+        mu_emissions =  Data_list.mean(axis=1)
+        min_emissions =  Data_list.min(axis=1)
+        max_emissions=  Data_list.max(axis=1)
+
+        axes[1].plot(property_vals, mu_emissions, label = labels[i])
+        axes[1].fill_between(property_vals, min_emissions, max_emissions, alpha=0.5)
+
+    axes[1].set_xlabel(property_title)
+    axes[1].set_title(title_consum)
+    axes[1].legend()
+    
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/" + property_save + "scenarios_emissions_joint" 
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+
 def plot_end_points_emissions_scenarios(
     fileName: str, Data_holder, property_title, property_save, property_vals, scenarios,title, learn_type
 ):
@@ -271,8 +317,10 @@ def main(
     scenarios= load_object(fileName + "/Data", "scenarios")
 
 
-    #plot_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning","attitude")
-    #plot_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning","consumption")
+    labels = ["Static preferences", "Static weightings","Social multiplier", "Cultural multiplier"]
+    plot_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning","attitude")
+    plot_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning","consumption")
+    plot_end_points_emissions_scenarios_joint(fileName, data_holder, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Attitude learning", "Consumption learning",labels)
 
     #scatter_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"],"attitude")
     #scatter_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning", base_params["seed_reps"],"consumption")
@@ -285,11 +333,11 @@ def main(
 
     #plot_consumption_impact(fileName,data_holder,  data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, base_params["seed_reps"])
     
-    norm_plot_seperate_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios,"Consumption learning", base_params["seed_reps"],"consumption" )
-    norm_plot_seperate_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"], "attitude")
+    #norm_plot_seperate_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios,"Consumption learning", base_params["seed_reps"],"consumption" )
+    #norm_plot_seperate_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"], "attitude")
 
-    norm_scatter_seperate_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios,"Consumption learning", base_params["seed_reps"],"consumption" )
-    norm_scatter_seperate_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"], "attitude")
+    #norm_scatter_seperate_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios,"Consumption learning", base_params["seed_reps"],"consumption" )
+    #norm_scatter_seperate_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"], "attitude")
 
     #the +1 in the steps is to account for the 0th step i think, The emissions should be the same for the case of 0 carbon price and fixed preferecens
     #init_norm_plot_seperate_end_points_emissions_scenarios(fileName, data_holder_consumption_based,init_data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios,"Consumption learning", base_params["seed_reps"],"consumption" , base_params["time_steps_max"]+1)
@@ -299,6 +347,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/scenario_comparison_21_42_20__18_07_2023"
+        fileName="results/scenario_comparison_16_19_11__20_07_2023"
     )
 
