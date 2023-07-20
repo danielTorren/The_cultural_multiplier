@@ -480,10 +480,17 @@ class Network:
         weighting_matrix_list = []
 
         for m in range(self.M):
-            low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
-
+            if self.ratio_preference_or_consumption_identity == 1.0:
+                low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
+            elif self.ratio_preference_or_consumption_identity == 0.0:
+                low_carbon_preferences_list = np.array([x.consumption_ratio[m] for x in self.agent_list])
+            elif self.ratio_preference_or_consumption_identity > 0.0 and self.ratio_preference_or_consumption_identity < 1.0:
+                low_carbon_preferences_list  =  np.array([self.ratio_preference_or_consumption_identity*x.low_carbon_preferences[m] + (1-self.ratio_preference_or_consumption_identity)*x.consumption_ratio for x in self.agent_list])
+            else:
+                raise("Invalid ratio_preference_or_consumption_identity = [0,1]", self.ratio_preference_or_consumption_identity)
+    
+            #low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
             norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
-
             weighting_matrix_list.append(norm_weighting_matrix)
 
         return weighting_matrix_list

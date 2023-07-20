@@ -103,9 +103,9 @@ class Individual:
         if self.ratio_preference_or_consumption_identity == 1.0:
             identity = np.mean(self.low_carbon_preferences)
         elif self.ratio_preference_or_consumption_identity == 0.0:
-            identity = np.mean(self.L_m/(self.L_m + self.H_m))
+            identity = np.mean(self.consumption_ratio)
         elif self.ratio_preference_or_consumption_identity > 0.0 and self.ratio_preference_or_consumption_identity < 1.0:
-            identity = self.ratio_preference_or_consumption_identity*np.mean(self.low_carbon_preferences) + (1-self.ratio_preference_or_consumption_identity)*np.mean(self.L_m/(self.L_m + self.H_m))
+            identity = self.ratio_preference_or_consumption_identity*np.mean(self.low_carbon_preferences) + (1-self.ratio_preference_or_consumption_identity)*np.mean(self.consumption_ratio)
         else:
             raise("Invalid ratio_preference_or_consumption_identity = [0,1]", self.ratio_preference_or_consumption_identity)
         return identity
@@ -124,6 +124,9 @@ class Individual:
         psuedo_utility = (self.low_carbon_preferences*(self.L_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences)*(self.H_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
         sum_U = (sum(self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))))**(self.service_preferences/(self.service_preferences-1))
         return sum_U
+    
+    def calc_consumption_ratio(self):
+        return self.L_m/(self.L_m + self.H_m)
 
     def save_timeseries_data_individual(self):
         """
@@ -156,12 +159,16 @@ class Individual:
         
         #update preferences 
         self.update_preferences(social_component)
-        self.identity = self.calc_identity()
+        
 
         #calculate consumption
         self.Omega_m = self.calc_omega()
         self.chi_m = self.calc_chi_m()
         self.H_m, self.L_m = self.calc_consumption_quantities()
+        self.consumption_ratio = self.calc_consumption_ratio()
+
+        #calc_identity
+        self.identity = self.calc_identity()
 
         #calc_emissions
         self.flow_carbon_emissions = self.calc_total_emissions()
