@@ -198,7 +198,7 @@ def plot_end_points_emissions_scenarios_joint_four(
 ):
 
     #print(c,emissions_final)
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,6), sharey=True, constrained_layout=True)
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,6), sharey="row", constrained_layout=True)
 
     axes[0][0].grid()
     axes[0][1].grid()
@@ -217,8 +217,8 @@ def plot_end_points_emissions_scenarios_joint_four(
             ax.legend()
             ax.set_title(titles[j])
 
-    axes[0][0].set_xlabel(property_title)
-    axes[0][1].set_xlabel(property_title)
+    axes[1][0].set_xlabel(property_title)
+    axes[1][1].set_xlabel(property_title)
     axes[0][0].set_ylabel(r"Carbon Emissions stock")
     axes[1][0].set_ylabel(r"Carbon Emissions stock")    
 
@@ -226,6 +226,46 @@ def plot_end_points_emissions_scenarios_joint_four(
     plotName = fileName + "/Plots"
     f = plotName + "/" + property_save + "scenarios_emissions_joint_four" 
     fig.savefig(f+ ".png", dpi=600, format="png") 
+
+def plot_social_versus_cultural_multiplier(
+    fileName: str, Data_set, property_title, property_save, property_vals, scenarios,titles, labels
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,6), sharey="row", constrained_layout=True)
+
+    axes[0][0].grid()
+    axes[0][1].grid()
+    axes[1][0].grid()
+    axes[1][1].grid()
+
+    for j, ax in enumerate(axes.flat):
+        Data_social = Data_set[j][2]
+        Data_cultural = Data_set[j][3]
+
+        Data_list = Data_cultural/Data_social
+
+        mu_emissions =  Data_list.mean(axis=1)
+        min_emissions =  Data_list.min(axis=1)
+        max_emissions=  Data_list.max(axis=1)
+
+        ax.plot(property_vals, mu_emissions)
+        ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.5)
+        ax.set_title(titles[j])
+
+    axes[1][0].set_xlabel(property_title)
+    axes[1][1].set_xlabel(property_title)
+    axes[0][0].set_ylabel(r"Carbon Emissions stock ratio")
+    axes[1][0].set_ylabel(r"Carbon Emissions stock ratio")  
+
+    fig.suptitle("Emissions ratio between cultural and social multiplier")  
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/" + property_save + "scenarios_social_versus_cultural_multiplier_four" 
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+
+
 
 def plot_end_points_emissions_scenarios_joint(
     fileName: str, Data_holder,Data_holder_consum, property_title, property_save, property_vals, scenarios,title, title_consum, labels
@@ -365,6 +405,10 @@ def main(
     plot_end_points_emissions_scenarios_joint_four(
         fileName,  data_set, property_varied_title, property_varied, property_values_list,scenarios,titles, labels
         )
+    
+    plot_social_versus_cultural_multiplier(
+        fileName,  data_set, property_varied_title, property_varied, property_values_list,scenarios,titles, labels
+    )
 
     #scatter_end_points_emissions_scenarios(fileName, data_holder, property_varied_title, property_varied, property_values_list,scenarios,"Attitude learning", base_params["seed_reps"],"attitude")
     #scatter_end_points_emissions_scenarios(fileName, data_holder_consumption_based, property_varied_title, property_varied, property_values_list,scenarios, "Consumption learning", base_params["seed_reps"],"consumption")
