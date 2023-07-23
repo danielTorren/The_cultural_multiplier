@@ -18,10 +18,11 @@
     "service_substitutability": 2,
     "low_carbon_substitutability_lower":2,
     "low_carbon_substitutability_upper":5,
-    "a_low_carbon_preference": 0.5,
-    "b_low_carbon_preference": 0.5,
+    "a_low_carbon_preference": 2,
+    "b_low_carbon_preference": 2,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "linear",
-    "carbon_price_increased" : 0.5
+    "carbon_price_increased" : 0.5, 
+    "ratio_preference_or_consumption_identity": 1.0
 }

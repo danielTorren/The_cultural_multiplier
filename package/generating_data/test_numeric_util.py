@@ -111,11 +111,11 @@ def multi_line_matrix_plot( Z, col_vals, row_vals, cmap, col_axis_x, col_label, 
         #ax.set_xlim(left = 0.0, right = 2.0)
 
 params = {
-    "low_carbon_preferences": 0.8,
+    "low_carbon_preferences": 0.5,
     "prices_low_carbon": 1,
     "prices_high_carbon": 1,#set q to 1
     "param_1": 1.1,#1.1,#need to GREATER THAN 1 #their phi
-    "param_2": 1.1,#11.5,#need to GREATER THAN param_1#their lambda
+    "param_2": 11.5,#need to GREATER THAN param_1#their lambda
     "eta": 75
 }
 
