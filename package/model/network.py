@@ -101,18 +101,23 @@ class Network:
 
         #THIS IS THE DIFFERNCE BETWEEN INDIVIDUALS AND THE STOCHASTIC MODEL COMPONENT
 
-
         if self.heterogenous_preferences == 1:
-            self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
-            self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
+            self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.var_low_carbon_preference = parameters["var_low_carbon_preference"]
+
             (
                 self.low_carbon_preference_matrix_init
-            ) = self.generate_init_data_preferences()
+            ) = self.alt_generate_init_data_preferences()
+            #print(" self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
+            #quit()
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
             #np.random.shuffle(self.low_carbon_preference_matrix_init)
             #print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
+        
+
         
         
         
@@ -313,11 +318,22 @@ class Network:
 
         #A_m 
         low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M) for n in range(self.N)]
-        test = np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=(self.M,self.N))
+        #test = np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=(self.M,self.N))
         #print("asdasd")
         #print(low_carbon_preference_list, test)
         #quit()
         low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)
+
+        return low_carbon_preference_matrix#,individual_budget_matrix#, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
+    
+    def alt_generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
+
+
+        indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
+
+        preferences_uncapped = np.asarray([np.random.normal(identity,self.var_low_carbon_preference, size=self.M) for identity in  indentities_beta])
+
+        low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
 
         return low_carbon_preference_matrix#,individual_budget_matrix#, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
 
