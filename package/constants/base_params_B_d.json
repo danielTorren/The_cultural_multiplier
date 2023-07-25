@@ -3,7 +3,7 @@
     "budget_inequality_state":1,
     "compression_factor":10,
     "time_steps_max": 2000,
-    "carbon_price_time": 500,
+    "carbon_price_duration": 500,
     "seed_reps": 20,
     "N": 200,
     "M": 3,

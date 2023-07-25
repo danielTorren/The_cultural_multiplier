@@ -40,7 +40,7 @@ if __name__ == '__main__':
     "alpha_change": "dynamic_culturally_determined_weights",
     "compression_factor":10,
     "time_steps_max": 2000,
-    "carbon_price_time": 0,
+    "carbon_price_duration": 0,
     "seed_reps": 20,
     "set_seed": 5,
     "N": 200,

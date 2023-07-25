@@ -46,19 +46,23 @@ class Network:
 
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
+        self.prices_high_carbon_array =  np.asarray([0.75]*self.M)
         #self.prices_high_carbon = self.prices_low_carbon*parameters["price_high_carbon_factor"]   #np.random.uniform(0.5,1,self.M)
+
+        self.burn_in_duration = parameters["burn_in_duration"]
 
         self.carbon_price = parameters["init_carbon_price"]
         #self.redistribution_state = parameters["redistribution_state"]
         #self.dividend_progressiveness = parameters["dividend_progressiveness"]
-        self.carbon_price_time = parameters["carbon_price_time"]
+        self.carbon_price_duration = parameters["carbon_price_duration"]
         self.carbon_price_increased = parameters["carbon_price_increased"]
         self.carbon_tax_implementation = parameters["carbon_tax_implementation"]
         
         #if  self.carbon_tax_implementation == "linear":
-        #    self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_time)
+        #    self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_duration)
             #print("carbon_price_gradient", self.carbon_price_gradient)
-        self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_time)
+        #self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_duration)
+        self.carbon_price_gradient = self.carbon_price_increased/self.carbon_price_duration
 
         self.service_substitutability = parameters["service_substitutability"]
         self.budget_inequality_state = parameters["budget_inequality_state"]
@@ -159,7 +163,7 @@ class Network:
         #self.prices_high_carbon_array = np.linspace(parameters["prices_high_carbon_lower"], parameters["prices_high_carbon_upper"], num=self.M)
         #np.random.shuffle(self.prices_high_carbon_array)   
         #Uniform prices
-        self.prices_high_carbon_array =  np.asarray([0.75]*self.M)
+        
 
         ##SERVICE PREFERENCE
         #no_norm_service_preference_matrix_init = np.linspace(parameters["service_preference_lower"], parameters["service_preference_upper"], num=self.M)
@@ -189,7 +193,7 @@ class Network:
 
         self.init_total_carbon_emissions  = self.calc_total_emissions()
         self.total_carbon_emissions_flow = self.init_total_carbon_emissions
-        self.total_carbon_emissions_stock = self.init_total_carbon_emissions
+        #self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
         #if self.redistribution_state:
         #    self.carbon_dividend_array = self.calc_carbon_dividend_array()
@@ -208,24 +212,31 @@ class Network:
 
         self.welfare = self.calc_welfare()
 
-        if self.save_timeseries_data:
-            self.history_weighting_matrix = [self.weighting_matrix]
-            self.history_time = [self.t]
-            self.weighting_matrix_convergence = 0  # there is no convergence in the first step, to deal with time issues when plotting
-            self.history_weighting_matrix_convergence = [
-                self.weighting_matrix_convergence
-            ]
-            self.history_average_identity = [self.average_identity]
-            self.history_std_identity = [self.std_identity]
-            self.history_var_identity = [self.var_identity]
-            self.history_min_identity = [self.min_identity]
-            self.history_max_identity = [self.max_identity]
-            self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
-            self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
-            self.history_identity_list = [self.identity_list]
-            self.history_welfare = [self.welfare]
-            if self.budget_inequality_state == 1:
-                self.history_gini = [self.gini]
+        #print("TIME",self.t, self.burn_in_duration, self.carbon_price_duration)
+        #print("BOOL", self.t == self.burn_in_duration)
+        if self.t == self.burn_in_duration:
+            self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
+            if self.save_timeseries_data:
+                self.set_up_time_series()
+
+    def set_up_time_series(self):
+        self.history_weighting_matrix = [self.weighting_matrix]
+        self.history_time = [self.t]
+        self.weighting_matrix_convergence = 0  # there is no convergence in the first step, to deal with time issues when plotting
+        self.history_weighting_matrix_convergence = [
+            self.weighting_matrix_convergence
+        ]
+        self.history_average_identity = [self.average_identity]
+        self.history_std_identity = [self.std_identity]
+        self.history_var_identity = [self.var_identity]
+        self.history_min_identity = [self.min_identity]
+        self.history_max_identity = [self.max_identity]
+        self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
+        self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
+        self.history_identity_list = [self.identity_list]
+        self.history_welfare = [self.welfare]
+        if self.budget_inequality_state == 1:
+            self.history_gini = [self.gini]
     
     def normalize_vector_sum(self, vec):
         return vec/sum(vec)
@@ -564,7 +575,7 @@ class Network:
 
     def calc_carbon_dividend_array(self):
 
-        if self.t < self.carbon_price_time:
+        if self.t <= self.burn_in_duration:
             carbon_dividend_array = [0]*self.N
         else:
             wealth_list_B = np.asarray([x.init_budget for x in self.agent_list])
@@ -670,8 +681,9 @@ class Network:
 
             self.social_component_matrix = self.calc_social_component_matrix()
 
+
         self.total_carbon_emissions_flow = self.calc_total_emissions()
-        self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
+        
         
         #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
 
@@ -679,21 +691,27 @@ class Network:
         #    self.carbon_dividend_array = self.calc_carbon_dividend_array()
         #a = [x.instant_budget for x in self.agent_list]
         #self.gini = self.calc_gini(a)
-        
-        if (self.t % self.compression_factor == 0) and (self.save_timeseries_data):
-            (
-                    self.identity_list,
-                    self.average_identity,
-                    self.std_identity,
-                    self.var_identity,
-                    self.min_identity,
-                    self.max_identity,
-            ) = self.calc_network_identity()
-            self.welfare = self.calc_welfare()
-            if self.budget_inequality_state == 1:
-                self.gini = self.calc_gini([x.instant_budget for x in self.agent_list])
-            self.save_timeseries_data_network()
 
-        if self.t > self.carbon_price_time:
-            #print("CARBON ON")
+        if self.t == self.burn_in_duration:
+            self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
+        elif self.t > self.burn_in_duration:
             self.carbon_price = self.calc_carbon_price()
+            self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
+
+        
+        if self.save_timeseries_data:
+            if self.t == self.burn_in_duration:
+                self.set_up_time_series()
+            elif (self.t % self.compression_factor == 0) and (self.t > self.burn_in_duration):
+                (
+                        self.identity_list,
+                        self.average_identity,
+                        self.std_identity,
+                        self.var_identity,
+                        self.min_identity,
+                        self.max_identity,
+                ) = self.calc_network_identity()
+                self.welfare = self.calc_welfare()
+                if self.budget_inequality_state == 1:
+                    self.gini = self.calc_gini([x.instant_budget for x in self.agent_list])
+                self.save_timeseries_data_network()

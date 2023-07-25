@@ -1666,7 +1666,7 @@ def plot_stock_emissions_timeseries_compare_culture(
                     np.asarray(data.history_stock_carbon_emissions), 
                     label = culture_list[i]
                 )
-    #ax.vlines(x = data_list[0].carbon_price_time, linestyles="-", ymax=10000, ymin=0)
+    #ax.vlines(x = data_list[0].carbon_price_duration, linestyles="-", ymax=10000, ymin=0)
     ax.set_xlabel(r"Time")
     ax.set_ylabel(r"%s" % y_title)
     ax.legend()
@@ -1694,7 +1694,7 @@ def plot_flow_emissions_timeseries_compare_culture(
                     np.asarray(data.history_flow_carbon_emissions), 
                     label = culture_list[i]
                 )
-    #ax.vlines(x = data_list[0].carbon_price_time, linestyles="-", ymax=10000, ymin=0)
+    #ax.vlines(x = data_list[0].carbon_price_duration, linestyles="-", ymax=10000, ymin=0)
     ax.set_xlabel(r"Time")
     ax.set_ylabel(r"%s" % y_title)
     ax.legend()

@@ -5,7 +5,7 @@
     "heterogenous_preferences":1,
     "compression_factor":10,
     "time_steps_max": 2000,
-    "carbon_price_time": 500,
+    "carbon_price_duration": 500,
     "set_seed": 1,
     "N": 200,
     "M": 3,
