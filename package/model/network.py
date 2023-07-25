@@ -696,13 +696,12 @@ class Network:
 
         self.total_carbon_emissions_flow = self.calc_total_emissions()
         
-        
         #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
 
-        #if self.redistribution_state:
-        #    self.carbon_dividend_array = self.calc_carbon_dividend_array()
-        #a = [x.instant_budget for x in self.agent_list]
-        #self.gini = self.calc_gini(a)
+        if self.redistribution_state:
+            self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        a = [x.instant_budget for x in self.agent_list]
+        self.gini = self.calc_gini(a)
 
         if self.t == self.burn_in_duration:
             self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
