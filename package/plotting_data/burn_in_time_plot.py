@@ -114,6 +114,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/burn_in_duration_sweep_12_41_33__25_07_2023"
+        fileName="results/burn_in_duration_sweep_12_57_20__25_07_2023"
     )
 
