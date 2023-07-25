@@ -52,8 +52,8 @@ class Network:
         self.burn_in_duration = parameters["burn_in_duration"]
 
         self.carbon_price = parameters["init_carbon_price"]
-        #self.redistribution_state = parameters["redistribution_state"]
-        #self.dividend_progressiveness = parameters["dividend_progressiveness"]
+        self.redistribution_state = parameters["redistribution_state"]
+        self.dividend_progressiveness = parameters["dividend_progressiveness"]
         self.carbon_price_duration = parameters["carbon_price_duration"]
         self.carbon_price_increased = parameters["carbon_price_increased"]
         self.carbon_tax_implementation = parameters["carbon_tax_implementation"]
@@ -134,14 +134,15 @@ class Network:
         
         
         
-        """
+        
         if self.budget_inequality_state == 1:
             #Inequality in budget
             self.budget_inequality_const = parameters["budget_inequality_const"]
-            self.budget_gen_min = parameters["budget_gen_min"]
+            #self.budget_gen_min = parameters["budget_gen_min"]
             #print("self.budget_inequality_const", self.budget_inequality_const)
             #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
-            u = np.linspace(self.budget_gen_min,1,self.N) #np.random.uniform(size=self.N) #NO LONGER STOCHASTIC
+            #u = np.linspace(self.budget_gen_min,1,self.N) #np.random.uniform(size=self.N) #NO LONGER STOCHASTIC
+            u = np.linspace(0.01,1,self.N)
             #print(u,np.random.uniform(size=self.N))
             no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
             #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
@@ -155,11 +156,10 @@ class Network:
         else:
             #Uniform budget
             self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
-
-        """
+        
         
         #Uniform budget
-        self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
+        #self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
@@ -202,11 +202,11 @@ class Network:
         self.total_carbon_emissions_flow = self.init_total_carbon_emissions
         #self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
-        #if self.redistribution_state:
-        #    self.carbon_dividend_array = self.calc_carbon_dividend_array()
-        #else:
-            #self.carbon_dividend_array = np.asarray([0]*self.N)
-        self.carbon_dividend_array = np.asarray([0]*self.N)
+        if self.redistribution_state:
+            self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        else:
+            self.carbon_dividend_array = np.asarray([0]*self.N)
+        #self.carbon_dividend_array = np.asarray([0]*self.N)
 
         (
                 self.identity_list,

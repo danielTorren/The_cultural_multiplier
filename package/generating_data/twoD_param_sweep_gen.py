@@ -77,7 +77,7 @@ def main(
 
     params_list,key_param_array = produce_param_list_stochastic_n_double(base_params, variable_parameters_dict)
     
-    results_emissions_stock_series = multi_emissions_stock(params_list)
+    results_emissions_stock_series,____ = multi_emissions_stock(params_list)
 
     results_emissions_stock = results_emissions_stock_series.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], base_params["seed_reps"]))
 

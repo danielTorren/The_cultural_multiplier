@@ -24,9 +24,20 @@ def main(
     latex_bool = 0
 ) -> None:
         
+    #variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
+    #results_emissions = load_object(fileName + "/Data", "results_emissions_stock")
+    #key_param_array = load_object(fileName + "/Data","key_param_array")
+
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     results_emissions = load_object(fileName + "/Data", "results_emissions_stock")
-    key_param_array = load_object(fileName + "/Data","key_param_array")
+
+    #results_emissions
+    #matrix_emissions = results_emissions.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"]))
+
+    matrix_emissions = np.mean(results_emissions, axis=2)
+    double_phase_diagram(fileName, matrix_emissions, r"Total normalised emissions $E/NM$", "emissions",variable_parameters_dict, get_cmap("Reds"),dpi_save, levels,latex_bool = latex_bool)  
+    
+    """
     print("key_param_array ",key_param_array)
     #print("results_emissions[0]",results_emissions[0])
     #print("results_emissions[:][0][:]",results_emissions[:][0][:])
@@ -34,9 +45,10 @@ def main(
     print("mean?", results_emissions.mean(axis = 2))
     print(np.mean([0.30240306, 0.09407981, 0.09057053]))
     #quit()
+    """
 
     #ys_mean = results_emissions[i].mean(axis=1)
-    
+    """
     if PLOT_TYPE == 2:
 
         col_dict = variable_parameters_dict["col"]
@@ -53,7 +65,6 @@ def main(
         #multi_line_matrix_plot_stoch(fileName, results_emissions, col_dict["vals"], row_dict["vals"], "emissions", get_cmap("plasma"),dpi_save, 1, col_label, row_label, y_label)
         multi_line_matrix_plot_stoch_bands(fileName,results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 1, col_label, row_label, y_label)
         multi_line_matrix_plot_stoch_scatter(fileName,results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 1, col_label, row_label, y_label)
-    """
     else:
         matrix_emissions = results_emissions.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"]))
         double_phase_diagram(fileName, matrix_emissions, r"Stock emissions $E$", "emissions",variable_parameters_dict, get_cmap("Reds"),dpi_save, levels,latex_bool = latex_bool)  
@@ -77,6 +88,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_average_11_39_14__24_05_2023",
+        fileName="results/two_param_sweep_average_16_04_17__25_07_2023",
         PLOT_TYPE=2
     )

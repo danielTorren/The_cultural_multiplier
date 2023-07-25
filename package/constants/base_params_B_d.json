@@ -1,18 +1,19 @@
 {
-    "save_timeseries_data": 1, 
-    "budget_inequality_state":0,
+    "save_timeseries_data": 0, 
+    "budget_inequality_state":1,
     "heterogenous_preferences": 1.0,
+    "redistribution_state": 1.0,
     "alpha_change": "dynamic_culturally_determined_weights",
     "compression_factor":10,
-    "carbon_price_duration": 2000,
-    "burn_in_duration": 0,
-    "seed_reps": 20,
+    "carbon_price_duration": 1500,
+    "burn_in_duration": 500,
+    "seed_reps": 10,
     "set_seed": 5,
     "N": 200,
     "M": 2,
     "K": 20,
     "prob_rewire": 0.1,
-    "learning_error_scale": 0.00,
+    "learning_error_scale": 0.03,
     "homophily": 0.95,
     "confirmation_bias": 10,
     "phi": 0.05,
@@ -31,6 +32,5 @@
     "service_preference": 0.8,
     "lambda_1": 1.1,
     "lambda_2": 10,
-    "init_vals_H": 0.05,
-    "dividend_progressiveness": 0
+    "init_vals_H": 0.05
 }
