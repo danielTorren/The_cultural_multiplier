@@ -709,8 +709,9 @@ def plot_network_timeseries(
     ax.set_ylabel(r"%s" % y_title)
 
     plotName = fileName + "/Plots"
-    f = plotName + "/" + property + "_timeseries.eps"
-    fig.savefig(f, dpi=600, format="eps")
+    f = plotName + "/" + property + "_timeseries"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
 
 def plot_cultural_range_timeseries(fileName: str, Data, dpi_save: int,latex_bool = False):
     if latex_bool:

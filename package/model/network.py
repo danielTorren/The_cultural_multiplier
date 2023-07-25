@@ -102,6 +102,8 @@ class Network:
         #THIS IS THE DIFFERNCE BETWEEN INDIVIDUALS AND THE STOCHASTIC MODEL COMPONENT
 
         if self.heterogenous_preferences == 1:
+            #self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
+            #self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.var_low_carbon_preference = parameters["var_low_carbon_preference"]
@@ -109,6 +111,7 @@ class Network:
             (
                 self.low_carbon_preference_matrix_init
             ) = self.alt_generate_init_data_preferences()
+            #) = self.generate_init_data_preferences()
             #print(" self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
             #quit()
         else:

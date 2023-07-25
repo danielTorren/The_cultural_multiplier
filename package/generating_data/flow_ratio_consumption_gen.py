@@ -43,7 +43,7 @@ def main(
 
     #print("HEYEYU",params_list, len(params_list))
     __, emissions_flow_timeseries, __= multi_emissions_flow_stock_run(params_list)
-    print("emissions_flow_timeseries", emissions_flow_timeseries)
+    #print("emissions_flow_timeseries", emissions_flow_timeseries)
     emissions_flow_timeseries_array = emissions_flow_timeseries.reshape(property_reps, params["seed_reps"],len(time_array))
 
     createFolder(fileName)
