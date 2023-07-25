@@ -10,6 +10,7 @@ Created: 10/10/2022
 # imports
 import numpy as np
 import numpy.typing as npt
+from scipy.optimize import fsolve
 
 # modules
 class Individual:
@@ -23,14 +24,15 @@ class Individual:
         self,
         individual_params,
         low_carbon_preferences,
-        service_preferences,
         budget,
         id_n,
     ):
 
         self.low_carbon_preferences = low_carbon_preferences
 
-        self.service_preferences = service_preferences
+        #self.service_preferences = service_preferences
+
+        
         
         self.init_budget = budget
         self.instant_budget = self.init_budget
@@ -48,26 +50,48 @@ class Individual:
         self.prices_high_carbon = individual_params["prices_high_carbon"]
         self.clipping_epsilon = individual_params["clipping_epsilon"]
         self.ratio_preference_or_consumption_identity = individual_params["ratio_preference_or_consumption_identity"]
+        
+        self.service_preference = individual_params["service_preference"]
+        self.lambda_1 = individual_params["lambda_2"]
+        self.lambda_2 = individual_params["lambda_2"]
+        init_vals_H = individual_params["init_vals_H"]
+
+        self.burn_in_duration = individual_params["burn_in_duration"]
+
+        self.psi_m = (self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array
 
         self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
 
         self.id = id_n
 
         self.Omega_m = self.calc_omega()
-        self.chi_m = self.calc_chi_m()
-        self.H_m, self.L_m = self.calc_consumption_quantities()
+        self.n_tilde = self.calc_n_tilde()
+        #self.chi_m = self.calc_chi_m()
+        self.chi = self.calc_chi()
+        self.H_m, self.L_m = self.calc_consumption_quantities(init_vals_H)
+        if self.ratio_preference_or_consumption_identity < 1.0:
+            self.consumption_ratio = self.calc_consumption_ratio()
 
         self.identity = self.calc_identity()
         self.initial_carbon_emissions = self.calc_total_emissions()
         self.flow_carbon_emissions = self.initial_carbon_emissions
 
         self.utility = self.calc_utility()
+        
+        #print("self.t",self.t, self.burn_in_duration)
+        if self.t == self.burn_in_duration and self.save_timeseries_data:
+            self.set_up_time_series()
+    
+    def set_up_time_series(self):
+        self.history_low_carbon_preferences = [self.low_carbon_preferences]
+        self.history_identity = [self.identity]
+        self.history_flow_carbon_emissions = [self.flow_carbon_emissions]
+        self.history_utility = [self.utility]
+        self.history_H_1 = [self.H_m[0]]
+        self.history_H_2 = [self.H_m[1]]
+        self.history_L_1 = [self.L_m[0]]
+        self.history_L_2 = [self.L_m[1]]
 
-        if self.save_timeseries_data:
-            self.history_low_carbon_preferences = [self.low_carbon_preferences]
-            self.history_identity = [self.identity]
-            self.history_flow_carbon_emissions = [self.flow_carbon_emissions]
-            self.history_utility = [self.utility]
 
     def calc_omega(self):        
         omega_vector = ((self.prices_high_carbon_instant*self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
@@ -83,13 +107,37 @@ class Individual:
         chi_components = first_bit*second_bit
 
         return chi_components
-         
-    def calc_consumption_quantities(self):
-        common_vector_denominator = self.Omega_m*self.prices_low_carbon + self.prices_high_carbon_instant
+    
+    def calc_n_tilde(self):
+        n_tilde = (self.low_carbon_preferences*(self.Omega_m**self.psi_m) + (1-self.low_carbon_preferences ))**(1/self.psi_m)
+        return n_tilde
 
-        H_m_denominators = np.matmul(self.chi_m, common_vector_denominator)
 
-        H_m = self.instant_budget*self.chi_m/H_m_denominators
+    def calc_chi(self):
+        chi = (((self.n_tilde[1]**(1-self.lambda_2)) * self.prices_high_carbon[1]*(1-self.service_preference))/((self.n_tilde[0]**(1-self.lambda_1))*self.prices_high_carbon[0]*self.service_preference))**(self.lambda_1/self.lambda_2)
+        return chi
+
+    def H_1_func(self,x):
+        omega_term = self.prices_high_carbon + self.prices_low_carbon*self.Omega_m
+        f = omega_term[1]*self.chi*x**(self.lambda_2/self.lambda_1) + omega_term[0]*x - self.instant_budget
+        #print("x",x)
+        return f
+
+    def root_finder_H_1(self,init_vals):
+        root = fsolve(self.H_1_func, init_vals)
+        #print("ROOT",root)
+        return root
+
+    def calc_consumption_quantities(self,init_vals):
+
+        # calc H_1
+        H_1 = self.root_finder_H_1(init_vals)
+
+        # calc H_2
+        H_2 = self.chi * H_1**(self.lambda_1/self.lambda_2)
+       
+        # construct H_m
+        H_m = np.asarray([H_1, H_2])
         L_m = H_m*self.Omega_m
 
         ###NOT SURE I NEED THE LINE BELOW
@@ -121,9 +169,15 @@ class Individual:
         return sum(self.H_m)
     
     def calc_utility(self):
-        psuedo_utility = (self.low_carbon_preferences*(self.L_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences)*(self.H_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
-        sum_U = (sum(self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))))**(self.service_preferences/(self.service_preferences-1))
-        return sum_U
+        #psuedo_utility = (self.low_carbon_preferences*(self.L_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences)*(self.H_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+        #sum_U = (sum(self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))))**(self.service_preferences/(self.service_preferences-1))
+        #pseudo_utility = (self.low_carbon_preferences*(self.L_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences)*(self.H_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+        
+        pseudo_utility_m = self.H_m*( self.low_carbon_preferences*self.Omega_m**self.psi_m +(1-self.low_carbon_preferences))**(1/self.psi_m)
+        
+        U = ((1-self.service_preference)*(pseudo_utility_m[1])**(1-self.lambda_2) + self.service_preference*(1-self.lambda_2)/(1-self.lambda_1)*(pseudo_utility_m[0])**(1-self.lambda_1))**(1/(1-self.lambda_2))
+        
+        return U
     
     def calc_consumption_ratio(self):
         return self.L_m/(self.L_m + self.H_m)
@@ -144,6 +198,11 @@ class Individual:
         self.history_identity.append(self.identity)
         self.history_flow_carbon_emissions.append(self.flow_carbon_emissions)
         self.history_utility.append(self.utility)
+        self.history_H_1.append(self.H_m[0])
+        self.history_H_2.append(self.H_m[1])
+        self.history_L_1.append(self.L_m[0])
+        self.history_L_2.append(self.L_m[1])
+
 
     def next_step(self, t: int, social_component: npt.NDArray, carbon_dividend, carbon_price):
 
@@ -163,9 +222,12 @@ class Individual:
 
         #calculate consumption
         self.Omega_m = self.calc_omega()
-        self.chi_m = self.calc_chi_m()
-        self.H_m, self.L_m = self.calc_consumption_quantities()
-        self.consumption_ratio = self.calc_consumption_ratio()
+        self.n_tilde = self.calc_n_tilde()
+        #self.chi_m = self.calc_chi_m()
+        self.chi = self.calc_chi()
+        self.H_m, self.L_m = self.calc_consumption_quantities(self.H_m[0])#use last turns value as the guess
+        if self.ratio_preference_or_consumption_identity < 1.0:
+            self.consumption_ratio = self.calc_consumption_ratio()
 
         #calc_identity
         self.identity = self.calc_identity()
@@ -176,7 +238,8 @@ class Individual:
         #calc_utility
         self.utility = self.calc_utility()
 
-        if (self.save_timeseries_data) and (self.t % self.compression_factor == 0):
-            #calc utility
-            
-            self.save_timeseries_data_individual()
+        if self.save_timeseries_data:
+            if self.t == self.burn_in_duration:
+                self.set_up_time_series()
+            elif (self.t % self.compression_factor == 0) and (self.t > self.burn_in_duration):
+                self.save_timeseries_data_individual()

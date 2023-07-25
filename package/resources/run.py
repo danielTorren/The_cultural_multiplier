@@ -37,6 +37,7 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
 
     parameters["time_steps_max"] = parameters["burn_in_duration"] + parameters["carbon_price_duration"]
 
+    #print("tim step max", parameters["time_steps_max"],parameters["burn_in_duration"], parameters["carbon_price_duration"])
     social_network = Network(parameters)
 
     #### RUN TIME STEPS

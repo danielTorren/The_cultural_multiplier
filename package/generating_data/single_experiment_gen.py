@@ -24,7 +24,7 @@ def main(
     print("fileName:", fileName)
 
     Data = generate_data(base_params)  # run the simulation
-    print(Data.average_identity)
+    #print(Data.average_identity)
 
     createFolder(fileName)
     save_object(Data, fileName + "/Data", "social_network")
@@ -39,15 +39,15 @@ if __name__ == '__main__':
     "heterogenous_preferences": 1.0,
     "alpha_change": "dynamic_culturally_determined_weights",
     "compression_factor":10,
-    "time_steps_max": 2000,
-    "carbon_price_duration": 0,
+    "carbon_price_duration": 2000,
+    "burn_in_duration": 0,
     "seed_reps": 20,
     "set_seed": 5,
     "N": 200,
-    "M": 3,
+    "M": 2,
     "K": 20,
     "prob_rewire": 0.1,
-    "learning_error_scale": 0.02,
+    "learning_error_scale": 0.00,
     "homophily": 0.95,
     "confirmation_bias": 10,
     "phi": 0.05,
@@ -56,14 +56,16 @@ if __name__ == '__main__':
     "low_carbon_substitutability_upper":5,
     "a_identity": 2,
     "b_identity": 2,
-    "a_low_carbon_preference": 2,
-    "b_low_carbon_preference": 2,
     "var_low_carbon_preference": 0.03,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "linear",
     "carbon_price_increased" : 0.5, 
     "ratio_preference_or_consumption_identity": 1.0,
-    "ratio_preference_or_consumption": 0.0
+    "ratio_preference_or_consumption": 1.0,
+    "service_preference": 0.8,
+    "lambda_1": 1.1,
+    "lambda_2": 10,
+    "init_vals_H": 0.05
 }
     fileName = main(base_params=base_params)

@@ -1544,6 +1544,7 @@ def plot_low_carbon_preferences_timeseries(
 
     for v in range(data.N):
         data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)
+        
         for j in range(data.M):
             axes[j].plot(
                 np.asarray(data.history_time),

@@ -75,6 +75,12 @@ class Network:
         self.clipping_epsilon = parameters["clipping_epsilon"]
         self.ratio_preference_or_consumption_identity = parameters["ratio_preference_or_consumption_identity"]
 
+        #basic and lux goods
+        self.service_preference = parameters["service_preference"]
+        self.lambda_1 = parameters["lambda_1"]
+        self.lambda_2 = parameters["lambda_2"]
+        self.init_vals_H = parameters["init_vals_H"]
+
         # setting arrays with lin space
         self.phi_array = np.asarray([parameters["phi"]]*self.M)
         #self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_upper"], num=self.M)
@@ -172,7 +178,8 @@ class Network:
         #self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
         
         #uniform service preferences
-        self.service_preference_matrix_init =np.asarray([1/self.M]*self.M)
+
+        #self.service_preference_matrix_init =np.asarray([1/self.M]*self.M)
         
 
         self.agent_list = self.create_agent_list()
@@ -378,13 +385,18 @@ class Network:
             "prices_high_carbon":self.prices_high_carbon_array,
             "clipping_epsilon" :self.clipping_epsilon,
             "ratio_preference_or_consumption_identity": self.ratio_preference_or_consumption_identity,
+            "service_preference" : self.service_preference,
+            "lambda_1": self.lambda_1,
+            "lambda_2": self.lambda_2,
+            "init_vals_H" : self.init_vals_H,
+            "burn_in_duration": self.burn_in_duration
         }
 
         agent_list = [
             Individual(
                 individual_params,
                 self.low_carbon_preference_matrix_init[n],
-                self.service_preference_matrix_init,
+                #self.service_preference_matrix_init,
                 self.individual_budget_array[n],
                 n
             )
@@ -697,7 +709,6 @@ class Network:
         elif self.t > self.burn_in_duration:
             self.carbon_price = self.calc_carbon_price()
             self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
-
         
         if self.save_timeseries_data:
             if self.t == self.burn_in_duration:
