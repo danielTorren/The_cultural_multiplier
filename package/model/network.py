@@ -12,6 +12,7 @@ import numpy as np
 import networkx as nx
 import numpy.typing as npt
 from package.model.individuals import Individual
+from functools import partial
 
 # modules
 class Network:
@@ -106,7 +107,7 @@ class Network:
             self.var_low_carbon_preference = parameters["var_low_carbon_preference"]
             (
                 self.low_carbon_preference_matrix_init
-            ) = self.alt_generate_init_data_preferences()
+            ) = self.generate_init_data_preferences()
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
@@ -277,21 +278,8 @@ class Network:
                 low=0, high=self.N, size=2
             )  # generate pair of indicies to swap
             self.agent_list[b], self.agent_list[a] = self.agent_list[a], self.agent_list[b]
-
-    def generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
-
-        #A_m 
-        low_carbon_preference_list = [np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=self.M) for n in range(self.N)]
-        #test = np.random.beta(self.a_low_carbon_preference, self.b_low_carbon_preference, size=(self.M,self.N))
-        #print("asdasd")
-        #print(low_carbon_preference_list, test)
-        #quit()
-        low_carbon_preference_matrix = np.asarray(low_carbon_preference_list)
-
-        return low_carbon_preference_matrix#,individual_budget_matrix#, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
     
-    def alt_generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
-
+    def generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
 
         indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
 
@@ -575,11 +563,26 @@ class Network:
         """
         Update Individual objects with new information regarding social interactions, prices and dividend
         """
+        # Assuming your list of objects is called 'object_list' and the function you want to call is 'my_function' with arguments 'arg1' and 'arg2'
+        map(
+            partial(
+                lambda agent, t, scm, cda, carbon_price: agent.next_step(t, scm, cda, carbon_price),
+                t=self.t,
+                scm= self.social_component_matrix,
+                cda= self.carbon_dividend_array,
+                carbon_price=self.carbon_price
+            ),
+            self.agent_list
+        )
+        #does this help?
+
+        """
         for i in range(self.N):
             self.agent_list[i].next_step(
                 self.t, self.social_component_matrix[i], self.carbon_dividend_array[i], self.carbon_price
             )
-    
+        """
+
     def save_timeseries_data_network(self):
         """
         Save time series data

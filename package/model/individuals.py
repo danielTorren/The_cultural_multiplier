@@ -93,33 +93,19 @@ class Individual:
         self.history_L_m = [self.L_m]
 
     def func_jacobian(self, x, chi_0, psi_0, lambda_0):
-        # Calculate the Jacobian matrix using approx_fprime
-        
-        summing_terms = []
-        for i in range(self.M):
-            term_1 = (chi_0/self.chi_m[i])**(1/(self.psi_m[i]-self.lambda_m[i]))
-            term_2 = self.prices_high_carbon_instant[i] +self.prices_low_carbon[i]*self.Omega_m[i]
-            term_3 = ((psi_0-lambda_0)/(self.psi_m[i]-self.lambda_m[i]))
+        term_1 = (chi_0 / self.chi_m)**(1 / (self.psi_m - self.lambda_m))
+        term_2 = self.prices_high_carbon_instant + self.prices_low_carbon * self.Omega_m
+        term_3 = (psi_0 - lambda_0) / (self.psi_m - self.lambda_m)
 
-            term = term_1*term_2*term_3*(x)**(((psi_0-lambda_0)/(self.psi_m[i]-self.lambda_m[i]))-1)
-            summing_terms.append(term)
+        jacobian = np.sum(term_1 * term_2 * term_3 * (x**(term_3 - 1)))
 
-        jacobian = sum(summing_terms)
-
-        #print("jacobian",jacobian)
         return jacobian
 
     def func_to_solve(self, x, chi_0, psi_0, lambda_0):
+        term_1 = (chi_0 / self.chi_m) ** (1 / (self.psi_m - self.lambda_m))
+        term_2 = self.prices_high_carbon_instant + self.prices_low_carbon * self.Omega_m
 
-        summing_terms = []
-        for i in range(self.M):
-            term_1 = (chi_0/self.chi_m[i])**(1/(self.psi_m[i]-self.lambda_m[i]))
-            term_2 = self.prices_high_carbon_instant[i] + self.prices_low_carbon[i]*self.Omega_m[i]
-
-            term = term_1*term_2*(x)**((psi_0-lambda_0)/(self.psi_m[i]-self.lambda_m[i]))
-            summing_terms.append(term)
-
-        f = sum(summing_terms) - self.instant_budget
+        f = np.sum(term_1 * term_2 * (x ** ((psi_0 - lambda_0) / (self.psi_m - self.lambda_m)))) - self.instant_budget
 
         return f
 
@@ -140,14 +126,9 @@ class Individual:
         omega_vector = ((self.prices_high_carbon_instant*self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
         return omega_vector
 
-    def calc_other_H(self, H_0,chi_0,psi_0,lambda_0):
-        #maybe can do this faster
-        H_m = []
-        for i in range(self.M):
-            H = ((chi_0/self.chi_m[i])**(1/(self.psi_m[i]-self.lambda_m[i])))*((H_0)**((psi_0-lambda_0)/(self.psi_m[i]-self.lambda_m[i])))
-            H_m.append(H)
-
-        return H_m
+    def calc_other_H(self, H_0, chi_0, psi_0, lambda_0):
+        H = ((chi_0/self.chi_m)**(1/(self.psi_m - self.lambda_m)))*((H_0)**((psi_0 - lambda_0)/(self.psi_m - self.lambda_m)))
+        return H
     
     def calc_consumption_quantities_addilog_CES(self):
         root = least_squares(self.func_to_solve, x0=self.init_vals_H, jac=self.func_jacobian, bounds = (0, np.inf), args = (self.chi_m[0], self.psi_m[0], self.lambda_m[0]))
@@ -184,13 +165,8 @@ class Individual:
         return U
     
     def calc_utility_addilog_CES(self):
-        summing_terms = []
-        for i in range(self.M):
-            #term = self.low_carbon_preferences[i]*((self.Q_m[i] +self.q_m[i])**(1-self.lambda_m[i]))/(1-self.lambda_m[i])
-            term = (self.service_preferences[i]*((self.H_m[i]*self.n_tilde_m[i])**(1-self.lambda_m[i])))/(1-self.lambda_m[i])
-            summing_terms.append(term)
-
-        U = sum(summing_terms)
+        term = (self.service_preferences * ((self.H_m * self.n_tilde_m) ** (1 - self.lambda_m))) / (1 - self.lambda_m)
+        U = np.sum(term)
         return U
     
     def calc_identity(self) -> float:
