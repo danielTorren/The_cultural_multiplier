@@ -38,8 +38,8 @@ if __name__ == '__main__':
     "budget_inequality_state":0,
     "heterogenous_preferences": 1.0,
     "alpha_change": "dynamic_culturally_determined_weights",
-    "compression_factor":10,
-    "carbon_price_duration": 2000,
+    "compression_factor":1,
+    "carbon_price_duration": 100,
     "burn_in_duration": 0,
     "seed_reps": 20,
     "set_seed": 5,
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     "learning_error_scale": 0.00,
     "homophily": 0.95,
     "confirmation_bias": 10,
-    "phi": 0.05,
+    "phi": 1,
     "service_substitutability": 2,
     "low_carbon_substitutability_lower":2,
     "low_carbon_substitutability_upper":5,
@@ -66,6 +66,8 @@ if __name__ == '__main__':
     "service_preference": 0.8,
     "lambda_1": 1.1,
     "lambda_2": 10,
-    "init_vals_H": 0.05
+    "init_vals_H": 0.05,
+    "redistribution_state":0,
+    "dividend_progressiveness":0
 }
     fileName = main(base_params=base_params)

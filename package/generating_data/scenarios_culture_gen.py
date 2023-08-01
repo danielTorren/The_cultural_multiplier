@@ -19,11 +19,11 @@ def main(
     f_var = open(VARIABLE_PARAMS_LOAD)
     var_params = json.load(f_var) 
 
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    propertprice_autocorried = var_params["propertprice_autocorried"]#"ratio_preference_or_consumption",
     property_min = var_params["property_min"]#0,
     property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,
-    property_varied_title = var_params["property_varied_title"]# #"A to Omega ratio"
+    propertprice_autocorried_title = var_params["propertprice_autocorried_title"]# #"A to Omega ratio"
 
     property_values_list = generate_vals(
         var_params
@@ -47,7 +47,7 @@ def main(
     params["ratio_preference_or_consumption_identity"] = 1.0
     for i in scenarios:
         params["alpha_change"] = i
-        params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+        params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_attitude_learn_attitude_identity.extend(params_sub_list)#append to an emply list!
 
     emissions_stock_array_attitude_learn_attitude_identity, init_emissions_stock_array_attitude_learn_attitude_identity = multi_emissions_stock(params_list_attitude_learn_attitude_identity)
@@ -61,7 +61,7 @@ def main(
     params["ratio_preference_or_consumption_identity"] = 0.0
     for i in scenarios:
         params["alpha_change"] = i
-        params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+        params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_attitude_learn_consumption_identity.extend(params_sub_list)#append to an emply list!
 
     emissions_stock_array_attitude_learn_consumption_identity, init_emissions_stock_array_attitude_learn_consumption_identity = multi_emissions_stock(params_list_attitude_learn_consumption_identity)
@@ -76,7 +76,7 @@ def main(
     params["ratio_preference_or_consumption_identity"] = 1.0
     for i in scenarios:
         params["alpha_change"] = i
-        params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+        params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_consumption_learn_attitude_identity.extend(params_sub_list)
     #print("adfsdf", params_list_consumption_based)
     emissions_stock_array_consumption_learn_attitude_identity, init_emissions_stock_array_consumption_learn_attitude_identity= multi_emissions_stock(params_list_consumption_learn_attitude_identity)
@@ -91,7 +91,7 @@ def main(
     params["ratio_preference_or_consumption_identity"] = 0.0
     for i in scenarios:
         params["alpha_change"] = i
-        params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+        params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_consumption_learn_consumption_identity.extend(params_sub_list)
     #print("adfsdf", params_list_consumption_based)
     emissions_stock_array_consumption_learn_consumption_identity, init_emissions_stock_array_consumption_learn_consumption_identity= multi_emissions_stock(params_list_consumption_learn_consumption_identity)
@@ -109,8 +109,8 @@ def main(
     save_object(params, fileName + "/Data", "base_params")
     save_object(scenarios, fileName + "/Data", "scenarios")
     save_object(var_params, fileName + "/Data", "var_params")
-    save_object(property_varied, fileName + "/Data", "property_varied")
-    save_object(property_varied_title, fileName + "/Data", "property_varied_title")
+    save_object(propertprice_autocorried, fileName + "/Data", "propertprice_autocorried")
+    save_object(propertprice_autocorried_title, fileName + "/Data", "propertprice_autocorried_title")
     save_object(property_values_list, fileName + "/Data", "property_values_list")
 
 
