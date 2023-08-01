@@ -52,9 +52,9 @@ def plot_multipliers(fileName,data_array_social,data_array_cultural, tau_list, p
     f = plotName + "/sorted_diif_multiplier_varying_tax" 
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png") 
-    
-    ###################################################################
-    """
+
+def plot_reduc(fileName,data_array_social,data_array_cultural, tau_list, phi_list):
+
     fig, axes = plt.subplots(nrows=1, ncols=2,constrained_layout=True, figsize=(14, 7), sharex=True, sharey=True)
 
     for i in range(len(phi_list) - 1):
@@ -82,7 +82,6 @@ def plot_multipliers(fileName,data_array_social,data_array_cultural, tau_list, p
     f = plotName + "/tax_reduct_sorted"
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png") 
-    """
 
 def main(
     fileName = "results/deriving_multipliers_14_49_23__01_08_2023",
@@ -100,6 +99,7 @@ def main(
     base_params = load_object(fileName + "/Data", "base_params")
     phi_list = load_object(fileName + "/Data", "phi_list")
 
+    print("base_params",base_params)
     #print("data_holder_social_multiplier",data_holder_flow_social_multiplier)
     #print("data_holder_cultural_multiplier",data_holder_flow_cultural_multiplier)
     
@@ -109,11 +109,11 @@ def main(
     #print("vdata_array_social",data_array_social,data_array_social.shape)
 
     plot_multipliers(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
-
+    #plot_reduc(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/deriving_multipliers_17_02_43__01_08_2023"
+        fileName= "results/deriving_multipliers_17_57_32__01_08_2023"
     )
 

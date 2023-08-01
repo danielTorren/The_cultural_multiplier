@@ -8,7 +8,7 @@
     "dividend_progressiveness":0,
     "compression_factor":10,
     "carbon_price_duration": 1,
-    "burn_in_duration": 100,
+    "burn_in_duration": 0,
     "seed_reps": 20,
     "N": 500,
     "M": 3,
