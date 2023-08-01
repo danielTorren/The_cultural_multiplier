@@ -106,7 +106,7 @@ def main(
     data_array_social = data_holder_flow_social_multiplier.mean(axis=2)
     data_array_cultural = data_holder_flow_cultural_multiplier.mean(axis=2)
 
-    print("vdata_array_social",data_array_social,data_array_social.shape)
+    #print("vdata_array_social",data_array_social,data_array_social.shape)
 
     plot_multipliers(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
 
@@ -114,6 +114,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/deriving_multipliers_15_58_40__01_08_2023"
+        fileName= "results/deriving_multipliers_17_02_43__01_08_2023"
     )
 

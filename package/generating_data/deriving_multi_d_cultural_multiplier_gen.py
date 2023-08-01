@@ -40,7 +40,6 @@ def main(
     print("fileName: ", fileName)
 
     #social multiplier
-    data_holder_social_multiplier = []
     params_list_social_multiplier= []
     params["alpha_change"] = "behavioural_independence"
     for i in phi_list:
@@ -56,10 +55,9 @@ def main(
     data_holder_flow_social_multiplier = emissions_flow_social_multiplier.reshape(len( phi_list ),property_reps, params["seed_reps"])
     
 
-    #print("data_holder_social_multiplier",data_holder_social_multiplier)
+    print("data_holder_flow_social_multiplier",data_holder_flow_social_multiplier,data_holder_flow_social_multiplier.shape)
 
     #cultural_multiplier
-    data_holder_cultural_multiplier = []
     params_list_cultural_multiplier= []
     params["alpha_change"] = "dynamic_culturally_determined_weights"
     for i in phi_list:

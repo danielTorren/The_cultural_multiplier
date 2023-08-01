@@ -96,7 +96,7 @@ class Individual:
 
     def func_jacobian(self, x, chi_0, psi_0, lambda_0):
         term_1 = (chi_0 / self.chi_m)**(1 / (self.psi_m - self.lambda_m))
-        term_2 = self.prices_high_carbon_instant + self.prices_low_carbon * self.Omega_m
+        term_2 = self.prices_high_carbon_instant + self.prices_low_carbon*self.Omega_m
         term_3 = (psi_0 - lambda_0) / (self.psi_m - self.lambda_m)
 
         jacobian = np.sum(term_1 * term_2 * term_3 * (x**(term_3 - 1)))
@@ -104,22 +104,21 @@ class Individual:
         return jacobian
 
     def func_to_solve(self, x, chi_0, psi_0, lambda_0):
-        term_1 = (chi_0 / self.chi_m) ** (1 / (self.psi_m - self.lambda_m))
-        term_2 = self.prices_high_carbon_instant + self.prices_low_carbon * self.Omega_m
+        term_1 = (chi_0/self.chi_m)**(1/(self.psi_m - self.lambda_m))
+        term_2 = self.prices_high_carbon_instant + self.prices_low_carbon*self.Omega_m
 
-        f = np.sum(term_1 * term_2 * (x ** ((psi_0 - lambda_0) / (self.psi_m - self.lambda_m)))) - self.instant_budget
+        f = np.sum(term_1*term_2*(x**((psi_0 - lambda_0)/(self.psi_m - self.lambda_m)))) - self.instant_budget
 
         return f
 
     def calc_chi_m_nested_CES(self):
         chi_m = ((self.service_preferences/self.prices_high_carbon_instant)**(self.service_substitutability))*(self.n_tilde_m**(self.service_substitutability-1))
-
         return chi_m
+    
     def calc_chi_m_addilog_CES(self):
         chi_m = (self.service_preferences*self.n_tilde_m**(1-self.lambda_m))/self.prices_high_carbon_instant
         return chi_m
     
-
     def calc_n_tilde_m(self):
         n_tilde_m = (self.low_carbon_preferences*(self.Omega_m**self.psi_m)+(1-self.low_carbon_preferences))**(1/self.psi_m)
         return n_tilde_m
@@ -217,6 +216,7 @@ class Individual:
 
     def next_step(self, t: int, social_component: npt.NDArray, carbon_dividend, carbon_price):
 
+        #print("STARS: ",t,social_component, carbon_dividend, carbon_price)
         self.t = t
 
         #update prices

@@ -97,9 +97,6 @@ class Network:
             self.network,
         ) = self.create_weighting_matrix()
 
-        if self.alpha_change == "behavioural_independence":
-            self.weighting_matrix_list = [self.weighting_matrix]*self.M
-
         self.network_density = nx.density(self.network)
 
         if self.heterogenous_preferences == 1:
@@ -135,6 +132,21 @@ class Network:
 
         self.shuffle_agent_list()#partial shuffle of the list based on identity
 
+
+        #if self.alpha_change == "behavioural_independence":
+        #    self.weighting_matrix_list = [self.weighting_matrix]*self.M
+        
+        if self.alpha_change == "static_preferences":
+            self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
+        else:
+            if self.alpha_change == "dynamic_culturally_determined_weights":
+                self.weighting_matrix = self.update_weightings()
+            elif self.alpha_change == "behavioural_independence":#independent behaviours
+                self.weighting_matrix_list = self.update_weightings_list()
+
+            self.social_component_matrix = self.calc_social_component_matrix()
+
+        """
         if self.alpha_change == "static_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
             #do nothing? or feed it the same thing
@@ -145,6 +157,8 @@ class Network:
             self.weighting_matrix = self.update_weightings()
         elif self.alpha_change == "behavioural_independence":#independent behaviours
             self.weighting_matrix_list = self.update_weightings_list()
+
+        """
         
 
         self.init_total_carbon_emissions  = self.calc_total_emissions()
@@ -365,7 +379,9 @@ class Network:
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
 
+        #print("attribute_matrix", attribute_matrix, attribute_matrix.shape)
         for m in range(self.M):
+            #print("self.weighting_matrix_list[m]", self.weighting_matrix_list[m], (self.weighting_matrix_list[m]).shape)
             neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], attribute_matrix[:,m])
         
         return neighbour_influence
@@ -470,9 +486,10 @@ class Network:
 
         #take the transpose so that you can access through m, this may make it way slower
         attribute_matrix = (np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list)))).T
-
+        #print("update_weightings_list", attribute_matrix, attribute_matrix.shape)
         for m in range(self.M):
             low_carbon_preferences_list = attribute_matrix[m]
+            #print("low_carbon_preferences_list",low_carbon_preferences_list)
             #low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
             norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
             weighting_matrix_list.append(norm_weighting_matrix)
@@ -579,24 +596,30 @@ class Network:
         Update Individual objects with new information regarding social interactions, prices and dividend
         """
         # Assuming your list of objects is called 'object_list' and the function you want to call is 'my_function' with arguments 'arg1' and 'arg2'
-        map(
+        
+        """
+        list(map(
             partial(
                 lambda agent, t, scm, cda, carbon_price: agent.next_step(t, scm, cda, carbon_price),
                 t=self.t,
-                scm= self.social_component_matrix,
-                cda= self.carbon_dividend_array,
-                carbon_price=self.carbon_price
+                scm = self.social_component_matrix,
+                cda = self.carbon_dividend_array,
+                carbon_price = self.carbon_price
             ),
             self.agent_list
         )
-        #does this help?
-
+        )
         """
+        
+        #HAVENT BEEN ABLE TO GET THIS WORK AS I WANT IT TOO
+
+        
         for i in range(self.N):
             self.agent_list[i].next_step(
                 self.t, self.social_component_matrix[i], self.carbon_dividend_array[i], self.carbon_price
             )
-        """
+        
+        
 
     def save_timeseries_data_network(self):
         """
@@ -666,12 +689,17 @@ class Network:
         a = [x.instant_budget for x in self.agent_list]
         self.gini = self.calc_gini(a)
 
+        #print("situ", self.phi_array, self.carbon_price, self.set_seed)
+
         if self.t == self.burn_in_duration:
+            #print("t stock", self.t)
             self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
         elif self.t > self.burn_in_duration:
+            #print("t carbon ", self.t)
             self.carbon_price = self.calc_carbon_price()
+            #print("self.carbon_price", self.carbon_price)
             self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
-        
+        #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
         if self.save_timeseries_data:
             if self.t == self.burn_in_duration:
                 self.set_up_time_series()
