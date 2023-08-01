@@ -44,6 +44,7 @@ class Individual:
         self.prices_high_carbon = individual_params["prices_high_carbon"]
         self.clipping_epsilon = individual_params["clipping_epsilon"]
         self.ratio_preference_or_consumption_identity = individual_params["ratio_preference_or_consumption_identity"]
+        self.ratio_preference_or_consumption = individual_params["ratio_preference_or_consumption"]
         self.burn_in_duration = individual_params["burn_in_duration"]
 
         self.utility_function_state = individual_params["utility_function_state"]
@@ -73,10 +74,11 @@ class Individual:
             self.H_m, self.L_m = self.calc_consumption_quantities_addilog_CES()
             self.utility = self.calc_utility_addilog_CES()
 
-        if self.ratio_preference_or_consumption_identity < 1.0:
-            self.consumption_ratio = self.calc_consumption_ratio()
+        self.consumption_ratio = self.calc_consumption_ratio()
+        self.outward_social_influence = self.ratio_preference_or_consumption*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*self.consumption_ratio
 
         self.identity = self.calc_identity()
+
         self.initial_carbon_emissions = self.calc_total_emissions()
         self.flow_carbon_emissions = self.initial_carbon_emissions
 
@@ -240,8 +242,8 @@ class Individual:
             self.init_vals_H = self.H_m[0]
             self.utility = self.calc_utility_addilog_CES()
 
-        if self.ratio_preference_or_consumption_identity < 1.0:
-            self.consumption_ratio = self.calc_consumption_ratio()
+        self.consumption_ratio = self.calc_consumption_ratio()
+        self.outward_social_influence = self.ratio_preference_or_consumption*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*self.consumption_ratio
 
         #calc_identity
         self.identity = self.calc_identity()

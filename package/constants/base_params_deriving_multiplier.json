@@ -7,7 +7,7 @@
     "utility_function_state": "nested_CES",
     "dividend_progressiveness":0,
     "compression_factor":10,
-    "carbon_price_duration": 1,
+    "carbon_price_duration": 2,
     "burn_in_duration": 100,
     "seed_reps": 10,
     "N": 500,

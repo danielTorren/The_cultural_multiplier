@@ -13,6 +13,7 @@ import networkx as nx
 import numpy.typing as npt
 from package.model.individuals import Individual
 from functools import partial
+from operator import attrgetter
 
 # modules
 class Network:
@@ -316,6 +317,7 @@ class Network:
             "prices_high_carbon":self.prices_high_carbon_array,
             "clipping_epsilon" :self.clipping_epsilon,
             "ratio_preference_or_consumption_identity": self.ratio_preference_or_consumption_identity,
+            "ratio_preference_or_consumption": self.ratio_preference_or_consumption,
             "service_preferences" : self.service_preferences,
             "burn_in_duration": self.burn_in_duration
         }
@@ -345,17 +347,21 @@ class Network:
         self.partial_shuffle_agent_list()#partial shuffle of the list
 
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
- 
+        #not sure if this stuff is corret tbh.
 
+        attribute_matrix =np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
+        """
         if self.ratio_preference_or_consumption == 1.0:
-            attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+            attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
+            #attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
         elif self.ratio_preference_or_consumption == 0.0:
-            attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
+            attribute_matrix = np.asarray(list(map(attrgetter('consumption_ratio'), self.agent_list)))
+            #attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
         elif self.ratio_preference_or_consumption > 0.0 and self.ratio_preference_or_consumption < 1.0:
             attribute_matrix = np.asarray([self.ratio_preference_or_consumption*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
         else:
             raise("Invalid ratio_preference_or_consumption = [0,1]", self.ratio_preference_or_consumption)
-
+        """
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
 
@@ -366,14 +372,19 @@ class Network:
     
     def calc_ego_influence_degroot(self) -> npt.NDArray:
 
+        attribute_matrix =np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
+        """
         if self.ratio_preference_or_consumption == 1.0:
-            attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+            attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
+            #attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
         elif self.ratio_preference_or_consumption == 0.0:
+            #attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
             attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
         elif self.ratio_preference_or_consumption > 0.0 and self.ratio_preference_or_consumption < 1.0:
             attribute_matrix = np.asarray([self.ratio_preference_or_consumption*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
         else:
             raise("Invalid ratio_preference_or_consumption = [0,1]", self.ratio_preference_or_consumption)
+        """
 
         neighbour_influence = np.matmul(self.weighting_matrix, attribute_matrix)
         #print("neighbour_influence",neighbour_influence)
@@ -444,9 +455,12 @@ class Network:
         total_difference: float
             total element wise difference between the previous weighting arrays
         """
-        identity_array = np.array([x.identity for x in self.agent_list])
 
-        norm_weighting_matrix = self.calc_weighting_matrix_attribute(identity_array)
+        ##THE WEIGHTING FOR THE IDENTITY IS DONE IN INDIVIDUALS
+
+        self.identity_list = list(map(attrgetter('identity'), self.agent_list))
+
+        norm_weighting_matrix = self.calc_weighting_matrix_attribute(self.identity_list)
 
         return norm_weighting_matrix
     
@@ -454,16 +468,11 @@ class Network:
 
         weighting_matrix_list = []
 
+        #take the transpose so that you can access through m, this may make it way slower
+        attribute_matrix = (np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list)))).T
+
         for m in range(self.M):
-            if self.ratio_preference_or_consumption_identity == 1.0:
-                low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
-            elif self.ratio_preference_or_consumption_identity == 0.0:
-                low_carbon_preferences_list = np.array([x.consumption_ratio[m] for x in self.agent_list])
-            elif self.ratio_preference_or_consumption_identity > 0.0 and self.ratio_preference_or_consumption_identity < 1.0:
-                low_carbon_preferences_list  =  np.array([self.ratio_preference_or_consumption_identity*x.low_carbon_preferences[m] + (1-self.ratio_preference_or_consumption_identity)*x.consumption_ratio for x in self.agent_list])
-            else:
-                raise("Invalid ratio_preference_or_consumption_identity = [0,1]", self.ratio_preference_or_consumption_identity)
-    
+            low_carbon_preferences_list = attribute_matrix[m]
             #low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
             norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
             weighting_matrix_list.append(norm_weighting_matrix)
@@ -483,7 +492,9 @@ class Network:
         total_network_emissions: float
             total network emissions from each Individual object
         """
-        total_network_emissions = sum([x.flow_carbon_emissions for x in self.agent_list])
+
+        total_network_emissions = sum(map(attrgetter('flow_carbon_emissions'), self.agent_list))
+        #total_network_emissions = sum([x.flow_carbon_emissions for x in self.agent_list])
         return total_network_emissions
 
     def calc_network_identity(self) -> tuple[float, float, float, float]:
@@ -509,14 +520,17 @@ class Network:
         identity_min: float
             min of network identity at time step t
         """
-        identity_list = [x.identity for x in self.agent_list]
 
-        identity_mean = np.mean(identity_list)
-        identity_std = np.std(identity_list)
-        identity_variance = np.var(identity_list)
-        identity_max = max(identity_list)
-        identity_min = min(identity_list)
-        return (identity_list,identity_mean, identity_std, identity_variance, identity_max, identity_min)
+        #this may be slightly faster not sure
+        
+        #identity_list = [x.identity for x in self.agent_list]
+
+        identity_mean = np.mean(self.identity_list)
+        identity_std = np.std(self.identity_list)
+        identity_variance = np.var(self.identity_list)
+        identity_max = max(self.identity_list)
+        identity_min = min(self.identity_list)
+        return (identity_mean, identity_std, identity_variance, identity_max, identity_min)
 
     def calc_carbon_dividend_array(self):
 
@@ -556,7 +570,8 @@ class Network:
         return carbon_price
     
     def calc_welfare(self):
-        welfare = sum(i.utility for i in self.agent_list)
+        welfare = sum(map(attrgetter('utility'), self.agent_list))
+        #welfare = sum(i.utility for i in self.agent_list)
         return welfare
 
     def update_individuals(self):
@@ -662,7 +677,6 @@ class Network:
                 self.set_up_time_series()
             elif (self.t % self.compression_factor == 0) and (self.t > self.burn_in_duration):
                 (
-                        self.identity_list,
                         self.average_identity,
                         self.std_identity,
                         self.var_identity,
