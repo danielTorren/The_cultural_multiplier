@@ -12,7 +12,6 @@ import numpy as np
 import networkx as nx
 import numpy.typing as npt
 from package.model.individuals import Individual
-from sklearn.preprocessing import normalize
 
 # modules
 class Network:
@@ -31,11 +30,15 @@ class Network:
         
         np.random.seed(self.set_seed)
 
-        self.K = int(round(parameters["K"]))  # round due to the sampling method producing floats in the Sobol Sensitivity Analysis
+        self.network_density = parameters["network_density"]
+        self.N = int(round(parameters["N"]))
+        self.K = int(round((self.N - 1)*self.network_density)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
+
         self.prob_rewire = parameters["prob_rewire"]
         self.alpha_change = parameters["alpha_change"]
         self.save_timeseries_data = parameters["save_timeseries_data"]
         self.compression_factor = parameters["compression_factor"]
+        self.utility_function_state = parameters["utility_function_state"]
 
         # time
         self.t = 0
@@ -46,8 +49,7 @@ class Network:
 
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
-        self.prices_high_carbon_array =  np.asarray([0.75]*self.M)
-        #self.prices_high_carbon = self.prices_low_carbon*parameters["price_high_carbon_factor"]   #np.random.uniform(0.5,1,self.M)
+        self.prices_high_carbon_array =  np.asarray([1]*self.M)#start them at the same value
 
         self.burn_in_duration = parameters["burn_in_duration"]
 
@@ -58,13 +60,15 @@ class Network:
         self.carbon_price_increased = parameters["carbon_price_increased"]
         self.carbon_tax_implementation = parameters["carbon_tax_implementation"]
         
-        #if  self.carbon_tax_implementation == "linear":
-        #    self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_duration)
-            #print("carbon_price_gradient", self.carbon_price_gradient)
-        #self.carbon_price_gradient = self.carbon_price_increased/(parameters["time_steps_max"] - self.carbon_price_duration)
-        self.carbon_price_gradient = self.carbon_price_increased/self.carbon_price_duration
+        if self.carbon_tax_implementation == "linear":
+            self.carbon_price_gradient = self.carbon_price_increased/self.carbon_price_duration
 
-        self.service_substitutability = parameters["service_substitutability"]
+        if self.utility_function_state == "nested_CES":
+            self.service_substitutability = parameters["service_substitutability"]
+        elif self.utility_function_state == "addilog_CES":#basic and lux goods
+            self.lambda_m = np.linspace(parameters["lambda_m_lower"],parameters["lambda_m_upper"],self.M)
+
+
         self.budget_inequality_state = parameters["budget_inequality_state"]
         self.heterogenous_preferences = parameters["heterogenous_preferences"]
 
@@ -74,21 +78,9 @@ class Network:
         self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
         self.clipping_epsilon = parameters["clipping_epsilon"]
         self.ratio_preference_or_consumption_identity = parameters["ratio_preference_or_consumption_identity"]
-
-        #basic and lux goods
-        self.service_preference = parameters["service_preference"]
-        self.lambda_1 = parameters["lambda_1"]
-        self.lambda_2 = parameters["lambda_2"]
-        self.init_vals_H = parameters["init_vals_H"]
-
+        
         # setting arrays with lin space
         self.phi_array = np.asarray([parameters["phi"]]*self.M)
-        #self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_upper"], num=self.M)
-
-        #print("self.low_carbon_substitutability_array", self.low_carbon_substitutability_array)
-        #print("self.prices_high_carbon_array", self.prices_high_carbon_array)
-        #print("self.service_preference_matrix_init", self.service_preference_matrix_init)
-        
 
         # network homophily
         self.homophily = parameters["homophily"]  # 0-1
@@ -108,78 +100,33 @@ class Network:
 
         self.network_density = nx.density(self.network)
 
-
-        #THIS IS THE DIFFERNCE BETWEEN INDIVIDUALS AND THE STOCHASTIC MODEL COMPONENT
-
         if self.heterogenous_preferences == 1:
-            #self.a_low_carbon_preference = parameters["a_low_carbon_preference"]#A
-            #self.b_low_carbon_preference = parameters["b_low_carbon_preference"]#A
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.var_low_carbon_preference = parameters["var_low_carbon_preference"]
-
             (
                 self.low_carbon_preference_matrix_init
             ) = self.alt_generate_init_data_preferences()
-            #) = self.generate_init_data_preferences()
-            #print(" self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
-            #quit()
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
-            #np.random.shuffle(self.low_carbon_preference_matrix_init)
-            #print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
-        
-
-        
-        
-        
         
         if self.budget_inequality_state == 1:
             #Inequality in budget
             self.budget_inequality_const = parameters["budget_inequality_const"]
-            #self.budget_gen_min = parameters["budget_gen_min"]
-            #print("self.budget_inequality_const", self.budget_inequality_const)
-            #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
-            #u = np.linspace(self.budget_gen_min,1,self.N) #np.random.uniform(size=self.N) #NO LONGER STOCHASTIC
             u = np.linspace(0.01,1,self.N)
-            #print(u,np.random.uniform(size=self.N))
             no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
-            #no_norm_individual_budget_array = np.random.exponential(scale=self.budget_inequality_const, size=self.N)
-            #print("no_norm_individual_budget_array", no_norm_individual_budget_array)
-            #np.exp(-parameters["individual_budget_array_lower"]*np.linspace(parameters["individual_budget_array_lower"], parameters["individual_budget_array_upper"], num=self.N))
             self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
-            #print("self.individual_budget_array", self.individual_budget_array,self.budget_inequality_const)
             self.gini = self.calc_gini(self.individual_budget_array)
-            #print("gini", self.gini, self.budget_inequality_const)
-            #quit()
+
         else:
             #Uniform budget
             self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
-        
-        
-        #Uniform budget
-        #self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
-        #np.random.shuffle(self.low_carbon_substitutability_array)
 
-        #HIGH CARBON PRICE
-        #self.prices_high_carbon_array = np.linspace(parameters["prices_high_carbon_lower"], parameters["prices_high_carbon_upper"], num=self.M)
-        #np.random.shuffle(self.prices_high_carbon_array)   
-        #Uniform prices
-        
-
-        ##SERVICE PREFERENCE
-        #no_norm_service_preference_matrix_init = np.linspace(parameters["service_preference_lower"], parameters["service_preference_upper"], num=self.M)
-        #norm_service_preference =  self.normalize_vector_sum(no_norm_service_preference_matrix_init)
-        #np.random.shuffle(norm_service_preference)
-        #self.service_preference_matrix_init = np.tile(norm_service_preference, (self.N, 1)) #SO THAT IT CAN BE MADE TO BE INDIVDUAL FOR OTHER S
-        
-        #uniform service preferences
-
-        #self.service_preference_matrix_init =np.asarray([1/self.M]*self.M)
+        self.service_preferences = np.asarray([1/self.M]*self.M)
         
 
         self.agent_list = self.create_agent_list()
@@ -200,13 +147,11 @@ class Network:
 
         self.init_total_carbon_emissions  = self.calc_total_emissions()
         self.total_carbon_emissions_flow = self.init_total_carbon_emissions
-        #self.total_carbon_emissions_stock = self.init_total_carbon_emissions
 
         if self.redistribution_state:
             self.carbon_dividend_array = self.calc_carbon_dividend_array()
         else:
             self.carbon_dividend_array = np.asarray([0]*self.N)
-        #self.carbon_dividend_array = np.asarray([0]*self.N)
 
         (
                 self.identity_list,
@@ -219,8 +164,6 @@ class Network:
 
         self.welfare = self.calc_welfare()
 
-        #print("TIME",self.t, self.burn_in_duration, self.carbon_price_duration)
-        #print("BOOL", self.t == self.burn_in_duration)
         if self.t == self.burn_in_duration:
             self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
             if self.save_timeseries_data:
@@ -378,19 +321,21 @@ class Network:
             "save_timeseries_data": self.save_timeseries_data,
             "phi_array": self.phi_array,
             "compression_factor": self.compression_factor,
-            "service_substitutability": self.service_substitutability,
+            "utility_function_state": self.utility_function_state,
             "carbon_price": self.carbon_price,
             "low_carbon_substitutability": self.low_carbon_substitutability_array,
             "prices_low_carbon": self.prices_low_carbon,
             "prices_high_carbon":self.prices_high_carbon_array,
             "clipping_epsilon" :self.clipping_epsilon,
             "ratio_preference_or_consumption_identity": self.ratio_preference_or_consumption_identity,
-            "service_preference" : self.service_preference,
-            "lambda_1": self.lambda_1,
-            "lambda_2": self.lambda_2,
-            "init_vals_H" : self.init_vals_H,
+            "service_preferences" : self.service_preferences,
             "burn_in_duration": self.burn_in_duration
         }
+
+        if self.utility_function_state == "nested_CES":
+            individual_params["service_substitutability"] = self.service_substitutability
+        elif self.utility_function_state == "addilog_CES":
+            individual_params["lambda_m"] = self.lambda_m
 
         agent_list = [
             Individual(

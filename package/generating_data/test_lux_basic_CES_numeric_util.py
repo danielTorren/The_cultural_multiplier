@@ -134,7 +134,7 @@ params = {
     "emissions_intensity": np.asarray([1,1,1,1])
 }
 """
- if __name__ == '__main__' :
+if __name__ == '__main__' :
     params = {
         "M": 3,
         "a_m": np.asarray([0.1,0.7,0.2]),#[0,1] have to sum to 1
