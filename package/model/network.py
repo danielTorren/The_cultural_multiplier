@@ -155,8 +155,8 @@ class Network:
         else:
             self.carbon_dividend_array = np.asarray([0]*self.N)
 
+        self.identity_list = list(map(attrgetter('identity'), self.agent_list))
         (
-                self.identity_list,
                 self.average_identity,
                 self.std_identity,
                 self.var_identity,
