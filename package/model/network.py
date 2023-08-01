@@ -613,11 +613,21 @@ class Network:
         
         #HAVENT BEEN ABLE TO GET THIS WORK AS I WANT IT TOO
 
-        
+        # Assuming you have self.agent_list as the list of objects
+        output_ignore = list(map(
+            lambda agent, scm, cda: agent.next_step(self.t, scm, cda, self.carbon_price),
+            self.agent_list,
+            self.social_component_matrix,
+            self.carbon_dividend_array
+        ))
+        #print("output",output)
+        #quit()
+        """
         for i in range(self.N):
             self.agent_list[i].next_step(
                 self.t, self.social_component_matrix[i], self.carbon_dividend_array[i], self.carbon_price
             )
+        """
         
         
 
