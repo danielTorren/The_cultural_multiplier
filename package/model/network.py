@@ -31,12 +31,15 @@ class Network:
         self.set_seed = parameters["set_seed"]
         
         np.random.seed(self.set_seed)
-
+        
+        # network
         self.network_density = parameters["network_density"]
         self.N = int(round(parameters["N"]))
         self.K = int(round((self.N - 1)*self.network_density)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
-
+        print("self.K",self.K)
         self.prob_rewire = parameters["prob_rewire"]
+
+        self.M = int(round(parameters["M"]))
         self.alpha_change = parameters["alpha_change"]
         self.save_timeseries_data = parameters["save_timeseries_data"]
         self.compression_factor = parameters["compression_factor"]
@@ -44,10 +47,6 @@ class Network:
 
         # time
         self.t = 0
-
-        # network
-        self.M = int(round(parameters["M"]))
-        self.N = int(round(parameters["N"]))
 
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
@@ -614,7 +613,7 @@ class Network:
         #HAVENT BEEN ABLE TO GET THIS WORK AS I WANT IT TOO
 
         # Assuming you have self.agent_list as the list of objects
-        output_ignore = list(map(
+        ____ = list(map(
             lambda agent, scm, cda: agent.next_step(self.t, scm, cda, self.carbon_price),
             self.agent_list,
             self.social_component_matrix,

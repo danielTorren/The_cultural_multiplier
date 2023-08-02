@@ -99,7 +99,7 @@ def main(
     base_params = load_object(fileName + "/Data", "base_params")
     phi_list = load_object(fileName + "/Data", "phi_list")
 
-    print("base_params",base_params)
+    #print("base_params",base_params)
     #print("data_holder_social_multiplier",data_holder_flow_social_multiplier)
     #print("data_holder_cultural_multiplier",data_holder_flow_cultural_multiplier)
     
@@ -109,11 +109,11 @@ def main(
     #print("vdata_array_social",data_array_social,data_array_social.shape)
 
     plot_multipliers(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
-    #plot_reduc(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
+    plot_reduc(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/deriving_multipliers_17_57_32__01_08_2023"
+        fileName= "results/deriving_multipliers_12_14_55__02_08_2023"
     )
 

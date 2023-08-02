@@ -40,32 +40,33 @@ def main(
     print("fileName: ", fileName)
 
     #social multiplier
-    params_list_social_multiplier= []
+    params_list = []
     params["alpha_change"] = "behavioural_independence"
     for i in phi_list:
         params["phi"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
-        params_list_social_multiplier.extend(params_sub_list)#append to an emply list!
+        params_list.extend(params_sub_list)#append to an emply list!
 
-    #is_work = [(x["phi"],x["carbon_price_increased"]) for x in params_list_social_multiplier]
-    #print("is_work", is_work)
-    #quit()
-    emissions_stock_social_multiplier, emissions_flow_social_multiplier = multi_emissions_stock_flow_end(params_list_social_multiplier)
-    data_holder_stock_social_multiplier = emissions_stock_social_multiplier.reshape(len( phi_list ),property_reps, params["seed_reps"])
-    data_holder_flow_social_multiplier = emissions_flow_social_multiplier.reshape(len( phi_list ),property_reps, params["seed_reps"])
-    
-
-    print("data_holder_flow_social_multiplier",data_holder_flow_social_multiplier,data_holder_flow_social_multiplier.shape)
+    social_multiplier_len = len(params_list)
+    print("social_multiplier_len",social_multiplier_len)
 
     #cultural_multiplier
-    params_list_cultural_multiplier= []
     params["alpha_change"] = "dynamic_culturally_determined_weights"
     for i in phi_list:
         params["phi"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
-        params_list_cultural_multiplier.extend(params_sub_list)#append to an emply list!
+        params_list.extend(params_sub_list)
 
-    emissions_stock_cultural_multiplier, emissions_flow_cultural_multiplier = multi_emissions_stock_flow_end(params_list_cultural_multiplier)
+    emissions_stock, emissions_flow = multi_emissions_stock_flow_end(params_list)
+
+    emissions_stock_social_multiplier, emissions_flow_social_multiplier = emissions_stock[0:social_multiplier_len], emissions_flow[0:social_multiplier_len]
+    emissions_stock_cultural_multiplier, emissions_flow_cultural_multiplier = emissions_stock[social_multiplier_len:], emissions_flow[social_multiplier_len:]
+
+    #emissions_stock_social_multiplier, emissions_flow_social_multiplier = multi_emissions_stock_flow_end(params_list_social_multiplier)
+    data_holder_stock_social_multiplier = emissions_stock_social_multiplier.reshape(len( phi_list ),property_reps, params["seed_reps"])
+    data_holder_flow_social_multiplier = emissions_flow_social_multiplier.reshape(len( phi_list ),property_reps, params["seed_reps"])
+
+    #emissions_stock_cultural_multiplier, emissions_flow_cultural_multiplier = multi_emissions_stock_flow_end(params_list_cultural_multiplier)
     data_holder_stock_cultural_multiplier = emissions_stock_cultural_multiplier.reshape(len( phi_list ),property_reps, params["seed_reps"])
     data_holder_flow_cultural_multiplier = emissions_flow_cultural_multiplier.reshape(len( phi_list ),property_reps, params["seed_reps"])
 
