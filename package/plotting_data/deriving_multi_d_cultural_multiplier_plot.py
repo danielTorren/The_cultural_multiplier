@@ -8,7 +8,7 @@ import numpy as np
 
 def trying_to_plot_theos_reduction(tau_list,y_line1,y_line2):
 
-    print("inside", tau_list,y_line1,y_line2)
+    #print("inside", tau_list,y_line1,y_line2)
     # Create interpolation functions for both lines
     interp_line1 = interp1d(y_line1, tau_list, kind='linear')
     interp_line2 = interp1d(y_line2, tau_list, kind='linear')
@@ -18,7 +18,7 @@ def trying_to_plot_theos_reduction(tau_list,y_line1,y_line2):
     y_min = max([min(y_line1)]+[min(y_line2)])
     y_max = min([max(y_line1)]+[max(y_line2)])
 
-    print("y_min max", y_min,y_max)
+    #print("y_min max", y_min,y_max)
     y_values = np.linspace(y_min, y_max, 100)
 
     # Calculate the x values for each y value using interpolation
@@ -32,7 +32,7 @@ def trying_to_plot_theos_reduction(tau_list,y_line1,y_line2):
 
     return y_values, x_reduction
 
-def plot_multipliers(fileName,data_array_social,data_array_cultural, tau_list, phi_list):
+def plot_multipliers(fileName,data_array_social,data_array_cultural, tau_list, phi_list,y_title,save_type):
     
     fig, axes = plt.subplots(nrows=1, ncols=2,constrained_layout=True, figsize=(14, 7), sharex=True, sharey=True)
 
@@ -43,17 +43,17 @@ def plot_multipliers(fileName,data_array_social,data_array_cultural, tau_list, p
     axes[1].legend()
     axes[0].set_xlabel(r"Carbon tax, $\tau$")#col
     axes[1].set_xlabel(r"Carbon tax, $\tau$")#col
-    axes[0].set_ylabel("Emissions, E")#row
+    axes[0].set_ylabel(y_title)#row
     
     axes[0].set_title("Social Multiplier")
     axes[1].set_title("Cultural Multiplier")
 
     plotName = fileName + "/Plots"
-    f = plotName + "/sorted_diif_multiplier_varying_tax" 
+    f = plotName + "/sorted_diif_multiplier_varying_tax_%s" % (save_type)
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png") 
 
-def plot_reduc(fileName,data_array_social,data_array_cultural, tau_list, phi_list):
+def plot_reduc(fileName,data_array_social,data_array_cultural, tau_list, phi_list, y_title,save_type):
 
     fig, axes = plt.subplots(nrows=1, ncols=2,constrained_layout=True, figsize=(14, 7), sharex=True, sharey=True)
 
@@ -70,8 +70,8 @@ def plot_reduc(fileName,data_array_social,data_array_cultural, tau_list, phi_lis
 
     axes[0].legend()
     axes[1].legend()
-    axes[0].set_xlabel("Emissions, E")#col
-    axes[1].set_xlabel("Emissions, E")#col
+    axes[0].set_xlabel(y_title)#col
+    axes[1].set_xlabel(y_title)#col
     axes[0].set_ylabel("Tax reduction")#row
     
     axes[0].set_title("Social Multiplier")
@@ -79,7 +79,7 @@ def plot_reduc(fileName,data_array_social,data_array_cultural, tau_list, phi_lis
 
 
     plotName = fileName + "/Plots"
-    f = plotName + "/tax_reduct_sorted"
+    f = plotName + "/tax_reduct_sorted_%s" % (save_type)
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png") 
 
@@ -89,31 +89,40 @@ def main(
 
     ############################
 
-    data_holder_stock_social_multiplier = load_object(fileName + "/Data", "data_holder_stock_social_multiplier")
-    data_holder_cultural_social_multiplier = load_object(fileName + "/Data", "data_holder_stock_cultural_multiplier")
+    #data_holder_stock_social_multiplier = load_object(fileName + "/Data", "data_holder_stock_social_multiplier")
     data_holder_flow_social_multiplier = load_object(fileName + "/Data", "data_holder_flow_social_multiplier")
+    #data_holder_stock_cultural_multiplier = load_object(fileName + "/Data", "data_holder_stock_cultural_multiplier")
     data_holder_flow_cultural_multiplier = load_object(fileName + "/Data", "data_holder_flow_cultural_multiplier")
-    property_varied = load_object(fileName + "/Data", "property_varied")
-    property_varied_title = load_object(fileName + "/Data", "property_varied_title")
+
+    #property_varied = load_object(fileName + "/Data", "property_varied")
+    #property_varied_title = load_object(fileName + "/Data", "property_varied_title")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
-    base_params = load_object(fileName + "/Data", "base_params")
+    #base_params = load_object(fileName + "/Data", "base_params")
     phi_list = load_object(fileName + "/Data", "phi_list")
 
     #print("base_params",base_params)
     #print("data_holder_social_multiplier",data_holder_flow_social_multiplier)
     #print("data_holder_cultural_multiplier",data_holder_flow_cultural_multiplier)
     
-    data_array_social = data_holder_flow_social_multiplier.mean(axis=2)
-    data_array_cultural = data_holder_flow_cultural_multiplier.mean(axis=2)
+    #data_array_social_stock = data_holder_stock_social_multiplier.mean(axis=2)
+    #data_array_cultural_stock = data_holder_stock_cultural_multiplier.mean(axis=2)
+
+    #print(data_holder_flow_social_multiplier, data_holder_flow_social_multiplier.shape)
+    #quit()
+    data_array_social_H = data_holder_flow_social_multiplier.mean(axis=2)
+    data_array_cultural_H = data_holder_flow_cultural_multiplier.mean(axis=2)
 
     #print("vdata_array_social",data_array_social,data_array_social.shape)
 
-    plot_multipliers(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
-    plot_reduc(fileName,data_array_social,data_array_cultural, property_values_list, phi_list)
+    #plot_multipliers(fileName,data_array_social_stock,data_array_cultural_stock, property_values_list, phi_list,"Emissions, E","stock")
+    #plot_reduc(fileName,data_array_social_stock,data_array_cultural_stock, property_values_list, phi_list,"Emissions, E","stock")
+
+    plot_multipliers(fileName,data_array_social_H,data_array_cultural_H, property_values_list, phi_list,"Total high carbon consumption, H","H")
+    plot_reduc(fileName,data_array_social_H,data_array_cultural_H, property_values_list, phi_list,"Total high carbon consumption, H","H")
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/deriving_multipliers_12_14_55__02_08_2023"
+        fileName= "results/deriving_multipliers_15_59_33__02_08_2023"
     )
 

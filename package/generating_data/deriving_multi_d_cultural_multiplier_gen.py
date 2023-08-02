@@ -56,6 +56,20 @@ def main(
         params["phi"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
         params_list.extend(params_sub_list)
+    
+    """
+    is_work = [(x["phi"],x["carbon_price_increased"]) for x in params_list]
+    print("is_work", is_work)
+    first_bit = is_work[0:social_multiplier_len]
+    second_bit = is_work[social_multiplier_len:]
+    print("first_bit", first_bit)
+    print("second", second_bit)
+    first_bit_arry = np.asarray(first_bit)
+    last= first_bit_arry.reshape(len(phi_list),property_reps, params["seed_reps"], 2)
+    print(last, last.shape)
+
+    quit()
+    """
 
     emissions_stock, emissions_flow = multi_emissions_stock_flow_end(params_list)
 
@@ -76,6 +90,7 @@ def main(
     save_object(data_holder_flow_social_multiplier, fileName + "/Data", "data_holder_flow_social_multiplier")
     save_object(data_holder_stock_cultural_multiplier, fileName + "/Data", "data_holder_stock_cultural_multiplier")
     save_object(data_holder_flow_cultural_multiplier, fileName + "/Data", "data_holder_flow_cultural_multiplier")
+    
     save_object(params, fileName + "/Data", "base_params")
     save_object(phi_list, fileName + "/Data", "phi_list")
     save_object(var_params, fileName + "/Data", "var_params")

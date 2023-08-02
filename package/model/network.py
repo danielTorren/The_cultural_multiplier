@@ -12,7 +12,6 @@ import numpy as np
 import networkx as nx
 import numpy.typing as npt
 from package.model.individuals import Individual
-from functools import partial
 from operator import attrgetter
 
 # modules
@@ -28,7 +27,8 @@ class Network:
             Dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters
 
         """
-        self.set_seed = parameters["set_seed"]
+        #self.set_seed = parameters["set_seed"]
+        self.set_seed = 1
         
         np.random.seed(self.set_seed)
         
@@ -36,7 +36,7 @@ class Network:
         self.network_density = parameters["network_density"]
         self.N = int(round(parameters["N"]))
         self.K = int(round((self.N - 1)*self.network_density)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
-        print("self.K",self.K)
+        #print("self.K",self.K)
         self.prob_rewire = parameters["prob_rewire"]
 
         self.M = int(round(parameters["M"]))
@@ -116,17 +116,15 @@ class Network:
             no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
             self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
             self.gini = self.calc_gini(self.individual_budget_array)
-
         else:
             #Uniform budget
             self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
-
+        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        self.low_carbon_substitutability_array = np.asarray([3])
         self.service_preferences = np.asarray([1/self.M]*self.M)
         
-
         self.agent_list = self.create_agent_list()
 
         self.shuffle_agent_list()#partial shuffle of the list based on identity
@@ -698,7 +696,6 @@ class Network:
         a = [x.instant_budget for x in self.agent_list]
         self.gini = self.calc_gini(a)
 
-        #print("situ", self.phi_array, self.carbon_price, self.set_seed)
 
         if self.t == self.burn_in_duration:
             #print("t stock", self.t)

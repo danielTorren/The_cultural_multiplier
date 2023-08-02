@@ -27,7 +27,8 @@ class Individual:
         id_n,
     ):
 
-        self.low_carbon_preferences = low_carbon_preferences        
+        self.low_carbon_preferences_init = low_carbon_preferences   
+        self.low_carbon_preferences = self.low_carbon_preferences_init       
         self.init_budget = budget
         self.instant_budget = self.init_budget
 
@@ -123,8 +124,12 @@ class Individual:
         n_tilde_m = (self.low_carbon_preferences*(self.Omega_m**self.psi_m)+(1-self.low_carbon_preferences))**(1/self.psi_m)
         return n_tilde_m
     
-    def calc_Omega_m(self):        
-        omega_vector = ((self.prices_high_carbon_instant*self.low_carbon_preferences)/(self.prices_low_carbon*(1- self.low_carbon_preferences )))**(self.low_carbon_substitutability_array)
+    def calc_Omega_m(self):       
+        #print("self.low_carbon_substitutability_array",self.low_carbon_substitutability_array) 
+        #print("self.prices_high_carbon_instant*self.low_carbon_preferences",self.prices_high_carbon_instant,self.low_carbon_preferences)
+        term_1 = (self.prices_high_carbon_instant*self.low_carbon_preferences)
+        term_2 = (self.prices_low_carbon*(1- self.low_carbon_preferences))
+        omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
         return omega_vector
 
     def calc_other_H(self, H_0, chi_0, psi_0, lambda_0):
@@ -161,7 +166,10 @@ class Individual:
     
     def calc_utility_nested_CES(self):
         psuedo_utility = (self.low_carbon_preferences*(self.L_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences)*(self.H_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
-        U = (sum(self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))))**(self.service_preferences/(self.service_preferences-1))
+        if self.M == 1:
+            U = psuedo_utility
+        else:
+            U = (sum(self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))))**(self.service_preferences/(self.service_preferences-1))
         
         return U
     
@@ -182,7 +190,7 @@ class Individual:
         return identity
 
     def update_preferences(self, social_component):
-        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + (self.phi_array)*(social_component)
+        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences_init + self.phi_array*social_component
         
         ###NOT SURE I NEED THE LINE BELOW
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
@@ -193,6 +201,11 @@ class Individual:
     
     def calc_consumption_ratio(self):
         return self.L_m/(self.L_m + self.H_m)
+    
+    def test_calc_H(self,A, P_H, tau, B, sigma):
+        H = B/((P_H + tau) + ((P_H + tau )**sigma)*((A/(1-A))**sigma))
+        H  = np.clip(H, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
+        return H 
 
     def save_timeseries_data_individual(self):
         """
@@ -242,6 +255,12 @@ class Individual:
             self.init_vals_H = self.H_m[0]
             self.utility = self.calc_utility_addilog_CES()
 
+        
+        #print("serivce prferece", self.service_preferences)
+        #test_H = self.test_calc_H(self.low_carbon_preferences, self.prices_high_carbon,self.carbon_price, self.instant_budget, self.low_carbon_substitutability_array)
+        #print("compare test_H", test_H, self.H_m)
+
+        #quit()
         self.consumption_ratio = self.calc_consumption_ratio()
         self.outward_social_influence = self.ratio_preference_or_consumption*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*self.consumption_ratio
 
