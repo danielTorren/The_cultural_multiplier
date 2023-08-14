@@ -191,7 +191,8 @@ class Individual:
 
     def update_preferences(self, social_component):
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences_init + self.phi_array*social_component
-        
+        #low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + self.phi_array*social_component
+        #print("prefences",self.id, self.low_carbon_preferences_init,self.low_carbon_preferences)
         ###NOT SURE I NEED THE LINE BELOW
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
         #self.low_carbon_preferences = low_carbon_preferences
@@ -202,10 +203,8 @@ class Individual:
     def calc_consumption_ratio(self):
         return self.L_m/(self.L_m + self.H_m)
     
-    def test_calc_H(self,A, P_H, tau, B, sigma):
-        H = B/((P_H + tau) + ((P_H + tau )**sigma)*((A/(1-A))**sigma))
-        H  = np.clip(H, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
-        return H 
+    def calc_outward_social_influence(self):
+        return self.ratio_preference_or_consumption*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*self.consumption_ratio
 
     def save_timeseries_data_individual(self):
         """
@@ -229,12 +228,12 @@ class Individual:
 
     def next_step(self, t: int, social_component: npt.NDArray, carbon_dividend, carbon_price):
 
-        #print("STARS: ",t,social_component, carbon_dividend, carbon_price)
         self.t = t
 
         #update prices
         self.carbon_price = carbon_price
         self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
+        
         #update_budget
         self.instant_budget = self.init_budget + carbon_dividend
 
@@ -255,14 +254,10 @@ class Individual:
             self.init_vals_H = self.H_m[0]
             self.utility = self.calc_utility_addilog_CES()
 
-        
-        #print("serivce prferece", self.service_preferences)
-        #test_H = self.test_calc_H(self.low_carbon_preferences, self.prices_high_carbon,self.carbon_price, self.instant_budget, self.low_carbon_substitutability_array)
-        #print("compare test_H", test_H, self.H_m)
-
-        #quit()
         self.consumption_ratio = self.calc_consumption_ratio()
-        self.outward_social_influence = self.ratio_preference_or_consumption*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*self.consumption_ratio
+        self.outward_social_influence = self.calc_outward_social_influence()
+
+        #print("outward infleunce:", self.id, self.low_carbon_preferences_init, self.low_carbon_preferences, self.outward_social_influence, self.consumption_ratio)
 
         #calc_identity
         self.identity = self.calc_identity()

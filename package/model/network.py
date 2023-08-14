@@ -136,7 +136,7 @@ class Network:
         if self.alpha_change == "static_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
-            if self.alpha_change == "dynamic_culturally_determined_weights":
+            if self.alpha_change == ("static_culturally_determined_weights" or "dynamic_culturally_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change == "behavioural_independence":#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()
@@ -673,6 +673,8 @@ class Network:
 
         # advance a time step
         self.t += 1
+
+        #print("step, phi: ",self.t,self.phi_array)
 
         # execute step
         self.update_individuals()
