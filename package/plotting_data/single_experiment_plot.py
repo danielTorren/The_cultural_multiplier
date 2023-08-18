@@ -141,10 +141,12 @@ def main(
     Data = load_object(fileName + "/Data", "social_network")
 
     ###PLOTS
+    """
     if Data.burn_in_duration == 0:
         plot_consumption_no_burn_in(fileName, Data, dpi_save)
     else:
         plot_consumption(fileName, Data, dpi_save)
+    """
     plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
     plot_emissions_individuals(fileName, Data, dpi_save)
     plot_identity_timeseries(fileName, Data, dpi_save)
@@ -155,7 +157,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_17_05_52__26_07_2023"
+        fileName = "results/single_experiment_11_18_51__18_08_2023"
     )
 
 

@@ -44,6 +44,7 @@ class Network:
         self.save_timeseries_data = parameters["save_timeseries_data"]
         self.compression_factor = parameters["compression_factor"]
         self.utility_function_state = parameters["utility_function_state"]
+        self.static_internal_A_state = parameters["static_internal_A_state"]
 
         # time
         self.t = 0
@@ -330,7 +331,8 @@ class Network:
             "ratio_preference_or_consumption_identity": self.ratio_preference_or_consumption_identity,
             "ratio_preference_or_consumption": self.ratio_preference_or_consumption,
             "service_preferences" : self.service_preferences,
-            "burn_in_duration": self.burn_in_duration
+            "burn_in_duration": self.burn_in_duration,
+            "static_internal_A_state": self.static_internal_A_state
         }
 
         if self.utility_function_state == "nested_CES":

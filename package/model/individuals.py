@@ -47,6 +47,7 @@ class Individual:
         self.ratio_preference_or_consumption_identity = individual_params["ratio_preference_or_consumption_identity"]
         self.ratio_preference_or_consumption = individual_params["ratio_preference_or_consumption"]
         self.burn_in_duration = individual_params["burn_in_duration"]
+        self.static_internal_A_state = individual_params["static_internal_A_state"]
 
         self.utility_function_state = individual_params["utility_function_state"]
 
@@ -190,8 +191,11 @@ class Individual:
         return identity
 
     def update_preferences(self, social_component):
-        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences_init + self.phi_array*social_component
-        #low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + self.phi_array*social_component
+        if self.static_internal_A_state:
+            low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences_init + self.phi_array*social_component
+        else:
+            low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + self.phi_array*social_component
+        #
         #print("prefences",self.id, self.low_carbon_preferences_init,self.low_carbon_preferences)
         ###NOT SURE I NEED THE LINE BELOW
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
