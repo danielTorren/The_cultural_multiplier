@@ -1,0 +1,8 @@
+{
+    "property_varied" : "ratio_preference_or_consumption",
+    "property_min" : 0,
+    "property_max" :1,
+    "property_reps": 3,
+    "property_varied_title" : "Mu",
+    "property_divisions": "linear"
+}
