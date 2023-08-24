@@ -1,8 +1,10 @@
+from cProfile import label
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from scipy.interpolate import interp1d
 from package.resources.utility import check_other_folder
+from scipy.optimize import least_squares
 
 #assume low carbon price is 1
 def calc_H(A, P_H, tau, B, sigma):
@@ -117,11 +119,28 @@ def shuffle_agent_list(attribute_list, shuffle_reps, N):
     
     return np.asarray(partial_attribute_list)
 
+
+def alt_shuffle_agent_list(attribute_list, homophily, N): 
+    #make list cirucalr then partial shuffle it
+    #print("before", attribute_list)
+    if homophily<0:
+        #print("IN")
+        np.random.shuffle(attribute_list)
+    else:
+        attribute_list.sort()
+        #print("after", attribute_list)
+        attribute_list_circ = circular_agent_list(attribute_list)#agent list is now circular in terms of identity
+        shuffle_reps = int(round(N*(1 - homophily)))
+        attribute_list = partial_shuffle_agent_list(attribute_list_circ, shuffle_reps, N)#partial shuffle of the list
+    
+    #print("partial_attribute_list",attribute_list)
+    return np.asarray(attribute_list)
+
 def calc_identity(low_carbon_preferences) -> float:
     identity = np.mean(low_carbon_preferences)
     return identity
 
-def next_step(adjacency_matrix,A_init,H_init_array,L_init_array,mu,phi,tau,clipping_epsilon):
+def next_step(adjacency_matrix,A_init,H_init_array,L_init_array,mu,phi,tau,clipping_epsilon,confirmation_bias,P_H,B, sigma):
     I = [calc_identity(A_indiv) for A_indiv in A_init]
     #print("I",I)
     #quit()
@@ -142,6 +161,8 @@ def next_step(adjacency_matrix,A_init,H_init_array,L_init_array,mu,phi,tau,clipp
     L_new = calc_L(H_new,A_new, P_H, tau, sigma)
     
     return H_new,L_new,A_new
+
+
 
 def sorted_calc_H_social(
     tau,
@@ -165,7 +186,7 @@ def sorted_calc_H_social(
     np.random.seed(set_seed)
 
     #calc shuffles
-    shuffle_reps = int(round(N*(1 - homophily)))
+    
 
     #create attributes for agents
     I = np.random.beta(a_low_carbon_preference, b_low_carbon_preference, size=N)
@@ -175,8 +196,10 @@ def sorted_calc_H_social(
     A_init_unsorted = list(np.clip(preferences_uncapped, 0 + clipping_epsilon, 1 - clipping_epsilon))
 
     #print("A before shuffle",A)
-    A_init = shuffle_agent_list(A_init_unsorted, shuffle_reps, N)
-    #print("A after shuffle",A)
+    #shuffle_reps = int(round(N*(1 - homophily)))
+    #A_init = shuffle_agent_list(A_init_unsorted, shuffle_reps, N)
+    A_init = alt_shuffle_agent_list(A_init_unsorted, homophily, N)
+    #print("A after shuffle",A_init)
     #print(A.shape)
     #quit()
     #sort the array
@@ -326,8 +349,172 @@ def trying_to_plot_theos_reduction(tau_list,y_line1,y_line2):
 
     return y_values, x_reduction
 
-if __name__ == '__main__':
 
+def init_sorted_calc_H_social(
+    N, 
+    K,
+    prob_rewire,
+    set_seed,
+    a_low_carbon_preference,
+    b_low_carbon_preference,
+    P_H,  
+    B, 
+    sigma,
+    homophily,
+    identity_var,
+    clipping_epsilon
+):
+    
+    np.random.seed(set_seed)
+
+    #calc shuffles
+    
+
+    #create attributes for agents
+    I = np.random.beta(a_low_carbon_preference, b_low_carbon_preference, size=N)
+    
+    preferences_uncapped = np.asarray([np.random.normal(identity,identity_var, size=1)[0] for identity in  I])
+    #print("preferences_uncapped",preferences_uncapped)
+    A_init_unsorted = list(np.clip(preferences_uncapped, 0 + clipping_epsilon, 1 - clipping_epsilon))
+
+    #print("A before shuffle",A)
+    #shuffle_reps = int(round(N*(1 - homophily)))
+    #A_init = shuffle_agent_list(A_init_unsorted, shuffle_reps, N)
+    A_init = alt_shuffle_agent_list(A_init_unsorted, homophily, N)
+    #print("A after shuffle",A_init)
+    #print(A.shape)
+    #quit()
+    #sort the array
+
+    H_init_array = calc_H(A_init, P_H, A_init, B, sigma)#in zeroth step tau = 0
+    #print("H_init_array",H_init_array)
+    L_init_array = calc_L(H_init_array,A_init, P_H, A_init, sigma)#in zeroth step tau = 0
+
+    #create a network     
+    adjacency_matrix, weighting_matrix, network= create_weighting_matrix(N, K, prob_rewire, set_seed)
+    #print("adjacency_matrix",adjacency_matrix)
+    #calc the weighting for each individual
+    
+    return adjacency_matrix,A_init,H_init_array,L_init_array
+
+def next_sorted_calc_H_social(adjacency_matrix,A_init,H_init_array,L_init_array,mu,phi,tau,clipping_epsilon,confirmation_bias,P_H,B, sigma):
+    H_new, L_new,A_new = next_step(adjacency_matrix,A_init,H_init_array,L_init_array,mu,phi,tau,clipping_epsilon,confirmation_bias,P_H,B, sigma)
+    return A_new, H_new, L_new
+
+def calc_root(x, phi_val_root, Q_init, adjacency_matrix,A_new,H_new,L_new,mu,clipping_epsilon,confirmation_bias,P_H,B, sigma):
+    A_new, H_new, L_new = next_sorted_calc_H_social(adjacency_matrix,A_new,H_new,L_new,mu,phi_val_root,x,clipping_epsilon,confirmation_bias,P_H,B, sigma)
+    Q_run = sum(H_new)
+
+    #if phi_val_root < 0.05:
+    #    print("phi", phi_val_root)
+    #    print(Q_run, Q_init/2,Q_run - Q_init/2)
+    return Q_run - Q_init/2
+
+def calc_M_given_phi_halving_emission(
+    vars_dict,
+    tau_guess_dyanmic,
+    tau_guess_fixed
+):
+    
+    xtol = 1e-6  # Example tolerance value
+    #print("dyanmic")
+    #print(vars_dict)
+    
+    adjacency_matrix = vars_dict["adjacency_matrix"]
+    A_init = vars_dict["A_init"]
+    H_init_array = vars_dict["H_init_array"]
+    L_init_array = vars_dict["L_init_array"]
+    mu = vars_dict["mu"]
+    phi = vars_dict["phi"]
+    #print("PHIII", phi)
+    clipping_epsilon = vars_dict["clipping_epsilon"]
+    confirmation_bias = vars_dict["confirmation_bias"]
+    P_H = vars_dict["P_H"]
+    B = vars_dict["B"]
+    sigma = vars_dict["sigma"]
+    A_init = params["A_init"]
+    H_init_array = params["H_init_array"] 
+    L_init_array = params["L_init_array"] 
+    adjacency_matrix = params["adjacency_matrix"] 
+    Q_init = params["Q_init"]
+    
+    result = least_squares(calc_root,verbose = 0, x0=tau_guess_dyanmic,xtol=xtol, bounds = (0, np.inf), args=(phi, Q_init, adjacency_matrix,A_init,H_init_array,L_init_array,mu,clipping_epsilon,confirmation_bias,P_H,B, sigma))
+    tau_dynamic = result["x"][0]
+
+    #print("now fixed")
+    #NOW DO THE SAME BUT FOR FIXED PREFERENCES
+    result_fixed = least_squares(calc_root, verbose = 0,x0=tau_guess_fixed,xtol=xtol, bounds = (0, np.inf), args=(0, Q_init, adjacency_matrix,A_init,H_init_array,L_init_array,mu,clipping_epsilon,confirmation_bias,P_H,B, sigma))
+    tau_fixed = result_fixed["x"][0]
+
+    #if phi > 0.05:
+    #    quit()
+
+    M = 1 - tau_dynamic/tau_fixed
+
+    return M, tau_dynamic, tau_fixed
+
+def phi_versus_M_gen_data(params, phi_list):
+
+    adjacency_matrix,A_init,H_init_array,L_init_array= init_sorted_calc_H_social(
+        params["N"], 
+        params["K"],
+        params["prob_rewire"],
+        params["set_seed"],
+        params["a_identity"],
+        params["b_identity"],
+        params["P_H"],  
+        params["B"], 
+        params["sigma"],
+        params["homophily"],
+        params["identity_var"],
+        params["clipping_epsilon"]
+        )
+    Q_init = sum(H_init_array)
+
+    data = []
+    data_taus = []
+
+    tau_dynamic_guess = 0 
+    tau_fixed_guess  = 0
+
+    params["A_init"] = A_init
+    params["H_init_array"] = H_init_array
+    params["L_init_array"] = L_init_array
+    params["adjacency_matrix"] = adjacency_matrix
+    params["Q_init"] = Q_init
+    
+    #print(params)
+    #quit()
+    counter = 0
+    for phi_val in phi_list:
+        params["phi"] = phi_val       
+        M, tau_dynamic_guess, tau_fixed_guess = calc_M_given_phi_halving_emission(params,tau_dynamic_guess,tau_fixed_guess)
+        data.append(M)
+        data_taus.append((tau_dynamic_guess,tau_fixed_guess))
+        counter +=1
+        print(round((counter/len(phi_list))*100,3))
+    return data, data_taus
+
+def plot_phi_versus_M(data_100, data_1000,data_10000, phi_list):
+
+    fig, ax = plt.subplots(constrained_layout=True)
+    ax.scatter(phi_list,data_100, label = "100")
+    ax.scatter(phi_list,data_1000, label= "1000")
+    ax.scatter(phi_list,data_10000, label= "10000")
+    ax.legend()
+    ax.set_xlabel(r"Phi")#col
+    #ax.xaxis.set_label_position('top') 
+    ax.set_ylabel("Tax reduction, M")#row
+
+    check_other_folder()
+    plotName = "results/Other"
+    f = plotName + "/tax_redux"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png") 
+
+
+if __name__ == '__main__':
+    """
     sigma = 3
     P_L = 1
     P_H = 1
@@ -342,54 +529,60 @@ if __name__ == '__main__':
     confirmation_bias = 0
     #a_low_carbon_preference = 2
     #b_low_carbon_preference = 2
-    a_identity = 2
-    b_identity = 2
+    a_identity = 1
+    b_identity = 1
     identity_var = 0.03
     #mu = 0
-    homophily = 0.95
+    homophily = -1
     clipping_epsilon = 1e-4
+    """
     
+
+    params = {
+        "sigma": 2,
+        "P_L": 1,
+        "P_H": 1,
+        "N": 1000,
+        "B": 1,
+        "network_density": 0.3,
+        "prob_rewire": 0.1,
+        "set_seed": 1,
+        "confirmation_bias": 0,
+        "a_identity": 1,
+        "b_identity": 1,
+        "identity_var": 0.03,
+        "homophily": -1,
+        "clipping_epsilon": 1e-4,
+        "mu": 0,
+        "confirmation_bias": 0
+    }
+
+    phi_list_6 = np.linspace(0,1, 100)
+
+    #N = 100
+    params["N"] =  100
+    K = int(round(( params["N"] - 1)* params["network_density"]))
+    params["K"] = K
+    
+    data_100, data_taus_100= phi_versus_M_gen_data(params, phi_list_6)
+    
+    params["N"] =  1000
+    K = int(round(( params["N"] - 1)* params["network_density"]))
+    params["K"] = K
+    data_1000, data_taus_1000= phi_versus_M_gen_data(params, phi_list_6)
+
+    params["N"] =  10000
+    K = int(round(( params["N"] - 1)* params["network_density"]))
+    params["K"] = K
+    data_10000, data_taus_10000= phi_versus_M_gen_data(params, phi_list_6)
+    #print("data_tau_dynamic, data_tau_fixed", data_taus)
+    #print(params, phi_list_6)
+    plot_phi_versus_M(data_100, data_1000,data_10000, phi_list_6)
+
+    """
     tau_list_5 = np.linspace(0,5, 100)
     phi_list_5 = [0,0.33,0.66,1.0]#np.linspace(0, 1, 4)
     mu_list_5 = np.linspace(0, 1, 4)
-
-
-    """
-    {
-        "save_timeseries_data": 0, 
-        "budget_inequality_state":0,
-        "heterogenous_preferences": 1.0,
-        "redistribution_state": 0,
-        "alpha_change": "dynamic_culturally_determined_weights",
-        "utility_function_state": "nested_CES",
-        "dividend_progressiveness":0,
-        "compression_factor":10,
-        "carbon_price_duration": 1,
-        "burn_in_duration": 0,
-        "seed_reps": 1,
-        "N": 100,
-        "M": 1,
-        "network_density": 0.3,
-        "prob_rewire": 0.1,
-        "learning_error_scale": 0.02,
-        "homophily": 0.95,
-        "confirmation_bias": 1,
-        "service_substitutability": 2,
-        "low_carbon_substitutability_lower":2,
-        "low_carbon_substitutability_upper":5,
-        "lambda_m_lower": 1.1,
-        "lambda_m_upper": 10,
-        "a_identity": 2,
-        "b_identity": 2,
-        "var_low_carbon_preference": 0.03,
-        "init_carbon_price": 0,
-        "clipping_epsilon": 1e-4,
-        "carbon_tax_implementation": "flat", 
-        "ratio_preference_or_consumption_identity": 1.0,
-        "ratio_preference_or_consumption": 0.0
-    }
-
-    """
 
     sort_homo_different_mu_tax_versus_quantities_for_social_preferences(
         mu_list_5,
@@ -412,7 +605,16 @@ if __name__ == '__main__':
         clipping_epsilon
     )
 
+    #remake the phi plots
+    """
+
     plt.show()
+
+
+
+
+
+
 """
 def calc_H_social(
     tau,
