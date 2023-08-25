@@ -9,10 +9,11 @@ Created: 10/10/2022
 """
 
 # imports
+from copy import deepcopy
 import json
 import numpy as np
 from package.resources.utility import createFolder, produce_name_datetime, save_object
-from package.resources.run import multi_norm_emissions_stock_only, multi_target_norm_emissions
+from package.resources.run import multi_norm_emissions_stock_societies, multi_target_norm_emissions_load
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
 from package.generating_data.twoD_param_sweep_gen import generate_vals_variable_parameters_and_norms
 
@@ -67,7 +68,9 @@ def calc_multiplier_matrix(vector_no_preference_change, matrix_preference_change
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
         VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
-        reduction_prop = 0.5
+        reduction_prop = 0.5,
+        carbon_price_duration = 1000,
+        tau_xtol = 1e-6
         ) -> str: 
 
     f_var = open(VARIABLE_PARAMS_LOAD)
@@ -98,12 +101,14 @@ def main(
     params["alpha_change"] = "static_preferences"
     params["carbon_price_increased"] = 0
     params["ratio_preference_or_consumption"] = 0#doesnt matter as its not used
+    params["alpha_change"] = "dynamic_culturally_determined_weights"
     params_list_no_price_no_preference_change = produce_param_list_just_stochastic(params)
     seed_list = [x["set_seed"] for x in params_list_no_price_no_preference_change]
     #print("params_list_no_price_no_preference_change",params_list_no_price_no_preference_change)
     #print("seed_list",seed_list)
-    emissions_stock_seeds = multi_norm_emissions_stock_only(params_list_no_price_no_preference_change)
-    #print("emissions_stock_seeds",emissions_stock_seeds)
+    emissions_stock_seeds, societies_list = multi_norm_emissions_stock_societies(params_list_no_price_no_preference_change)
+    print("Gen seeds no carbon price, no preference change, emissions_stock_seeds",emissions_stock_seeds)
+    print("societies_list",societies_list)
     ##################################
     #Calc the target emissions for each seed
 
@@ -112,10 +117,20 @@ def main(
     ##################################
     #Gen seeds recursive carbon price, no preference change, Runs: seeds*R
     #OUTPUT: Carbon price for run for each seed, [tau_1, tau_2,...,tau_seed]
-    params["alpha_change"] = "static_preferences"
-    params_list_emissions_targect_no_preference_change = produce_param_list_emissions_target_just_stochastic(params,emissions_target_seeds, "norm_emissions_stock_target", seed_list)
+
+    #take the models, make copies and the run them
+    societies_model_targect_no_preference_change_list = []
+    for i, model_seed in enumerate(societies_list):
+        model_seed.burn_in_duration = 0
+        model_seed.carbon_price_duration = carbon_price_duration
+        model_seed.norm_emissions_stock_target = emissions_target_seeds[i]
+        model_seed.switch_from_dynamic_to_static_preferences()
+        societies_model_targect_no_preference_change_list.append(deepcopy(model_seed))
+
+    #params["alpha_change"] = "static_preferences"
+    #params_list_emissions_targect_no_preference_change = produce_param_list_emissions_target_just_stochastic(params,emissions_target_seeds, "norm_emissions_stock_target", seed_list)
     #print("params_list_emissions_targect_no_preference_change",params_list_emissions_targect_no_preference_change)
-    tau_seeds_no_preference_change_array = multi_target_norm_emissions(params_list_emissions_targect_no_preference_change)
+    tau_seeds_no_preference_change_array = multi_target_norm_emissions_load([societies_model_targect_no_preference_change_list],tau_xtol)#put in brackets so its the same dimensions as later on!
     tau_seeds_no_preference_change = tau_seeds_no_preference_change_array[0]
     #tau_seeds_no_preference_change.T#not sure this is the correct shape?
     print("tau_seeds_no_preference_change",tau_seeds_no_preference_change)
@@ -123,12 +138,25 @@ def main(
     ##################################
     #Gen seeds recursive carbon price, preference change, with varying parameters, Runs: seeds*N*R
     #OUTPUT: Carbon price for run for each seed and parameters, [[tau_1_1, tau_2_1,...,tau_seed_1],..,[...,tau_seed_N]]
-    params["alpha_change"] = "dynamic_culturally_determined_weights"
-    params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "norm_emissions_stock_target", seed_list)
+    
+    #THERE HAS TO BE A SMARTER WAY TO DO THIS
+    societies_model_targect_preference_change_list = []
+    for i, model_seed in enumerate(societies_list):
+        model_seed.burn_in_duration = 0
+        model_seed.carbon_price_duration = carbon_price_duration
+        model_seed.norm_emissions_stock_target = emissions_target_seeds[i]
+        model_seed.alpha_change = "dynamic_culturally_determined_weights"
+        same_seed_list = []
+        for j in property_values_list: 
+            setattr(model_seed, property_varied, j)#BETTER THAN EVAL!
+            same_seed_list.append(deepcopy(model_seed))
+        societies_model_targect_preference_change_list.append(same_seed_list)
+
+    #params["alpha_change"] = "dynamic_culturally_determined_weights"
+    #params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "norm_emissions_stock_target", seed_list)
     #print("params_list_emissions_target_preference_change",params_list_emissions_target_preference_change)
-    tau_seeds_preference_change = multi_target_norm_emissions(params_list_emissions_target_preference_change)
+    tau_seeds_preference_change = multi_target_norm_emissions_load(societies_model_targect_preference_change_list,tau_xtol)
     tau_seeds_preference_change_matrix_not_T = tau_seeds_preference_change.reshape(params["seed_reps"],property_reps)
-    #print("BEFORE tau_seeds_preference_change_matrix", tau_seeds_preference_change_matrix)
     
     tau_seeds_preference_change_matrix =tau_seeds_preference_change_matrix_not_T.T  #take transpose so that the stuff seeds are back in the correct place!
     print("tau_seeds_preference_change_matrix",tau_seeds_preference_change_matrix)
@@ -157,6 +185,7 @@ if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_mu_target.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_mu_target.json",
-        reduction_prop = 0.1
+        reduction_prop = 0.1,
+        carbon_price_duration = 100
 )
 

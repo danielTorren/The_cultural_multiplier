@@ -15,6 +15,7 @@ from joblib import Parallel, delayed
 import multiprocessing
 from package.model.network import Network
 from scipy.optimize import least_squares
+from copy import deepcopy
 
 
 # modules
@@ -283,21 +284,24 @@ def multi_emissions_stock_ineq(
 #################################################################################################################################
 #CALC MULTIPLIERS WITH EMISSIONS REDUCTION TARGETS
 
-def generate_norm_emissions_stock_only(params):
+def generate_norm_emissions_stock_societies(params):
     data = generate_data(params)
     norm = params["N"]*params["M"]
-    return data.total_carbon_emissions_stock/norm
+    return data.total_carbon_emissions_stock/norm, data
 
-def multi_norm_emissions_stock_only(
+def multi_norm_emissions_stock_societies(
         params_dict: list[dict]
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
     #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
-    emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_norm_emissions_stock_only)(i) for i in params_dict
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_norm_emissions_stock_societies)(i) for i in params_dict
+    )
+    emissions_stock, societies = zip(
+        *res
     )
 
-    return np.asarray(emissions_stock)
+    return np.asarray(emissions_stock), np.asarray(societies)
 
 
 def calc_root_emissions_target(x, params):
@@ -329,5 +333,48 @@ def multi_target_norm_emissions(
     
     tau_vals = Parallel(n_jobs=num_cores, verbose=10)(
         delayed(generate_target_tau_val)(i) for i in params_dict_seeds
+    )
+    return np.asarray(tau_vals)
+
+#################################################################################################
+def generate_data_load(social_network) -> Network:
+    """
+    Load model and run it
+
+    """
+
+    social_network.time_steps_max = social_network.burn_in_duration + social_network.carbon_price_duration
+
+    #### RUN TIME STEPS
+    while social_network.t <= social_network.time_steps_max:
+        social_network.next_step()
+
+def calc_root_emissions_target_load(x, model):
+    model_copy = deepcopy(model)
+
+    model_copy.carbon_price_increased = x
+    generate_data_load(model_copy)
+    norm = model_copy.N*model_copy.M
+    root = model_copy.total_carbon_emissions_stock/norm - model_copy.norm_emissions_stock_target
+    return root
+
+def generate_target_tau_val_load(model_same_seed,tau_xtol):
+    tau_guess = 0
+    tau_list = []
+    for model in model_same_seed:
+        result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 0, x0=tau_guess, xtol=tau_xtol, bounds = (0, np.inf))
+        tau_val = result["x"][0]
+        tau_list.append(tau_val)
+        tau_guess = tau_val
+    return tau_list
+
+def multi_target_norm_emissions_load(        
+        models_matrix,tau_xtol
+) -> npt.NDArray:
+    
+    num_cores = multiprocessing.cpu_count()
+    
+    tau_vals = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_target_tau_val_load)(i,tau_xtol) for i in models_matrix
     )
     return np.asarray(tau_vals)

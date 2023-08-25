@@ -48,7 +48,7 @@ class Individual:
         self.ratio_preference_or_consumption = individual_params["ratio_preference_or_consumption"]
         self.burn_in_duration = individual_params["burn_in_duration"]
         self.static_internal_A_state = individual_params["static_internal_A_state"]
-
+        self.alpha_change = individual_params["alpha_change"]
         self.utility_function_state = individual_params["utility_function_state"]
 
         if self.utility_function_state == "nested_CES":
@@ -242,7 +242,8 @@ class Individual:
         self.instant_budget = self.init_budget + carbon_dividend
 
         #update preferences 
-        self.update_preferences(social_component)
+        if self.alpha_change != "static_preferences":
+            self.update_preferences(social_component)
         
         self.Omega_m = self.calc_Omega_m()
         self.n_tilde_m = self.calc_n_tilde_m()

@@ -7,10 +7,10 @@
     "utility_function_state": "nested_CES",
     "dividend_progressiveness":0,
     "compression_factor":10,
-    "carbon_price_duration": 1000,
-    "burn_in_duration": 0,
+    "carbon_price_duration": 0,
+    "burn_in_duration": 50,
     "phi": 0.05,
-    "seed_reps": 4,
+    "seed_reps": 10,
     "N": 200,
     "M": 1,
     "network_density": 0.1,
@@ -29,6 +29,5 @@
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "flat", 
-    "ratio_preference_or_consumption_identity": 1.0,
-    "tau_xtol": 1e-6
+    "ratio_preference_or_consumption_identity": 1.0
 }

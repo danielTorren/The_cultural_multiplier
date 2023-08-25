@@ -330,7 +330,8 @@ class Network:
             "ratio_preference_or_consumption": self.ratio_preference_or_consumption,
             "service_preferences" : self.service_preferences,
             "burn_in_duration": self.burn_in_duration,
-            "static_internal_A_state": self.static_internal_A_state
+            "static_internal_A_state": self.static_internal_A_state,
+            "alpha_change": self.alpha_change
         }
 
         if self.utility_function_state == "nested_CES":
@@ -626,6 +627,10 @@ class Network:
             )
         """
         
+    def switch_from_dynamic_to_static_preferences(self):
+        self.alpha_change = "static_preferences"
+        for i in range(self.N):
+            self.agent_list[i].alpha_change = "static_preferences"
         
 
     def save_timeseries_data_network(self):
@@ -695,8 +700,8 @@ class Network:
 
         if self.redistribution_state:
             self.carbon_dividend_array = self.calc_carbon_dividend_array()
-        a = [x.instant_budget for x in self.agent_list]
-        self.gini = self.calc_gini(a)
+            a = [x.instant_budget for x in self.agent_list]
+            self.gini = self.calc_gini(a)
 
 
         if self.t == self.burn_in_duration:
