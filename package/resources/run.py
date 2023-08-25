@@ -240,58 +240,11 @@ def multi_emissions_stock(
 
     return np.asarray(emissions_stock), np.asarray(emissions_stock_init)
 
-
-def generate_norm_emissions_stock_only(params):
-    data = generate_data(params)
-    norm = params["N"]*params["M"]
-    return np.asarray(data.total_carbon_emissions_stock/norm)
-
-def multi_norm_emissions_stock_only(
-        params_dict: list[dict]
-) -> npt.NDArray:
-    num_cores = multiprocessing.cpu_count()
-    #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
-    emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_emissions_stock)(i) for i in params_dict
-    )
-
-    return np.asarray(emissions_stock)
-
-
-def calc_root_emissions_target(x, params):
-    params["carbon_price_increased"] = x
-    data = generate_data(params)
-    norm = params["N"]*params["M"]
-    root = np.asarray(data.total_carbon_emissions_stock/norm) - params["emissions_stock_target"]
-    return root
-
-def generate_target_tau_val(params_same_seed):
-    tau_guess = 0
-    tau_list = []
-    for params in params_same_seed:
-        result = least_squares(lambda x: calc_root_emissions_target(x, params),verbose = 0, x0=tau_guess, xtol=params["tau_xtol"], bounds = (0, np.inf))
-        tau_val = result["x"][0]
-        tau_list.append(tau_val)
-        tau_guess = tau_val
-    return tau_list
-
-def multi_target_norm_emissions(        
-        params_dict_seeds: list[dict]
-) -> npt.NDArray:
-    
-    num_cores = multiprocessing.cpu_count()
-    
-    tau_vals = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_target_tau_val)(i) for i in params_dict_seeds
-    )
-    return np.asarray(tau_vals)
-
 def generate_emissions_stock_flow_end(params):
     data = generate_data(params)
     norm = params["N"]*params["M"]
     return np.asarray(data.total_carbon_emissions_stock/norm), np.asarray(data.total_carbon_emissions_flow/norm)
     #return np.asarray(data.total_carbon_emissions_stock), np.asarray(data.total_carbon_emissions_flow)
-
 
 def multi_emissions_stock_flow_end(
         params_dict: list[dict]
@@ -325,3 +278,52 @@ def multi_emissions_stock_ineq(
 
     return np.asarray(emissions_stock), np.asarray(gini_list)
 
+
+
+#################################################################################################################################
+#CALC MULTIPLIERS WITH EMISSIONS REDUCTION TARGETS
+
+def generate_norm_emissions_stock_only(params):
+    data = generate_data(params)
+    norm = params["N"]*params["M"]
+    return data.total_carbon_emissions_stock/norm
+
+def multi_norm_emissions_stock_only(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
+    emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_norm_emissions_stock_only)(i) for i in params_dict
+    )
+
+    return np.asarray(emissions_stock)
+
+
+def calc_root_emissions_target(x, params):
+    params["carbon_price_increased"] = x
+    data = generate_data(params)
+    norm = params["N"]*params["M"]
+    root = data.total_carbon_emissions_stock/norm - params["emissions_stock_target"]
+    return root
+
+def generate_target_tau_val(params_same_seed):
+    tau_guess = 0
+    tau_list = []
+    for params in params_same_seed:
+        result = least_squares(lambda x: calc_root_emissions_target(x, params),verbose = 0, x0=tau_guess, xtol=params["tau_xtol"], bounds = (0, np.inf))
+        tau_val = result["x"][0]
+        tau_list.append(tau_val)
+        tau_guess = tau_val
+    return tau_list
+
+def multi_target_norm_emissions(        
+        params_dict_seeds: list[dict]
+) -> npt.NDArray:
+    
+    num_cores = multiprocessing.cpu_count()
+    
+    tau_vals = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_target_tau_val)(i) for i in params_dict_seeds
+    )
+    return np.asarray(tau_vals)
