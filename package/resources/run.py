@@ -301,16 +301,20 @@ def multi_norm_emissions_stock_only(
 
 
 def calc_root_emissions_target(x, params):
+    print("set_seed",params["set_seed"])
     params["carbon_price_increased"] = x
     data = generate_data(params)
     norm = params["N"]*params["M"]
-    root = data.total_carbon_emissions_stock/norm - params["emissions_stock_target"]
+    root = data.total_carbon_emissions_stock/norm - params["norm_emissions_stock_target"]
+    print("emissions",data.total_carbon_emissions_stock/norm,params["norm_emissions_stock_target"])
+    print("tax,mu",x,params["ratio_preference_or_consumption"])
     return root
 
 def generate_target_tau_val(params_same_seed):
     tau_guess = 0
     tau_list = []
     for params in params_same_seed:
+        print("NEW MU")
         result = least_squares(lambda x: calc_root_emissions_target(x, params),verbose = 0, x0=tau_guess, xtol=params["tau_xtol"], bounds = (0, np.inf))
         tau_val = result["x"][0]
         tau_list.append(tau_val)

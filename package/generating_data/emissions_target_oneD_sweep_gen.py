@@ -101,9 +101,9 @@ def main(
     params_list_no_price_no_preference_change = produce_param_list_just_stochastic(params)
     seed_list = [x["set_seed"] for x in params_list_no_price_no_preference_change]
     #print("params_list_no_price_no_preference_change",params_list_no_price_no_preference_change)
-    print("seed_list",seed_list)
+    #print("seed_list",seed_list)
     emissions_stock_seeds = multi_norm_emissions_stock_only(params_list_no_price_no_preference_change)
-    print("emissions_stock_seeds",emissions_stock_seeds)
+    #print("emissions_stock_seeds",emissions_stock_seeds)
     ##################################
     #Calc the target emissions for each seed
 
@@ -113,27 +113,30 @@ def main(
     #Gen seeds recursive carbon price, no preference change, Runs: seeds*R
     #OUTPUT: Carbon price for run for each seed, [tau_1, tau_2,...,tau_seed]
     params["alpha_change"] = "static_preferences"
-    params_list_emissions_targect_no_preference_change = produce_param_list_emissions_target_just_stochastic(params,emissions_target_seeds, "emissions_stock_target", seed_list)
+    params_list_emissions_targect_no_preference_change = produce_param_list_emissions_target_just_stochastic(params,emissions_target_seeds, "norm_emissions_stock_target", seed_list)
     #print("params_list_emissions_targect_no_preference_change",params_list_emissions_targect_no_preference_change)
-    tau_seeds_no_preference_change = multi_target_norm_emissions(params_list_emissions_targect_no_preference_change)
-    tau_seeds_no_preference_change.T#not sure this is the correct shape?
+    tau_seeds_no_preference_change_array = multi_target_norm_emissions(params_list_emissions_targect_no_preference_change)
+    tau_seeds_no_preference_change = tau_seeds_no_preference_change_array[0]
+    #tau_seeds_no_preference_change.T#not sure this is the correct shape?
     print("tau_seeds_no_preference_change",tau_seeds_no_preference_change)
 
     ##################################
     #Gen seeds recursive carbon price, preference change, with varying parameters, Runs: seeds*N*R
     #OUTPUT: Carbon price for run for each seed and parameters, [[tau_1_1, tau_2_1,...,tau_seed_1],..,[...,tau_seed_N]]
     params["alpha_change"] = "dynamic_culturally_determined_weights"
-    params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "emissions_stock_target", seed_list)
+    params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "norm_emissions_stock_target", seed_list)
     #print("params_list_emissions_target_preference_change",params_list_emissions_target_preference_change)
     tau_seeds_preference_change = multi_target_norm_emissions(params_list_emissions_target_preference_change)
-    tau_seeds_preference_change_matrix = tau_seeds_preference_change.reshape(params["seed_reps"],property_reps)
-    tau_seeds_preference_change_matrix.T#take transpose so that the stuff seeds are back in the correct place!
+    tau_seeds_preference_change_matrix_not_T = tau_seeds_preference_change.reshape(params["seed_reps"],property_reps)
+    #print("BEFORE tau_seeds_preference_change_matrix", tau_seeds_preference_change_matrix)
+    
+    tau_seeds_preference_change_matrix =tau_seeds_preference_change_matrix_not_T.T  #take transpose so that the stuff seeds are back in the correct place!
     print("tau_seeds_preference_change_matrix",tau_seeds_preference_change_matrix)
     
     ##################################
     #Calc the multiplier for each seed and parameter: seed*N matrix
+
     multiplier_matrix = calc_multiplier_matrix(tau_seeds_no_preference_change, tau_seeds_preference_change_matrix)
-   
     print("multiplier_matrix",multiplier_matrix)
 
     createFolder(fileName)
@@ -153,6 +156,7 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_mu_target.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_mu_target.json"
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_mu_target.json",
+        reduction_prop = 0.1
 )
 

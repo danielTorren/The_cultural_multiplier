@@ -1146,7 +1146,8 @@ def plot_end_points_emissions_scatter(
     #print(c,emissions_final)
     fig, ax = plt.subplots(figsize=(10,6))
 
-    print("Data_list.shape[2]", Data_list.shape)
+    print("Data_list.shape", Data_list.shape)
+    print(" property_vals", property_vals)
 
     colors = iter(rainbow(np.linspace(0, 1, Data_list.shape[1])))
 
