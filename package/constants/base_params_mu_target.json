@@ -6,10 +6,11 @@
     "static_internal_A_state": 0,
     "utility_function_state": "nested_CES",
     "dividend_progressiveness":0,
+    "ratio_preference_or_consumption_identity": 1.0,
     "compression_factor":10,
-    "burn_in_duration": 1000,
+    "burn_in_duration": 300,
     "phi": 0.05,
-    "seed_reps": 10,
+    "seed_reps": 3,
     "N": 200,
     "M": 1,
     "network_density": 0.1,
@@ -27,6 +28,5 @@
     "var_low_carbon_preference": 0.03,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
-    "carbon_tax_implementation": "flat", 
-    "ratio_preference_or_consumption_identity": 1.0
+    "carbon_tax_implementation": "flat"
 }

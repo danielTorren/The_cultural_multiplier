@@ -387,7 +387,7 @@ def calc_root_emissions_target_load(x, model):
     return root
 
 def generate_target_tau_val_load(model,tau_xtol,tau_guess):
-    result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 1, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
+    result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 2, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
     #print("result",result)
     tau_val = result["x"][0]
     return tau_val

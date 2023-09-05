@@ -71,7 +71,8 @@ def main(
         reduction_prop = 0.5,
         carbon_price_duration = 1000,
         tau_xtol = 1e-6,
-        print_simu = 1
+        print_simu = 1,
+        static_weighting_run = 0
         ) -> str: 
 
     f_var = open(VARIABLE_PARAMS_LOAD)
@@ -104,13 +105,10 @@ def main(
     #params["alpha_change"] = "static_preferences"
     params["carbon_price_duration"] =  0#no carbon price duration, only burn in
     params["carbon_price_increased"] = 0
-    params["ratio_preference_or_consumption"] = 1 #WE ASSUME PREFERENCE BASE LEARNING AS THE BENCH MARK AGAINST WHICH TO STUDY THE IMPACT OF A CARBON PRICE, IE CARBON PRICE HAS NO SOCIAL IMPACT
+    params["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
     params["alpha_change"] = "dynamic_culturally_determined_weights"#burn in we do want preference change to stabalize system
     params_list_no_price_no_preference_change = produce_param_list_just_stochastic(params)
-    seed_list = [x["set_seed"] for x in params_list_no_price_no_preference_change]
-    
-    #print("params_list_no_price_no_preference_change",params_list_no_price_no_preference_change)
-    #print("seed_list",seed_list)
+    #seed_list = [x["set_seed"] for x in params_list_no_price_no_preference_change]
     
     societies_list = multi_burn_in_societies(params_list_no_price_no_preference_change)
     #print("Gen seeds no carbon price, no preference change, emissions_stock_seeds",emissions_stock_seeds)
@@ -145,15 +143,15 @@ def main(
 
     #########################################
     #Now run the burn in simulation with no carbon price for the carbon price time to establish the baseline, Runs: seeds*R
-    #mu = 0, so preference change but no tax
+    #mu = 0, so preference change but no tax, CONSUMPTION BASED LEARNING
     #OUTPUT: TOTAL EMISSIONS for run for each seed, [E_1, E_2,...,E_seed]
 
-        #take the models, make copies and the run them
+    #take the models, make copies and the run them
     societies_model_no_price_preference_change_list = []
     for i, model_seed in enumerate(societies_list):
         model_copy = deepcopy(model_seed)
-        model_copy.t = 0#reset time!
-        model_copy.burn_in_duration = 0
+        #model_copy.t = 0#reset time!# not sure these are necessary
+        #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_copy.carbon_price_increased = 0#need to run as if the carbon price was zero
         #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
@@ -163,38 +161,58 @@ def main(
     emissions_target_seeds = emissions_stock_seeds*reduction_prop
     
     #Below also assume that the inital ratio between low and high carbon goods is 1, and both are 1?
-    tau_guess = (1/reduction_prop)#ITS PROPORTIONAL TO THE SIZE OF THE REDUCTION IN EMISSIONS AND THE PRICE RATIO
+    price_ratio = 1
+    tau_guess = (1/reduction_prop) - price_ratio#ITS PROPORTIONAL TO THE SIZE OF THE REDUCTION IN EMISSIONS AND THE PRICE ratio of high and low carbon goods()
     
     ##################################
     #Gen seeds recursive carbon price, no preference change, Runs: seeds*R
     #OUTPUT: Carbon price for run for each seed, [tau_1, tau_2,...,tau_seed]
-
     #take the models, make copies and the run them
     societies_model_targect_no_preference_change_list = []
     for i, model_seed in enumerate(societies_list):
         model_copy = deepcopy(model_seed)
-        model_copy.t = 0#reset time!
-        model_copy.burn_in_duration = 0
+        #model_copy.t = 0#reset time!
+        #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_copy.emissions_stock_target = emissions_target_seeds[i]#set the emissions target reduction
-        #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
+        model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_targect_no_preference_change_list.append(model_copy)
     
     tau_seeds_no_preference_change = multi_target_emissions_load(societies_model_targect_no_preference_change_list,tau_xtol,tau_guess)#put in brackets so its the same dimensions as later on!
     #tau_seeds_no_preference_change = tau_seeds_no_preference_change_array#This is cos we want to use the same functions for the latter 2d version so take the 0th element in the 2d list
     print("tau_seeds_no_preference_change",tau_seeds_no_preference_change)
 
-    #quit()
-
     ##################################
-    #Gen seeds recursive carbon price, preference change, with varying parameters, Runs: seeds*N*R
+    #Gen seeds recursive carbon price, ATTITUDE based preference  , Runs: seeds*R
+    #OUTPUT: Carbon price for run for each seed, [tau_1, tau_2,...,tau_seed]
+
+    #take the models, make copies and the run them
+    societies_model_targect_attiude_preference_change_list = []
+    for i, model_seed in enumerate(societies_list):
+        model_copy = deepcopy(model_seed)
+        model_copy.ratio_preference_or_consumption = 1.0
+        #model_copy.t = 0#reset time!
+        #model_copy.burn_in_duration = 0
+        model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
+        model_copy.emissions_stock_target = emissions_target_seeds[i]#set the emissions target reduction
+        #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
+        societies_model_targect_attiude_preference_change_list.append(model_copy)
+    
+    tau_seeds_attitude_preference_change = multi_target_emissions_load(societies_model_targect_attiude_preference_change_list,tau_xtol,tau_guess)#put in brackets so its the same dimensions as later on!
+    #tau_seeds_no_preference_change = tau_seeds_no_preference_change_array#This is cos we want to use the same functions for the latter 2d version so take the 0th element in the 2d list
+    print("tau_seeds_attitude_preference_change",tau_seeds_attitude_preference_change)
+
+    ########################################################################################################################################
+    ########################################################################################################################################
+    ########################################################################################################################################
+    #Gen seeds recursive carbon price, CONSUMPTION BASED preference change, with varying parameters, Runs: seeds*N*R
     #OUTPUT: Carbon price for run for each seed and parameters, [[tau_1_1, tau_2_1,...,tau_seed_1],..,[...,tau_seed_N]]
 
     societies_model_targect_preference_change_list = []
     for i, model_seed in enumerate(societies_list):#loop through different seeds
         model_copy = deepcopy(model_seed)
-        model_copy.t = 0#reset time!
-        model_copy.burn_in_duration = 0
+        #model_copy.t = 0#reset time!
+        #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration
         model_copy.emissions_stock_target = emissions_target_seeds[i]
         #model_seed.alpha_change = "dynamic_culturally_determined_weights"#It should already be dynamic but just in case
@@ -223,8 +241,10 @@ def main(
     ##################################
     #Calc the multiplier for each seed and parameter: seed*N matrix
 
-    multiplier_matrix = calc_multiplier_matrix(tau_seeds_no_preference_change, tau_seeds_preference_change_matrix)
-    print("multiplier_matrix",multiplier_matrix)
+    multiplier_matrix_attitude_preference_change = calc_multiplier_matrix(tau_seeds_attitude_preference_change, tau_seeds_preference_change_matrix)
+    multiplier_matrix_no_preference_change = calc_multiplier_matrix(tau_seeds_no_preference_change, tau_seeds_preference_change_matrix)
+    print("multiplier_matrix_attitude_preference_change",multiplier_matrix_attitude_preference_change)
+    print("multiplier_matrix_no_preference_change",multiplier_matrix_no_preference_change)
 
     ##################################
     #save data
@@ -234,12 +254,50 @@ def main(
     save_object(emissions_stock_seeds, fileName + "/Data", "emissions_stock_seeds")
     save_object(tau_seeds_no_preference_change, fileName + "/Data", "tau_seeds_no_preference_change")
     save_object(tau_seeds_preference_change_matrix, fileName + "/Data", "tau_seeds_preference_change_matrix")
-    save_object(multiplier_matrix, fileName + "/Data", "multiplier_matrix") 
+    save_object(multiplier_matrix_attitude_preference_change, fileName + "/Data", "multiplier_matrix_attitude_preference_change") 
+    save_object(multiplier_matrix_no_preference_change, fileName + "/Data", "multiplier_matrix_no_preference_change") 
     save_object(params, fileName + "/Data", "base_params")
     save_object(reduction_prop, fileName + "/Data", "reduction_prop")
     save_object(property_varied, fileName + "/Data", "property_varied")
     save_object(property_varied_title, fileName + "/Data", "property_varied_title")
     save_object(property_values_list, fileName + "/Data", "property_values_list")
+
+    if static_weighting_run:
+        ########################################################################################################################################
+        #Gen seeds recursive carbon price, CONSUMPTION BASED preference change, but STATIC WEIGHTING, with varying parameters, Runs: seeds*N*R
+        #OUTPUT: Carbon price for run for each seed and parameters, [[tau_1_1, tau_2_1,...,tau_seed_1],..,[...,tau_seed_N]]
+
+        societies_model_targect_static_weighting_preference_change_list = []
+        for i, model_seed in enumerate(societies_list):#loop through different seeds
+            model_copy = deepcopy(model_seed)
+            #model_copy.t = 0#reset time!
+            #model_copy.burn_in_duration = 0
+            model_copy.carbon_price_duration = carbon_price_duration
+            model_copy.emissions_stock_target = emissions_target_seeds[i]
+            model_copy.alpha_change = "static_culturally_determined_weights"
+            #model_seed.alpha_change = "dynamic_culturally_determined_weights"#It should already be dynamic but just in case
+            for j in property_values_list: #loop trough the different param values
+                model_copy_param = deepcopy(model_copy)
+                setattr(model_copy_param, property_varied, j)#BETTER THAN EVAL!
+                societies_model_targect_static_weighting_preference_change_list.append(model_copy_param)
+
+        #params["alpha_change"] = "dynamic_culturally_determined_weights"
+        #params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "emissions_stock_target", seed_list)
+        #print("params_list_emissions_target_preference_change",params_list_emissions_target_preference_change)
+        
+        tau_seeds_static_weighting_preference_change = multi_target_emissions_load(societies_model_targect_static_weighting_preference_change_list,tau_xtol,tau_guess)
+        tau_seeds_static_weighting_preference_change_matrix_not_T = tau_seeds_static_weighting_preference_change.reshape(params["seed_reps"],property_reps)
+    
+        tau_seeds_static_weighting_preference_change_matrix = tau_seeds_static_weighting_preference_change_matrix_not_T.T  #take transpose so that the stuff seeds are back in the correct place!
+        print("tau_seeds_preference_change_matrix",tau_seeds_static_weighting_preference_change_matrix)
+
+        multiplier_matrix_static_weighting_attitude_preference_change = calc_multiplier_matrix(tau_seeds_attitude_preference_change, tau_seeds_static_weighting_preference_change)
+        multiplier_matrix_static_weighting_no_preference_change = calc_multiplier_matrix(tau_seeds_no_preference_change, tau_seeds_preference_change_matrix)
+        print("multiplier_matrix_static_weighting_attitude_preference_change",multiplier_matrix_static_weighting_attitude_preference_change)
+        print("multiplier_matrix_static_weighting_no_preference_change",multiplier_matrix_static_weighting_no_preference_change)
+
+        save_object(multiplier_matrix_static_weighting_attitude_preference_change, fileName + "/Data", "multiplier_matrix_static_weighting_attitude_preference_change") 
+        save_object(multiplier_matrix_static_weighting_no_preference_change, fileName + "/Data", "multiplier_matrix_static_weighting_no_preference_change") 
 
     return fileName
 
@@ -248,6 +306,7 @@ if __name__ == '__main__':
         BASE_PARAMS_LOAD = "package/constants/base_params_mu_target.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_mu_target.json",
         reduction_prop = 0.5,
-        carbon_price_duration = 1000
+        carbon_price_duration = 1000,
+        static_weighting_run = 1
 )
 
