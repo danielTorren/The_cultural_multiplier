@@ -214,6 +214,6 @@ if __name__ == '__main__':
         BASE_PARAMS_LOAD = "package/constants/base_params_mu_target.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_mu_target.json",
         reduction_prop = 0.5,
-        carbon_price_duration = 100
+        carbon_price_duration = 1000
 )
 
