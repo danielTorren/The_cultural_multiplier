@@ -95,14 +95,16 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
-
+    if print_simu:
+        start_time = time.time()
+    
     ##################################
     #Gen burn in socieities for different seeds no carbon price, with preference change!!, Runs: seeds
     #OUTPUT: societies list array of length seed [socities_1, E_2,...,E_seed]
     #params["alpha_change"] = "static_preferences"
     params["carbon_price_duration"] =  0#no carbon price duration, only burn in
     params["carbon_price_increased"] = 0
-    params["ratio_preference_or_consumption"] = 0#ASSUME CONSUMPTION BASED TO MATCH SOCIAL MULTIPLIER, OBSERVABLE?
+    params["ratio_preference_or_consumption"] = 1 #WE ASSUME PREFERENCE BASE LEARNING AS THE BENCH MARK AGAINST WHICH TO STUDY THE IMPACT OF A CARBON PRICE, IE CARBON PRICE HAS NO SOCIAL IMPACT
     params["alpha_change"] = "dynamic_culturally_determined_weights"#burn in we do want preference change to stabalize system
     params_list_no_price_no_preference_change = produce_param_list_just_stochastic(params)
     seed_list = [x["set_seed"] for x in params_list_no_price_no_preference_change]
@@ -118,9 +120,9 @@ def main(
     print("Societies burn in done")
 
     #quit()
-    if print_simu:
-        start_time = time.time()
 
+
+    """
     ##################################
     #Now run the burn in simulation with no carbon price for the carbon price time to establish the baseline, Runs: seeds*R
     #OUTPUT: TOTAL EMISSIONS for run for each seed, [E_1, E_2,...,E_seed]
@@ -139,9 +141,12 @@ def main(
     emissions_stock_seeds = multi_emissions_load(societies_model_no_price_no_preference_change_list)
     print("emissions_stock_seeds after running for carbon tax time",emissions_stock_seeds)
     #print("Emissiosn targets calculated")
+    """
 
     #########################################
-    #FOR COMPARISONS SAKE: do the full time but with variable preferences, no tax
+    #Now run the burn in simulation with no carbon price for the carbon price time to establish the baseline, Runs: seeds*R
+    #mu = 0, so preference change but no tax
+    #OUTPUT: TOTAL EMISSIONS for run for each seed, [E_1, E_2,...,E_seed]
 
         #take the models, make copies and the run them
     societies_model_no_price_preference_change_list = []
@@ -154,19 +159,7 @@ def main(
         #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_no_price_preference_change_list.append(model_copy)
 
-    emissions_stock_seeds_preference_change = multi_emissions_load(societies_model_no_price_preference_change_list)
-    print("emissions_stock_seeds_preference_change after running for carbon tax time",emissions_stock_seeds_preference_change)
-    
-    #print("Emissiosn targets calculated")
-
-    print("ratio of no change, to change", (emissions_stock_seeds/emissions_stock_seeds_preference_change)*100)
-
-    quit()
-
-    #quit()
-    ##################################
-    #Calc the target emissions for each seed
-
+    emissions_stock_seeds = multi_emissions_load(societies_model_no_price_preference_change_list)
     emissions_target_seeds = emissions_stock_seeds*reduction_prop
     
     #Below also assume that the inital ratio between low and high carbon goods is 1, and both are 1?
@@ -184,7 +177,7 @@ def main(
         model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_copy.emissions_stock_target = emissions_target_seeds[i]#set the emissions target reduction
-        model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
+        #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_targect_no_preference_change_list.append(model_copy)
     
     tau_seeds_no_preference_change = multi_target_emissions_load(societies_model_targect_no_preference_change_list,tau_xtol,tau_guess)#put in brackets so its the same dimensions as later on!
@@ -196,8 +189,7 @@ def main(
     ##################################
     #Gen seeds recursive carbon price, preference change, with varying parameters, Runs: seeds*N*R
     #OUTPUT: Carbon price for run for each seed and parameters, [[tau_1_1, tau_2_1,...,tau_seed_1],..,[...,tau_seed_N]]
-    
-    #THERE HAS TO BE A SMARTER WAY TO DO THIS
+
     societies_model_targect_preference_change_list = []
     for i, model_seed in enumerate(societies_list):#loop through different seeds
         model_copy = deepcopy(model_seed)
