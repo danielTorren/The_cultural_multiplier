@@ -320,21 +320,21 @@ def generate_data_load(social_network) -> Network:
 
     return social_network
 
-def generate_norm_emissions_load(model_burn_in):
+def generate_emissions_load(model_burn_in):
     #print("before social_network.time_steps_max ",model_burn_in.time_steps_max,model_burn_in.burn_in_duration, model_burn_in.carbon_price_duration )
     #print("BEFORE norm emissions init",model_burn_in.total_carbon_emissions_stock,model_burn_in.total_carbon_emissions_stock/(model_burn_in.N*model_burn_in.M))
     data = generate_data_load(model_burn_in)
     #print("AFTER norm emissions init",data.total_carbon_emissions_stock,data.total_carbon_emissions_stock/(data.N*data.M))
-    norm = data.N*data.M
-    return data.total_carbon_emissions_stock/norm
+    #norm = data.N*data.M
+    return data.total_carbon_emissions_stock
 
-def multi_norm_emissions_load(
+def multi_emissions_load(
         model_list: list
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
     #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
-    emissions_stock = Parallel(n_jobs=num_cores)(#, verbose=10
-        delayed(generate_norm_emissions_load)(i) for i in model_list
+    emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(#
+        delayed(generate_emissions_load)(i) for i in model_list
     )
 
     return np.asarray(emissions_stock)
@@ -378,30 +378,28 @@ def multi_target_norm_emissions(
 #Finding carbon price reduction for a given target
 def calc_root_emissions_target_load(x, model):
     model_copy = deepcopy(model)
-
-    model_copy.carbon_price_increased = x
+    #print("current emissions, target", model_copy.total_carbon_emissions_stock, model_copy.emissions_stock_target)
+    model_copy.carbon_price_increased = x[0]# i dont know why x is given as a list, and i dont know why is works?
     model_copy_end = generate_data_load(model_copy)
-    norm = model_copy_end.N*model_copy_end.M
-    root = (model_copy_end.total_carbon_emissions_stock/norm) - model_copy_end.norm_emissions_stock_target
+    #norm = model_copy_end.N*model_copy_end.M
+    #print("emissiosn after run,target, price",model_copy_end.total_carbon_emissions_stock, model_copy_end.emissions_stock_target,x[0])
+    root = model_copy_end.total_carbon_emissions_stock - model_copy_end.emissions_stock_target
     return root
 
-def generate_target_tau_val_load(model_same_seed,tau_xtol):
-    tau_guess = 0
-    tau_list = []
-    for model in model_same_seed:
-        result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 0, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
-        tau_val = result["x"][0]
-        tau_list.append(tau_val)
-        tau_guess = tau_val
-    return tau_list
+def generate_target_tau_val_load(model,tau_xtol,tau_guess):
+    result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 1, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
+    #print("result",result)
+    tau_val = result["x"][0]
+    return tau_val
 
-def multi_target_norm_emissions_load(        
-        models_matrix,tau_xtol
+
+def multi_target_emissions_load(        
+        models_matrix,tau_xtol,tau_guess
 ) -> npt.NDArray:
     
     num_cores = multiprocessing.cpu_count()
     
-    tau_vals = Parallel(n_jobs=num_cores)(#, verbose=10
-        delayed(generate_target_tau_val_load)(i,tau_xtol) for i in models_matrix
+    tau_vals = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_target_tau_val_load)(i,tau_xtol,tau_guess) for i in models_matrix
     )
     return np.asarray(tau_vals)
