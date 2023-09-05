@@ -20,7 +20,7 @@ def plot_end_points_emissions_scatter(
 
     #print(c,emissions_final)
     fig, ax = plt.subplots(figsize=(10,6))
-
+    print("Data_list",Data_list)
     print("Data_list.shape", Data_list.shape)
     print(" property_vals", property_vals)
 
@@ -63,6 +63,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/emission_target_sweep_17_31_01__25_08_2023"
+        fileName="results/emission_target_sweep_10_52_06__05_09_2023"
     )
 
