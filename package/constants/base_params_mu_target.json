@@ -10,7 +10,7 @@
     "burn_in_duration": 300,
     "phi": 0.05,
     "seed_reps": 20,
-    "N": 50,
+    "N": 200,
     "M": 1,
     "network_density": 0.1,
     "prob_rewire": 0.1,

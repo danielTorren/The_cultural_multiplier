@@ -156,9 +156,13 @@ class Network:
 
         """
         
+       
 
         self.init_total_carbon_emissions  = self.calc_total_emissions()
-        self.total_carbon_emissions_flow = self.init_total_carbon_emissions
+        
+        #self.total_carbon_emissions_stock_burn_in = self.init_total_carbon_emissions
+
+        self.total_carbon_emissions_stock = 0#this are for post tax
 
         if self.redistribution_state:
             self.carbon_dividend_array = self.calc_carbon_dividend_array()
@@ -176,10 +180,10 @@ class Network:
 
         self.welfare = self.calc_welfare()
 
-        if self.t == self.burn_in_duration:
+        if self.t == self.burn_in_duration:#in the case that we load in and there is no burn in period i want to calculate the emissions immedialty
+            self.total_carbon_emissions_flow = self.init_total_carbon_emissions
             self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
-            if self.save_timeseries_data:
-                self.set_up_time_series()
+            self.set_up_time_series()
 
     def set_up_time_series(self):
         self.history_weighting_matrix = [self.weighting_matrix]
@@ -193,10 +197,11 @@ class Network:
         self.history_var_identity = [self.var_identity]
         self.history_min_identity = [self.min_identity]
         self.history_max_identity = [self.max_identity]
-        self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
-        self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
         self.history_identity_list = [self.identity_list]
         self.history_welfare = [self.welfare]
+        self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
+        self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
+
         if self.budget_inequality_state == 1:
             self.history_gini = [self.gini]
     
@@ -679,8 +684,6 @@ class Network:
         # advance a time step
         self.t += 1
 
-        #print("step, phi: ",self.t,self.phi_array)
-
         # execute step
         self.update_individuals()
 
@@ -692,29 +695,23 @@ class Network:
                 self.weighting_matrix_list = self.update_weightings_list()
 
             self.social_component_matrix = self.calc_social_component_matrix()
-
-
-        self.total_carbon_emissions_flow = self.calc_total_emissions()
         
-        #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
-
         if self.redistribution_state:
             self.carbon_dividend_array = self.calc_carbon_dividend_array()
-            a = [x.instant_budget for x in self.agent_list]
-            self.gini = self.calc_gini(a)
+            if self.budget_inequality_state == 1:
+                a = [x.instant_budget for x in self.agent_list]
+                self.gini = self.calc_gini(a)
 
-
-        if self.t == self.burn_in_duration:
-            #print("t stock", self.t)
-            self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
-        elif self.t > self.burn_in_duration:
-            #print("t carbon ", self.t)
-            self.carbon_price = self.calc_carbon_price()
-            #print("self.carbon_price", self.carbon_price)
+        #check the exact timings on these
+        #print("self.t > self.burn_in_duration", self.t, self.burn_in_duration)
+        if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
+            #print("T more than burn in")
+            self.total_carbon_emissions_flow = self.calc_total_emissions()
             self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
-        #print("self.total_carbon_emissions_flow",self.total_carbon_emissions_flow)
+            self.carbon_price = self.calc_carbon_price()#update price for next round
+            
         if self.save_timeseries_data:
-            if self.t == self.burn_in_duration:
+            if self.t == self.burn_in_duration + 1:#want to create it the step after burn in is finished
                 self.set_up_time_series()
             elif (self.t % self.compression_factor == 0) and (self.t > self.burn_in_duration):
                 (
@@ -725,6 +722,4 @@ class Network:
                         self.max_identity,
                 ) = self.calc_network_identity()
                 self.welfare = self.calc_welfare()
-                if self.budget_inequality_state == 1:
-                    self.gini = self.calc_gini([x.instant_budget for x in self.agent_list])
                 self.save_timeseries_data_network()

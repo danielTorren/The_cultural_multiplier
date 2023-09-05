@@ -14,8 +14,6 @@ import json
 import numpy as np
 from package.resources.utility import createFolder, produce_name_datetime, save_object
 from package.resources.run import multi_burn_in_societies,multi_norm_emissions_load, multi_target_norm_emissions_load
-from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
-from package.generating_data.twoD_param_sweep_gen import generate_vals_variable_parameters_and_norms
 
 def generate_vals(variable_parameters_dict):
     if variable_parameters_dict["property_divisions"] == "linear":
@@ -105,12 +103,18 @@ def main(
     params["alpha_change"] = "dynamic_culturally_determined_weights"#burn in we do want preference change to stabalize system
     params_list_no_price_no_preference_change = produce_param_list_just_stochastic(params)
     seed_list = [x["set_seed"] for x in params_list_no_price_no_preference_change]
+    
     #print("params_list_no_price_no_preference_change",params_list_no_price_no_preference_change)
-    print("seed_list",seed_list)
+    #print("seed_list",seed_list)
+    
     societies_list = multi_burn_in_societies(params_list_no_price_no_preference_change)
     #print("Gen seeds no carbon price, no preference change, emissions_stock_seeds",emissions_stock_seeds)
     #print("societies_list",societies_list)
+    stock_emissions_list = [x.total_carbon_emissions_stock for x in societies_list]
+    print("stock_emissions_list shoudl be zero",stock_emissions_list)
     print("Societies burn in done")
+
+    #quit()
 
     ##################################
     #Now run the burn in simulation with no carbon price for the carbon price time to establish the baseline, Runs: seeds*R
@@ -119,14 +123,17 @@ def main(
     #take the models, make copies and the run them
     societies_model_no_price_no_preference_change_list = []
     for i, model_seed in enumerate(societies_list):
+        model_seed.t = 0#reset time!
         model_seed.burn_in_duration = 0
         model_seed.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
+        model_seed.carbon_price_increased = 0#need to run as if the carbon price was zero
         model_seed.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_no_price_no_preference_change_list.append(deepcopy(model_seed))
 
     norm_emissions_stock_seeds = multi_norm_emissions_load(societies_model_no_price_no_preference_change_list)
-    print("emissions_stock_seeds",norm_emissions_stock_seeds)
-
+    print("emissions_stock_seeds after running for carbon tax time",norm_emissions_stock_seeds)
+    print("Emissiosn targets calculated")
+    #quit()
     ##################################
     #Calc the target emissions for each seed
 
@@ -139,6 +146,7 @@ def main(
     #take the models, make copies and the run them
     societies_model_targect_no_preference_change_list = []
     for i, model_seed in enumerate(societies_list):
+        model_seed.t = 0#reset time!
         model_seed.burn_in_duration = 0
         model_seed.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_seed.norm_emissions_stock_target = norm_emissions_target_seeds[i]#set the emissions target reduction
@@ -146,10 +154,10 @@ def main(
         societies_model_targect_no_preference_change_list.append(deepcopy(model_seed))
 
     tau_seeds_no_preference_change_array = multi_target_norm_emissions_load([societies_model_targect_no_preference_change_list],tau_xtol)#put in brackets so its the same dimensions as later on!
-    tau_seeds_no_preference_change = tau_seeds_no_preference_change_array[0]
+    tau_seeds_no_preference_change = tau_seeds_no_preference_change_array[0]#This is cos we want to use the same functions for the latter 2d version so take the 0th element in the 2d list
     print("tau_seeds_no_preference_change",tau_seeds_no_preference_change)
 
-    quit()
+    #quit()
 
     ##################################
     #Gen seeds recursive carbon price, preference change, with varying parameters, Runs: seeds*N*R
@@ -158,6 +166,7 @@ def main(
     #THERE HAS TO BE A SMARTER WAY TO DO THIS
     societies_model_targect_preference_change_list = []
     for i, model_seed in enumerate(societies_list):
+        model_seed.t = 0#reset time!
         model_seed.burn_in_duration = 0
         model_seed.carbon_price_duration = carbon_price_duration
         model_seed.norm_emissions_stock_target = norm_emissions_target_seeds[i]
@@ -174,7 +183,7 @@ def main(
     tau_seeds_preference_change = multi_target_norm_emissions_load(societies_model_targect_preference_change_list,tau_xtol)
     tau_seeds_preference_change_matrix_not_T = tau_seeds_preference_change.reshape(params["seed_reps"],property_reps)
     
-    tau_seeds_preference_change_matrix =tau_seeds_preference_change_matrix_not_T.T  #take transpose so that the stuff seeds are back in the correct place!
+    tau_seeds_preference_change_matrix = tau_seeds_preference_change_matrix_not_T.T  #take transpose so that the stuff seeds are back in the correct place!
     print("tau_seeds_preference_change_matrix",tau_seeds_preference_change_matrix)
     
     ##################################
@@ -188,7 +197,7 @@ def main(
 
     createFolder(fileName)
 
-    save_object(emissions_stock_seeds, fileName + "/Data", "emissions_stock_seeds")
+    save_object(norm_emissions_stock_seeds, fileName + "/Data", "emissions_stock_seeds")
     save_object(tau_seeds_no_preference_change, fileName + "/Data", "tau_seeds_no_preference_change")
     save_object(tau_seeds_preference_change_matrix, fileName + "/Data", "tau_seeds_preference_change_matrix")
     save_object(multiplier_matrix, fileName + "/Data", "multiplier_matrix") 

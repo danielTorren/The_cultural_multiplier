@@ -44,7 +44,7 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
     social_network = Network(parameters)
 
     #### RUN TIME STEPS
-    while social_network.t <= parameters["time_steps_max"]:
+    while social_network.t < parameters["time_steps_max"]:
         social_network.next_step()
         #print("step", social_network.t)
 
@@ -287,10 +287,7 @@ def multi_emissions_stock_ineq(
 
 #Running emissions reductions simulations
 #################################################################################################################################
-
-
 #Run the burn in periods
-
 def generate_burn_in_societies(params):
     data = generate_data(params)
     return data
@@ -298,8 +295,8 @@ def generate_burn_in_societies(params):
 def multi_burn_in_societies(
         params_dict: list[dict]
 ) -> npt.NDArray:
+    #societies = [generate_burn_in_societies(i) for i in params_dict]
     num_cores = multiprocessing.cpu_count()
-    #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
     societies = Parallel(n_jobs=num_cores)(#, verbose=10
         delayed(generate_burn_in_societies)(i) for i in params_dict
     )
@@ -307,7 +304,7 @@ def multi_burn_in_societies(
     return np.asarray(societies)
 
 #################################################################################################################################
-#CALC MULTIPLIERS WITH EMISSIONS REDUCTION TARGETS
+#run the models with a carbon price (can be zero calc the baseline emissions for a given burn in set up)
 def generate_data_load(social_network) -> Network:
     """
     Load model and run it
@@ -316,7 +313,7 @@ def generate_data_load(social_network) -> Network:
 
     social_network.time_steps_max = social_network.burn_in_duration + social_network.carbon_price_duration
 
-    print("social_network.time_steps_max ",social_network.time_steps_max,social_network.burn_in_duration, social_network.carbon_price_duration )
+    #print("social_network.time_steps_max ",social_network.time_steps_max,social_network.burn_in_duration, social_network.carbon_price_duration )
     #### RUN TIME STEPS
     while social_network.t <= social_network.time_steps_max:
         social_network.next_step()
@@ -324,8 +321,10 @@ def generate_data_load(social_network) -> Network:
     return social_network
 
 def generate_norm_emissions_load(model_burn_in):
-    print("norm emissions init",model_burn_in.total_carbon_emissions_stock/(model_burn_in.N*model_burn_in.M))
+    #print("before social_network.time_steps_max ",model_burn_in.time_steps_max,model_burn_in.burn_in_duration, model_burn_in.carbon_price_duration )
+    #print("BEFORE norm emissions init",model_burn_in.total_carbon_emissions_stock,model_burn_in.total_carbon_emissions_stock/(model_burn_in.N*model_burn_in.M))
     data = generate_data_load(model_burn_in)
+    #print("AFTER norm emissions init",data.total_carbon_emissions_stock,data.total_carbon_emissions_stock/(data.N*data.M))
     norm = data.N*data.M
     return data.total_carbon_emissions_stock/norm
 
@@ -341,22 +340,23 @@ def multi_norm_emissions_load(
     return np.asarray(emissions_stock)
 
 ######################################################################
-#Emissions target
+"""
+#Calculate the emissions target
 def calc_root_emissions_target(x, params):
-    print("set_seed",params["set_seed"])
+    #print("set_seed",params["set_seed"])
     params["carbon_price_increased"] = x
     data = generate_data(params)
     norm = params["N"]*params["M"]
     root = data.total_carbon_emissions_stock/norm - params["norm_emissions_stock_target"]
-    print("emissions",data.total_carbon_emissions_stock/norm,params["norm_emissions_stock_target"])
-    print("tax,mu",x,params["ratio_preference_or_consumption"])
+    #print("emissions",data.total_carbon_emissions_stock/norm,params["norm_emissions_stock_target"])
+    #print("tax,mu",x,params["ratio_preference_or_consumption"])
     return root
 
 def generate_target_tau_val(params_same_seed):
     tau_guess = 0
     tau_list = []
     for params in params_same_seed:
-        print("NEW MU")
+        #print("NEW MU")
         result = least_squares(lambda x: calc_root_emissions_target(x, params),verbose = 0, x0=tau_guess, xtol=params["tau_xtol"], bounds = (0, np.inf))
         tau_val = result["x"][0]
         tau_list.append(tau_val)
@@ -373,9 +373,9 @@ def multi_target_norm_emissions(
         delayed(generate_target_tau_val)(i) for i in params_dict_seeds
     )
     return np.asarray(tau_vals)
-
+"""
 #################################################################################################
-
+#Finding carbon price reduction for a given target
 def calc_root_emissions_target_load(x, model):
     model_copy = deepcopy(model)
 
@@ -389,7 +389,7 @@ def generate_target_tau_val_load(model_same_seed,tau_xtol):
     tau_guess = 0
     tau_list = []
     for model in model_same_seed:
-        result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 0, x0=tau_guess, xtol=tau_xtol, bounds = (0, np.inf))
+        result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 0, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
         tau_val = result["x"][0]
         tau_list.append(tau_val)
         tau_guess = tau_val
