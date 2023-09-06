@@ -14,8 +14,9 @@ import numpy.typing as npt
 from joblib import Parallel, delayed
 import multiprocessing
 from package.model.network import Network
-from scipy.optimize import least_squares
+#from scipy.optimize import least_squares
 from copy import deepcopy
+from scipy.optimize import minimize, NonlinearConstraint
 
 
 # modules
@@ -310,10 +311,8 @@ def generate_data_load(social_network) -> Network:
     Load model and run it
 
     """
-
     social_network.time_steps_max = social_network.burn_in_duration + social_network.carbon_price_duration
 
-    #print("social_network.time_steps_max ",social_network.time_steps_max,social_network.burn_in_duration, social_network.carbon_price_duration )
     #### RUN TIME STEPS
     while social_network.t <= social_network.time_steps_max:
         social_network.next_step()
@@ -340,45 +339,14 @@ def multi_emissions_load(
     return np.asarray(emissions_stock)
 
 ######################################################################
-"""
-#Calculate the emissions target
-def calc_root_emissions_target(x, params):
-    #print("set_seed",params["set_seed"])
-    params["carbon_price_increased"] = x
-    data = generate_data(params)
-    norm = params["N"]*params["M"]
-    root = data.total_carbon_emissions_stock/norm - params["norm_emissions_stock_target"]
-    #print("emissions",data.total_carbon_emissions_stock/norm,params["norm_emissions_stock_target"])
-    #print("tax,mu",x,params["ratio_preference_or_consumption"])
-    return root
-
-def generate_target_tau_val(params_same_seed):
-    tau_guess = 0
-    tau_list = []
-    for params in params_same_seed:
-        #print("NEW MU")
-        result = least_squares(lambda x: calc_root_emissions_target(x, params),verbose = 0, x0=tau_guess, xtol=params["tau_xtol"], bounds = (0, np.inf))
-        tau_val = result["x"][0]
-        tau_list.append(tau_val)
-        tau_guess = tau_val
-    return tau_list
-
-def multi_target_norm_emissions(        
-        params_dict_seeds: list[dict]
-) -> npt.NDArray:
-    
-    num_cores = multiprocessing.cpu_count()
-    
-    tau_vals = Parallel(n_jobs=num_cores)(#, verbose=10
-        delayed(generate_target_tau_val)(i) for i in params_dict_seeds
-    )
-    return np.asarray(tau_vals)
-"""
 #################################################################################################
+
 #Finding carbon price reduction for a given target
 def calc_root_emissions_target_load(x, model):
     model_copy = deepcopy(model)
     #print("current emissions, target", model_copy.total_carbon_emissions_stock, model_copy.emissions_stock_target)
+    #print("x",x)
+    #model_copy.carbon_price_increased = x# i dont know why x is given as a list, and i dont know why is works?
     model_copy.carbon_price_increased = x[0]# i dont know why x is given as a list, and i dont know why is works?
     model_copy_end = generate_data_load(model_copy)
     #norm = model_copy_end.N*model_copy_end.M
@@ -387,10 +355,24 @@ def calc_root_emissions_target_load(x, model):
     return root
 
 def generate_target_tau_val_load(model,tau_guess):
-    result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 1, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
-    print("result",result)
-    tau_val = result["x"][0]
+
+    # Create a NonlinearConstraint with additional parameters using a lambda function
+    #constraint_func = 
+    # Create a NonlinearConstraint for the positivity constraint, #Want the emissions to be lower than the target
+    positivity_constraint = NonlinearConstraint(lambda x: constraint(x, model), lb=0, ub=np.inf)
+    # Call minimize with the constraint
+    #
+    result = minimize(calc_root_emissions_target_load, x0 = tau_guess, args = (model),bounds=[(0, np.inf)], method='trust-constr',constraints=positivity_constraint)#,
+    #result = minimize(calc_root_emissions_target_load, x0 = tau_guess, args = (model), method='trust-constr',constraints=positivity_constraint)#,bounds=(0, np.inf)
+    #result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 1, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
+    #print("result",result)
+    #tau_val = result["x"][0]
+    tau_val = result.x[0]
     return tau_val
+
+def constraint(x, model):
+    # Ensure that the function is positive at x
+    return calc_root_emissions_target_load(x,model)
 
 
 def multi_target_emissions_load(        
@@ -399,7 +381,6 @@ def multi_target_emissions_load(
     
     num_cores = multiprocessing.cpu_count()
     
-    tau_vals = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_target_tau_val_load)(i,tau_guess) for i in models_matrix
-    )
+    tau_vals = [generate_target_tau_val_load(i,tau_guess) for i in models_matrix]
+    #tau_vals = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_target_tau_val_load)(i,tau_guess) for i in models_matrix)
     return np.asarray(tau_vals)
