@@ -383,11 +383,11 @@ def calc_root_emissions_target_load(x, model):
     model_copy_end = generate_data_load(model_copy)
     #norm = model_copy_end.N*model_copy_end.M
     #print("emissiosn after run,target, price",model_copy_end.total_carbon_emissions_stock, model_copy_end.emissions_stock_target,x[0])
-    root = model_copy_end.total_carbon_emissions_stock - model_copy_end.emissions_stock_target
+    root = model_copy_end.emissions_stock_target - model_copy_end.total_carbon_emissions_stock
     return root
 
 def generate_target_tau_val_load(model,tau_guess):
-    result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 2, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
+    result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 1, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
     print("result",result)
     tau_val = result["x"][0]
     return tau_val
