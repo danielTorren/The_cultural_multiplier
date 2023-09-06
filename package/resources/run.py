@@ -386,20 +386,20 @@ def calc_root_emissions_target_load(x, model):
     root = model_copy_end.total_carbon_emissions_stock - model_copy_end.emissions_stock_target
     return root
 
-def generate_target_tau_val_load(model,tau_xtol,tau_guess):
+def generate_target_tau_val_load(model,tau_guess):
     result = least_squares(lambda x: calc_root_emissions_target_load(x, model),verbose = 2, x0=tau_guess, bounds = (0, np.inf))# xtol=tau_xtol
-    #print("result",result)
+    print("result",result)
     tau_val = result["x"][0]
     return tau_val
 
 
 def multi_target_emissions_load(        
-        models_matrix,tau_xtol,tau_guess
+        models_matrix,tau_guess
 ) -> npt.NDArray:
     
     num_cores = multiprocessing.cpu_count()
     
     tau_vals = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_target_tau_val_load)(i,tau_xtol,tau_guess) for i in models_matrix
+        delayed(generate_target_tau_val_load)(i,tau_guess) for i in models_matrix
     )
     return np.asarray(tau_vals)

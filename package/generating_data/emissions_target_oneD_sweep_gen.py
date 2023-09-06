@@ -70,7 +70,6 @@ def main(
         VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
         reduction_prop = 0.5,
         carbon_price_duration = 1000,
-        tau_xtol = 1e-6,
         print_simu = 1,
         static_weighting_run = 0
         ) -> str: 
@@ -178,7 +177,7 @@ def main(
         model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_targect_no_preference_change_list.append(model_copy)
     
-    tau_seeds_no_preference_change = multi_target_emissions_load(societies_model_targect_no_preference_change_list,tau_xtol,tau_guess)#put in brackets so its the same dimensions as later on!
+    tau_seeds_no_preference_change = multi_target_emissions_load(societies_model_targect_no_preference_change_list,tau_guess)#put in brackets so its the same dimensions as later on!
     #tau_seeds_no_preference_change = tau_seeds_no_preference_change_array#This is cos we want to use the same functions for the latter 2d version so take the 0th element in the 2d list
     print("tau_seeds_no_preference_change",tau_seeds_no_preference_change)
 
@@ -198,7 +197,7 @@ def main(
         #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_targect_attiude_preference_change_list.append(model_copy)
     
-    tau_seeds_attitude_preference_change = multi_target_emissions_load(societies_model_targect_attiude_preference_change_list,tau_xtol,tau_guess)#put in brackets so its the same dimensions as later on!
+    tau_seeds_attitude_preference_change = multi_target_emissions_load(societies_model_targect_attiude_preference_change_list,tau_guess)#put in brackets so its the same dimensions as later on!
     #tau_seeds_no_preference_change = tau_seeds_no_preference_change_array#This is cos we want to use the same functions for the latter 2d version so take the 0th element in the 2d list
     print("tau_seeds_attitude_preference_change",tau_seeds_attitude_preference_change)
 
@@ -225,7 +224,7 @@ def main(
     #params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "emissions_stock_target", seed_list)
     #print("params_list_emissions_target_preference_change",params_list_emissions_target_preference_change)
     
-    tau_seeds_preference_change = multi_target_emissions_load(societies_model_targect_preference_change_list,tau_xtol,tau_guess)
+    tau_seeds_preference_change = multi_target_emissions_load(societies_model_targect_preference_change_list,tau_guess)
     
     if print_simu:
         print(

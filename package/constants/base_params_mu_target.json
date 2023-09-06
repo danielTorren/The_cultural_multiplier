@@ -10,7 +10,7 @@
     "compression_factor":10,
     "burn_in_duration": 300,
     "phi": 0.05,
-    "seed_reps": 3,
+    "seed_reps": 10,
     "N": 200,
     "M": 1,
     "network_density": 0.1,
