@@ -284,7 +284,7 @@ def main(
         #params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "emissions_stock_target", seed_list)
         #print("params_list_emissions_target_preference_change",params_list_emissions_target_preference_change)
         
-        tau_seeds_static_weighting_preference_change = multi_target_emissions_load(societies_model_targect_static_weighting_preference_change_list,tau_xtol,tau_guess)
+        tau_seeds_static_weighting_preference_change = multi_target_emissions_load(societies_model_targect_static_weighting_preference_change_list,tau_guess)
         tau_seeds_static_weighting_preference_change_matrix_not_T = tau_seeds_static_weighting_preference_change.reshape(params["seed_reps"],property_reps)
     
         tau_seeds_static_weighting_preference_change_matrix = tau_seeds_static_weighting_preference_change_matrix_not_T.T  #take transpose so that the stuff seeds are back in the correct place!
