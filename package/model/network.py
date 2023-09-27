@@ -129,7 +129,7 @@ class Network:
         self.shuffle_agent_list()#partial shuffle of the list based on identity
 
 
-        #if self.alpha_change == "behavioural_independence":
+        #if self.alpha_change == "dynamic_socially_determined_weights":
         #    self.weighting_matrix_list = [self.weighting_matrix]*self.M
         
         if self.alpha_change == "static_preferences":
@@ -137,7 +137,7 @@ class Network:
         else:
             if self.alpha_change == ("static_culturally_determined_weights" or "dynamic_culturally_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change == "behavioural_independence":#independent behaviours
+            elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()
 
             self.social_component_matrix = self.calc_social_component_matrix()
@@ -151,7 +151,7 @@ class Network:
 
         if self.alpha_change == ("static_culturally_determined_weights" or "dynamic_culturally_determined_weights"):#update the weightings once and thats it
             self.weighting_matrix = self.update_weightings()
-        elif self.alpha_change == "behavioural_independence":#independent behaviours
+        elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
             self.weighting_matrix_list = self.update_weightings_list()
 
         """
@@ -425,7 +425,7 @@ class Network:
             NxM array giving the influence of social learning from neighbours for that time step
         """
 
-        if self.alpha_change == "behavioural_independence":
+        if self.alpha_change == "dynamic_socially_determined_weights":
             ego_influence = self.calc_ego_influence_degroot_independent()
         else:
             ego_influence = self.calc_ego_influence_degroot()           
@@ -691,7 +691,7 @@ class Network:
         if self.alpha_change != "static_preferences":
             if self.alpha_change == "dynamic_culturally_determined_weights":
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change == "behavioural_independence":#independent behaviours
+            elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()
 
             self.social_component_matrix = self.calc_social_component_matrix()

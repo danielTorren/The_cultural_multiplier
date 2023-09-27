@@ -147,6 +147,21 @@ def parallel_run_sa(
         np.asarray(results_emissions_change)
     )
 
+
+def generate_emissions_stock_res(params):
+    data = generate_data(params)
+    return data.total_carbon_emissions_stock
+
+def emissions_parallel_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_emissions_stock_res(i) for i in params_dict]
+    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_emissions_stock_res)(i) for i in params_dict
+    )
+    return np.asarray(emissions_list)
+
 def generate_multi_output_individual_emissions_list(params):
     emissions_list = []
     for v in range(params["seed_reps"]):
@@ -164,8 +179,6 @@ def multi_stochstic_emissions_run(
         delayed(generate_multi_output_individual_emissions_list)(i) for i in params_dict
     )
     return np.asarray(emissions_list)
-
-
 
 def stochastic_generate_emissions(params):
     data = generate_data(params)

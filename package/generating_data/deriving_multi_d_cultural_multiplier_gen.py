@@ -41,7 +41,7 @@ def main(
 
     #social multiplier
     params_list = []
-    params["alpha_change"] = "behavioural_independence"
+    params["alpha_change"] = "dynamic_socially_determined_weights"
     for i in phi_list:
         params["phi"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)

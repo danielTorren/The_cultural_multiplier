@@ -163,6 +163,8 @@ def main(
     price_ratio = 1
     tau_guess = (1/reduction_prop) - price_ratio#ITS PROPORTIONAL TO THE SIZE OF THE REDUCTION IN EMISSIONS AND THE PRICE ratio of high and low carbon goods()
     
+    print("emissions_stock_seeds",emissions_stock_seeds)
+    
     ##################################
     #Gen seeds recursive carbon price, no preference change, Runs: seeds*R
     #OUTPUT: Carbon price for run for each seed, [tau_1, tau_2,...,tau_seed]

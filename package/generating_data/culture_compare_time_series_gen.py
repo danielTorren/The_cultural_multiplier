@@ -15,7 +15,7 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
-    culture_list = ["dynamic_culturally_determined_weights","behavioural_independence","static_culturally_determined_weights", "static_preferences"]
+    culture_list = ["dynamic_culturally_determined_weights","dynamic_socially_determined_weights","static_culturally_determined_weights", "static_preferences"]
     params_list = []
     for i in culture_list:
         base_params["alpha_change"] =  i
