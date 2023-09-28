@@ -143,7 +143,7 @@ def arrange_scenarios_tax(base_params, carbon_tax_vals,scenarios):
     if "dynamic_culturally_determined_weights" in scenarios:
         base_params_copy_6 = deepcopy(base_params)
         base_params_copy_6["alpha_change"] = "dynamic_culturally_determined_weights"
-        params_sub_list_6 = produce_param_list_scenarios_tax(base_params_copy_5, carbon_tax_vals,"carbon_price_increased")
+        params_sub_list_6 = produce_param_list_scenarios_tax(base_params_copy_6, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_6)
 
     return params_list
@@ -209,7 +209,8 @@ def main(
     #Gen params lists
     params_list_no_tax = arrange_scenarios_no_tax(params,scenarios)
     params_list_tax = arrange_scenarios_tax(params,property_values_list,scenarios)
-
+    print("Total runs: ",len(params_list_tax) + len(params_list_no_tax))
+    
     #RESULTS
     emissions_stock_no_tax_flat = emissions_parallel_run(params_list_no_tax)
     emissions_stock_tax_flat = emissions_parallel_run(params_list_tax)
@@ -244,5 +245,5 @@ if __name__ == '__main__':
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",
         scenarios = ["fixed_preferences","uniform_network_weighting", "static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ]
-)
+    )
 

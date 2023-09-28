@@ -174,7 +174,7 @@ def multi_stochstic_emissions_run(
         params_dict: list[dict]
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
-    #res = [generate_multi_output_individual_emissions_list(i) for i in params_dict]
+    res = [generate_multi_output_individual_emissions_list(i) for i in params_dict]
     emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
         delayed(generate_multi_output_individual_emissions_list)(i) for i in params_dict
     )

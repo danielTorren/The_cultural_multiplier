@@ -128,10 +128,6 @@ class Network:
 
         self.shuffle_agent_list()#partial shuffle of the list based on identity
 
-
-        #if self.alpha_change == "dynamic_socially_determined_weights":
-        #    self.weighting_matrix_list = [self.weighting_matrix]*self.M
-        
         if self.alpha_change == "static_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
@@ -366,7 +362,7 @@ class Network:
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
         #not sure if this stuff is corret tbh.
 
-        attribute_matrix =np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
+        attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
         """
         if self.ratio_preference_or_consumption == 1.0:
             attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
@@ -426,6 +422,7 @@ class Network:
         """
 
         if self.alpha_change == "dynamic_socially_determined_weights":
+            #print("updating socially")
             ego_influence = self.calc_ego_influence_degroot_independent()
         else:
             ego_influence = self.calc_ego_influence_degroot()           
@@ -690,8 +687,10 @@ class Network:
         # update network parameters for next step
         if self.alpha_change != "static_preferences":
             if self.alpha_change == "dynamic_culturally_determined_weights":
+                #print("updating culturally list")
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
+                #print("updating socially list")
                 self.weighting_matrix_list = self.update_weightings_list()
 
             self.social_component_matrix = self.calc_social_component_matrix()
