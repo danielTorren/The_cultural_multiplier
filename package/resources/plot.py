@@ -18,7 +18,6 @@ from typing import Union
 from package.model.network import Network
 from scipy.stats import beta
 import numpy.typing as npt
-import seaborn
 from pydlc import dense_lines
 
 ###########################################################

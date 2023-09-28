@@ -12,6 +12,7 @@ from package.resources.plot import (
 )
 from matplotlib.cm import get_cmap,rainbow
 import numpy as np
+
 def plot_end_points_emissions_scatter(
     fileName: str, Data_list, property_title, property_save, property_vals,dpi_save: int,latex_bool = False 
 ):
