@@ -176,10 +176,10 @@ class Network:
 
         self.welfare = self.calc_welfare()
 
-        if self.t == self.burn_in_duration:#in the case that we load in and there is no burn in period i want to calculate the emissions immedialty
-            self.total_carbon_emissions_flow = self.init_total_carbon_emissions
-            self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
-            self.set_up_time_series()
+        #if self.t == self.burn_in_duration:#in the case that we load in and there is no burn in period i want to calculate the emissions immedialty
+        #    self.total_carbon_emissions_flow = self.init_total_carbon_emissions
+        #    self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
+        #    self.set_up_time_series()
 
     def set_up_time_series(self):
         self.history_weighting_matrix = [self.weighting_matrix]
@@ -681,6 +681,9 @@ class Network:
         # advance a time step
         self.t += 1
 
+        if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
+            self.carbon_price = self.calc_carbon_price()#update price for next round
+        
         # execute step
         self.update_individuals()
 
@@ -707,7 +710,7 @@ class Network:
             #print("T more than burn in")
             self.total_carbon_emissions_flow = self.calc_total_emissions()
             self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
-            self.carbon_price = self.calc_carbon_price()#update price for next round
+            #self.carbon_price = self.calc_carbon_price()#update price for next round
             
         if self.save_timeseries_data:
             if self.t == self.burn_in_duration + 1:#want to create it the step after burn in is finished

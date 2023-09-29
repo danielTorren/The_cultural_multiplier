@@ -114,6 +114,83 @@ def plot_emissions_individuals(fileName, data, dpi_save):
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
+def plot_low_carbon_adoption_timeseries(fileName, data, emissions_threshold_list, dpi_save):
+
+    y_title = r"Low carbon emissions proportion"
+
+    fig, ax = plt.subplots(constrained_layout=True)
+
+    data_matrix = []
+    for v in range(data.N):
+        data_matrix.append(data.agent_list[v].history_flow_carbon_emissions)
+
+    N = data.N
+
+    data_matrix_trans = np.asarray(data_matrix).T
+
+    for emissions_threshold  in emissions_threshold_list:
+        adoption_time_series = [sum([1 if x < emissions_threshold else 0 for x in j])/N for j in data_matrix_trans]
+        #print("adoption_time_series",adoption_time_series)
+        ax.plot(data.history_time,adoption_time_series, label = r"$E_{Thres} = $" + str(emissions_threshold))
+
+    ax.set_ylabel(y_title)
+    ax.set_xlabel("Time")
+    ax.legend()
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/plot_low_carbon_adoption_timeserieds" + str(len(emissions_threshold_list))
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_low_carbon_adoption_transition_timeseries(fileName, data,emissions_threshold_range, dpi_save):
+
+    y_title = r"Low carbon emissions proportion"
+
+    fig, ax = plt.subplots(constrained_layout=True)
+
+    data_matrix = []
+    for v in range(data.N):
+        data_matrix.append(data.agent_list[v].history_flow_carbon_emissions)
+
+    N = data.N
+
+    data_matrix_trans = np.asarray(data_matrix).T
+
+    lowest_threshold = None
+    # Iterate through possible thresholds
+    for emissions_threshold in emissions_threshold_range:  # Adjust the range as needed
+        # Calculate the proportion of agents above the current threshold at the last timestep
+        last_timestep_proportion = np.mean(data_matrix_trans[-1, :] < emissions_threshold)
+
+        # Check if the proportion is 1 (all agents are below the threshold)
+        if last_timestep_proportion == 1:
+            lowest_threshold = emissions_threshold
+            break  # Stop iterating if the condition is met
+
+    # Check if a threshold was found
+    if lowest_threshold is not None:
+        print("Lowest emissions threshold:", lowest_threshold)
+        
+        lower = (lowest_threshold - 0.000001)
+        adoption_time_series = [sum([1 if x < lowest_threshold else 0 for x in j])/N for j in data_matrix_trans]
+        ax.plot(data.history_time,adoption_time_series, label = r"$E_{Thres} = $" + str(lowest_threshold))
+        adoption_time_series = [sum([1 if x < (lower) else 0 for x in j])/N for j in data_matrix_trans]
+        ax.plot(data.history_time,adoption_time_series, label = r"$E_{Thres} = $" + str(lower))
+    else:
+        print("No threshold found that meets the condition.")
+
+
+
+    ax.set_ylabel(y_title)
+    ax.set_xlabel("Time")
+    ax.legend()
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/plot_low_carbon_adoption_timeserieds"
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     PLOT_NAME = "INDIVIDUAL",
@@ -147,17 +224,21 @@ def main(
     else:
         plot_consumption(fileName, Data, dpi_save)
     """
-    plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
-    plot_emissions_individuals(fileName, Data, dpi_save)
-    plot_identity_timeseries(fileName, Data, dpi_save)
-    plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
-    plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
+    #plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
+    #plot_emissions_individuals(fileName, Data, dpi_save)
+    #plot_identity_timeseries(fileName, Data, dpi_save)
+    #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
+    #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
+    threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
+    emissions_threshold_range = np.arange(0,0.005,0.000001)
+    #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
+    plot_low_carbon_adoption_transition_timeseries(fileName, Data,emissions_threshold_range, dpi_save)
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_11_18_51__18_08_2023"
+        fileName = "results/single_experiment_13_57_18__29_09_2023"
     )
 
 
