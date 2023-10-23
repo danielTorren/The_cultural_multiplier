@@ -250,7 +250,7 @@ class Network:
             a networkx watts strogatz small world graph
         """
 
-        G = nx.watts_strogatz_graph(n=self.N, k=self.K, p=self.prob_rewire, seed=self.set_seed)
+        G = nx.watts_strogatz_graph(n=self.N, k=self.K, p=self.prob_rewire, seed=1)#FIX THE NETWORK STRUCTURE
 
         weighting_matrix = nx.to_numpy_array(G)
 
