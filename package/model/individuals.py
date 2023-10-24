@@ -67,7 +67,7 @@ class Individual:
         self.n_tilde_m = self.calc_n_tilde_m()
         
         if self.utility_function_state == "nested_CES":
-            self.service_substitutability = individual_params["service_substitutability"]
+            #self.service_substitutability = individual_params["service_substitutability"]
             self.chi_m = self.calc_chi_m_nested_CES()
             self.H_m, self.L_m = self.calc_consumption_quantities_nested_CES()
             self.utility = self.calc_utility_nested_CES()
@@ -170,8 +170,9 @@ class Individual:
         if self.M == 1:
             U = psuedo_utility
         else:
-            U = (sum(self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))))**(self.service_preferences/(self.service_preferences-1))
-        
+            interal_components_utility = self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))
+            sum_utility = sum(interal_components_utility)
+            U = sum_utility**(self.service_substitutability/(self.service_substitutability-1))
         return U
     
     def calc_utility_addilog_CES(self):

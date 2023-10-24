@@ -27,7 +27,8 @@ class Network:
             Dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters
 
         """
-        self.set_seed = parameters["set_seed"]        
+        self.set_seed = parameters["set_seed"]    
+        self.network_structure_seed = parameters["network_structure_seed"]    
         np.random.seed(self.set_seed)
         
         # network
@@ -120,8 +121,8 @@ class Network:
             self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
-        self.low_carbon_substitutability_array = np.asarray([3])
+        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        #self.low_carbon_substitutability_array = np.asarray([3])
         self.service_preferences = np.asarray([1/self.M]*self.M)
         
         self.agent_list = self.create_agent_list()
@@ -250,7 +251,7 @@ class Network:
             a networkx watts strogatz small world graph
         """
 
-        G = nx.watts_strogatz_graph(n=self.N, k=self.K, p=self.prob_rewire, seed=1)#FIX THE NETWORK STRUCTURE
+        G = nx.watts_strogatz_graph(n=self.N, k=self.K, p=self.prob_rewire, seed=self.network_structure_seed)#FIX THE NETWORK STRUCTURE
 
         weighting_matrix = nx.to_numpy_array(G)
 

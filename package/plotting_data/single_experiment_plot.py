@@ -7,9 +7,12 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 from matplotlib.cm import get_cmap
 import numpy as np
+from matplotlib.animation import FuncAnimation
 from package.resources.utility import ( 
     load_object,
 )
+import pandas as pd
+import seaborn as sns
 from package.resources.plot import (
     plot_identity_timeseries,
     plot_value_timeseries,
@@ -169,7 +172,7 @@ def plot_low_carbon_adoption_transition_timeseries(fileName, data,emissions_thre
 
     # Check if a threshold was found
     if lowest_threshold is not None:
-        print("Lowest emissions threshold:", lowest_threshold)
+        #print("Lowest emissions threshold:", lowest_threshold)
         
         lower = (lowest_threshold - 0.000001)
         adoption_time_series = [sum([1 if x < lowest_threshold else 0 for x in j])/N for j in data_matrix_trans]
@@ -191,20 +194,227 @@ def plot_low_carbon_adoption_transition_timeseries(fileName, data,emissions_thre
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
 
+
+"""
+def pde_value_snapshot(fileName, data_sim,property_plot,, snapsdpi_save):
+
+    time_series = data_sim.history_time
+    data_list = []  
+    
+    for v in range(data_sim.N):
+            data_list.append(np.asarray(data_sim.agent_list[v].property_plot))
+
+    data_df = 
+    data = pd.DataFrame({
+        'Time': time_series,  # Your time points
+        'Distribution': data_df,  # Your distribution vectors
+    })
+
+    for index, row in data.iterrows():
+        sns.kdeplot(row['Distribution'], label=f'Time {row['Time']}')
+
+    # You can add labels and titles to your plot
+    plt.xlabel('Values')
+    plt.ylabel('Density')
+    plt.title('Distribution Over Time')
+
+    # Add a legend to distinguish the different time points
+plt.legend()
+
+    f = plotName + "/plot_low_carbon_adoption_timeserieds"
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+"""
+
+def variable_animation_distribution(fileName, data_sim,property_plot,x_axis_label, dpi_save):
+
+    time_series = data_sim.history_time
+    data_list = []  
+    for v in range(data_sim.N):
+        data_list.append(np.asarray(eval("data_sim.agent_list[v].%s" % property_plot)))
+    
+    data_matrix = np.asarray(data_list)
+    data_matrix_T = data_matrix.T
+    data_list_list = data_matrix_T.tolist()
+
+    # Example data
+    data = pd.DataFrame({
+        'Time': time_series,
+        'Distribution': data_list_list
+    })
+
+    # Create a figure and axis for the animation
+    fig, ax = plt.subplots(figsize=(8, 5))
+    fig.suptitle("Animation: " + property_plot)
+    sns.set_style("whitegrid")
+
+    # Set up the initial KDE plot
+    initial_kde = sns.kdeplot(data['Distribution'].iloc[0], color='b', label=f"Time {data['Time'].iloc[0]}")
+    ax.set_xlabel('Values')
+    ax.set_ylabel('Density')
+    ax.set_title(f"Distribution Over Time - Time {data['Time'].iloc[0]}")
+    ax.legend(loc='upper right')
+
+    # Define the update function to animate the KDE plot
+    def update(frame):
+        ax.clear()
+        kde = sns.kdeplot(data['Distribution'].iloc[frame], color='b', label=f"Time {data['Time'].iloc[frame]}")
+        ax.set_xlabel(x_axis_label)
+        ax.set_ylabel('Density')
+        ax.set_title(f"Distribution Over Time - Time {data['Time'].iloc[frame]}")
+        ax.legend(loc='upper right')
+
+    # Create the animation
+    animation = FuncAnimation(fig, update, frames=len(data), repeat=False)
+    return animation
+
+def fixed_animation_distribution(fileName, data_sim,property_plot,x_axis_label, direction, dpi_save,save_bool):
+
+    time_series = data_sim.history_time
+    data_list = []  
+    for v in range(data_sim.N):
+        data_list.append(np.asarray(eval("data_sim.agent_list[v].%s" % property_plot)))
+    
+    data_matrix = np.asarray(data_list)
+
+    min_lim = np.min(data_matrix)
+    max_lim = np.max(data_matrix)
+
+    data_matrix_T = data_matrix.T
+    data_list_list = data_matrix_T.tolist()
+
+    # Example data
+    data = pd.DataFrame({
+        'Time': time_series,
+        'Distribution': data_list_list
+    })
+
+    # Create a figure and axis for the animation
+    fig, ax = plt.subplots(figsize=(8, 5))
+    sns.set_style("whitegrid")
+
+
+    # Set up the initial KDE plot
+    if direction == "y":
+        initial_kde = sns.kdeplot(y = data['Distribution'].iloc[0], color='b', label=f"Time {data['Time'].iloc[0]}")
+        ax.set_ylabel(x_axis_label)
+        ax.set_xlabel('Density')
+        ax.set_ylim(min_lim,max_lim)
+    else:
+        initial_kde = sns.kdeplot(x = data['Distribution'].iloc[0], color='b', label=f"Time {data['Time'].iloc[0]}")
+        ax.set_xlabel(x_axis_label)
+        ax.set_ylabel('Density')
+        ax.set_xlim(min_lim,max_lim)
+    #ax.set_title(f"Distribution Over Time - Time {data['Time'].iloc[0]}")
+    ax.legend(loc='upper right')
+
+    # Define the update function to animate the KDE plot
+    def update(frame):
+        ax.clear()
+        if direction == "y":
+            kde = sns.kdeplot(y=data['Distribution'].iloc[frame], color='b', label=f"Time {data['Time'].iloc[frame]}/{time_series[-1]}")
+            ax.set_ylabel(x_axis_label)
+            ax.set_ylim(min_lim,max_lim)
+            ax.set_xlabel('Density')
+        else:
+            kde = sns.kdeplot(x=data['Distribution'].iloc[frame], color='b', label=f"Time {data['Time'].iloc[frame]}/{time_series[-1]}")
+            ax.set_xlabel(x_axis_label)
+            ax.set_xlim(min_lim,max_lim)
+            ax.set_ylabel('Density')
+        #ax.set_title(f"Distribution Over Time - Time {data['Time'].iloc[frame]}")
+        ax.legend(loc='upper right')
+
+    # Create the animation
+    animation = FuncAnimation(fig, update, frames=len(data), repeat_delay=100,interval=0.01)
+    return animation
+
+def multi_col_fixed_animation_distribution(fileName, data_sim,property_plot,x_axis_label, direction, dpi_save,save_bool):
+
+    time_series = data_sim.history_time
+    data_list = []  
+    for v in range(data_sim.N):
+        data_list.append(np.asarray(eval("data_sim.agent_list[v].%s" % property_plot)))
+    
+    data_matrix = np.asarray(data_list)#[N, T, M]
+
+    reshaped_array = np.transpose(data_matrix, (2, 1, 0))#[M, T, N] SO COOL THAT YOU CAN SPECIFY REORDING WITH TRANSPOSE!
+
+    min_lim = np.min(data_matrix)
+    max_lim = np.max(data_matrix)
+
+    #data_matrix_T = data_matrix.T
+    #data_list_list = data_matrix_T.tolist()
+
+    # Create a figure and axis for the animation
+    fig, ax = plt.subplots(figsize=(8, 5))
+    sns.set_style("whitegrid")
+
+    data_pd_list = []
+    for data_matrix_T in reshaped_array:
+        # Example data
+        data = pd.DataFrame({
+            'Time': time_series,
+            'Distribution': data_matrix_T.tolist()
+        })
+        data_pd_list.append(data)
+
+    # Set up the initial KDE plot
+    if direction == "y":
+        for i,data in enumerate(data_pd_list):
+            initial_kde = sns.kdeplot(y = data['Distribution'].iloc[0], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
+        ax.set_ylabel(x_axis_label)
+        ax.set_xlabel('Density')
+        ax.set_ylim(min_lim,max_lim)
+    else:
+        for i,data in enumerate(data_pd_list):
+            initial_kde = sns.kdeplot(x = data['Distribution'].iloc[0], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))#color='b'
+        ax.set_xlabel(x_axis_label)
+        ax.set_ylabel('Density')
+        ax.set_xlim(min_lim,max_lim)
+    #ax.set_title(f"Distribution Over Time - Time {data['Time'].iloc[0]}")
+    ax.legend(loc='upper left')
+    ax.set_title(f"Steps: {data['Time'].iloc[0]}/{time_series[-1]}")
+
+    # Define the update function to animate the KDE plot
+    def update(frame):
+        ax.clear()
+        if direction == "y":
+            for i,data in enumerate(data_pd_list):
+                kde = sns.kdeplot(y=data['Distribution'].iloc[frame], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
+            ax.set_ylabel(x_axis_label)
+            ax.set_ylim(min_lim,max_lim)
+            ax.set_xlabel('Density')
+        else:
+            for i,data in enumerate(data_pd_list):
+                kde = sns.kdeplot(x=data['Distribution'].iloc[frame], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
+            ax.set_xlabel(x_axis_label)
+            ax.set_xlim(min_lim,max_lim)
+            ax.set_ylabel('Density')
+        ax.set_title(f"Steps: {data['Time'].iloc[frame]}/{time_series[-1]}")
+        #ax.set_title(f"Distribution Over Time - Time {data['Time'].iloc[frame]}")
+        ax.legend(loc='upper left')
+
+    # Create the animation
+    animation = FuncAnimation(fig, update, frames=len(data_pd_list[0]), repeat_delay=100,interval=0.01)
+
+    if save_bool:
+        # save the video
+        animateName = fileName + "/Animations"
+        f = (
+            animateName
+            + "/live_animate_identity_network_weighting_matrix.mp4"
+        )
+        # print("f", f)
+        writervideo = animation.FFMpegWriter(fps=60)
+        animation.save(f, writer=writervideo)
+    
+    return animation
+
+
+
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
-    PLOT_NAME = "INDIVIDUAL",
-    node_size = 50,
-    fps = 5,
-    interval = 50,
-    layout = "circular",
-    round_dec = 3,
-    dpi_save = 2000,
-    no_samples = 10000,
-    bandwidth = 0.01,
-    shuffle_colours = True,
-    animation_save_bool = 0,
-    latex_bool = 0
+    dpi_save = 600,
     ) -> None: 
 
     cmap_multi = get_cmap("plasma")
@@ -217,6 +427,7 @@ def main(
 
     Data = load_object(fileName + "/Data", "social_network")
 
+    anim_save_bool = False#Need to install the saving thing
     ###PLOTS
     """
     if Data.burn_in_duration == 0:
@@ -227,18 +438,28 @@ def main(
     #plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
     #plot_emissions_individuals(fileName, Data, dpi_save)
     #plot_identity_timeseries(fileName, Data, dpi_save)
-    #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
-    #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save,latex_bool = latex_bool)
-    threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
-    emissions_threshold_range = np.arange(0,0.005,0.000001)
+    #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
+    #emissions_threshold_range = np.arange(0,0.005,0.000001)
     #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
-    plot_low_carbon_adoption_transition_timeseries(fileName, Data,emissions_threshold_range, dpi_save)
+    #plot_low_carbon_adoption_transition_timeseries(fileName, Data,emissions_threshold_range, dpi_save)
+    
+    #anim_1 = variable_animation_distribution(fileName, Data, "history_identity","Identity", dpi_save,anim_save_bool)
+    #anim_2 = varaible_animation_distribution(fileName, Data, "history_flow_carbon_emissions","Individual emissions" , dpi_save,anim_save_bool)
+
+    #anim_3 = fixed_animation_distribution(fileName, Data, "history_identity","Identity","y", dpi_save,anim_save_bool,anim_save_bool)
+    #anim_4 = fixed_animation_distribution(fileName, Data, "history_flow_carbon_emissions","Individual emissions","y",dpi_save,anim_save_bool)
+    #anim_5 = fixed_animation_distribution(fileName, Data, "history_utility","Utility","y",dpi_save,anim_save_bool)
+    
+    anim_4 = multi_col_fixed_animation_distribution(fileName, Data, "history_low_carbon_preferences","Low carbon Preferences","y", dpi_save,anim_save_bool)
+
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_13_57_18__29_09_2023"
+        fileName = "results/single_experiment_10_17_46__24_10_2023"
     )
 
 
