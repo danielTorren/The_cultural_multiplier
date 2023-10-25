@@ -25,7 +25,7 @@
     "lambda_m_upper": 10,
     "a_identity": 1,
     "b_identity": 1,
-    "var_low_carbon_preference": 0.03,
+    "std_low_carbon_preference": 0.03,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "flat"

@@ -101,7 +101,7 @@ class Network:
         if self.heterogenous_preferences == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
-            self.var_low_carbon_preference = parameters["var_low_carbon_preference"]
+            self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
             (
                 self.low_carbon_preference_matrix_init
             ) = self.generate_init_data_preferences()
@@ -296,7 +296,7 @@ class Network:
 
         indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
 
-        preferences_uncapped = np.asarray([np.random.normal(identity,self.var_low_carbon_preference, size=self.M) for identity in  indentities_beta])
+        preferences_uncapped = np.asarray([np.random.normal(identity,self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
 
         low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
 

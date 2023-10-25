@@ -67,7 +67,7 @@ if __name__ == '__main__':
     "low_carbon_substitutability_upper":5,
     "a_identity": 1,
     "b_identity": 1,
-    "var_low_carbon_preference": 0.05,
+    "std_low_carbon_preference": 0.05,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "lambda_m_lower": 1.1,

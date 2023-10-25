@@ -1,8 +1,0 @@
-{
-    "property_varied" : "var_low_carbon_preference",
-    "property_min" : 0,
-    "property_max" : 1,
-    "property_reps": 5,
-    "property_varied_title" : "var_low_carbon_preference",
-    "property_divisions": "linear"
-}

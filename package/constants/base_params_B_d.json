@@ -22,7 +22,7 @@
     "low_carbon_substitutability_upper":5,
     "a_identity": 2,
     "b_identity": 2,
-    "var_low_carbon_preference": 0.03,
+    "std_low_carbon_preference": 0.03,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "linear",
