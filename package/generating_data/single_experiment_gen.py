@@ -14,6 +14,7 @@ from package.resources.utility import (
     save_object, 
     produce_name_datetime
 )
+from package.plotting_data import single_experiment_plot
 import pyperclip
 
 def main(
@@ -22,6 +23,7 @@ def main(
 
     root = "single_experiment"
     fileName = produce_name_datetime(root)
+    pyperclip.copy(fileName)
     print("fileName:", fileName)
 
     Data = generate_data(base_params)  # run the simulation
@@ -46,30 +48,34 @@ if __name__ == '__main__':
     "compression_factor":10,
     "carbon_tax_implementation": "flat", 
     "ratio_preference_or_consumption_identity": 1.0,
-    "ratio_preference_or_consumption": 1.0,
-    "set_seed": 3,
+    "ratio_preference_or_consumption": 0.0,
+    "set_seed": 10,
     "network_structure_seed": 1,
     "carbon_price_duration": 2000,
     "burn_in_duration": 0,
     "N": 200,
-    "M": 3,
-    "phi": 0.01,
+    "M": 10,
+    "phi": 0.025,
     "network_density": 0.1,
     "prob_rewire": 0.1,
     "learning_error_scale": 0.02,
     "homophily": 0.95,
-    "confirmation_bias": 20,
+    "confirmation_bias": 10,
     "carbon_price_increased": 0.5,
     "service_substitutability": 1.5,
     "low_carbon_substitutability_lower":2,
     "low_carbon_substitutability_upper":5,
     "a_identity": 1,
     "b_identity": 1,
-    "var_low_carbon_preference": 0.1,
+    "var_low_carbon_preference": 0.05,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "lambda_m_lower": 1.1,
     "lambda_m_upper": 10
 }
     fileName = main(base_params=base_params)
-    pyperclip.copy(fileName)
+
+    RUN_PLOT = 1
+
+    if RUN_PLOT:
+        single_experiment_plot.main(fileName = fileName)

@@ -435,11 +435,11 @@ def main(
     else:
         plot_consumption(fileName, Data, dpi_save)
     """
-    #plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
-    #plot_emissions_individuals(fileName, Data, dpi_save)
-    #plot_identity_timeseries(fileName, Data, dpi_save)
-    #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
-    #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
+    plot_emissions_individuals(fileName, Data, dpi_save)
+    plot_identity_timeseries(fileName, Data, dpi_save)
+    plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
     #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
     #emissions_threshold_range = np.arange(0,0.005,0.000001)
     #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
@@ -452,14 +452,15 @@ def main(
     #anim_4 = fixed_animation_distribution(fileName, Data, "history_flow_carbon_emissions","Individual emissions","y",dpi_save,anim_save_bool)
     #anim_5 = fixed_animation_distribution(fileName, Data, "history_utility","Utility","y",dpi_save,anim_save_bool)
     
-    anim_4 = multi_col_fixed_animation_distribution(fileName, Data, "history_low_carbon_preferences","Low carbon Preferences","y", dpi_save,anim_save_bool)
+    #VECTORS
+    #anim_4 = multi_col_fixed_animation_distribution(fileName, Data, "history_low_carbon_preferences","Low carbon Preferences","y", dpi_save,anim_save_bool)
 
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_10_17_46__24_10_2023"
+        fileName = "results/single_experiment_12_39_44__25_10_2023"
     )
 
 

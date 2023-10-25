@@ -12,8 +12,8 @@ Created: 10/10/2022
 import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import multi_emissions_stock, multi_emissions_stock_ineq
-from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
+from package.resources.run import multi_emissions_stock, multi_emissions_stock_ineq,parallel_run
+from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic,produce_param_list
 from package.generating_data.twoD_param_sweep_gen import generate_vals_variable_parameters_and_norms
 
 def generate_vals(variable_parameters_dict):
@@ -35,10 +35,7 @@ def main(
     var_params = json.load(f_var) 
 
     property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
-    property_min = var_params["property_min"]#0,
-    property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,
-    property_varied_title = var_params["property_varied_title"]# #"A to Omega ratio"
 
     property_values_list = generate_vals(
         var_params
@@ -52,32 +49,39 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
-    params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+    
+    createFolder(fileName)
 
     if RUN_TYPE == 1:
+        #looking at inequality
+        params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
         emissions_stock_array, gini_list = multi_emissions_stock_ineq(params_list)
         emissions_array= emissions_stock_array.reshape(property_reps, params["seed_reps"])
         gini_array= gini_list.reshape(property_reps, params["seed_reps"])
+        save_object(gini_array, fileName + "/Data", "gini_array")
+        save_object(emissions_array, fileName + "/Data", "emissions_array")
+
+    if RUN_TYPE == 5:
+        # look at splitting of the last behaviour with preference dissonance
+        params_list = produce_param_list(params, property_values_list, property_varied)
+        data_list = parallel_run(params_list)
+        save_object(data_list, fileName + "/Data", "data_list")
     else:
+        params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
         emissions_stock_array = multi_emissions_stock(params_list)
         emissions_array= emissions_stock_array.reshape(property_reps, params["seed_reps"])
-
-    createFolder(fileName)
-
-    save_object(emissions_array, fileName + "/Data", "emissions_array")
+        save_object(emissions_array, fileName + "/Data", "emissions_array")
+    
     save_object(params, fileName + "/Data", "base_params")
-    save_object(property_varied, fileName + "/Data", "property_varied")
-    save_object(property_varied_title, fileName + "/Data", "property_varied_title")
-    save_object(property_values_list, fileName + "/Data", "property_values_list")
-    if RUN_TYPE == 1:
-        save_object(gini_array, fileName + "/Data", "gini_array")
+    save_object(var_params,fileName + "/Data" , "var_params")
+    save_object(property_values_list,fileName + "/Data", "property_values_list")
 
     return fileName
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_d.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_d.json",
-        RUN_TYPE = 0
+        BASE_PARAMS_LOAD = "package/constants/base_params_5.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_5.json",
+        RUN_TYPE = 5
 )
 
