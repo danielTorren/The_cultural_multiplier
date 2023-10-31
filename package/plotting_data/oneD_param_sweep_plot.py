@@ -247,9 +247,9 @@ def main(
     if PLOT_TYPE == 5:
         # look at splitting of the last behaviour with preference dissonance
         #property_varied_title = "$\sigma_A$"
-        #plot_stacked_preferences(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        plot_stacked_preferences(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         anim_save_bool = False
-        multi_data_and_col_fixed_animation_distribution(fileName, data_list, "history_low_carbon_preferences","Low carbon Preferences","y", property_varied_title,property_values_list,dpi_save,anim_save_bool)
+        #multi_data_and_col_fixed_animation_distribution(fileName, data_list, "history_low_carbon_preferences","Low carbon Preferences","y", property_varied_title,property_values_list,dpi_save,anim_save_bool)
         #DONT PUT ANYTHING MORE PLOTS AFTER HERE DUE TO ANIMATION 
     else:
         plot_end_points_emissions(fileName, emissions_array, property_varied_title, property_varied, property_values_list, dpi_save)
@@ -258,7 +258,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/one_param_sweep_multi_15_04_34__25_10_2023",
+        fileName= "results/one_param_sweep_multi_22_27_08__25_10_2023",
         PLOT_TYPE = 5
     )
 

@@ -57,14 +57,12 @@ class Individual:
             self.lambda_m = individual_params["lambda_m"]
             self.init_vals_H = (self.instant_budget/self.M)*0.5 #assume initially its uniformaly spread
 
-        self.psi_m = (self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array
-
         self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
 
         self.id = id_n
 
         self.Omega_m = self.calc_Omega_m()
-        self.n_tilde_m = self.calc_n_tilde_m()
+       
         
         if self.utility_function_state == "nested_CES":
             #self.service_substitutability = individual_params["service_substitutability"]
@@ -72,6 +70,7 @@ class Individual:
             self.H_m, self.L_m = self.calc_consumption_quantities_nested_CES()
             self.utility = self.calc_utility_nested_CES()
         elif self.utility_function_state == "addilog_CES":
+            self.n_tilde_m = self.calc_n_tilde_m()
             self.chi_m = self.calc_chi_m_addilog_CES()
             self.H_m, self.L_m = self.calc_consumption_quantities_addilog_CES()
             self.utility = self.calc_utility_addilog_CES()
@@ -96,53 +95,40 @@ class Individual:
         self.history_H_m = [self.H_m]
         self.history_L_m = [self.L_m]
 
+    #############################################
+    #ADDILOG
     def func_jacobian(self, x, chi_0, psi_0, lambda_0):
-        term_1 = (chi_0 / self.chi_m)**(1 / (self.psi_m - self.lambda_m))
+        term_1 = (chi_0 / self.chi_m)**(1 / (((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array) - self.lambda_m))
         term_2 = self.prices_high_carbon_instant + self.prices_low_carbon*self.Omega_m
-        term_3 = (psi_0 - lambda_0) / (self.psi_m - self.lambda_m)
+        term_3 = (psi_0 - lambda_0) / (((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array) - self.lambda_m)
 
         jacobian = np.sum(term_1 * term_2 * term_3 * (x**(term_3 - 1)))
 
         return jacobian
 
     def func_to_solve(self, x, chi_0, psi_0, lambda_0):
-        term_1 = (chi_0/self.chi_m)**(1/(self.psi_m - self.lambda_m))
+        term_1 = (chi_0/self.chi_m)**(1/(((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array) - self.lambda_m))
         term_2 = self.prices_high_carbon_instant + self.prices_low_carbon*self.Omega_m
 
-        f = np.sum(term_1*term_2*(x**((psi_0 - lambda_0)/(self.psi_m - self.lambda_m)))) - self.instant_budget
+        f = np.sum(term_1*term_2*(x**((psi_0 - lambda_0)/(((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array) - self.lambda_m)))) - self.instant_budget
 
         return f
 
-    def calc_chi_m_nested_CES(self):
-        chi_m = ((self.service_preferences/self.prices_high_carbon_instant)**(self.service_substitutability))*(self.n_tilde_m**(self.service_substitutability-1))
-        return chi_m
-    
     def calc_chi_m_addilog_CES(self):
         chi_m = (self.service_preferences*self.n_tilde_m**(1-self.lambda_m))/self.prices_high_carbon_instant
         return chi_m
     
-    def calc_n_tilde_m(self):
-        n_tilde_m = (self.low_carbon_preferences*(self.Omega_m**self.psi_m)+(1-self.low_carbon_preferences))**(1/self.psi_m)
-        return n_tilde_m
     
-    def calc_Omega_m(self):       
-        #print("self.low_carbon_substitutability_array",self.low_carbon_substitutability_array) 
-        #print("self.prices_high_carbon_instant*self.low_carbon_preferences",self.prices_high_carbon_instant,self.low_carbon_preferences)
-        term_1 = (self.prices_high_carbon_instant*self.low_carbon_preferences)
-        term_2 = (self.prices_low_carbon*(1- self.low_carbon_preferences))
-        omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
-        return omega_vector
-
     def calc_other_H(self, H_0, chi_0, psi_0, lambda_0):
-        H = ((chi_0/self.chi_m)**(1/(self.psi_m - self.lambda_m)))*((H_0)**((psi_0 - lambda_0)/(self.psi_m - self.lambda_m)))
+        H = ((chi_0/self.chi_m)**(1/(((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array) - self.lambda_m)))*((H_0)**((psi_0 - lambda_0)/(((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array) - self.lambda_m)))
         return H
     
     def calc_consumption_quantities_addilog_CES(self):
-        root = least_squares(self.func_to_solve, x0=self.init_vals_H, jac=self.func_jacobian, bounds = (0, np.inf), args = (self.chi_m[0], self.psi_m[0], self.lambda_m[0]))
+        root = least_squares(self.func_to_solve, x0=self.init_vals_H, jac=self.func_jacobian, bounds = (0, np.inf), args = (self.chi_m[0], ((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)[0], self.lambda_m[0]))
 
         H_0 = root["x"][0]
 
-        H_m = self.calc_other_H(H_0,self.chi_m[0], self.psi_m[0], self.lambda_m[0])
+        H_m = self.calc_other_H(H_0,self.chi_m[0], ((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)[0], self.lambda_m[0])
         L_m = self.Omega_m*H_m
 
         ###NOT SURE I NEED THE LINE BELOW
@@ -151,10 +137,27 @@ class Individual:
 
         return H_m_clipped,L_m_clipped
     
+    def calc_utility_addilog_CES(self):
+        term = (self.service_preferences * ((self.H_m * self.n_tilde_m) ** (1 - self.lambda_m))) / (1 - self.lambda_m)
+        U = np.sum(term)
+        return U
+    
+    def calc_n_tilde_m(self):
+        n_tilde_m = (self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array))+(1-self.low_carbon_preferences))**(1/((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array))
+        return n_tilde_m
+    
+    #####################################################################################
+    #NESTED CES
+    
+    def calc_chi_m_nested_CES(self):
+        first_term = ((self.service_preferences/self.prices_high_carbon_instant)**(self.service_substitutability))
+        second_term = (self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1-self.low_carbon_preferences)  )**((self.service_substitutability-1)*self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+        chi_m = first_term*second_term
+        return chi_m
+    
     def calc_consumption_quantities_nested_CES(self):
         common_vector_denominator = self.Omega_m*self.prices_low_carbon + self.prices_high_carbon_instant
-
-        H_m_denominators = np.matmul(self.chi_m, common_vector_denominator)
+        H_m_denominators = np.matmul(self.chi_m, common_vector_denominator)#THIS TERM IS COMMON AMONGT ALL THE Hs
 
         H_m = self.instant_budget*self.chi_m/H_m_denominators
         L_m = H_m*self.Omega_m
@@ -167,6 +170,7 @@ class Individual:
     
     def calc_utility_nested_CES(self):
         psuedo_utility = (self.low_carbon_preferences*(self.L_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1 - self.low_carbon_preferences)*(self.H_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+
         if self.M == 1:
             U = psuedo_utility
         else:
@@ -175,21 +179,14 @@ class Individual:
             U = sum_utility**(self.service_substitutability/(self.service_substitutability-1))
         return U
     
-    def calc_utility_addilog_CES(self):
-        term = (self.service_preferences * ((self.H_m * self.n_tilde_m) ** (1 - self.lambda_m))) / (1 - self.lambda_m)
-        U = np.sum(term)
-        return U
+    ###########################################################################
+    #SHARED   
     
-    def calc_identity(self) -> float:
-        if self.ratio_preference_or_consumption_identity == 1.0:
-            identity = np.mean(self.low_carbon_preferences)
-        elif self.ratio_preference_or_consumption_identity == 0.0:
-            identity = np.mean(self.consumption_ratio)
-        elif self.ratio_preference_or_consumption_identity > 0.0 and self.ratio_preference_or_consumption_identity < 1.0:
-            identity = self.ratio_preference_or_consumption_identity*np.mean(self.low_carbon_preferences) + (1-self.ratio_preference_or_consumption_identity)*np.mean(self.consumption_ratio)
-        else:
-            raise("Invalid ratio_preference_or_consumption_identity = [0,1]", self.ratio_preference_or_consumption_identity)
-        return identity
+    def calc_Omega_m(self):       
+        term_1 = (self.prices_high_carbon_instant*self.low_carbon_preferences)
+        term_2 = (self.prices_low_carbon*(1- self.low_carbon_preferences))
+        omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
+        return omega_vector
 
     def update_preferences(self, social_component):
         if self.static_internal_A_state:
@@ -201,6 +198,17 @@ class Individual:
         ###NOT SURE I NEED THE LINE BELOW
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
         #self.low_carbon_preferences = low_carbon_preferences
+
+    def calc_identity(self) -> float:
+        if self.ratio_preference_or_consumption_identity == 1.0:
+            identity = np.mean(self.low_carbon_preferences)
+        elif self.ratio_preference_or_consumption_identity == 0.0:
+            identity = np.mean(self.consumption_ratio)
+        elif self.ratio_preference_or_consumption_identity > 0.0 and self.ratio_preference_or_consumption_identity < 1.0:
+            identity = self.ratio_preference_or_consumption_identity*np.mean(self.low_carbon_preferences) + (1-self.ratio_preference_or_consumption_identity)*np.mean(self.consumption_ratio)
+        else:
+            raise("Invalid ratio_preference_or_consumption_identity = [0,1]", self.ratio_preference_or_consumption_identity)
+        return identity
 
     def calc_total_emissions(self):      
         return sum(self.H_m)
@@ -247,14 +255,14 @@ class Individual:
             self.update_preferences(social_component)
         
         self.Omega_m = self.calc_Omega_m()
-        self.n_tilde_m = self.calc_n_tilde_m()
-
+    
         #calculate consumption
         if self.utility_function_state == "nested_CES":
             self.chi_m = self.calc_chi_m_nested_CES()
             self.H_m, self.L_m = self.calc_consumption_quantities_nested_CES()
             self.utility = self.calc_utility_nested_CES()
         elif self.utility_function_state == "addilog_CES":
+            self.n_tilde_m = self.calc_n_tilde_m()
             self.chi_m = self.calc_chi_m_addilog_CES()
             self.H_m, self.L_m = self.calc_consumption_quantities_addilog_CES()
             self.init_vals_H = self.H_m[0]

@@ -1,0 +1,8 @@
+{
+    "property_varied" : "set_seed",
+    "property_min" : 1,
+    "property_max" : 200,
+    "property_reps": 150,
+    "property_varied_title" : "Seed",
+    "property_divisions": "linear"
+}

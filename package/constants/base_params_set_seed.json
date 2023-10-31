@@ -11,7 +11,6 @@
     "carbon_tax_implementation": "flat", 
     "ratio_preference_or_consumption_identity": 1.0,
     "ratio_preference_or_consumption": 0.0,
-    "set_seed": 3,
     "network_structure_seed": 1,
     "carbon_price_duration": 2000,
     "burn_in_duration": 0,
@@ -23,14 +22,15 @@
     "learning_error_scale": 0.0,
     "homophily": 0.95,
     "carbon_price_increased": 0,
-    "service_substitutability": 8,
+    "service_substitutability": 10,
     "low_carbon_substitutability_lower":1.1,
-    "low_carbon_substitutability_upper":1.2,
+    "low_carbon_substitutability_upper":5,
     "a_identity": 3,
     "b_identity": 3,
     "init_carbon_price": 0,
     "clipping_epsilon": 1e-4,
     "lambda_m_lower": 1.1,
     "lambda_m_upper": 10,
-    "std_low_carbon_preference":0.0
+    "std_low_carbon_preference":0.0,
+    "confirmation_bias":0
 }

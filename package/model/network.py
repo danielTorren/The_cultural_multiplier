@@ -27,7 +27,7 @@ class Network:
             Dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters
 
         """
-        self.set_seed = parameters["set_seed"]    
+        self.set_seed = int(round(parameters["set_seed"]))
         self.network_structure_seed = parameters["network_structure_seed"]    
         np.random.seed(self.set_seed)
         

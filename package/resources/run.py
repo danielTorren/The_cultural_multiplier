@@ -161,6 +161,32 @@ def emissions_parallel_run(
         delayed(generate_emissions_stock_res)(i) for i in params_dict
     )
     return np.asarray(emissions_list)
+################################################################################
+#Bifurcation of preferences with 1d param vary
+def generate_preferences_res(params):
+    #get out the N by M matrix of final preferences
+    data = generate_data(params)
+
+    data_individual_preferences = []
+
+    for v in range(data.N):
+        data_individual_preferences.append(np.asarray(data.agent_list[v].low_carbon_preferences))
+
+    return np.asarray(data_individual_preferences)
+
+
+def preferences_parallel_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_emissions_stock_res(i) for i in params_dict]
+    preferences_array_list = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_preferences_res)(i) for i in params_dict
+    )
+    return np.asarray(preferences_array_list)#shaep is #of runs, N indiviuduals, M preferences
+
+##############################################################################
+
 
 def generate_multi_output_individual_emissions_list(params):
     emissions_list = []
