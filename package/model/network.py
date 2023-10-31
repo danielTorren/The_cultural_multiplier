@@ -29,7 +29,11 @@ class Network:
         """
         self.set_seed = int(round(parameters["set_seed"]))
         self.network_structure_seed = parameters["network_structure_seed"]    
-        np.random.seed(self.set_seed)
+        self.init_vals_seed = parameters["init_vals_seed"] 
+
+        #For inital construction set a seed, this is the same for all runs, then later change it to set_seed
+        np.random.seed(self.init_vals_seed)
+        
         
         # network
         self.network_density = parameters["network_density"]
@@ -128,6 +132,9 @@ class Network:
         self.agent_list = self.create_agent_list()
 
         self.shuffle_agent_list()#partial shuffle of the list based on identity
+
+        #NOW SET SEED FOR THE IMPERFECT LEARNING
+        np.random.seed(self.set_seed)
 
         if self.alpha_change == "static_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT

@@ -63,7 +63,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/one_param_sweep_multi_12_21_26__31_10_2023",
+        fileName= "results/bifur_one_param_sweep_15_28_59__31_10_2023",
         PLOT_TYPE = 1
     )
 
