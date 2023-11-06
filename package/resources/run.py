@@ -8,6 +8,7 @@ Created: 10/10/2022
 """
 
 # imports
+from gc import callbacks
 import time
 import numpy as np
 import numpy.typing as npt
@@ -423,3 +424,53 @@ def multi_target_emissions_load(
     tau_vals = [generate_target_tau_val_load(i,tau_guess) for i in models_matrix]
     #tau_vals = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_target_tau_val_load)(i,tau_guess) for i in models_matrix)
     return np.asarray(tau_vals)
+
+########################################################
+# Create a class to store the best_model
+class BestModelContainer:
+    def __init__(self):
+        self.best_model = None
+        self.termination_flag = False
+
+# Run model changing the carbon price to get to a target:
+def optimizing_tax_to_reach_emissions_target(model, tau_guess, stock_target_convergence):
+    # Initialize the BestModelContainer
+    best_model_container = BestModelContainer()
+
+    # Create a NonlinearConstraint for the positivity constraint
+    positivity_constraint = NonlinearConstraint(lambda x: constraint_return_model(x, model,best_model_container), lb=0, ub=np.inf)
+
+    def callback_func(xk,fun):
+        #print("xk,fun",xk,fun["fun"])
+        if abs(fun["fun"]) < stock_target_convergence: 
+            return True
+        else:
+            return False
+        
+    # Call minimize with the constraint and callback
+    result = minimize(calc_root_emissions_target_load_return_model, x0=tau_guess, args=(model,best_model_container), bounds=[(0, np.inf)], method='trust-constr', constraints=positivity_constraint, callback=callback_func)
+    #result = minimize(calc_root_emissions_target_load_return_model, x0=tau_guess, args=(model,best_model_container), bounds=[(0, np.inf)], method='trust-constr', callback=callback_func)
+    tau_val = result.x[0]
+
+    return best_model_container.best_model, tau_val
+
+# The rest of your functions remain the same
+
+def calc_root_emissions_target_load_return_model(x, model,best_model_container):
+    model_copy = deepcopy(model)
+    model_copy.carbon_price_increased = x[0]
+    model_copy_end = generate_data_load(model_copy)
+    root = model_copy_end.emissions_stock_target - model_copy_end.total_carbon_emissions_stock
+
+    if best_model_container.best_model is None or root < best_model_container.best_model['fun']:
+        result = {'x': x, 'fun': root, 'model': model}
+        best_model_container.best_model = deepcopy(result)
+
+    print("root checking, x",model_copy_end.emissions_stock_target, model_copy_end.total_carbon_emissions_stock, root, x)
+    
+    return root
+
+def constraint_return_model(x, model,best_model_container):
+    # Ensure that the function is positive at x
+    constraint = calc_root_emissions_target_load_return_model(x, model,best_model_container)
+    return constraint

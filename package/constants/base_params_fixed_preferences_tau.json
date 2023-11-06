@@ -1,0 +1,16 @@
+{
+    "carbon_tax_implementation": "flat", 
+    "carbon_price_duration": 2000,
+    "init_vals_seed": 2,
+    "seed_reps": 20,
+    "N": 20,
+    "M": 5,
+    "service_substitutability": 1.1,
+    "low_carbon_substitutability_lower":1.1,
+    "low_carbon_substitutability_upper":5,
+    "a_identity": 2,
+    "b_identity": 2,
+    "init_carbon_price": 0,
+    "clipping_epsilon": 1e-4,
+    "std_low_carbon_preference":0.01
+}
