@@ -122,7 +122,7 @@ class Network:
             self.gini = self.calc_gini(self.individual_budget_array)
         else:
             #Uniform budget
-            self.individual_budget_array =  np.asarray([1/self.N]*self.N)#sums to 1
+            self.individual_budget_array =  np.asarray([1/(self.N)]*self.N)#sums to 1
             #self.individual_budget_array =  np.asarray([1]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours

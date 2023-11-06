@@ -118,10 +118,10 @@ def main(
     save_object(property_values_list,fileName + "/Data", "property_values_list")
     save_object(results_reshaped,fileName + "/Data", "results")
 
-    return fileName
+    return fileName, results_reshaped
 
 if __name__ == '__main__':
-    fileName_Figure_1 = main(
+    fileName_Figure_1, results_reshaped = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_fixed_preferences_tau.json",#"package/constants/base_params_confirmation_bias.json",#"package/constants/base_params_std_low_carbon_preference.json"
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau.json",#"package/constants/oneD_dict_confirmation_bias.json",#"package/constants/oneD_dict_std_low_carbon_preference.json"
 )
