@@ -137,16 +137,21 @@ class Network:
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
 
+        #print("BEFORE",self.alpha_change)
         if self.alpha_change == "fixed_preferences":
+            #print("self.alpha",self.alpha_change)
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
-            if self.alpha_change == ("static_culturally_determined_weights" or "dynamic_culturally_determined_weights"):
+            if self.alpha_change in ("static_culturally_determined_weights","dynamic_culturally_determined_weights"):
+                #print("self.alpha",self.alpha_change)
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change == ("static_socially_determined_weights" or "dynamic_socially_determined_weights"):#independent behaviours
+            elif self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
+                #print("self.alpha",self.alpha_change)
                 self.weighting_matrix_list = self.update_weightings_list()
-
+            #print("update_done")
             self.social_component_matrix = self.calc_social_component_matrix()
 
+        #print("DONE")
         """
         if self.alpha_change == "fixed_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])

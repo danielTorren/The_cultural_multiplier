@@ -15,7 +15,7 @@ def scenario_emissions_no_tax(
     fileName, emissions, scenarios_titles, seed_reps
 ):
 
-    fig, ax = plt.subplots(figsize=(10,6),layout="constrained")
+    fig, ax = plt.subplots(figsize=(10,6),constrained_layout = True)
 
     data = emissions.T
     for i in range(len(data)):
@@ -34,7 +34,7 @@ def plot_scatter_end_points_emissions_scatter(
 ):
 
     #print(c,emissions_final)
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = plt.subplots(figsize=(10,6), constrained_layout = True)
     #print(len(emissions))
     colors = iter(rainbow(np.linspace(0, 1,len(emissions))))
 
@@ -60,7 +60,7 @@ def plot_means_end_points_emissions(
 ):
 
     #print(c,emissions_final)
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = plt.subplots(figsize=(10,6), constrained_layout = True)
 
     colors = iter(rainbow(np.linspace(0, 1, len(emissions))))
 
@@ -90,7 +90,7 @@ def plot_emissions_ratio_scatter(
 ):
 
     #print(c,emissions_final)
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = plt.subplots(figsize=(10,6), constrained_layout = True)
     colors = iter(rainbow(np.linspace(0, 1,len(emissions_no_tax))))
 
     for i in range(len(emissions_no_tax)):
@@ -122,7 +122,7 @@ def plot_emissions_ratio_line(
 ):
 
     #print(c,emissions_final)
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = plt.subplots(figsize=(10,6), constrained_layout = True)
     colors = iter(rainbow(np.linspace(0, 1,len(emissions_no_tax))))
 
     for i in range(len(emissions_no_tax)):
@@ -169,11 +169,13 @@ def main(
     scenarios = load_object(fileName + "/Data", "scenarios")
 
     print("scenarios",scenarios)
-    print("emissions_no_tax",emissions_no_tax)
-    print("emissions_tax",emissions_tax[4])
-    quit()
+    #print("emissions_no_tax",emissions_no_tax)
+    #quit()
+    print("emissions_tax",emissions_tax[1][0],emissions_tax[1][1])
+    print("emissions_tax",emissions_tax[2][0],emissions_tax[2][1])
 
-    print("base_params", base_params)
+    #quit()
+    #print("base_params", base_params)
 
     seed_reps = base_params["seed_reps"]
     
@@ -188,5 +190,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_19_13_20__06_11_2023",
+        fileName="results/tax_sweep_13_55_04__07_11_2023",
     )

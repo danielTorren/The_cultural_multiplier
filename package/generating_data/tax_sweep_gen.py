@@ -14,7 +14,7 @@ from copy import deepcopy
 import json
 import numpy as np
 from package.resources.utility import createFolder, produce_name_datetime, save_object
-from package.resources.run import emissions_parallel_run
+from package.resources.run import emissions_parallel_run, emissions_parallel_run_timeseries
 
 def generate_vals(variable_parameters_dict):
     if variable_parameters_dict["property_divisions"] == "linear":
@@ -154,7 +154,8 @@ def main(
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",
         print_simu = 1,
-        scenarios = ["fixed_preferences","uniform_network_weighting", "static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ]
+        scenarios = ["fixed_preferences","uniform_network_weighting", "static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
+        RUN_TYPE = 1
         ) -> str: 
 
     scenario_reps = len(scenarios)
@@ -214,12 +215,20 @@ def main(
     print("Total runs: ",len(params_list_tax) + len(params_list_no_tax))
     
     #RESULTS
-    emissions_stock_no_tax_flat = emissions_parallel_run(params_list_no_tax)
-    emissions_stock_tax_flat = emissions_parallel_run(params_list_tax)
+    if RUN_TYPE == 1:
+        emissions_stock_no_tax_flat = emissions_parallel_run(params_list_no_tax)
+        emissions_stock_tax_flat = emissions_parallel_run(params_list_tax)
 
-    #unpack_results into scenarios and seeds
-    emissions_stock_no_tax = emissions_stock_no_tax_flat.reshape(scenario_reps,params["seed_reps"])
-    emissions_stock_tax = emissions_stock_tax_flat.reshape(scenario_reps,property_reps,params["seed_reps"])
+        #unpack_results into scenarios and seeds
+        emissions_stock_no_tax = emissions_stock_no_tax_flat.reshape(scenario_reps,params["seed_reps"])
+        emissions_stock_tax = emissions_stock_tax_flat.reshape(scenario_reps,property_reps,params["seed_reps"])
+    elif RUN_TYPE == 2:
+        emissions_stock_no_tax_flat = emissions_parallel_run_timeseries(params_list_no_tax)
+        emissions_stock_tax_flat = emissions_parallel_run_timeseries(params_list_tax)
+
+        #unpack_results into scenarios and seeds
+        emissions_stock_no_tax = emissions_stock_no_tax_flat.reshape(scenario_reps,params["seed_reps"], params["carbon_price_duration"])
+        emissions_stock_tax = emissions_stock_tax_flat.reshape(scenario_reps,property_reps,params["seed_reps"], params["carbon_price_duration"])
 
     if print_simu:
         print(
@@ -239,13 +248,15 @@ def main(
     save_object(property_varied_title, fileName + "/Data", "property_varied_title")
     save_object(property_values_list, fileName + "/Data", "property_values_list")
     save_object(scenarios, fileName + "/Data", "scenarios")
+    save_object(RUN_TYPE,  fileName + "/Data", "RUN_TYPE")
 
     return fileName
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",
-        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ]
+        BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",#"package/constants/base_params_tau_vary_timeseries.json",#"package/constants/base_params_tau_vary.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",#"package/constants/oneD_dict_tau_vary_timeseries.json", #"package/constants/oneD_dict_tau_vary.json",
+        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
+        RUN_TYPE = 1
     )
 

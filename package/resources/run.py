@@ -157,11 +157,26 @@ def emissions_parallel_run(
         params_dict: list[dict]
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
-    #res = [generate_emissions_stock_res(i) for i in params_dict]
+    emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
+    #emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
+    #    delayed(generate_emissions_stock_res)(i) for i in params_dict
+    #)
+    return np.asarray(emissions_list)
+
+def generate_emissions_stock_res_timeseries(params):
+    data = generate_data(params)
+    return data.history_stock_carbon_emissions
+
+def emissions_parallel_run_timeseries(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #emissions_list = [generate_emissions_stock_res_timeseries(i) for i in params_dict]
     emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_emissions_stock_res)(i) for i in params_dict
+        delayed(generate_emissions_stock_res_timeseries)(i) for i in params_dict
     )
     return np.asarray(emissions_list)
+
 ################################################################################
 #Bifurcation of preferences with 1d param vary
 def generate_preferences_res(params):
