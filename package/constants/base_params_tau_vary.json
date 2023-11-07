@@ -7,7 +7,7 @@
     "utility_function_state": "nested_CES",
     "dividend_progressiveness":0,
     "compression_factor":10,
-    "carbon_tax_implementation": "flat", 
+    "carbon_tax_implementation": "linear", 
     "ratio_preference_or_consumption_identity": 1.0,
     "ratio_preference_or_consumption": 0.0,
     "network_structure_seed": 1,
