@@ -157,10 +157,10 @@ def emissions_parallel_run(
         params_dict: list[dict]
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
-    emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
-    #emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
-    #    delayed(generate_emissions_stock_res)(i) for i in params_dict
-    #)
+    #emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
+    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_emissions_stock_res)(i) for i in params_dict
+    )
     return np.asarray(emissions_list)
 
 def generate_emissions_stock_res_timeseries(params):
