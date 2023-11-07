@@ -162,9 +162,18 @@ def main(
         
     emissions_no_tax = load_object(fileName + "/Data","emissions_stock_no_tax")
     emissions_tax = load_object(fileName + "/Data","emissions_stock_tax")
+
+
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
     scenarios = load_object(fileName + "/Data", "scenarios")
+
+    print("scenarios",scenarios)
+    print("emissions_no_tax",emissions_no_tax)
+    print("emissions_tax",emissions_tax[4])
+    quit()
+
+    print("base_params", base_params)
 
     seed_reps = base_params["seed_reps"]
     
@@ -179,5 +188,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_19_02_15__06_11_2023",
+        fileName="results/tax_sweep_19_13_20__06_11_2023",
     )

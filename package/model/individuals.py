@@ -251,7 +251,7 @@ class Individual:
         self.instant_budget = self.init_budget + carbon_dividend
 
         #update preferences 
-        if self.alpha_change != "static_preferences":
+        if self.alpha_change != "fixed_preferences":
             self.update_preferences(social_component)
         
         self.Omega_m = self.calc_Omega_m()

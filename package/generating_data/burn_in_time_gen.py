@@ -47,12 +47,17 @@ def main(
     print("fileName: ", fileName)
 
     params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
+    print("parmas list", len(params_list), property_reps,params["seed_reps"] )
 
+    
     time_array = np.arange(0,params["carbon_price_duration"] + params["compression_factor"],params["compression_factor"])
 
     #print("HEYEYU",params_list, len(params_list))
     emissions_stock_timeseries, emissions_flow_timeseries, __= multi_emissions_flow_stock_run(params_list)
-    #print("emissions_flow_timeseries", emissions_flow_timeseries)
+
+    print("emissions_flow_timeseries", emissions_stock_timeseries)
+    print("shgaep", emissions_stock_timeseries.shape)
+    
     emissions_flow_timeseries_array = emissions_flow_timeseries.reshape(property_reps, params["seed_reps"],len(time_array))
     emissions_stock_timeseries_array = emissions_stock_timeseries.reshape(property_reps, params["seed_reps"],len(time_array))
 

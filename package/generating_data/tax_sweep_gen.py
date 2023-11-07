@@ -45,7 +45,7 @@ def arrange_scenarios_no_tax(base_params,scenarios):
     # 1. Run with fixed preferences, Emissions: [S_n]
     if "fixed_preferences" in scenarios:
         base_params_copy_1 = deepcopy(base_params)
-        base_params_copy_1["alpha_change"] = "static_preferences"
+        base_params_copy_1["alpha_change"] = "fixed_preferences"
         params_sub_list_1 = produce_param_list_just_stochastic(base_params_copy_1)
         params_list.extend(params_sub_list_1)
 
@@ -58,10 +58,11 @@ def arrange_scenarios_no_tax(base_params,scenarios):
         params_list.extend(params_sub_list_2)
 
     # 3. Run with fixed network weighting socially determined, Emissions: [S_n]
-    #base_params_copy_3 = deepcopy(base_params)
-    #base_params_copy_3["alpha_change"] = "static_socially_determined_weights"
-    #params_sub_list_3 = produce_param_list_just_stochastic(base_params_copy_3)
-    #params_list.extend(params_sub_list_3)
+    if "static_socially_determined_weights" in scenarios:
+        base_params_copy_3 = deepcopy(base_params)
+        base_params_copy_3["alpha_change"] = "static_socially_determined_weights"
+        params_sub_list_3 = produce_param_list_just_stochastic(base_params_copy_3)
+        params_list.extend(params_sub_list_3)
 
     # 4. Run with fixed network weighting culturally determined, Emissions: [S_n]
     if "static_culturally_determined_weights" in scenarios:
@@ -107,7 +108,7 @@ def arrange_scenarios_tax(base_params, carbon_tax_vals,scenarios):
     # 1. Run with fixed preferences, Emissions: [S_n]
     if "fixed_preferences" in scenarios:
         base_params_copy_1 = deepcopy(base_params)
-        base_params_copy_1["alpha_change"] = "static_preferences"
+        base_params_copy_1["alpha_change"] = "fixed_preferences"
         params_sub_list_1 = produce_param_list_scenarios_tax(base_params_copy_1, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_1)
 
@@ -120,10 +121,11 @@ def arrange_scenarios_tax(base_params, carbon_tax_vals,scenarios):
         params_list.extend(params_sub_list_2)
 
     # 3. Run with fixed network weighting socially determined, Emissions: [S_n]
-    #base_params_copy_3 = deepcopy(base_params)
-    #base_params_copy_3["alpha_change"] = "static_socially_determined_weights"
-    #params_sub_list_3 = produce_param_list_stochastic_tax(base_params_copy_3, carbon_tax_vals,"carbon_price_increased")
-    #params_list.extend(params_sub_list_3)
+    if "static_socially_determined_weights" in scenarios:
+        base_params_copy_3 = deepcopy(base_params)
+        base_params_copy_3["alpha_change"] = "static_socially_determined_weights"
+        params_sub_list_3 = produce_param_list_scenarios_tax(base_params_copy_3, carbon_tax_vals,"carbon_price_increased")
+        params_list.extend(params_sub_list_3)
 
     # 4. Run with fixed network weighting culturally determined, Emissions: [S_n]
     if "static_culturally_determined_weights" in scenarios:
@@ -191,7 +193,7 @@ def main(
     ###### WITHOUT CARBON TAX
     # 1. Run with fixed preferences, Emissions: [S_n]
     # 2. Run with fixed network weighting uniform, Emissions: [S_n]
-    #DONT HAVE A WAY TO DO THIS ATM ######################### 3. Run with fixed network weighting socially determined, Emissions: [S_n]
+    # 3. Run with fixed network weighting socially determined, Emissions: [S_n]
     # 4. Run with fixed network weighting culturally determined, Emissions: [S_n]
     # 5. Run with social learning, Emissions: [S_n]
     # 6.  Run with cultural learning, Emissions: [S_n]
@@ -244,6 +246,6 @@ if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",
-        scenarios = ["fixed_preferences","uniform_network_weighting", "static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ]
+        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ]
     )
 

@@ -137,18 +137,18 @@ class Network:
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
 
-        if self.alpha_change == "static_preferences":
+        if self.alpha_change == "fixed_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
             if self.alpha_change == ("static_culturally_determined_weights" or "dynamic_culturally_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
+            elif self.alpha_change == ("static_socially_determined_weights" or "dynamic_socially_determined_weights"):#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()
 
             self.social_component_matrix = self.calc_social_component_matrix()
 
         """
-        if self.alpha_change == "static_preferences":
+        if self.alpha_change == "fixed_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
             #do nothing? or feed it the same thing
         else:
@@ -369,7 +369,7 @@ class Network:
         self.partial_shuffle_agent_list()#partial shuffle of the list
 
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
-        #not sure if this stuff is corret tbh.
+        #not sure if this stuff is correct tbh.
 
         attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
         """
@@ -430,10 +430,10 @@ class Network:
             NxM array giving the influence of social learning from neighbours for that time step
         """
 
-        if self.alpha_change == "dynamic_socially_determined_weights":
+        if self.alpha_change == ("static_socially_determined_weights" or "dynamic_socially_determined_weights"):
             #print("updating socially")
             ego_influence = self.calc_ego_influence_degroot_independent()
-        else:
+        else:#culturally determined either static or dynamic
             ego_influence = self.calc_ego_influence_degroot()           
          
 
@@ -642,10 +642,10 @@ class Network:
             )
         """
         
-    def switch_from_dynamic_to_static_preferences(self):
-        self.alpha_change = "static_preferences"
+    def switch_from_dynamic_to_fixed_preferences(self):
+        self.alpha_change = "fixed_preferences"
         for i in range(self.N):
-            self.agent_list[i].alpha_change = "static_preferences"
+            self.agent_list[i].alpha_change = "fixed_preferences"
         
 
     def save_timeseries_data_network(self):
@@ -702,14 +702,14 @@ class Network:
         self.update_individuals()
 
         # update network parameters for next step
-        if self.alpha_change != "static_preferences":
+        if self.alpha_change != "fixed_preferences":
             if self.alpha_change == "dynamic_culturally_determined_weights":
                 #print("updating culturally list")
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
                 #print("updating socially list")
                 self.weighting_matrix_list = self.update_weightings_list()
-
+            #This still updates for the case of the static weightings
             self.social_component_matrix = self.calc_social_component_matrix()
         
         if self.redistribution_state:

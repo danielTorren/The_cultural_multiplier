@@ -1,5 +1,5 @@
 [
-    "static_preferences",
+    "fixed_preferences",
     "static_culturally_determined_weights",
     "dynamic_socially_determined_weights",
     "dynamic_culturally_determined_weights"

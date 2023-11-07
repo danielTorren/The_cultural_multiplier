@@ -101,7 +101,7 @@ def main(
     ##################################
     #Gen burn in socieities for different seeds no carbon price, with preference change!!, Runs: seeds
     #OUTPUT: societies list array of length seed [socities_1, E_2,...,E_seed]
-    #params["alpha_change"] = "static_preferences"
+    #params["alpha_change"] = "fixed_preferences"
     params["carbon_price_duration"] =  0#no carbon price duration, only burn in
     params["carbon_price_increased"] = 0
     params["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
@@ -132,7 +132,7 @@ def main(
         model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_copy.carbon_price_increased = 0#need to run as if the carbon price was zero
-        model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
+        model_copy.switch_from_dynamic_to_fixed_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_no_price_no_preference_change_list.append(model_copy)
 
     emissions_stock_seeds = multi_emissions_load(societies_model_no_price_no_preference_change_list)
@@ -153,7 +153,7 @@ def main(
         #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_copy.carbon_price_increased = 0#need to run as if the carbon price was zero
-        #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
+        #model_copy.switch_from_dynamic_to_fixed_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_no_price_preference_change_list.append(model_copy)
 
     emissions_stock_seeds = multi_emissions_load(societies_model_no_price_preference_change_list)
@@ -176,7 +176,7 @@ def main(
         #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_copy.emissions_stock_target = emissions_target_seeds[i]#set the emissions target reduction
-        model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
+        model_copy.switch_from_dynamic_to_fixed_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_targect_no_preference_change_list.append(model_copy)
     
     tau_seeds_no_preference_change = multi_target_emissions_load(societies_model_targect_no_preference_change_list,tau_guess)#put in brackets so its the same dimensions as later on!
@@ -196,7 +196,7 @@ def main(
         #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
         model_copy.emissions_stock_target = emissions_target_seeds[i]#set the emissions target reduction
-        #model_copy.switch_from_dynamic_to_static_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
+        #model_copy.switch_from_dynamic_to_fixed_preferences()#change from dynamic to static preferences, this is to avoid doing unnecessary calculations
         societies_model_targect_attiude_preference_change_list.append(model_copy)
     
     tau_seeds_attitude_preference_change = multi_target_emissions_load(societies_model_targect_attiude_preference_change_list,tau_guess)#put in brackets so its the same dimensions as later on!
