@@ -201,6 +201,35 @@ def preferences_parallel_run(
     )
     return np.asarray(preferences_array_list)#shaep is #of runs, N indiviuduals, M preferences
 
+def generate_preferences_consumption_res(params):
+    #get out the N by M matrix of final preferences
+    data = generate_data(params)
+
+    data_individual_preferences = []
+    data_individual_H = []
+    data_individual_L = []
+
+    for v in range(data.N):
+        data_individual_preferences.append(np.asarray(data.agent_list[v].low_carbon_preferences))
+        data_individual_H.append(np.asarray(data.agent_list[v].H_m))
+        data_individual_L.append(np.asarray(data.agent_list[v].L_m))
+
+    return np.asarray(data_individual_preferences),np.asarray(data_individual_H),np.asarray(data_individual_L)
+
+def preferences_consumption_parallel_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_emissions_stock_res(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_preferences_consumption_res)(i) for i in params_dict
+    )
+    preferences, high_carbon, low_carbon= zip(
+        *res
+    )
+    return np.asarray(preferences),np.asarray(high_carbon),np.asarray(low_carbon)
+#shaep is #of runs, N indiviuduals, M preferences
+
 ##############################################################################
 
 

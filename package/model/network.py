@@ -143,32 +143,13 @@ class Network:
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
             if self.alpha_change in ("static_culturally_determined_weights","dynamic_culturally_determined_weights"):
-                #print("self.alpha",self.alpha_change)
+                #print("static_culturally_determined_weights","dynamic_culturally_determined_weights:       ",self.alpha_change)
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
-                #print("self.alpha",self.alpha_change)
+            elif self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights:"):#independent behaviours
+                #print("static_socially_determined_weights","dynamic_socially_determined_weights:     ",self.alpha_change)
                 self.weighting_matrix_list = self.update_weightings_list()
             #print("update_done")
             self.social_component_matrix = self.calc_social_component_matrix()
-
-        #print("DONE")
-        """
-        if self.alpha_change == "fixed_preferences":
-            self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
-            #do nothing? or feed it the same thing
-        else:
-            self.social_component_matrix = self.calc_social_component_matrix()
-
-        if self.alpha_change == ("static_culturally_determined_weights" or "dynamic_culturally_determined_weights"):#update the weightings once and thats it
-            self.weighting_matrix = self.update_weightings()
-        elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
-            self.weighting_matrix_list = self.update_weightings_list()
-
-        """
-        
-        #self.init_total_carbon_emissions  = self.calc_total_emissions()
-        
-        #self.total_carbon_emissions_stock_burn_in = self.init_total_carbon_emissions
 
         self.total_carbon_emissions_stock = 0#this are for post tax
 
@@ -709,10 +690,10 @@ class Network:
         # update network parameters for next step
         if self.alpha_change != "fixed_preferences":
             if self.alpha_change == "dynamic_culturally_determined_weights":
-                #print("updating culturally list")
+                #print("updating culturally list",self.alpha_change)
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
-                #print("updating socially list")
+                #print("updating socially list",self.alpha_change)
                 self.weighting_matrix_list = self.update_weightings_list()
             #This still updates for the case of the static weightings
             self.social_component_matrix = self.calc_social_component_matrix()

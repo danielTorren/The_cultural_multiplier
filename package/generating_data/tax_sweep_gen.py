@@ -20,7 +20,7 @@ def generate_vals(variable_parameters_dict):
     if variable_parameters_dict["property_divisions"] == "linear":
         property_values_list  = np.linspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
     elif variable_parameters_dict["property_divisions"] == "log":
-        property_values_list  = np.logspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
+        property_values_list  = np.logspace(np.log10(variable_parameters_dict["property_min"]),np.log10( variable_parameters_dict["property_max"]), variable_parameters_dict["property_reps"])
     else:
         print("Invalid divisions, try linear or log")
     return property_values_list 
@@ -256,7 +256,9 @@ if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",#"package/constants/base_params_tau_vary_timeseries.json",#"package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",#"package/constants/oneD_dict_tau_vary_timeseries.json", #"package/constants/oneD_dict_tau_vary.json",
-        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
+        scenarios = ["uniform_network_weighting", "dynamic_socially_determined_weights"],
         RUN_TYPE = 1
     )
+
+    #        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
 

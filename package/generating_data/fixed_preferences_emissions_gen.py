@@ -8,7 +8,7 @@ def generate_vals(variable_parameters_dict):
     if variable_parameters_dict["property_divisions"] == "linear":
         property_values_list  = np.linspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
     elif variable_parameters_dict["property_divisions"] == "log":
-        property_values_list  = np.logspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
+        property_values_list  = np.logspace(np.log10(variable_parameters_dict["property_min"]),np.log10( variable_parameters_dict["property_max"]), variable_parameters_dict["property_reps"])
     else:
         print("Invalid divisions, try linear or log")
     return property_values_list 

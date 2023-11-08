@@ -79,7 +79,7 @@ def plot_bifurcation_sectors_2d(fileName, data_array,base_params,property_values
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
 
-def plot_bifurcation_sectors_2d_alt(fileName, data_array,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2, dpi_save):
+def plot_bifurcation_sectors_2d_alt(fileName, data_array,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2,plot_var,plot_var_title, dpi_save):
 
     fig, axes = plt.subplots(nrows=len(property_values_list_1), ncols=len(property_values_list_2),sharey="row", constrained_layout = True, figsize= (10,6))
 
@@ -104,12 +104,13 @@ def plot_bifurcation_sectors_2d_alt(fileName, data_array,base_params,property_va
 
             #axes[i][j].set_ylabel("Final preference, $A_{\\tau,i,%s}$" % (str(j+1)))
             #axes[i][j].set_xlabel(property_varied_title_2)
-            axes[i][j].set_ylim(0,1)
+            if plot_var == "preference":
+                axes[i][j].set_ylim(0,1)
 
     
     #cols = ["$\sigma_{%s}=%s$" % (i+1,str(round(low_carbon_substitutability_array[i],3))) for i in range(len(low_carbon_substitutability_array))]
-    cols = ["%s=%s" % ("$%s$" % (property_varied_title_2),str(round(val,3))) for val in property_values_list_2]
-    rows = ["%s=%s" % (property_varied_title_1,str(round(val,3))) for val in property_values_list_1]
+    cols = ["%s=%s" % ("$%s$" % (property_varied_title_2),str(round(val,4))) for val in property_values_list_2]
+    rows = ["%s=%s" % (property_varied_title_1,str(round(val,4))) for val in property_values_list_1]
 
     pad = 2 # in points
 
@@ -125,11 +126,11 @@ def plot_bifurcation_sectors_2d_alt(fileName, data_array,base_params,property_va
         
     #fig.supxlabel("$%s$" % property_varied_title_2)
     fig.supxlabel("Sector substitutability, $\sigma_m$")
-    fig.supylabel("Final preference, $A_{\\tau,i,m}$")
+    fig.supylabel(plot_var_title)
 
     plotName = fileName + "/Prints"
 
-    f = plotName + "/2d_bifurcation_preferences_alt_%s_%s" %(property_varied_1,property_varied_2)
+    f = plotName + "/2d_bifurcation_preferences_alt_%s_%s_%s" %(property_varied_1,property_varied_2, plot_var)
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
@@ -170,12 +171,30 @@ def main(
     if PLOT_TYPE == 1:
         # look at splitting of the last behaviour with preference dissonance at final time step
         #plot_bifurcation_sectors_2d(fileName,data_array,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2, dpi_save)
-        plot_bifurcation_sectors_2d_alt(fileName,data_array,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2, dpi_save)
+        plot_var = "preference"
+        plot_var_title = "Final preference, $A_{t_{max},i,m}$"
+        plot_bifurcation_sectors_2d_alt(fileName,data_array,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2,plot_var,plot_var_title, dpi_save)
+    if PLOT_TYPE == 3:
+
+        data_array_H = load_object(fileName + "/Data", "data_array_H")
+        data_array_L = load_object(fileName + "/Data", "data_array_L")
+        
+        plot_var = "preference"
+        plot_var_title = "Final preference, $A_{t_{max},i,m}$"
+        plot_bifurcation_sectors_2d_alt(fileName,data_array,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2,plot_var,plot_var_title, dpi_save)
+        
+        plot_var = "H"
+        plot_var_title = "Final high carbon quantity, $H_{t_{max},i,m}$"
+        plot_bifurcation_sectors_2d_alt(fileName,data_array_H,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2,plot_var,plot_var_title, dpi_save)
+        plot_var = "L"
+        plot_var_title = "Final low carbon quantity, $L_{t_{max},i,m}$"
+        plot_bifurcation_sectors_2d_alt(fileName,data_array_L,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2,plot_var,plot_var_title, dpi_save)
+
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/2D_bifur_one_param_sweep_10_39_21__03_11_2023",
-        PLOT_TYPE = 1
+        fileName= "results/2D_bifur_param_sweep_18_50_43__08_11_2023",
+        PLOT_TYPE = 3
     )
 

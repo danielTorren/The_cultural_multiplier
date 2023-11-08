@@ -171,8 +171,17 @@ def main(
     print("scenarios",scenarios)
     #print("emissions_no_tax",emissions_no_tax)
     #quit()
-    print("emissions_tax",emissions_tax[1][0],emissions_tax[1][1])
-    print("emissions_tax",emissions_tax[2][0],emissions_tax[2][1])
+    #print("emissions_tax",emissions_tax[0][0],emissions_tax[0][1])
+    #print("emissions_tax",emissions_tax[1][0],emissions_tax[1][1])
+    #print("emissions_tax",emissions_tax[2][0],emissions_tax[2][1])
+    print("emissions_tax shape", emissions_tax.shape)
+    emissions_init = [emissions_tax[i][0][0] for i in range(len(scenarios))]
+    print("emissions_init",emissions_init)
+    emissions_first = [emissions_tax[i][1][0] for i in range(len(scenarios))]
+    print("emissions_tax fist",emissions_first)
+    print("emissions_tax init",emissions_tax[0][0][0],emissions_tax[1][0][0],emissions_tax[2][0][0])
+    #
+
 
     #quit()
     #print("base_params", base_params)
@@ -190,5 +199,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_13_55_04__07_11_2023",
+        fileName="results/tax_sweep_10_56_04__08_11_2023",
     )

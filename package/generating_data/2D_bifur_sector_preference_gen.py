@@ -12,14 +12,14 @@ Created: 10/10/2022
 import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import preferences_parallel_run
+from package.resources.run import preferences_parallel_run,preferences_consumption_parallel_run
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list
 
 def generate_vals(variable_parameters_dict):
     if variable_parameters_dict["property_divisions"] == "linear":
         property_values_list  = np.linspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
     elif variable_parameters_dict["property_divisions"] == "log":
-        property_values_list  = np.logspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
+        property_values_list  = np.logspace(np.log10(variable_parameters_dict["property_min"]),np.log10( variable_parameters_dict["property_max"]), variable_parameters_dict["property_reps"])
     else:
         print("Invalid divisions, try linear or log")
     return property_values_list 
@@ -85,7 +85,7 @@ def main(
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
 
-    root = "2D_bifur_one_param_sweep"
+    root = "2D_bifur_param_sweep"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
     
@@ -95,12 +95,22 @@ def main(
     
     if RUN_TYPE == 1:
         params_list = produce_param_list_2D_single_seed(params, property_values_list_1,property_values_list_2, property_varied_1, property_varied_2)
+        print("Total Runs", len(params_list))
         data_array_serial = preferences_parallel_run(params_list)#shape is nxM, (property_reps_2*property_reps_1)*M
         data_array = data_array_serial.reshape(property_reps_1,property_reps_2, params["N"],params["M"])
     elif RUN_TYPE == 2:
         params_list = produce_param_list_2D_stochastic_seed(params, property_values_list_1,property_values_list_2, property_varied_1, property_varied_2)
         data_array_serial = preferences_parallel_run(params_list)#shape is nxM, (property_reps_2*property_reps_1*seed_reps)*M
         data_array = data_array_serial.reshape(property_reps_1,property_reps_2, params["seed_reps"], params["N"],params["M"])
+    elif RUN_TYPE == 3:
+        params_list = produce_param_list_2D_single_seed(params, property_values_list_1,property_values_list_2, property_varied_1, property_varied_2)
+        print("Total Runs", len(params_list))
+        data_array_serial, data_consumption_H_serial, data_consumption_L_serial, = preferences_consumption_parallel_run(params_list)#shape is nxM, (property_reps_2*property_reps_1)*M
+        data_array = data_array_serial.reshape(property_reps_1,property_reps_2, params["N"],params["M"])
+        data_array_H = data_consumption_H_serial.reshape(property_reps_1,property_reps_2, params["N"],params["M"])
+        data_array_L = data_consumption_L_serial.reshape(property_reps_1,property_reps_2, params["N"],params["M"])
+        save_object(data_array_H, fileName + "/Data", "data_array_H")
+        save_object(data_array_L, fileName + "/Data", "data_array_L")
 
     save_object(data_array, fileName + "/Data", "data_array")
     save_object(params, fileName + "/Data", "base_params")
@@ -113,9 +123,9 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_bifur_ratio_preference_or_consumption_and_a.json",#"package/constants/base_params_bifur_a.json",#"package/constants/base_params_bifur_seed.json",
-        VARIABLE_PARAMS_LOAD_1 = "package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json"
+        BASE_PARAMS_LOAD = "package/constants/base_params_bifur_ratio_preference_or_consumption.json",#"package/constants/base_params_bifur_ratio_preference_or_consumption_and_a.json",#"package/constants/base_params_bifur_a.json",#"package/constants/base_params_bifur_seed.json",
+        VARIABLE_PARAMS_LOAD_1 = "package/constants/oneD_dict_bifur_tau.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json"
         VARIABLE_PARAMS_LOAD_2 = "package/constants/oneD_dict_bifur_ratio_preference_or_consumption.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json",
-        RUN_TYPE = 1,
+        RUN_TYPE = 3,
 )
 

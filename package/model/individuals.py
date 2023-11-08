@@ -68,7 +68,7 @@ class Individual:
             #self.service_substitutability = individual_params["service_substitutability"]
             self.chi_m = self.calc_chi_m_nested_CES()
             self.H_m, self.L_m = self.calc_consumption_quantities_nested_CES()
-            self.utility = self.calc_utility_nested_CES()
+            self.utility, self.pseudo_utility = self.calc_utility_nested_CES()
         elif self.utility_function_state == "addilog_CES":
             self.n_tilde_m = self.calc_n_tilde_m()
             self.chi_m = self.calc_chi_m_addilog_CES()
@@ -92,6 +92,7 @@ class Individual:
         self.history_identity = [self.identity]
         self.history_flow_carbon_emissions = [self.flow_carbon_emissions]
         self.history_utility = [self.utility]
+        self.history_pseudo_utility = [self.pseudo_utility]
         self.history_H_m = [self.H_m]
         self.history_L_m = [self.L_m]
 
@@ -177,7 +178,7 @@ class Individual:
             interal_components_utility = self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))
             sum_utility = sum(interal_components_utility)
             U = sum_utility**(self.service_substitutability/(self.service_substitutability-1))
-        return U
+        return U,psuedo_utility
     
     ###########################################################################
     #SHARED   
@@ -235,6 +236,7 @@ class Individual:
         self.history_identity.append(self.identity)
         self.history_flow_carbon_emissions.append(self.flow_carbon_emissions)
         self.history_utility.append(self.utility)
+        self.history_pseudo_utility.append(self.pseudo_utility)
         self.history_H_m.append(self.H_m)
         self.history_L_m.append(self.L_m)
 
@@ -260,7 +262,7 @@ class Individual:
         if self.utility_function_state == "nested_CES":
             self.chi_m = self.calc_chi_m_nested_CES()
             self.H_m, self.L_m = self.calc_consumption_quantities_nested_CES()
-            self.utility = self.calc_utility_nested_CES()
+            self.utility,self.pseudo_utility = self.calc_utility_nested_CES()
         elif self.utility_function_state == "addilog_CES":
             self.n_tilde_m = self.calc_n_tilde_m()
             self.chi_m = self.calc_chi_m_addilog_CES()
