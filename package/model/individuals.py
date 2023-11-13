@@ -89,6 +89,8 @@ class Individual:
     
     def set_up_time_series(self):
         self.history_low_carbon_preferences = [self.low_carbon_preferences]
+        self.history_omega_m = [self.Omega_m]
+        self.history_chi_m = [self.chi_m]
         self.history_identity = [self.identity]
         self.history_flow_carbon_emissions = [self.flow_carbon_emissions]
         self.history_utility = [self.utility]
@@ -233,6 +235,8 @@ class Individual:
         None
         """
         self.history_low_carbon_preferences.append(self.low_carbon_preferences)
+        self.history_omega_m.append(self.Omega_m)
+        self.history_chi_m.append(self.chi_m)
         self.history_identity.append(self.identity)
         self.history_flow_carbon_emissions.append(self.flow_carbon_emissions)
         self.history_utility.append(self.utility)

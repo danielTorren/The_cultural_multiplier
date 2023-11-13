@@ -21,12 +21,14 @@ import seaborn as sns
 
 def plot_stacked_preferences(fileName, data_list,property_values_list, property_varied, property_varied_title, dpi_save):
 
-    fig, axes = plt.subplots(nrows=len(data_list),ncols=data_list[0].M, sharey="row", sharex="col", constrained_layout = True)
+    fig, axes = plt.subplots(nrows=len(data_list),ncols=data_list[0].M, sharex="col", constrained_layout = True)
 
     for i, data in enumerate(data_list):
         #axes[i][0].set_title(property_varied_title + " = " + str(round(property_values_list[i],3)))
         for v in range(data.N):
             data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)
+            #print("data_indivdiual",data_indivdiual,len(data_indivdiual))
+            #quit()
             for j in range(data.M):
                 #if i == 0:
                 #axes[0][j].set_title("$\sigma_{%s} = %s$" % (j,data.low_carbon_substitutability_array[j]))
@@ -60,6 +62,93 @@ def plot_stacked_preferences(fileName, data_list,property_values_list, property_
     f = plotName + "/timeseries_preference_stacked_%s" %(property_varied)
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
+def plot_stacked_chi_m(fileName, data_list,property_values_list, property_varied, property_varied_title, dpi_save):
+
+    fig, axes = plt.subplots(nrows=len(data_list),ncols=data_list[0].M, sharex="col", constrained_layout = True)
+
+    for i, data in enumerate(data_list):
+        #axes[i][0].set_title(property_varied_title + " = " + str(round(property_values_list[i],3)))
+        for v in range(data.N):
+            data_indivdiual = np.asarray(data.agent_list[v].history_chi_m)
+            for j in range(data.M):
+                #if i == 0:
+                #axes[0][j].set_title("$\sigma_{%s} = %s$" % (j,data.low_carbon_substitutability_array[j]))
+                axes[i][j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    cols = ["$\sigma_{%s}=%s$" % (i+1,str(round(data_list[0].low_carbon_substitutability_array[i],3))) for i in range(len(data_list[0].low_carbon_substitutability_array))]
+    rows = ["%s=%s" % (property_varied_title,str(round(val,3))) for val in property_values_list]
+
+    #print(cols)
+    #print(rows)
+    pad = 2 # in points
+
+    for ax, col in zip(axes[0], cols):
+        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
+                    xycoords='axes fraction', textcoords='offset points',
+                    size='small', ha='center', va='baseline')
+
+    for ax, row in zip(axes[:,0], rows):
+        ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+                    xycoords=ax.yaxis.label, textcoords='offset points',
+                    size='small', ha='right', va='center',rotation=90)
+        
+    fig.supxlabel(r"Time")
+    fig.supylabel("$\chi$")
+    
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/chi_stacked_%s" %(property_varied)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_stacked_omega_m(fileName, data_list,property_values_list, property_varied, property_varied_title, dpi_save):
+
+    fig, axes = plt.subplots(nrows=len(data_list),ncols=data_list[0].M, sharex="col", constrained_layout = True)
+
+    for i, data in enumerate(data_list):
+        #axes[i][0].set_title(property_varied_title + " = " + str(round(property_values_list[i],3)))
+        for v in range(data.N):
+            data_indivdiual = np.asarray(data.agent_list[v].history_omega_m)
+            for j in range(data.M):
+                #if i == 0:
+                #axes[0][j].set_title("$\sigma_{%s} = %s$" % (j,data.low_carbon_substitutability_array[j]))
+                axes[i][j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    cols = ["$\sigma_{%s}=%s$" % (i+1,str(round(data_list[0].low_carbon_substitutability_array[i],3))) for i in range(len(data_list[0].low_carbon_substitutability_array))]
+    rows = ["%s=%s" % (property_varied_title,str(round(val,3))) for val in property_values_list]
+
+    #print(cols)
+    #print(rows)
+    pad = 2 # in points
+
+    for ax, col in zip(axes[0], cols):
+        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
+                    xycoords='axes fraction', textcoords='offset points',
+                    size='small', ha='center', va='baseline')
+
+    for ax, row in zip(axes[:,0], rows):
+        ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+                    xycoords=ax.yaxis.label, textcoords='offset points',
+                    size='small', ha='right', va='center',rotation=90)
+        
+    fig.supxlabel(r"Time")
+    fig.supylabel("$\Omega$")
+    
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/omega_stacked_%s" %(property_varied)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
 
 def multi_data_and_col_fixed_animation_distribution(fileName, Data_run_list, property_plot, x_axis_label, direction,property_varied_title,property_values_list, dpi_save, save_bool):
 
@@ -248,7 +337,9 @@ def main(
         # look at splitting of the last behaviour with preference dissonance
         #property_varied_title = "$\sigma_A$"
         plot_stacked_preferences(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        anim_save_bool = False
+        plot_stacked_chi_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #anim_save_bool = False
         #multi_data_and_col_fixed_animation_distribution(fileName, data_list, "history_low_carbon_preferences","Low carbon Preferences","y", property_varied_title,property_values_list,dpi_save,anim_save_bool)
         #DONT PUT ANYTHING MORE PLOTS AFTER HERE DUE TO ANIMATION 
     else:
@@ -258,7 +349,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/one_param_sweep_multi_22_27_08__25_10_2023",
+        fileName= "results/one_param_sweep_multi_15_44_05__13_11_2023",
         PLOT_TYPE = 5
     )
 
