@@ -43,12 +43,12 @@ def plot_stacked_preferences(fileName, data_list,property_values_list, property_
     #print(cols)
     #print(rows)
     pad = 2 # in points
-
+    """
     for ax, col in zip(axes[0], cols):
         ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
                     xycoords='axes fraction', textcoords='offset points',
                     size='small', ha='center', va='baseline')
-
+    """
     for ax, row in zip(axes[:,0], rows):
         ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
                     xycoords=ax.yaxis.label, textcoords='offset points',
@@ -86,11 +86,14 @@ def plot_stacked_chi_m(fileName, data_list,property_values_list, property_varied
     #print(cols)
     #print(rows)
     pad = 2 # in points
-
+    """
     for ax, col in zip(axes[0], cols):
         ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
                     xycoords='axes fraction', textcoords='offset points',
                     size='small', ha='center', va='baseline')
+    """
+
+    
 
     for ax, row in zip(axes[:,0], rows):
         ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
@@ -128,12 +131,12 @@ def plot_stacked_omega_m(fileName, data_list,property_values_list, property_vari
     #print(cols)
     #print(rows)
     pad = 2 # in points
-
+    """
     for ax, col in zip(axes[0], cols):
         ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
                     xycoords='axes fraction', textcoords='offset points',
                     size='small', ha='center', va='baseline')
-
+    """
     for ax, row in zip(axes[:,0], rows):
         ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
                     xycoords=ax.yaxis.label, textcoords='offset points',
@@ -349,7 +352,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/one_param_sweep_multi_15_44_05__13_11_2023",
+        fileName= "results/one_param_sweep_multi_20_50_04__13_11_2023",
         PLOT_TYPE = 5
     )
 

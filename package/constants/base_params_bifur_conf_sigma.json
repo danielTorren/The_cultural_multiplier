@@ -1,5 +1,5 @@
 {
-    "save_timeseries_data": 1, 
+    "save_timeseries_data": 0, 
     "alpha_change": "dynamic_culturally_determined_weights",
     "budget_inequality_state":0,
     "heterogenous_preferences": 1.0,

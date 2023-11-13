@@ -126,7 +126,10 @@ class Network:
             #self.individual_budget_array =  np.asarray([1]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        #CHANGE THIS !!!!!!!!!!!!!!!!!!!!!!!!!
+        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        
         #self.low_carbon_substitutability_array = np.asarray([3])
         self.service_preferences = np.asarray([1/self.M]*self.M)
         

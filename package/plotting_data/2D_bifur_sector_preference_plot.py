@@ -175,6 +175,16 @@ def main(
         plot_var_title = "Final preference, $A_{t_{max},i,m}$"
         plot_bifurcation_sectors_2d_alt(fileName,data_array,base_params,property_values_list_1, property_varied_1, property_varied_title_1,property_values_list_2, property_varied_2, property_varied_title_2,plot_var,plot_var_title, dpi_save)
     if PLOT_TYPE == 3:
+        #print("property_varied_1, property_varied_title_1, property_varied_2, property_varied_title_2")
+        #print(property_varied_1, property_varied_title_1, property_varied_2, property_varied_title_2)
+        #quit()
+
+        property_varied_title_1 = "sigma"
+        property_varied_title_2 = "confirmation bias"
+
+        property_varied_1 = "sigma"
+        property_varied_2 = "confirmation_bias"
+
 
         data_array_H = load_object(fileName + "/Data", "data_array_H")
         data_array_L = load_object(fileName + "/Data", "data_array_L")
@@ -194,7 +204,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/2D_bifur_param_sweep_13_00_05__13_11_2023",
+        fileName= "results/2D_bifur_param_sweep_21_47_37__13_11_2023",
         PLOT_TYPE = 3
     )
 
