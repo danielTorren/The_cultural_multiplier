@@ -60,7 +60,7 @@ class Network:
             self.carbon_price_gradient = self.carbon_price_increased/self.carbon_price_duration
 
         if self.utility_function_state == "nested_CES":
-            self.service_substitutability = parameters["service_substitutability"]
+            self.sector_substitutability = parameters["sector_substitutability"]
         elif self.utility_function_state == "addilog_CES":#basic and lux goods
             self.lambda_m = np.linspace(parameters["lambda_m_lower"],parameters["lambda_m_upper"],self.M)
 
@@ -118,7 +118,7 @@ class Network:
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
         #self.low_carbon_substitutability_array = np.asarray([3])
-        self.service_preferences = np.asarray([1/self.M]*self.M)
+        self.sector_preferences = np.asarray([1/self.M]*self.M)
         
         self.agent_list = self.create_agent_list()
 
@@ -298,7 +298,7 @@ class Network:
 
         low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
 
-        return low_carbon_preference_matrix#,individual_budget_matrix#, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
+        return low_carbon_preference_matrix#,individual_budget_matrix#, norm_sector_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
 
     def create_agent_list(self) -> list[Individual]:
         """
@@ -328,14 +328,14 @@ class Network:
             "clipping_epsilon" :self.clipping_epsilon,
             "ratio_preference_or_consumption_identity": self.ratio_preference_or_consumption_identity,
             "ratio_preference_or_consumption": self.ratio_preference_or_consumption,
-            "service_preferences" : self.service_preferences,
+            "sector_preferences" : self.sector_preferences,
             "burn_in_duration": self.burn_in_duration,
             "static_internal_A_state": self.static_internal_A_state,
             "alpha_change": self.alpha_change
         }
 
         if self.utility_function_state == "nested_CES":
-            individual_params["service_substitutability"] = self.service_substitutability
+            individual_params["sector_substitutability"] = self.sector_substitutability
         elif self.utility_function_state == "addilog_CES":
             individual_params["lambda_m"] = self.lambda_m
 
@@ -343,7 +343,7 @@ class Network:
             Individual(
                 individual_params,
                 self.low_carbon_preference_matrix_init[n],
-                #self.service_preference_matrix_init,
+                #self.sector_preference_matrix_init,
                 self.individual_budget_array[n],
                 n
             )
@@ -762,7 +762,7 @@ class Individual:
         self.save_timeseries_data = individual_params["save_timeseries_data"]
         self.compression_factor = individual_params["compression_factor"]
         self.phi_array = individual_params["phi_array"]
-        self.service_preferences = individual_params["service_preferences"]
+        self.sector_preferences = individual_params["sector_preferences"]
         self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
         self.prices_low_carbon = individual_params["prices_low_carbon"]
         self.prices_high_carbon = individual_params["prices_high_carbon"]
@@ -775,7 +775,7 @@ class Individual:
         self.utility_function_state = individual_params["utility_function_state"]
 
         if self.utility_function_state == "nested_CES":
-            self.service_substitutability = individual_params["service_substitutability"]
+            self.sector_substitutability = individual_params["sector_substitutability"]
         elif self.utility_function_state == "addilog_CES":
             self.lambda_m = individual_params["lambda_m"]
             self.init_vals_H = (self.instant_budget/self.M)*0.5 #assume initially its uniformaly spread
@@ -788,7 +788,7 @@ class Individual:
        
         
         if self.utility_function_state == "nested_CES":
-            #self.service_substitutability = individual_params["service_substitutability"]
+            #self.sector_substitutability = individual_params["sector_substitutability"]
             self.chi_m = self.calc_chi_m_nested_CES()
             self.H_m, self.L_m = self.calc_consumption_quantities_nested_CES()
             self.utility = self.calc_utility_nested_CES()
@@ -838,7 +838,7 @@ class Individual:
         return f
 
     def calc_chi_m_addilog_CES(self):
-        chi_m = (self.service_preferences*self.n_tilde_m**(1-self.lambda_m))/self.prices_high_carbon_instant
+        chi_m = (self.sector_preferences*self.n_tilde_m**(1-self.lambda_m))/self.prices_high_carbon_instant
         return chi_m
     
     
@@ -861,7 +861,7 @@ class Individual:
         return H_m_clipped,L_m_clipped
     
     def calc_utility_addilog_CES(self):
-        term = (self.service_preferences * ((self.H_m * self.n_tilde_m) ** (1 - self.lambda_m))) / (1 - self.lambda_m)
+        term = (self.sector_preferences * ((self.H_m * self.n_tilde_m) ** (1 - self.lambda_m))) / (1 - self.lambda_m)
         U = np.sum(term)
         return U
     
@@ -873,8 +873,8 @@ class Individual:
     #NESTED CES
     
     def calc_chi_m_nested_CES(self):
-        first_term = ((self.service_preferences/self.prices_high_carbon_instant)**(self.service_substitutability))
-        second_term = (self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1-self.low_carbon_preferences)  )**((self.service_substitutability-1)*self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+        first_term = ((self.sector_preferences/self.prices_high_carbon_instant)**(self.sector_substitutability))
+        second_term = (self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array)) + (1-self.low_carbon_preferences)  )**((self.sector_substitutability-1)*self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
         chi_m = first_term*second_term
         return chi_m
     
@@ -897,9 +897,9 @@ class Individual:
         if self.M == 1:
             U = psuedo_utility
         else:
-            interal_components_utility = self.service_preferences*(psuedo_utility**((self.service_substitutability -1)/self.service_preferences))
+            interal_components_utility = self.sector_preferences*(psuedo_utility**((self.sector_substitutability -1)/self.sector_preferences))
             sum_utility = sum(interal_components_utility)
-            U = sum_utility**(self.service_substitutability/(self.service_substitutability-1))
+            U = sum_utility**(self.sector_substitutability/(self.sector_substitutability-1))
         return U
     
     ###########################################################################

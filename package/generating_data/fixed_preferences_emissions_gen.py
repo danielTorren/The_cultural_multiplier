@@ -51,7 +51,7 @@ def calc_inputs(parameters):
         PH = np.asarray([high_carbon_goods_price + parameters["carbon_price_increased"]]*parameters["carbon_price_duration"])
     else:
         print("INVALID carbon price implementation")
-    nu = parameters["service_substitutability"]
+    nu = parameters["sector_substitutability"]
     A = gen_A_alt(parameters["a_identity"],parameters["b_identity"],parameters["std_low_carbon_preference"],N,M,parameters["clipping_epsilon"],parameters["init_vals_seed"])
     sigma = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=M)
     

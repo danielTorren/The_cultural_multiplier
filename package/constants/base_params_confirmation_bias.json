@@ -23,7 +23,7 @@
     "learning_error_scale": 0.0,
     "homophily": 0.95,
     "carbon_price_increased": 0,
-    "service_substitutability": 8,
+    "sector_substitutability": 8,
     "low_carbon_substitutability_lower":1.1,
     "low_carbon_substitutability_upper":1.2,
     "a_identity": 3,

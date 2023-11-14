@@ -5,7 +5,7 @@
     "seed_reps": 20,
     "N": 20,
     "M": 5,
-    "service_substitutability": 1.1,
+    "sector_substitutability": 1.1,
     "low_carbon_substitutability_lower":1.1,
     "low_carbon_substitutability_upper":5,
     "a_identity": 2,

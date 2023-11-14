@@ -25,14 +25,14 @@
     "homophily": 0.95,
     "init_carbon_price": 0,
     "carbon_price_increased": 0.0,
-    "service_substitutability": 10,
-    "low_carbon_substitutability_lower":1.001,
-    "low_carbon_substitutability_upper":1.001,
+    "sector_substitutability": 2,
+    "low_carbon_substitutability_lower":5,
+    "low_carbon_substitutability_upper":5,
     "a_identity": 2,
     "b_identity": 2,
     "clipping_epsilon": 1e-5,
     "lambda_m_lower": 1.1,
     "lambda_m_upper": 10,
-    "std_low_carbon_preference":0.001,
+    "std_low_carbon_preference":0.01,
     "confirmation_bias":1
 }

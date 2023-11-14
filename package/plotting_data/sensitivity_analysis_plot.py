@@ -256,9 +256,9 @@ def main(
         "emissions_change": {"title": r"$\Delta E/NM$", "colour": "brown", "linestyle": "-*"},
     },
     titles= [
-    r"Service  substitutability $\nu$",
+    r"sector  substitutability $\nu$",
     r"Initial low carbon preference Beta $b_A$",
-    r"Service preference Beta $b_{a}$",
+    r"sector preference Beta $b_{a}$",
     r"Low carbon substitutability Beta $b_{\\sigma}$",
     r"High carbon goods prices Beta $b_{P_H}$"
     ],
@@ -303,9 +303,9 @@ if __name__ == '__main__':
             "emissions_change": {"title": r"$\Delta E/NM$", "colour": "brown", "linestyle": "-*"},
         },
         titles = [
-        r"Service substitutability $\nu$",
+        r"sector substitutability $\nu$",
         r"Initial low carbon preference Beta $b_A$",
-        r"Service preference Beta $b_{a}$",
+        r"sector preference Beta $b_{a}$",
         r"Low carbon substitutability Beta $b_{\sigma}$",
         r"High carbon goods prices Beta $b_{P_H}$"
         ]

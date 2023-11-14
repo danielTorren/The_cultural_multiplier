@@ -62,7 +62,7 @@ if __name__ == '__main__':
     "homophily": 0.95,
     "confirmation_bias": 10,
     "carbon_price_increased": 0.5,
-    "service_substitutability": 1.5,
+    "sector_substitutability": 1.5,
     "low_carbon_substitutability_lower":2,
     "low_carbon_substitutability_upper":5,
     "a_identity": 1,

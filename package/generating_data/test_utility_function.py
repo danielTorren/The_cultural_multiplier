@@ -16,7 +16,7 @@ class Individual_test:
         self,
         individual_params,
         low_carbon_preferences,
-        service_preferences,
+        sector_preferences,
         H_mins,
         U_mins,
         budget_med,
@@ -25,7 +25,7 @@ class Individual_test:
 
         self.low_carbon_preferences = low_carbon_preferences
 
-        self.service_preferences = service_preferences
+        self.sector_preferences = sector_preferences
         
         #self.init_budget = budget
         #self.instant_budget = self.init_budget
@@ -33,9 +33,9 @@ class Individual_test:
         self.carbon_price = individual_params["carbon_price"]
 
         self.M = individual_params["M"]
-        self.service_substitutability = individual_params["service_substitutability"]
+        self.sector_substitutability = individual_params["sector_substitutability"]
         self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
-        self.omega = (self.service_substitutability -1)/self.service_substitutability
+        self.omega = (self.sector_substitutability -1)/self.sector_substitutability
         self.psi = (self.low_carbon_substitutability_array -1)/self.low_carbon_substitutability_array
 
         self.prices_low_carbon = individual_params["prices_low_carbon"]
@@ -58,7 +58,7 @@ class Individual_test:
         return tilde_n_m
     
     def calc_chi(self):
-        chi_array = (self.prices_high_carbon_instant/(self.service_preferences*(self.tilde_n_m**(self.omega))))**(1/(self.omega-1))
+        chi_array = (self.prices_high_carbon_instant/(self.sector_preferences*(self.tilde_n_m**(self.omega))))**(1/(self.omega-1))
         return chi_array
 
 
@@ -101,7 +101,7 @@ class Individual_test:
 
         psuedo_utility = (self.low_carbon_preferences*(self.L_m**(self.psi)) + (1 - self.low_carbon_preferences)*((self.H_m - self.h_m)**(self.psi)))**(1/self.psi)
         
-        sum_U = (sum(self.service_preferences*(psuedo_utility**(self.omega))))**(1/self.omega)
+        sum_U = (sum(self.sector_preferences*(psuedo_utility**(self.omega))))**(1/self.omega)
         return sum_U
 
     def calc_stuff_cobbs_min_u_prop_B(self, budget):
@@ -183,7 +183,7 @@ def multi_line_matrix_plot( Z, col_vals, row_vals, cmap, col_axis_x, col_label, 
 
 params = {
     "M": 3,
-    "service_substitutability": 5,
+    "sector_substitutability": 5,
     "low_carbon_substitutability":np.asarray([10,10,2]),
     "prices_low_carbon": np.asarray([1,1,1]),
     "prices_high_carbon": np.asarray([0.9,0.9,0.9]),
@@ -191,7 +191,7 @@ params = {
 }
 
 low_carbon_preferences = np.asarray([0.5,0.5,0.5])
-service_preferences = np.asarray([0.2,0.2,0.6])
+sector_preferences = np.asarray([0.2,0.2,0.6])
 #budget = 1
 
 H_mins = np.asarray([0,0,0])
@@ -204,8 +204,8 @@ budget_med = np.median(budget_list)
 #b_min = 1
 omega_m = np.asarray([0.3, 0.3, 0.4])#has to add up to 1 FOR COBB DOUGLASS
 
-#test_subject = Individual_test(params,low_carbon_preferences,service_preferences,H_mins)
-test_subject_cobbs_min_u_prop_B = Individual_test(params,low_carbon_preferences,service_preferences,H_mins, U_mins,budget_med, omega_m)
+#test_subject = Individual_test(params,low_carbon_preferences,sector_preferences,H_mins)
+test_subject_cobbs_min_u_prop_B = Individual_test(params,low_carbon_preferences,sector_preferences,H_mins, U_mins,budget_med, omega_m)
 
 #carbon_tax_list = np.linspace(0,1,3)
 

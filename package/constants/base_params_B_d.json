@@ -17,7 +17,7 @@
     "homophily": 0.95,
     "confirmation_bias": 10,
     "phi": 0.05,
-    "service_substitutability": 2,
+    "sector_substitutability": 2,
     "low_carbon_substitutability_lower":2,
     "low_carbon_substitutability_upper":5,
     "a_identity": 2,
@@ -29,7 +29,7 @@
     "carbon_price_increased" : 0.5, 
     "ratio_preference_or_consumption_identity": 1.0,
     "ratio_preference_or_consumption": 1.0,
-    "service_preference": 0.8,
+    "sector_preference": 0.8,
     "lambda_1": 1.1,
     "lambda_2": 10,
     "init_vals_H": 0.05

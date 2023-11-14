@@ -21,7 +21,7 @@
     "prob_rewire": 0.1,
     "learning_error_scale": 0.02,
     "homophily": 0.95,
-    "service_substitutability": 1.1,
+    "sector_substitutability": 1.1,
     "low_carbon_substitutability_lower":1.1,
     "low_carbon_substitutability_upper":5,
     "a_identity": 2,

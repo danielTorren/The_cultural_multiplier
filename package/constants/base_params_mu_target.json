@@ -18,7 +18,7 @@
     "learning_error_scale": 0.02,
     "homophily": 0.95,
     "confirmation_bias": 1,
-    "service_substitutability": 2,
+    "sector_substitutability": 2,
     "low_carbon_substitutability_lower":2,
     "low_carbon_substitutability_upper":5,
     "lambda_m_lower": 1.1,

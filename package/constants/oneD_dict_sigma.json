@@ -1,7 +1,7 @@
 {
     "property_varied" : "low_carbon_substitutability_upper",
-    "property_min" : 1.01,
-    "property_max" :2,
+    "property_min" :2,
+    "property_max" :8,
     "property_reps": 4,
     "property_varied_title" : "$\\sigma$ upper",
     "property_divisions": "log"

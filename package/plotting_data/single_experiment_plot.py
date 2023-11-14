@@ -57,7 +57,7 @@ def plot_consumption_no_burn_in(fileName, data, dpi_save):
     axes[1][1].set_title("L_2")
 
 
-    fig.suptitle(r"Service 1 is the luxury and 2 is the basic good, a = 0.8")
+    fig.suptitle(r"sector 1 is the luxury and 2 is the basic good, a = 0.8")
     fig.supxlabel(r"Time")
     fig.supylabel(r"%s" % y_title)
 
@@ -87,7 +87,7 @@ def plot_consumption(fileName, data, dpi_save):
     axes[1][1].set_title("L_2")
 
 
-    fig.suptitle(r"Service 1 is the luxury and 2 is the basic good, a = 0.8")
+    fig.suptitle(r"sector 1 is the luxury and 2 is the basic good, a = 0.8")
     fig.supxlabel(r"Time")
     fig.supylabel(r"%s" % y_title)
 

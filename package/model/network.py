@@ -69,7 +69,7 @@ class Network:
             self.calc_gradient()
 
         if self.utility_function_state == "nested_CES":
-            self.service_substitutability = parameters["service_substitutability"]
+            self.sector_substitutability = parameters["sector_substitutability"]
         elif self.utility_function_state == "addilog_CES":#basic and lux goods
             self.lambda_m = np.linspace(parameters["lambda_m_lower"],parameters["lambda_m_upper"],self.M)
 
@@ -131,7 +131,7 @@ class Network:
         self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
         
         #self.low_carbon_substitutability_array = np.asarray([3])
-        self.service_preferences = np.asarray([1/self.M]*self.M)
+        self.sector_preferences = np.asarray([1/self.M]*self.M)
         
         self.agent_list = self.create_agent_list()
 
@@ -297,7 +297,7 @@ class Network:
 
         low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
 
-        return low_carbon_preference_matrix#,individual_budget_matrix#, norm_service_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
+        return low_carbon_preference_matrix#,individual_budget_matrix#, norm_sector_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
 
     def create_agent_list(self) -> list[Individual]:
         """
@@ -327,14 +327,14 @@ class Network:
             "clipping_epsilon" :self.clipping_epsilon,
             "ratio_preference_or_consumption_identity": self.ratio_preference_or_consumption_identity,
             "ratio_preference_or_consumption": self.ratio_preference_or_consumption,
-            "service_preferences" : self.service_preferences,
+            "sector_preferences" : self.sector_preferences,
             "burn_in_duration": self.burn_in_duration,
             "static_internal_A_state": self.static_internal_A_state,
             "alpha_change": self.alpha_change
         }
 
         if self.utility_function_state == "nested_CES":
-            individual_params["service_substitutability"] = self.service_substitutability
+            individual_params["sector_substitutability"] = self.sector_substitutability
         elif self.utility_function_state == "addilog_CES":
             individual_params["lambda_m"] = self.lambda_m
 
@@ -342,7 +342,7 @@ class Network:
             Individual(
                 individual_params,
                 self.low_carbon_preference_matrix_init[n],
-                #self.service_preference_matrix_init,
+                #self.sector_preference_matrix_init,
                 self.individual_budget_array[n],
                 n
             )

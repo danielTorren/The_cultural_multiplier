@@ -25,7 +25,7 @@
     "homophily": 0.95,
     "init_carbon_price": 0,
     "carbon_price_increased": 0.0,
-    "service_substitutability": 10,
+    "sector_substitutability": 10,
     "low_carbon_substitutability_lower":1.001,
     "low_carbon_substitutability_upper":1.001,
     "a_identity": 2,

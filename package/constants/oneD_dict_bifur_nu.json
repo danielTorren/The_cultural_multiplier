@@ -1,5 +1,5 @@
 {
-    "property_varied": "service_substitutability",
+    "property_varied": "sector_substitutability",
     "property_min" : 1.1,
     "property_max" :10,
     "property_reps": 5,
