@@ -53,6 +53,17 @@ class Network:
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
         self.prices_high_carbon_array =  np.asarray([1]*self.M)#start them at the same value
+        """
+        #why doesnt this work??
+        self.prices_high_carbon_array[0] == 1.5#np.asarray([1]*self.M)#start them at the same value
+        self.prices_high_carbon_array[1] = 1.5#np.asarray([1]*self.M)#start them at the same value
+        self.prices_high_carbon_array[2] = 1.5#np.asarray([1]*self.M)#start them at the same value
+        self.prices_high_carbon_array[3] = 1.5#np.asarray([1]*self.M)#start them at the same value
+        self.prices_high_carbon_array[4] = 1.5#np.asarray([1]*self.M)#start them at the same value
+        print("self.prices_high_carbon_array",self.prices_high_carbon_array)
+        print("self.prices_high_carbon_array[0]",self.prices_high_carbon_array[0])
+        quit()
+        """
 
         self.burn_in_duration = parameters["burn_in_duration"]
         self.carbon_price = parameters["init_carbon_price"]
@@ -60,6 +71,9 @@ class Network:
         self.carbon_price_increased = parameters["carbon_price_increased"]
         self.sector_substitutability = parameters["sector_substitutability"]
         self.heterogenous_preferences = parameters["heterogenous_preferences"]
+
+        if self.burn_in_duration == 0:
+            self.carbon_price = self.carbon_price_increased#turn on carbon price
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
@@ -96,22 +110,13 @@ class Network:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
         
-        if self.budget_inequality_state == 1:
-            #Inequality in budget
-            self.budget_inequality_const = parameters["budget_inequality_const"]
-            u = np.linspace(0.01,1,self.N)
-            no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
-            self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
-            self.gini = self.calc_gini(self.individual_budget_array)
-        else:
-            #Uniform budget
-            self.individual_budget_array =  np.asarray([1/(self.N)]*self.N)#sums to 1
-            #self.individual_budget_array =  np.asarray([1]*self.N)#sums to 1
+        #Uniform budget
+        self.individual_budget_array =  np.asarray([parameters["budget"]]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
         #CHANGE THIS !!!!!!!!!!!!!!!!!!!!!!!!!
-        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
         
         #self.low_carbon_substitutability_array = np.asarray([3])
         self.sector_preferences = np.asarray([1/self.M]*self.M)
@@ -173,9 +178,6 @@ class Network:
         self.history_welfare_stock = [self.welfare_stock]
         self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
         self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
-
-        if self.budget_inequality_state == 1:
-            self.history_gini = [self.gini]
     
     def normalize_vector_sum(self, vec):
         return vec/sum(vec)
@@ -528,38 +530,13 @@ class Network:
         """
         Update Individual objects with new information regarding social interactions, prices and dividend
         """
-        # Assuming your list of objects is called 'object_list' and the function you want to call is 'my_function' with arguments 'arg1' and 'arg2'
-        
-        """
-        list(map(
-            partial(
-                lambda agent, t, scm, cda, carbon_price: agent.next_step(t, scm, cda, carbon_price),
-                t=self.t,
-                scm = self.social_component_matrix,
-                cda = self.carbon_dividend_array,
-                carbon_price = self.carbon_price
-            ),
-            self.agent_list
-        )
-        )
-        """
-        
-        #HAVENT BEEN ABLE TO GET THIS WORK AS I WANT IT TOO
 
         # Assuming you have self.agent_list as the list of objects
         ____ = list(map(
-            lambda agent, scm, cda: agent.next_step(self.t, scm, cda, self.carbon_price),
+            lambda agent, scm: agent.next_step(self.t, scm, self.carbon_price),
             self.agent_list,
             self.social_component_matrix
         ))
-        #print("output",output)
-        #quit()
-        """
-        for i in range(self.N):
-            self.agent_list[i].next_step(
-                self.t, self.social_component_matrix[i], self.carbon_dividend_array[i], self.carbon_price
-            )
-        """
         
     def switch_from_dynamic_to_fixed_preferences(self):
         self.alpha_change = "fixed_preferences"
@@ -594,8 +571,6 @@ class Network:
         self.history_identity_list.append(self.identity_list)
         self.history_welfare_flow.append(self.welfare_flow)
         self.history_welfare_stock.append(self.welfare_stock)
-        if self.budget_inequality_state == 1:
-            self.history_gini.append(self.gini)
 
     def next_step(self):
         """

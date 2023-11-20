@@ -6,6 +6,7 @@ Created: 10/10/2022
 """
 
 # imports
+from cProfile import label
 import string
 import networkx as nx
 import numpy as np
@@ -706,6 +707,8 @@ def plot_network_timeseries(
     ax.plot(Data.history_time, data)
     ax.set_xlabel(r"Time")
     ax.set_ylabel(r"%s" % y_title)
+
+    fig.tight_layout()
 
     plotName = fileName + "/Plots"
     f = plotName + "/" + property + "_timeseries"
@@ -1541,15 +1544,71 @@ def plot_low_carbon_preferences_timeseries(
     y_title = r"Low carbon preference"
 
     fig, axes = plt.subplots(nrows=1,ncols=data.M, sharey=True)
-
+    data_list = []
     for v in range(data.N):
         data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)
-        
+        data_list.append(data_indivdiual)
+        if data.M == 1:
+            #print("data_indivdiual",data_indivdiual)
+            #quit()
+            axes.plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual
+                )
+        else:
+            for j in range(data.M):
+                #print("HI", len(data.history_time), len(data_indivdiual[:,j]))
+                #quit()
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    data_list_array =np.asarray(data_list)#n,t,m
+    #print("shape", data_list_array.shape)
+
+    data_list_arr_t = np.transpose(data_list_array,(2,1,0))#m,t,n
+
+    #print("after", data_list_arr_t.shape)
+
+    mean_data = np.mean(data_list_arr_t, axis = 2)
+    median_data = np.median(data_list_arr_t, axis = 2)
+
+    #print(" mean_data ", mean_data )
+
+    if data.M == 1:
+        #print("data_indivdiual",data_indivdiual)
+        #quit()
+        axes.plot(
+                np.asarray(data.history_time),
+                mean_data[0],
+                label= "mean",
+                linestyle="dotted"
+            )
+        axes.plot(
+                np.asarray(data.history_time),
+                median_data[0],
+                label= "median",
+                linestyle="dashed"
+            )
+        axes.legend()
+    else:
         for j in range(data.M):
             axes[j].plot(
                 np.asarray(data.history_time),
-                data_indivdiual[:,j]
+                mean_data[j],
+                label= "median",
+                linestyle="dotted"
             )
+            axes[j].plot(
+                    np.asarray(data.history_time),
+                    median_data[j],
+                    label= "median",
+                    linestyle="dashed"
+                )
+            axes[j].legend()
+                
+    fig.tight_layout()
 
     fig.supxlabel(r"Time")
     fig.supylabel(r"%s" % y_title)

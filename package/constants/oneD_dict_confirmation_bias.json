@@ -1,7 +1,7 @@
 {
     "property_varied" : "confirmation_bias",
     "property_min" : 0,
-    "property_max" : 5,
+    "property_max" : 20,
     "property_reps": 4,
     "property_varied_title" : "$\\theta$",
     "property_divisions": "linear"

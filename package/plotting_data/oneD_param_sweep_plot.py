@@ -335,6 +335,57 @@ def plot_stacked_omega_m(fileName, data_list,property_values_list, property_vari
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
+def plot_utility(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save):
+
+    fig, axes = plt.subplots(nrows=len(data_list),ncols=data_list[0].M, constrained_layout = True,figsize=(14, 7))
+
+    # I need to get the data into the shape [property run, M,time,N], then i can take the average and media of the last value
+
+    for i, data in enumerate(data_list):
+        data_store = []#shape [N,time,M]
+        for v in range(data.N):
+            data_store.append(np.asarray(data.agent_list[v].history_pseudo_utility)) # thing being appended this has shape [time, M]
+        data_array = np.asarray(data_store)
+        data_trans = data_array.transpose(2,1,0)#will now be [M,time,N]
+
+        for j in range(data.M):
+            data_mean = np.mean(data_trans[j], axis=1)
+            data_median = np.median(data_trans[j], axis=1)
+            axes[i][j].plot(np.asarray(data.history_time),data_mean,linestyle = "dashed", label = "mean")
+            axes[i][j].plot(np.asarray(data.history_time),data_median,linestyle = "dotted", label = "median")
+            axes[i][j].legend()
+            
+            axes[i][j].plot(
+                    np.asarray(data.history_time),
+                    data_trans[j]
+                )
+
+    cols = ["$\sigma_{%s}=%s$" % (i+1,str(round(data_list[0].low_carbon_substitutability_array[i],3))) for i in range(len(data_list[0].low_carbon_substitutability_array))]
+    rows = ["%s=%s" % (property_varied_title,str(round(val,3))) for val in property_values_list]
+
+    #print(cols)
+    #print(rows)
+    pad = 2 # in points
+    #"""
+    for ax, col in zip(axes[0], cols):
+        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
+                    xycoords='axes fraction', textcoords='offset points',
+                    size='small', ha='center', va='baseline')
+    #"""
+    for ax, row in zip(axes[:,0], rows):
+        ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+                    xycoords=ax.yaxis.label, textcoords='offset points',
+                    size='small', ha='right', va='center',rotation=90)
+        
+    fig.supxlabel(r"Time")
+    fig.supylabel("pseudo utility")
+    
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/history_pseudo_utility_%s" %(property_varied)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
 
 def multi_data_and_col_fixed_animation_distribution(fileName, Data_run_list, property_plot, x_axis_label, direction,property_varied_title,property_values_list, dpi_save, save_bool):
 
@@ -522,14 +573,15 @@ def main(
     if PLOT_TYPE == 5:
         # look at splitting of the last behaviour with preference dissonance
         #property_varied_title = "$\sigma_A$"
-        plot_stacked_preferences(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_chi_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_H_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_L_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_preferences(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_chi_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_H_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_L_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
 
-        plot_stacked_preferences_averages(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_preferences_averages(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_utility(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         #anim_save_bool = False
         #multi_data_and_col_fixed_animation_distribution(fileName, data_list, "history_low_carbon_preferences","Low carbon Preferences","y", property_varied_title,property_values_list,dpi_save,anim_save_bool)
         #DONT PUT ANYTHING MORE PLOTS AFTER HERE DUE TO ANIMATION 
@@ -540,7 +592,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/one_param_sweep_multi_18_52_13__14_11_2023",
+        fileName= "results/one_param_sweep_multi_16_16_09__17_11_2023",
         PLOT_TYPE = 5
     )
 

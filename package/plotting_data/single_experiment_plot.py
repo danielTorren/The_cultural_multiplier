@@ -410,7 +410,157 @@ def multi_col_fixed_animation_distribution(fileName, data_sim,property_plot,x_ax
     
     return animation
 
+def plot_chi(
+    fileName, 
+    data, 
+    dpi_save,
+    ):
 
+    y_title = "$\chi$"
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M)
+
+    for v in range(data.N):
+        data_indivdiual = np.asarray(data.agent_list[v].history_chi_m)
+        
+        if data.M == 1:
+            #print("data_indivdiual",data_indivdiual)
+            #quit()
+            axes.plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual
+                )
+        else:
+            for j in range(data.M):
+                #print("HI", len(data.history_time), len(data_indivdiual[:,j]))
+                #quit()
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_chi"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_omega(
+    fileName, 
+    data, 
+    dpi_save,
+    ):
+
+    y_title = "$\Omega$"
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M)
+
+    for v in range(data.N):
+        data_indivdiual = np.asarray(data.agent_list[v].history_omega_m)
+        
+        if data.M == 1:
+            #print("data_indivdiual",data_indivdiual)
+            #quit()
+            axes.plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual
+                )
+        else:
+            for j in range(data.M):
+                #print("HI", len(data.history_time), len(data_indivdiual[:,j]))
+                #quit()
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_omega"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_L(
+    fileName, 
+    data, 
+    dpi_save,
+    ):
+
+    y_title = "L"
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M)
+
+    for v in range(data.N):
+        data_indivdiual = np.asarray(data.agent_list[v].history_L_m)
+        
+        if data.M == 1:
+            #print("data_indivdiual",data_indivdiual)
+            #quit()
+            axes.plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual
+                )
+        else:
+            for j in range(data.M):
+                #print("HI", len(data.history_time), len(data_indivdiual[:,j]))
+                #quit()
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_L"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_H(
+    fileName, 
+    data, 
+    dpi_save,
+    ):
+
+    y_title = "H"
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M)
+
+    for v in range(data.N):
+        data_indivdiual = np.asarray(data.agent_list[v].history_H_m)
+        
+        if data.M == 1:
+            #print("data_indivdiual",data_indivdiual)
+            #quit()
+            axes.plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual
+                )
+        else:
+            for j in range(data.M):
+                #print("HI", len(data.history_time), len(data_indivdiual[:,j]))
+                #quit()
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_H"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
@@ -440,6 +590,10 @@ def main(
     plot_identity_timeseries(fileName, Data, dpi_save)
     plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
     plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    plot_chi(fileName, Data, dpi_save)
+    plot_omega(fileName, Data, dpi_save)
+    plot_L(fileName, Data, dpi_save)
+    plot_H(fileName, Data, dpi_save)
     #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
     #emissions_threshold_range = np.arange(0,0.005,0.000001)
     #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
@@ -448,7 +602,7 @@ def main(
     #anim_1 = variable_animation_distribution(fileName, Data, "history_identity","Identity", dpi_save,anim_save_bool)
     #anim_2 = varaible_animation_distribution(fileName, Data, "history_flow_carbon_emissions","Individual emissions" , dpi_save,anim_save_bool)
 
-    #anim_3 = fixed_animation_distribution(fileName, Data, "history_identity","Identity","y", dpi_save,anim_save_bool,anim_save_bool)
+    #anim_3 = fixed_animation_distribution(fileName, Data, "history_identity","Identity","y", dpi_save,anim_save_bool)
     #anim_4 = fixed_animation_distribution(fileName, Data, "history_flow_carbon_emissions","Individual emissions","y",dpi_save,anim_save_bool)
     #anim_5 = fixed_animation_distribution(fileName, Data, "history_utility","Utility","y",dpi_save,anim_save_bool)
     
@@ -460,7 +614,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_21_59_36__25_10_2023"
+        fileName = "results/single_experiment_20_18_21__16_11_2023"
     )
 
 

@@ -1,0 +1,8 @@
+{
+    "property_varied" : "budget",
+    "property_min" :1,
+    "property_max" :100,
+    "property_reps": 4,
+    "property_varied_title" : "Budget",
+    "property_divisions": "linear"
+}
