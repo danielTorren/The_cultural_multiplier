@@ -1597,7 +1597,7 @@ def plot_low_carbon_preferences_timeseries(
             axes[j].plot(
                 np.asarray(data.history_time),
                 mean_data[j],
-                label= "median",
+                label= "mean",
                 linestyle="dotted"
             )
             axes[j].plot(

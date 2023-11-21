@@ -17,13 +17,13 @@
     "learning_error_scale": 0.01,
     "homophily": 0.95,
     "init_carbon_price": 0,
-    "sector_substitutability": 10,
+    "sector_substitutability": 5,
     "low_carbon_substitutability_lower":2,
-    "low_carbon_substitutability_upper":10,
+    "low_carbon_substitutability_upper":5,
     "a_identity": 2,
     "b_identity": 2,
     "clipping_epsilon": 1e-5,
     "std_low_carbon_preference":0.01,
-    "confirmation_bias":10,
+    "confirmation_bias":5,
     "budget":100
 }
