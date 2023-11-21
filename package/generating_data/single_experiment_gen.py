@@ -56,7 +56,7 @@ if __name__ == '__main__':
     "homophily": 0.95,
     "init_carbon_price": 0,
     "carbon_price_increased": 0.2,
-    "sector_substitutability": 5,
+    "sector_substitutability": 10,
     "low_carbon_substitutability_lower":5,
     "low_carbon_substitutability_upper":5,
     "a_identity": 2,

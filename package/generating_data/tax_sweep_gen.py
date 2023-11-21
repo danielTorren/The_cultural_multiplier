@@ -256,7 +256,8 @@ if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",#"package/constants/base_params_tau_vary_timeseries.json",#"package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",#"package/constants/oneD_dict_tau_vary_timeseries.json", #"package/constants/oneD_dict_tau_vary.json",
-        scenarios = ["uniform_network_weighting", "dynamic_socially_determined_weights"],
+        #scenarios = ["uniform_network_weighting", "dynamic_socially_determined_weights"],
+        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
         RUN_TYPE = 1
     )
 
