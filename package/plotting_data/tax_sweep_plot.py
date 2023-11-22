@@ -186,11 +186,11 @@ def plot_emissions_ratio_scatter_alt(
     ax.legend()
     ax.set_xlabel(r"Carbon Tax")
     ax.set_ylabel(r"Emissions ratio")
-    ax.set_title(r'Ratio of taxed to no tax emissions stock by Scenario')
+    ax.set_title(r'ALT Ratio of taxed to no tax emissions stock by Scenario')
 
     #print("what worong")
     plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_ratio_scatter"
+    f = plotName + "/ALT_plot_emissions_ratio_scatter"
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
 def plot_emissions_ratio_line_alt(
@@ -230,11 +230,11 @@ def plot_emissions_ratio_line_alt(
     ax.legend()
     ax.set_xlabel(r"Carbon Tax")
     ax.set_ylabel(r"Emissions ratio")
-    ax.set_title(r'Ratio of taxed to no tax emissions stock by Scenario')
+    ax.set_title(r'ALT Ratio of taxed to no tax emissions stock by Scenario')
 
     #print("what worong")
     plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_ratio_line"
+    f = plotName + "/ALT_plot_emissions_ratio_line"
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
 def main(
@@ -249,46 +249,24 @@ def main(
     base_params = load_object(fileName + "/Data", "base_params") 
     scenarios = load_object(fileName + "/Data", "scenarios")
 
-    """
-    #print("property_values_list",property_values_list)
-    #quit()
-    print("scenarios",scenarios)
-    emissions_init_no_tax = [emissions_no_tax[i][0] for i in range(len(scenarios))]
-    print("emissions_init_no_tax",emissions_init_no_tax)
-    #quit()
-    #print("emissions_tax",emissions_tax[0][0],emissions_tax[0][1])
-    #print("emissions_tax",emissions_tax[1][0],emissions_tax[1][1])
-    #print("emissions_tax",emissions_tax[2][0],emissions_tax[2][1])
-    print("emissions_tax shape", emissions_tax.shape)
-    emissions_init = [emissions_tax[i][0][0] for i in range(len(scenarios))]
-    print("emissions_init",emissions_init)
-    difference = np.asarray(emissions_init_no_tax) -  np.asarray(emissions_init)
-    print("difference", difference)
-    emissions_first = [emissions_tax[i][1][0] for i in range(len(scenarios))]
-    print("emissions_tax fist",emissions_first)
-    #print("emissions_tax init",emissions_tax[0][0][0],emissions_tax[1][0][0],emissions_tax[2][0][0])
-    #
-    quit()
-    """
-    
-
-    #quit()
-    #print("base_params", base_params)
-
     seed_reps = base_params["seed_reps"]
     
-    #scenario_emissions_no_tax(fileName, emissions_no_tax, scenarios,seed_reps)
-    #plot_scatter_end_points_emissions_scatter(fileName, emissions_tax, scenarios ,property_values_list)
-    #plot_means_end_points_emissions(fileName, emissions_tax, scenarios ,property_values_list)
-    #plot_emissions_ratio_scatter(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
-    #plot_emissions_ratio_line(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
-    plot_emissions_ratio_scatter_alt(fileName, emissions_tax, scenarios ,property_values_list)
-    plot_emissions_ratio_line_alt(fileName, emissions_tax, scenarios ,property_values_list)
+    scenario_emissions_no_tax(fileName, emissions_no_tax, scenarios,seed_reps)
+    plot_scatter_end_points_emissions_scatter(fileName, emissions_tax, scenarios ,property_values_list)
+    plot_means_end_points_emissions(fileName, emissions_tax, scenarios ,property_values_list)
+    
+    arr_zero_price = (np.where(property_values_list==0)[0])
+    if arr_zero_price.size != 0:#check whether zero price included
+        plot_emissions_ratio_scatter_alt(fileName, emissions_tax, scenarios ,property_values_list)
+        plot_emissions_ratio_line_alt(fileName, emissions_tax, scenarios ,property_values_list)
+    else:
+        #if 0 price not include then divide by the zero tax, NOT really sure i need this could just get rid of zero tax entirely
+        plot_emissions_ratio_scatter(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
+        plot_emissions_ratio_line(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
 
-    #print(emissions_tax[3],emissions_tax[4])
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_11_24_06__22_11_2023",
+        fileName="results/tax_sweep_12_37_36__22_11_2023",
     )
