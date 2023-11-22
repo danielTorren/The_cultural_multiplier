@@ -85,7 +85,7 @@ def arrange_scenarios_no_tax(base_params,scenarios):
 
     # 6.  Run with cultural learning, Emissions: [S_n]
     if "dynamic_culturally_determined_weights" in scenarios:
-        base_params_copy_6 = deepcopy(base_params)
+        base_params_copy_6 = deepcopy(base_params_copy)
         base_params_copy_6["alpha_change"] = "dynamic_culturally_determined_weights"
         params_sub_list_6 = produce_param_list_just_stochastic(base_params_copy_6)
         params_list.extend(params_sub_list_6)
