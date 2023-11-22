@@ -128,19 +128,28 @@ class Network:
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
 
-        #print("BEFORE",self.alpha_change)
+        #print("BEFORE")
         if self.alpha_change == "fixed_preferences":
-            #print("self.alpha",self.alpha_change)
+            #print("fixed",self.alpha_change)
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
-            if self.alpha_change in ("static_culturally_determined_weights","dynamic_culturally_determined_weights"):
-                #print("static_culturally_determined_weights","dynamic_culturally_determined_weights:       ",self.alpha_change)
+            if self.alpha_change in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_culturally_determined_weights"):
+                #print("cultural",self.alpha_change,self.confirmation_bias)
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights:"):#independent behaviours
-                #print("static_socially_determined_weights","dynamic_socially_determined_weights:     ",self.alpha_change)
+            elif self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
+                #print("social",self.alpha_change,self.confirmation_bias)
                 self.weighting_matrix_list = self.update_weightings_list()
             #print("update_done")
             self.social_component_matrix = self.calc_social_component_matrix()
+
+        """
+        if self.alpha_change == "uniform_network_weighting":
+            print("uniform",self.weighting_matrix)
+
+        if self.alpha_change == "static_socially_determined_weights":
+            print("static_socially_determined_weights",self.weighting_matrix_list)
+        """
+
 
         self.total_carbon_emissions_stock = 0#this are for post tax
 
@@ -393,13 +402,12 @@ class Network:
             NxM array giving the influence of social learning from neighbours for that time step
         """
 
-        if self.alpha_change == ("static_socially_determined_weights" or "dynamic_socially_determined_weights"):
+        if self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
             #print("updating socially")
             ego_influence = self.calc_ego_influence_degroot_independent()
         else:#culturally determined either static or dynamic
             ego_influence = self.calc_ego_influence_degroot()           
          
-
         social_influence = ego_influence + np.random.normal(loc=0, scale=self.learning_error_scale, size=(self.N, self.M))
 
         return social_influence
@@ -603,8 +611,12 @@ class Network:
             elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
                 #print("updating socially list",self.alpha_change)
                 self.weighting_matrix_list = self.update_weightings_list()
+            else:
+                pass #this is for "uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights"
             #This still updates for the case of the static weightings
             self.social_component_matrix = self.calc_social_component_matrix()
+
+        #quit()
 
         #check the exact timings on these
         if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there

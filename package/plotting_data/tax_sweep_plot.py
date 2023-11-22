@@ -168,8 +168,12 @@ def main(
     base_params = load_object(fileName + "/Data", "base_params") 
     scenarios = load_object(fileName + "/Data", "scenarios")
 
+    """
+    #print("property_values_list",property_values_list)
+    #quit()
     print("scenarios",scenarios)
-    #print("emissions_no_tax",emissions_no_tax)
+    emissions_init_no_tax = [emissions_no_tax[i][0] for i in range(len(scenarios))]
+    print("emissions_init_no_tax",emissions_init_no_tax)
     #quit()
     #print("emissions_tax",emissions_tax[0][0],emissions_tax[0][1])
     #print("emissions_tax",emissions_tax[1][0],emissions_tax[1][1])
@@ -177,11 +181,15 @@ def main(
     print("emissions_tax shape", emissions_tax.shape)
     emissions_init = [emissions_tax[i][0][0] for i in range(len(scenarios))]
     print("emissions_init",emissions_init)
+    difference = np.asarray(emissions_init_no_tax) -  np.asarray(emissions_init)
+    print("difference", difference)
     emissions_first = [emissions_tax[i][1][0] for i in range(len(scenarios))]
     print("emissions_tax fist",emissions_first)
-    print("emissions_tax init",emissions_tax[0][0][0],emissions_tax[1][0][0],emissions_tax[2][0][0])
+    #print("emissions_tax init",emissions_tax[0][0][0],emissions_tax[1][0][0],emissions_tax[2][0][0])
     #
-
+    quit()
+    """
+    
 
     #quit()
     #print("base_params", base_params)
@@ -199,5 +207,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_17_43_33__21_11_2023",
+        fileName="results/tax_sweep_09_19_39__22_11_2023",
     )

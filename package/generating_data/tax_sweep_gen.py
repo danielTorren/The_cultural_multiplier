@@ -15,6 +15,7 @@ import json
 import numpy as np
 from package.resources.utility import createFolder, produce_name_datetime, save_object
 from package.resources.run import emissions_parallel_run, emissions_parallel_run_timeseries
+from copy import deepcopy
 
 def generate_vals(variable_parameters_dict):
     if variable_parameters_dict["property_divisions"] == "linear":
@@ -35,45 +36,52 @@ def produce_param_list_just_stochastic(params: dict) -> list[dict]:
     return params_list
 
 def arrange_scenarios_no_tax(base_params,scenarios):
-
-    base_params["carbon_price_increased"] = 0# no carbon tax
-    base_params["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
+    base_params_copy = deepcopy(base_params)
+    base_params_copy["carbon_price_increased"] = 0# no carbon tax
+    base_params_copy["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
 
     params_list = []
-
+    #scenarios = [
+    # "fixed_preferences",
+    # "uniform_network_weighting", 
+    # "static_socially_determined_weights",
+    # "static_culturally_determined_weights", 
+    # "dynamic_socially_determined_weights", 
+    # "dynamic_culturally_determined_weights" 
+    # ]
     ###### WITHOUT CARBON TAX
     # 1. Run with fixed preferences, Emissions: [S_n]
     if "fixed_preferences" in scenarios:
-        base_params_copy_1 = deepcopy(base_params)
+        base_params_copy_1 = deepcopy(base_params_copy)
         base_params_copy_1["alpha_change"] = "fixed_preferences"
         params_sub_list_1 = produce_param_list_just_stochastic(base_params_copy_1)
         params_list.extend(params_sub_list_1)
 
     # 2. Run with fixed network weighting uniform, Emissions: [S_n]
     if "uniform_network_weighting" in scenarios:
-        base_params_copy_2 = deepcopy(base_params)
-        base_params_copy_2["alpha_change"] = "static_culturally_determined_weights"
+        base_params_copy_2 = deepcopy(base_params_copy)
+        base_params_copy_2["alpha_change"] = "uniform_network_weighting"
         base_params_copy_2["confirmation_bias"] = 0
         params_sub_list_2 = produce_param_list_just_stochastic(base_params_copy_2)
         params_list.extend(params_sub_list_2)
 
     # 3. Run with fixed network weighting socially determined, Emissions: [S_n]
     if "static_socially_determined_weights" in scenarios:
-        base_params_copy_3 = deepcopy(base_params)
+        base_params_copy_3 = deepcopy(base_params_copy)
         base_params_copy_3["alpha_change"] = "static_socially_determined_weights"
         params_sub_list_3 = produce_param_list_just_stochastic(base_params_copy_3)
         params_list.extend(params_sub_list_3)
 
     # 4. Run with fixed network weighting culturally determined, Emissions: [S_n]
     if "static_culturally_determined_weights" in scenarios:
-        base_params_copy_4 = deepcopy(base_params)
+        base_params_copy_4 = deepcopy(base_params_copy)
         base_params_copy_4["alpha_change"] = "static_culturally_determined_weights"
         params_sub_list_4 = produce_param_list_just_stochastic(base_params_copy_4)
         params_list.extend(params_sub_list_4)
 
     # 5. Run with social learning, Emissions: [S_n]
     if "dynamic_socially_determined_weights" in scenarios:
-        base_params_copy_5 = deepcopy(base_params)
+        base_params_copy_5 = deepcopy(base_params_copy)
         base_params_copy_5["alpha_change"] = "dynamic_socially_determined_weights"
         params_sub_list_5 = produce_param_list_just_stochastic(base_params_copy_5)
         params_list.extend(params_sub_list_5)
@@ -84,7 +92,6 @@ def arrange_scenarios_no_tax(base_params,scenarios):
         base_params_copy_6["alpha_change"] = "dynamic_culturally_determined_weights"
         params_sub_list_6 = produce_param_list_just_stochastic(base_params_copy_5)
         params_list.extend(params_sub_list_6)
-
 
     return params_list
 
@@ -97,9 +104,10 @@ def produce_param_list_scenarios_tax(params: dict, property_list: list, property
             params_list.append(params.copy())  
     return params_list
 
-def arrange_scenarios_tax(base_params, carbon_tax_vals,scenarios):
+def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
+    base_params_tax_copy = deepcopy(base_params_tax)
 
-    base_params["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
+    base_params_tax_copy["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
 
     params_list = []
 
@@ -107,43 +115,43 @@ def arrange_scenarios_tax(base_params, carbon_tax_vals,scenarios):
 
     # 1. Run with fixed preferences, Emissions: [S_n]
     if "fixed_preferences" in scenarios:
-        base_params_copy_1 = deepcopy(base_params)
+        base_params_copy_1 = deepcopy(base_params_tax_copy)
         base_params_copy_1["alpha_change"] = "fixed_preferences"
         params_sub_list_1 = produce_param_list_scenarios_tax(base_params_copy_1, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_1)
 
     # 2. Run with fixed network weighting uniform, Emissions: [S_n]
     if "uniform_network_weighting" in scenarios:
-        base_params_copy_2 = deepcopy(base_params)
-        base_params_copy_2["alpha_change"] = "static_culturally_determined_weights"
+        base_params_copy_2 = deepcopy(base_params_tax_copy)
+        base_params_copy_2["alpha_change"] = "uniform_network_weighting"
         base_params_copy_2["confirmation_bias"] = 0
         params_sub_list_2 = produce_param_list_scenarios_tax(base_params_copy_2, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_2)
 
     # 3. Run with fixed network weighting socially determined, Emissions: [S_n]
     if "static_socially_determined_weights" in scenarios:
-        base_params_copy_3 = deepcopy(base_params)
+        base_params_copy_3 = deepcopy(base_params_tax_copy)
         base_params_copy_3["alpha_change"] = "static_socially_determined_weights"
         params_sub_list_3 = produce_param_list_scenarios_tax(base_params_copy_3, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_3)
 
     # 4. Run with fixed network weighting culturally determined, Emissions: [S_n]
     if "static_culturally_determined_weights" in scenarios:
-        base_params_copy_4 = deepcopy(base_params)
+        base_params_copy_4 = deepcopy(base_params_tax_copy)
         base_params_copy_4["alpha_change"] = "static_culturally_determined_weights"
         params_sub_list_4 = produce_param_list_scenarios_tax(base_params_copy_4, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_4)
 
     # 5. Run with social learning, Emissions: [S_n]
     if "dynamic_socially_determined_weights" in scenarios:
-        base_params_copy_5 = deepcopy(base_params)
+        base_params_copy_5 = deepcopy(base_params_tax_copy)
         base_params_copy_5["alpha_change"] = "dynamic_socially_determined_weights"
         params_sub_list_5 = produce_param_list_scenarios_tax(base_params_copy_5, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_5)
 
     # 6.  Run with cultural learning, Emissions: [S_n]
     if "dynamic_culturally_determined_weights" in scenarios:
-        base_params_copy_6 = deepcopy(base_params)
+        base_params_copy_6 = deepcopy(base_params_tax_copy)
         base_params_copy_6["alpha_change"] = "dynamic_culturally_determined_weights"
         params_sub_list_6 = produce_param_list_scenarios_tax(base_params_copy_6, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_6)
@@ -154,7 +162,7 @@ def main(
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",
         print_simu = 1,
-        scenarios = ["fixed_preferences","uniform_network_weighting", "static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
+        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
         RUN_TYPE = 1
         ) -> str: 
 
@@ -212,11 +220,14 @@ def main(
     #Gen params lists
     params_list_no_tax = arrange_scenarios_no_tax(params,scenarios)
     params_list_tax = arrange_scenarios_tax(params,property_values_list,scenarios)
+
+    #quit()
     print("Total runs: ",len(params_list_tax) + len(params_list_no_tax))
     
     #RESULTS
     if RUN_TYPE == 1:
         emissions_stock_no_tax_flat = emissions_parallel_run(params_list_no_tax)
+        print("NO TAX DONE")
         emissions_stock_tax_flat = emissions_parallel_run(params_list_tax)
 
         #unpack_results into scenarios and seeds
@@ -236,6 +247,7 @@ def main(
             "or %s s" % ((time.time() - start_time)),
         )
 
+    #quit()
     ##################################
     #save data
 
