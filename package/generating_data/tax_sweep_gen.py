@@ -2,9 +2,6 @@
 A module that use input data to generate data from multiple social networks varying a single property
 between simulations so that the differences may be compared. 
 
-
-
-
 Created: 10/10/2022
 """
 
@@ -90,7 +87,7 @@ def arrange_scenarios_no_tax(base_params,scenarios):
     if "dynamic_culturally_determined_weights" in scenarios:
         base_params_copy_6 = deepcopy(base_params)
         base_params_copy_6["alpha_change"] = "dynamic_culturally_determined_weights"
-        params_sub_list_6 = produce_param_list_just_stochastic(base_params_copy_5)
+        params_sub_list_6 = produce_param_list_just_stochastic(base_params_copy_6)
         params_list.extend(params_sub_list_6)
 
     return params_list
@@ -235,6 +232,7 @@ def main(
         emissions_stock_tax = emissions_stock_tax_flat.reshape(scenario_reps,property_reps,params["seed_reps"])
     elif RUN_TYPE == 2:
         emissions_stock_no_tax_flat = emissions_parallel_run_timeseries(params_list_no_tax)
+        print("NO TAX DONE")
         emissions_stock_tax_flat = emissions_parallel_run_timeseries(params_list_tax)
 
         #unpack_results into scenarios and seeds
