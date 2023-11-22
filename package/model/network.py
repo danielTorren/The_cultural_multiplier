@@ -27,9 +27,15 @@ class Network:
             Dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters
 
         """
-        self.set_seed = int(round(parameters["set_seed"]))
+        
         self.network_structure_seed = parameters["network_structure_seed"]    
-        self.init_vals_seed = parameters["init_vals_seed"] 
+        
+        #THIS IS THE CORRECT WAY
+        #self.init_vals_seed = parameters["init_vals_seed"] 
+        #self.set_seed = int(round(parameters["set_seed"]))
+        #THIS IS FOR VARYING INITAL CONDITONS
+        self.init_vals_seed = int(round(parameters["set_seed"]))
+        self.set_seed = parameters["init_vals_seed"] 
 
         #For inital construction set a seed, this is the same for all runs, then later change it to set_seed
         np.random.seed(self.init_vals_seed)
