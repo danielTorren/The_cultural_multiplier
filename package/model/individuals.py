@@ -31,7 +31,7 @@ class Individual:
         self.init_budget = budget
         self.instant_budget = self.init_budget
 
-        self.carbon_price = individual_params["carbon_price"]
+        self.carbon_price_m = individual_params["carbon_price_m"]
 
         self.M = individual_params["M"]
         self.t = individual_params["t"]
@@ -40,8 +40,8 @@ class Individual:
         self.phi_array = individual_params["phi_array"]
         self.sector_preferences = individual_params["sector_preferences"]
         self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
-        self.prices_low_carbon = individual_params["prices_low_carbon"]
-        self.prices_high_carbon = individual_params["prices_high_carbon"]
+        self.prices_low_carbon_m = individual_params["prices_low_carbon_m"]
+        self.prices_high_carbon_m = individual_params["prices_high_carbon_m"]
         self.clipping_epsilon = individual_params["clipping_epsilon"]
         self.ratio_preference_or_consumption = individual_params["ratio_preference_or_consumption"]
         self.burn_in_duration = individual_params["burn_in_duration"]
@@ -49,7 +49,7 @@ class Individual:
 
         self.sector_substitutability = individual_params["sector_substitutability"]
 
-        self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
+        self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
 
         self.id = id_n
 
@@ -82,7 +82,7 @@ class Individual:
 
     def calc_Omega_m(self):
         term_1 = (self.prices_high_carbon_instant*self.low_carbon_preferences)
-        term_2 = (self.prices_low_carbon*(1- self.low_carbon_preferences))
+        term_2 = (self.prices_low_carbon_m*(1- self.low_carbon_preferences))
         omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
         return omega_vector
     
@@ -96,7 +96,7 @@ class Individual:
         return chi_m
     
     def calc_Z(self):
-        common_vector_denominator = self.Omega_m*self.prices_low_carbon + self.prices_high_carbon_instant
+        common_vector_denominator = self.Omega_m*self.prices_low_carbon_m + self.prices_high_carbon_instant
         chi_pow = self.chi_m**self.sector_substitutability
         
         Z = np.matmul(chi_pow, common_vector_denominator)#is this correct[new]        
@@ -170,13 +170,13 @@ class Individual:
         self.history_L_m.append(self.L_m)
 
 
-    def next_step(self, t: int, social_component: npt.NDArray, carbon_price):
+    def next_step(self, t: int, social_component: npt.NDArray, carbon_price_m):
 
         self.t = t
 
         #update prices
-        self.carbon_price = carbon_price
-        self.prices_high_carbon_instant = self.prices_high_carbon + self.carbon_price
+        self.carbon_price_m = carbon_price_m
+        self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
 
         #update preferences 
         if self.alpha_change != "fixed_preferences":
