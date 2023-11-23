@@ -104,6 +104,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_average_21_43_39__25_07_2023",
+        fileName="results/two_param_sweep_average_13_10_30__23_11_2023",
         PLOT_TYPE=2
     )

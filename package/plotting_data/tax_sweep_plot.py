@@ -237,6 +237,40 @@ def plot_emissions_ratio_line_alt(
     f = plotName + "/ALT_plot_emissions_ratio_line"
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
+def plot_seeds_scatter_emissions(
+    fileName, emissions_array, scenarios_titles, property_vals, seed_reps,seeds_to_show
+):
+
+    #print(c,emissions_final)
+    #print(emissions.shape)#6,200,10 ie scenario, reps, seeds
+    emissions_trans = np.transpose(emissions_array,(2,0,1))#now its seed, scenario, reps
+    emissions_reduc = emissions_trans[:seeds_to_show]
+    #quit()
+    fig, axes = plt.subplots(ncols=seeds_to_show,figsize=(20,10),sharey=True, constrained_layout = True)
+
+
+    for k, ax in enumerate(axes.flat):
+        ax.grid()  
+        #print("k",k)
+        colors = iter(rainbow(np.linspace(0, 1,len(scenarios_titles))))
+        emissions = emissions_reduc[k]#this is a 2d array
+        #print(len(emissions))
+        for i in range(len(emissions)):#cycle through scenarios
+            
+            color = next(colors)#set color for whole scenario?
+            data = emissions[i]#its now seed then tax
+            #print("data",data)
+            ax.scatter(property_vals,  data, color = color, label=scenarios_titles[i])
+
+          
+        ax.set_xlabel(r"Carbon Tax")
+        ax.set_ylabel(r"Carbon Emissions")
+    axes[-1].legend()
+    #print("what worong")
+    plotName = fileName + "/Prints"
+    f = plotName + "/seeds_scatter_carbon_tax_emissions"
+    fig.savefig(f+ ".png", dpi=600, format="png")  
+
 def main(
     fileName = "results/tax_sweep_11_29_20__28_09_2023",
 ) -> None:
@@ -250,11 +284,14 @@ def main(
     scenarios = load_object(fileName + "/Data", "scenarios")
 
     seed_reps = base_params["seed_reps"]
+    seeds_to_show = 4
+    #scenario_emissions_no_tax(fileName, emissions_no_tax, scenarios,seed_reps)
+    #plot_scatter_end_points_emissions_scatter(fileName, emissions_tax, scenarios ,property_values_list)
+    #plot_means_end_points_emissions(fileName, emissions_tax, scenarios ,property_values_list)
+    plot_seeds_scatter_emissions(fileName, emissions_tax, scenarios ,property_values_list,seed_reps,seeds_to_show)
+    #quit()
     
-    scenario_emissions_no_tax(fileName, emissions_no_tax, scenarios,seed_reps)
-    plot_scatter_end_points_emissions_scatter(fileName, emissions_tax, scenarios ,property_values_list)
-    plot_means_end_points_emissions(fileName, emissions_tax, scenarios ,property_values_list)
-    
+    """
     arr_zero_price = (np.where(property_values_list==0)[0])
     if arr_zero_price.size != 0:#check whether zero price included
         plot_emissions_ratio_scatter_alt(fileName, emissions_tax, scenarios ,property_values_list)
@@ -263,10 +300,10 @@ def main(
         #if 0 price not include then divide by the zero tax, NOT really sure i need this could just get rid of zero tax entirely
         plot_emissions_ratio_scatter(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
         plot_emissions_ratio_line(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
-
+    """
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_12_37_36__22_11_2023",
+        fileName="results/tax_sweep_12_57_50__22_11_2023",
     )

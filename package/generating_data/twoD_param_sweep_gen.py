@@ -18,7 +18,7 @@ from package.resources.utility import (
     produce_name_datetime,
 )
 from package.resources.run import (
-    multi_emissions_stock,
+    multi_emissions_stock, emissions_parallel_run
 )
 
 # modules
@@ -76,8 +76,8 @@ def main(
     print("fileName:", fileName)
 
     params_list,key_param_array = produce_param_list_stochastic_n_double(base_params, variable_parameters_dict)
-    
-    results_emissions_stock_series,____ = multi_emissions_stock(params_list)
+    print("TOTAL RUNS: ", len(params_list))
+    results_emissions_stock_series = emissions_parallel_run(params_list)
 
     results_emissions_stock = results_emissions_stock_series.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], base_params["seed_reps"]))
 
@@ -93,6 +93,6 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_11 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_B_d.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_B_d.json"
+        BASE_PARAMS_LOAD = "package/constants/base_params_2D_tau_vary_sigma_low.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_tau_vary_sigma_low.json"
     )

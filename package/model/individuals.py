@@ -81,90 +81,30 @@ class Individual:
     #NESTED CES
 
     def calc_Omega_m(self):
-        """Looks correct"""     
         term_1 = (self.prices_high_carbon_instant*self.low_carbon_preferences)
         term_2 = (self.prices_low_carbon*(1- self.low_carbon_preferences))
-        #mul = (term_1/term_2)
         omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
-        #"""
-        #if self.id == 1:
-            #print("self.id", self.id, self.t,self.low_carbon_preferences)
-            #print("omega", self.t,self.low_carbon_substitutability_array, omega_vector )
-        #if self.id == 1 and self.t== 3:
-        #    quit()
-        #"""
         return omega_vector
     
     def calc_n_tilde_m(self):
-        """Looks correct"""
         n_tilde_m = (self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array))+(1-self.low_carbon_preferences))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
-        
-        """
-        if self.id == 1:
-            print("self.id", self.id, self.t,self.low_carbon_preferences)
-            print(" n_tilde_m", n_tilde_m)
-        if self.id == 1 and self.t== 3:
-            quit()
-        """
         return n_tilde_m
         
     
     def calc_chi_m_nested_CES(self):
-        """Looks correct"""
         chi_m = (self.sector_preferences*(self.n_tilde_m**((self.sector_substitutability-1)/self.sector_substitutability)))/self.prices_high_carbon_instant
-        """
-        if self.id == 1:
-            print("self.id", self.id, self.t,self.low_carbon_preferences)
-            print(" chi_m", chi_m)
-        if self.id == 1 and self.t== 3:
-            quit()
-        """
-        
         return chi_m
     
     def calc_Z(self):
-        """Hard to interpret but looks right"""
         common_vector_denominator = self.Omega_m*self.prices_low_carbon + self.prices_high_carbon_instant
         chi_pow = self.chi_m**self.sector_substitutability
         
-        Z = np.matmul(chi_pow, common_vector_denominator)#is this correct[new]
-        #Z = np.matmul(self.chi_m, common_vector_denominator)#is this correct[original]
-        """
-        if self.id == 1:
-            print("self.id", self.id, self.t,self.low_carbon_preferences)
-            #print("self.chi_m",self.chi_m)
-            #print("chi_pow",chi_pow)
-            #print("common_vector_denominator", common_vector_denominator)
-            #print("Z",Z)
-            #print(sum(chi_pow),chi_pow, Z)
-        if self.id == 1 and self.t== 3:
-            quit()
-        """
-        
+        Z = np.matmul(chi_pow, common_vector_denominator)#is this correct[new]        
         return Z
     
     def calc_consumption_quantities_nested_CES(self):
         H_m = (self.instant_budget*(self.chi_m**self.sector_substitutability))/self.Z
         L_m = H_m*self.Omega_m
-
-        """
-        if self.id == 1:
-            print("self.id", self.id, self.t,self.low_carbon_preferences)
-            print("self.instant_budget",self.instant_budget)
-            print("(self.chi_m**self.sector_substitutability)",(self.chi_m**self.sector_substitutability))
-            print("self.Z",self.Z)
-            print("H_m",H_m)
-            print("self.Omega_m",self.Omega_m)
-            print("L_m",L_m)
-        if self.id == 1 and self.t== 5:
-            quit()
-        """
-
-        ###NOT SURE I NEED THE LINE BELOW
-        #H_m_clipped = np.clip(H_m, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
-        #L_m_clipped = np.clip(L_m, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
-        
-        #return H_m_clipped,L_m_clipped
         return H_m, L_m
     
     def calc_consumption_ratio(self):
