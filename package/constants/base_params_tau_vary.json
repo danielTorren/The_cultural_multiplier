@@ -12,7 +12,7 @@
     "N": 200,
     "M": 5,
     "phi": 0.005,
-    "network_density": 0.4,
+    "network_density": 0.1,
     "prob_rewire": 0.1,
     "learning_error_scale": 0.01,
     "homophily": 0.95,

@@ -75,6 +75,8 @@ def main(
     #variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     #results_emissions = load_object(fileName + "/Data", "results_emissions_stock")
     #key_param_array = load_object(fileName + "/Data","key_param_array")
+    base_params = load_object(fileName + "/Data","base_params")
+    print("base params",base_params)
 
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     results_emissions = load_object(fileName + "/Data", "results_emissions_stock")
@@ -83,7 +85,7 @@ def main(
     #results_emissions
     #matrix_emissions = results_emissions.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"]))
 
-    #matrix_emissions = np.mean(results_emissions, axis=2)
+    matrix_emissions = np.mean(results_emissions, axis=2)
     #double_phase_diagram(fileName, matrix_emissions, r"Total normalised emissions $E/NM$", "emissions",variable_parameters_dict, get_cmap("Reds"),dpi_save, levels,latex_bool = latex_bool)  
     
     col_dict = variable_parameters_dict["col"]
@@ -99,7 +101,7 @@ def main(
     y_label = "Emissions stock, $E/(NM)$"#col_dict["title"]#r"Identity variance, $\sigma^2$"
         
     #multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 1, col_label, row_label, y_label)#y_ticks_pos, y_ticks_label
-    #multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label)#y_ticks_pos, y_ticks_label
+    multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label)#y_ticks_pos, y_ticks_label
     seed_reps_select = 4
     multi_line_matrix_plot_stacked(fileName,results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label,seed_reps_select)
     
@@ -112,6 +114,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_average_13_17_40__23_11_2023",
+        fileName="results/two_param_sweep_average_16_23_26__23_11_2023",
         PLOT_TYPE=2
     )

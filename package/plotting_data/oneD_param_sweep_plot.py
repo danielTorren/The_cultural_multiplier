@@ -572,25 +572,25 @@ def main(
         plot_end_points_emissions_lines(fileName, emissions_array, "redistribution val", property_varied, property_values_list, dpi_save)
     if PLOT_TYPE == 5:
 
+        """
         emissions_array= np.asarray([[x.total_carbon_emissions_stock] for x in data_list])
-
         plot_end_points_emissions(fileName, emissions_array, "redistribution val", property_varied, property_values_list, dpi_save)
         plot_end_points_emissions_scatter(fileName, emissions_array, "redistribution val", property_varied, property_values_list, dpi_save)
         plot_end_points_emissions_lines(fileName, emissions_array, "redistribution val", property_varied, property_values_list, dpi_save)
-        
         """
+
         # look at splitting of the last behaviour with preference dissonance
         #property_varied_title = "$\sigma_A$"
         plot_stacked_preferences(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_chi_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_chi_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         plot_stacked_H_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_L_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_L_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
 
-        plot_stacked_preferences_averages(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        plot_utility(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        """
+        #plot_stacked_preferences_averages(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        #plot_utility(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        
         #anim_save_bool = False
         #multi_data_and_col_fixed_animation_distribution(fileName, data_list, "history_low_carbon_preferences","Low carbon Preferences","y", property_varied_title,property_values_list,dpi_save,anim_save_bool)
         #DONT PUT ANYTHING MORE PLOTS AFTER HERE DUE TO ANIMATION 
@@ -601,7 +601,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/one_param_sweep_multi_12_38_58__23_11_2023",
+        fileName= "results/one_param_sweep_multi_18_29_09__23_11_2023",
         PLOT_TYPE = 5
     )
 

@@ -31,11 +31,11 @@ class Network:
         self.network_structure_seed = parameters["network_structure_seed"]    
         
         #THIS IS THE CORRECT WAY
-        self.init_vals_seed = parameters["init_vals_seed"] 
-        self.set_seed = int(round(parameters["set_seed"]))
+        #self.init_vals_seed = parameters["init_vals_seed"] 
+        #self.set_seed = int(round(parameters["set_seed"]))
         #THIS IS FOR VARYING INITAL CONDITONS
-        #self.init_vals_seed = int(round(parameters["set_seed"]))
-        #self.set_seed = parameters["init_vals_seed"] 
+        self.init_vals_seed = int(round(parameters["set_seed"]))
+        self.set_seed = parameters["init_vals_seed"] 
 
         #For inital construction set a seed, this is the same for all runs, then later change it to set_seed
         np.random.seed(self.init_vals_seed)
@@ -63,11 +63,14 @@ class Network:
 
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
-        self.prices_high_carbon_array =  np.asarray([1]*self.M)#start them at the same value
+        self.prices_high_carbon =  np.asarray([1]*self.M)#start them at the same value
 
         #carbon_price
         self.carbon_price_m = np.asarray([0]*self.M)
-        self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
+        #RIGHTWAY 
+        #self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
+        #WRONG WAY CHANGE
+        self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_lower"], num=self.M)
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
@@ -108,9 +111,9 @@ class Network:
         self.individual_budget_array =  np.asarray([parameters["budget"]]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
         #CHANGE THIS !!!!!!!!!!!!!!!!!!!!!!!!!
-        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
+        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
         
         #self.low_carbon_substitutability_array = np.asarray([3])
         self.sector_preferences = np.asarray([1/self.M]*self.M)
@@ -302,10 +305,10 @@ class Network:
             "save_timeseries_data": self.save_timeseries_data,
             "phi_array": self.phi_array,
             "compression_factor": self.compression_factor,
-            "carbon_price_m": self.carbon_price_m,
+            "init_carbon_price_m": self.carbon_price_m,
             "low_carbon_substitutability": self.low_carbon_substitutability_array,
             "prices_low_carbon_m": self.prices_low_carbon,
-            "prices_high_carbon_m":self.prices_high_carbon_array,
+            "prices_high_carbon_m":self.prices_high_carbon,
             "clipping_epsilon" :self.clipping_epsilon,
             "ratio_preference_or_consumption": self.ratio_preference_or_consumption,
             "sector_preferences" : self.sector_preferences,
@@ -591,7 +594,7 @@ class Network:
         # advance a time step
         self.t += 1
 
-        if self.t == self.burn_in_duration + 1:
+        if self.t == (self.burn_in_duration + 1):
             self.carbon_price_m = self.carbon_price_increased_m#turn on carbon price
         
         # execute step

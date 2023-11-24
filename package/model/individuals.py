@@ -31,8 +31,6 @@ class Individual:
         self.init_budget = budget
         self.instant_budget = self.init_budget
 
-        self.carbon_price_m = individual_params["carbon_price_m"]
-
         self.M = individual_params["M"]
         self.t = individual_params["t"]
         self.save_timeseries_data = individual_params["save_timeseries_data"]
@@ -49,7 +47,7 @@ class Individual:
 
         self.sector_substitutability = individual_params["sector_substitutability"]
 
-        self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
+        self.prices_high_carbon_instant = self.prices_high_carbon_m + individual_params["init_carbon_price_m"]
 
         self.id = id_n
 
@@ -175,8 +173,10 @@ class Individual:
         self.t = t
 
         #update prices
-        self.carbon_price_m = carbon_price_m
-        self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
+        self.prices_high_carbon_instant = self.prices_high_carbon_m + carbon_price_m
+
+        #print("self.prices_high_carbon_instant",self.prices_high_carbon_instant)
+        #quit()
 
         #update preferences 
         if self.alpha_change != "fixed_preferences":
