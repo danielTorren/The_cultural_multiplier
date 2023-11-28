@@ -90,7 +90,7 @@ def arrange_scenarios_no_tax(base_params,scenarios):
         params_sub_list_6 = produce_param_list_just_stochastic(base_params_copy_6)
         params_list.extend(params_sub_list_6)
 
-    if "fixed_fully_connected" in scenarios:
+    if "fully_connected_uniform" in scenarios:
         base_params_copy_7 = deepcopy(base_params_copy)
         base_params_copy_7["alpha_change"] = "fixed_preferences"
         base_params_copy_7["network_density"] = 1
@@ -160,7 +160,7 @@ def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
         params_sub_list_6 = produce_param_list_scenarios_tax(base_params_copy_6, carbon_tax_vals,"carbon_price_increased_lower")
         params_list.extend(params_sub_list_6)
 
-    if "fixed_fully_connected" in scenarios:
+    if "fully_connected_uniform" in scenarios:
         base_params_copy_7 = deepcopy(base_params_tax_copy)
         base_params_copy_7["network_density"] = 1
         base_params_copy_7["alpha_change"] = "uniform_network_weighting"
@@ -281,7 +281,7 @@ if __name__ == '__main__':
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",#"package/constants/base_params_tau_vary_timeseries.json",#"package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",#"package/constants/oneD_dict_tau_vary_timeseries.json", #"package/constants/oneD_dict_tau_vary.json",
         #scenarios = ["uniform_network_weighting", "dynamic_socially_determined_weights"],
-        scenarios = ["fixed_fully_connected","fixed_preferences","uniform_network_weighting","static_culturally_determined_weights", "dynamic_culturally_determined_weights" ],
+        scenarios = ["fully_connected_uniform","fixed_preferences","uniform_network_weighting","static_culturally_determined_weights", "dynamic_culturally_determined_weights" ],
         RUN_TYPE = 1
     )
     #["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],

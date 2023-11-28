@@ -7,7 +7,8 @@ from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 from package.resources.utility import (
-    load_object
+    load_object,
+    save_object
 )
 from matplotlib.cm import rainbow
 import matplotlib.pyplot as plt
@@ -320,32 +321,31 @@ def main(
     base_params = load_object(fileName + "/Data", "base_params") 
     #print("base params", base_params)
     scenarios = load_object(fileName + "/Data", "scenarios")
-    #print(scenarios)
-    #quit()
-    #culture is 5!
+    print(scenarios)
 
     seed_reps = base_params["seed_reps"]
-    seeds_to_show = 2
-    #scenario_emissions_no_tax(fileName, emissions_no_tax, scenarios,seed_reps)
-    #plot_scatter_end_points_emissions_scatter(fileName, emissions_tax, scenarios ,property_values_list)
-    #plot_means_end_points_emissions(fileName, emissions_tax, scenarios ,property_values_list)
-    #plot_seeds_scatter_emissions(fileName, emissions_tax, scenarios ,property_values_list,seed_reps,seeds_to_show)
-    log_emissions_plot_culture(fileName, emissions_tax, scenarios ,property_values_list,seed_reps,seeds_to_show)
+    seeds_to_show = 4
+    scenario_emissions_no_tax(fileName, emissions_no_tax, scenarios,seed_reps)
+    plot_scatter_end_points_emissions_scatter(fileName, emissions_tax, scenarios ,property_values_list)
+    plot_means_end_points_emissions(fileName, emissions_tax, scenarios ,property_values_list)
+    plot_seeds_scatter_emissions(fileName, emissions_tax, scenarios ,property_values_list,seed_reps,seeds_to_show)
+    #log_emissions_plot_culture(fileName, emissions_tax, scenarios ,property_values_list,seed_reps,seeds_to_show)
     #quit()
     
-    """
+    #"""
     arr_zero_price = (np.where(property_values_list==0)[0])
     if arr_zero_price.size != 0:#check whether zero price included
         plot_emissions_ratio_scatter_alt(fileName, emissions_tax, scenarios ,property_values_list)
         plot_emissions_ratio_line_alt(fileName, emissions_tax, scenarios ,property_values_list)
+        
     else:
         #if 0 price not include then divide by the zero tax, NOT really sure i need this could just get rid of zero tax entirely
         plot_emissions_ratio_scatter(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
         plot_emissions_ratio_line(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
-    """
+    #"""
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_12_57_50__22_11_2023",
+        fileName="results/tax_sweep_13_35_03__28_11_2023",
     )
