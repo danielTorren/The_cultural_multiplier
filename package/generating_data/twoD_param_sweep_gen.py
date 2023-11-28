@@ -71,7 +71,7 @@ def main(
         variable_parameters_dict
     )
 
-    root = "two_param_sweep_average"
+    root = "two_param_sweep"
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
@@ -93,6 +93,6 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_11 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_2D_tau_vary_sigma_low.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_tau_vary_sigma_low.json"
+        BASE_PARAMS_LOAD = "package/constants/base_params_2D_sigma_sigma.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_sigma_sigma.json"
     )
