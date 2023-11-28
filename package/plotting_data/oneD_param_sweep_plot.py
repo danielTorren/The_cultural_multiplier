@@ -4,6 +4,7 @@ Created: 10/10/2022
 """
 
 # imports
+from cProfile import label
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 from package.resources.utility import load_object
@@ -18,6 +19,8 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.cm import get_cmap
+from matplotlib.cm import ScalarMappable
 
 def plot_stacked_preferences(fileName, data_list,property_values_list, property_varied, property_varied_title, dpi_save):
 
@@ -387,143 +390,149 @@ def plot_utility(fileName,data_list,property_values_list, property_varied, prope
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
 
-def multi_data_and_col_fixed_animation_distribution(fileName, Data_run_list, property_plot, x_axis_label, direction,property_varied_title,property_values_list, dpi_save, save_bool):
+def plot_stacked_total_quant(fileName, data_list,property_values_list, property_varied, property_varied_title, dpi_save):
 
+    fig, axes = plt.subplots(nrows=len(data_list),ncols=data_list[0].M, sharex="col", constrained_layout = True,figsize=(14, 7))
 
-    cols = ["%s=%s" % (property_varied_title,str(round(val,4))) for val in property_values_list]
+    for i, data in enumerate(data_list):
+        #axes[i][0].set_title(property_varied_title + " = " + str(round(property_values_list[i],3)))
+        for v in range(data.N):
+            a = np.asarray(data.agent_list[v].history_L_m)
+            b = np.asarray(data.agent_list[v].history_H_m)
+            data_indivdiual = np.asarray(data.agent_list[v].history_L_m) + np.asarray(data.agent_list[v].history_H_m)
+            for j in range(data.M):
+                #if i == 0:
+                #axes[0][j].set_title("$\sigma_{%s} = %s$" % (j,data.low_carbon_substitutability_array[j]))
+                axes[i][j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j]
+                )
 
-    data_store = []
+    cols = ["$\sigma_{%s}=%s$" % (i+1,str(round(data_list[0].low_carbon_substitutability_array[i],3))) for i in range(len(data_list[0].low_carbon_substitutability_array))]
+    rows = ["%s=%s" % (property_varied_title,str(round(val,4))) for val in property_values_list]
 
-    min_lim = 0#change this if they arent [0,1] variable such as utility
-    max_lim = 1
-
-    for data_sim in Data_run_list:
-        time_series = data_sim.history_time
-        data_list = []  
-        for v in range(data_sim.N):
-            data_list.append(np.asarray(eval("data_sim.agent_list[v].%s" % property_plot)))
-        
-        data_matrix = np.asarray(data_list)#[N, T, M]
-
-        reshaped_array = np.transpose(data_matrix, (2, 1, 0))#[M, T, N] SO COOL THAT YOU CAN SPECIFY REORDING WITH TRANSPOSE!
-
-        data_pd_list = []
-        for data_matrix_T in reshaped_array:
-            # Example data
-            data = pd.DataFrame({
-                'Time': time_series,
-                'Distribution': data_matrix_T.tolist()
-            })
-            data_pd_list.append(data)
-
-        data_store.append(data_pd_list)
-
-    # Create a figure and axis for the animation
-    fig, axes = plt.subplots(figsize=(10, 5), nrows=1,ncols=len(Data_run_list), sharey=True, constrained_layout = True)
-    sns.set_style("whitegrid")
-
-    pad = 5
-
-    for k, ax in enumerate(axes.flat):
-        ax.annotate(cols[k], xy=(0.5, 1), xytext=(0, pad),
+    #print(cols)
+    #print(rows)
+    pad = 2 # in points
+    #"""
+    for ax, col in zip(axes[0], cols):
+        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
                     xycoords='axes fraction', textcoords='offset points',
-                    size='small', ha='center', va='baseline')#add rthe label
-            
-        data_pd_list = data_store[k]
-        # Set up the initial KDE plot
-        if direction == "y":
-            for i,data in enumerate(data_pd_list):
-                initial_kde = sns.kdeplot(ax = ax,y = data['Distribution'].iloc[0], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
-            ax.set_ylabel(x_axis_label)
-            ax.set_xlabel('Density')
-            ax.set_ylim(min_lim,max_lim)
-        else:
-            for i,data in enumerate(data_pd_list):
-                initial_kde = sns.kdeplot(ax = ax,x = data['Distribution'].iloc[0], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))#color='b'
-            ax.set_xlabel(x_axis_label)
-            ax.set_ylabel('Density')
-            ax.set_xlim(min_lim,max_lim)
-        #ax.set_title(f"Distribution Over Time - Time {data['Time'].iloc[0]}")
-        ax.legend(loc='upper right')
+                    size='small', ha='center', va='baseline')
+    #"""
 
+    for ax, row in zip(axes[:,0], rows):
+        ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+                    xycoords=ax.yaxis.label, textcoords='offset points',
+                    size='small', ha='right', va='center',rotation=90)
+        
+    fig.supxlabel(r"Time")
+    fig.supylabel("$Q_m = H_m + L_m$")
     
-    fig.suptitle(f"Steps: {data_store[0][0]['Time'].iloc[0]}/{data_store[0][0]['Time'].iloc[-1]}")
+    plotName = fileName + "/Prints"
 
-    def update(frame):
-        fig.suptitle(f"Steps: {data_store[0][0]['Time'].iloc[frame]}/{data_store[0][0]['Time'].iloc[-1]}")
+    f = plotName + "/plot_stacked_total_quant_%s" %(property_varied)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def multiline(xs, ys, c, ax=None, **kwargs):
+    """Plot lines with different colorings
+    Parameters
+    ----------
+    xs : iterable container of x coordinates
+    ys : iterable container of y coordinates
+    c : iterable container of numbers mapped to colormap
+    ax (optional): Axes to plot on.
+    kwargs (optional): passed to LineCollection
+    Notes:
+        len(xs) == len(ys) == len(c) is the number of line segments
+        len(xs[i]) == len(ys[i]) is the number of points for each line (indexed by i)
+    Returns
+    -------
+    lc : LineCollection instance.
+    """
+
+    # find axes
+    ax = plt.gca() if ax is None else ax
+
+    # create LineCollection
+    segments = [np.column_stack([x, y]) for x, y in zip(xs, ys)]
+    lc = LineCollection(segments, **kwargs)
+
+    # set coloring of line segments
+    #    Note: I get an error if I pass c as a list here... not sure why.
+    lc.set_array(np.asarray(c))
+
+    # add lines to axes and rescale 
+    #    Note: adding a collection doesn't autoscalee xlim/ylim
+    ax.add_collection(lc)
+    ax.autoscale()
+    return lc
+
+def plot_stuff_one_individual(fileName, data_list,property_values_list, property_varied, property_varied_title, dpi_save,indiv_index):
+
+    rows = 4
+
+    fig, axes = plt.subplots(nrows=rows,ncols=data_list[0].M, sharex="col", constrained_layout = True,figsize=(14, 7))
+
+    c = property_values_list
+    cmap = plt.get_cmap("cividis")
+
+    for i, data in enumerate(data_list):#loop through different property values
+        A = np.asarray(data.agent_list[indiv_index].history_low_carbon_preferences).T
+        H = np.asarray(data.agent_list[indiv_index].history_H_m).T
+        L = np.asarray(data.agent_list[indiv_index].history_L_m).T
+        Q = (np.asarray(data.agent_list[indiv_index].history_L_m) + np.asarray(data.agent_list[indiv_index].history_H_m)).T
         
-        for k, ax in enumerate(axes.flat):
-            ax.cla()  # Clear the current axes
+        for j in range(data.M):
             
-            ax.annotate(cols[k], xy=(0.5, 1), xytext=(0, pad),
-                        xycoords='axes fraction', textcoords='offset points',
-                        size='small', ha='center', va='baseline')  # Add the top label
+            axes[0][j].plot(np.asarray(data.history_time),A[j],  color=cmap(c[i]),label = "$\tau = %s$" % (str(round(property_values_list[i],4))))
+            axes[1][j].plot(np.asarray(data.history_time),H[j],  color=cmap(c[i]),label = "$\tau = %s$" % (str(round(property_values_list[i],4))))
+            axes[2][j].plot(np.asarray(data.history_time),L[j],  color=cmap(c[i]),label = "$\tau = %s$" % (str(round(property_values_list[i],4))))
+            axes[3][j].plot(np.asarray(data.history_time),Q[j],  color=cmap(c[i]),label = "$\tau = %s$" % (str(round(property_values_list[i],4))))
+    
+    axes[0][0].set_ylabel("A")
+    axes[1][0].set_ylabel("H")
+    axes[2][0].set_ylabel("L")
+    axes[3][0].set_ylabel("Q")
 
-            data_pd_list = data_store[k]  # Get the right data
+    # Create a ScalarMappable to map values to colors
+    norm = plt.Normalize(min(property_values_list), max(property_values_list))
+    sm = ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])  # You need to set an array for the mappable
 
-            if direction == "y":
-                for i, data in enumerate(data_pd_list):
-                    kde = sns.kdeplot(ax=ax, y=data['Distribution'].iloc[frame],
-                                    label="$\sigma_{%s}$ = %s" % (i + 1, data_sim.low_carbon_substitutability_array[i]))
-                ax.set_ylabel(x_axis_label)
-                ax.set_ylim(min_lim, max_lim)
-                ax.set_xlabel('Density')
-            else:
-                for i, data in enumerate(data_pd_list):
-                    kde = sns.kdeplot(ax=ax, x=data['Distribution'].iloc[frame],
-                                    label="$\sigma_{%s}$ = %s" % (i + 1, data_sim.low_carbon_substitutability_array[i]))
-                ax.set_xlabel(x_axis_label)
-                ax.set_xlim(min_lim, max_lim)
-                ax.set_ylabel('Density')
-            ax.legend(loc='upper right')
+    # Add a colorbar
+    cbar = fig.colorbar(sm, ax=axes, orientation="vertical", pad=0.02)
+    cbar.set_label(property_varied_title)
 
+    cols = ["$\sigma_{%s}=%s$" % (i+1,str(round(data_list[0].low_carbon_substitutability_array[i],3))) for i in range(len(data_list[0].low_carbon_substitutability_array))]
+    #rows = ["%s=%s" % (property_varied_title,str(round(val,4))) for val in property_values_list]
 
-    # Define the update function to animate the KDE plot
-    def update_og(frame):
-        
-        fig.suptitle(f"Steps: {data_store[0][0]['Time'].iloc[frame]}/{data_store[0][0]['Time'].iloc[-1]}")
-        for k, ax in enumerate(axes.flat):
-            ax.clear()
-
-            ax.annotate(cols[k], xy=(0.5, 1), xytext=(0, pad),
+    #print(cols)
+    #print(rows)
+    pad = 2 # in points
+    #"""
+    for ax, col in zip(axes[0], cols):
+        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
                     xycoords='axes fraction', textcoords='offset points',
-                    size='small', ha='center', va='baseline')#add the top label
-                
-            data_pd_list = data_store[k]# get the right data
-            
-            if direction == "y":
-                for i,data in enumerate(data_pd_list):
-                    kde = sns.kdeplot(ax = ax, y=data['Distribution'].iloc[frame], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
-                ax.set_ylabel(x_axis_label)
-                ax.set_ylim(min_lim,max_lim)
-                ax.set_xlabel('Density')
-            else:
-                for i,data in enumerate(data_pd_list):
-                    kde = sns.kdeplot(ax = ax, x=data['Distribution'].iloc[frame], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
-                ax.set_xlabel(x_axis_label)
-                ax.set_xlim(min_lim,max_lim)
-                ax.set_ylabel('Density')
-            ax.legend(loc='upper right')
+                    size='small', ha='center', va='baseline')
+    #"""
+    #for ax, row in zip(axes[:,0], rows):
+    #    ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+    #                xycoords=ax.yaxis.label, textcoords='offset points',
+    #                size='small', ha='right', va='center',rotation=90)
+        
+    fig.supxlabel(r"Time")
+    fig.suptitle("Agent %s" % (indiv_index))
+    #fig.supylabel("$Q_m = H_m + L_m$")
+    
+    plotName = fileName + "/Prints"
 
-    animation = FuncAnimation(fig, update, frames=len(data_store[0][0]["Time"]), repeat_delay=100,interval=0.1)
+    f = plotName + "/plot_stuff_one_individual_%s_%s" %(property_varied,indiv_index)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
-    plt.show()
-
-    return animation
-
-"""
-    if save_bool:
-        # save the video
-        animateName = fileName + "/Animations"
-        f = (
-            animateName
-            + "/live_animate_identity_network_weighting_matrix.mp4"
-        )
-        # print("f", f)
-        writervideo = animation.FFMpegWriter(fps=60)
-        animation.save(f, writer=writervideo)
-"""
-
+        
 
 def main(
     fileName = "results/one_param_sweep_single_17_43_28__31_01_2023",
@@ -538,6 +547,8 @@ def main(
     #quit()
 
     base_params = load_object(fileName + "/Data", "base_params")
+    #print(base_params)
+    #quit()
     var_params  = load_object(fileName + "/Data" , "var_params")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
 
@@ -585,11 +596,14 @@ def main(
         #plot_stacked_chi_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         #plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         plot_stacked_H_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-        #plot_stacked_L_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
-
+        plot_stacked_L_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+        plot_stacked_total_quant(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         #plot_stacked_preferences_averages(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         #plot_stacked_omega_m(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
         #plot_utility(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save)
+
+        plot_stuff_one_individual(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save, 1)
+        plot_stuff_one_individual(fileName,data_list,property_values_list, property_varied, property_varied_title, dpi_save, 15)
         
         #anim_save_bool = False
         #multi_data_and_col_fixed_animation_distribution(fileName, data_list, "history_low_carbon_preferences","Low carbon Preferences","y", property_varied_title,property_values_list,dpi_save,anim_save_bool)
@@ -601,7 +615,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/one_param_sweep_multi_18_29_09__23_11_2023",
+        fileName= "results/one_param_sweep_multi_17_46_32__24_11_2023",
         PLOT_TYPE = 5
     )
 

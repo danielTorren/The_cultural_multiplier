@@ -15,6 +15,7 @@ from package.resources.plot import (
 from package.resources.utility import (
     load_object
 )
+from matplotlib.colors import LinearSegmentedColormap, Normalize
 import numpy as np
 
 def multi_line_matrix_plot_stacked(    
@@ -64,6 +65,57 @@ def multi_line_matrix_plot_stacked(
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")  
 
+def multi_line_matrix_plot_stoch_bands(
+    fileName, Z_array, col_vals, row_vals,  Y_param, cmap, dpi_save, col_axis_x, col_label, row_label, y_label
+    ):
+    
+    fig, ax = plt.subplots( constrained_layout=True)#figsize=(14, 7)
+    
+    
+    #cmap = plt.get_cmap("cividis")
+
+    if col_axis_x:#= 1
+        c = Normalize()(row_vals)
+        for i in range(len(Z_array)):
+            data = Z_array_T[i]#(sigma, seeds)
+            ys_mean = data.mean(axis=1)
+            ys_min = data.min(axis=1)
+            ys_max= data.max(axis=1)
+
+            ax.plot(col_vals, ys_mean, ls="-", linewidth = 0.5, color = cmap(c[i]))
+            ax.fill_between(col_vals, ys_min, ys_max, facecolor=cmap(c[i]), alpha=0.5)
+    else:
+        Z_array_T = np.transpose(Z_array,(1,0,2))#put (sigma, tau,seeds) from (tau,sigma, seeds)
+        c = Normalize()(col_vals)
+        for i in range(len(Z_array_T)):#loop through sigma
+            data = Z_array_T[i]
+            ys_mean = data.mean(axis=1)
+            ys_min = data.min(axis=1)
+            ys_max= data.max(axis=1)
+
+            ax.plot(row_vals, ys_mean, ls="-", linewidth = 0.5,color=cmap(c[i]))
+            ax.fill_between(row_vals, ys_min, ys_max, facecolor=cmap(c[i]), alpha=0.5)
+
+    #quit()
+    ax.set_ylabel(y_label)#(r"First behaviour attitude variance, $\sigma^2$")
+
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap), ax=ax
+    )
+    
+    if col_axis_x:
+        cbar.set_label(row_label)#(r"Number of behaviours per agent, M")
+        ax.set_xlabel(col_label)#(r'Confirmation bias, $\theta$')
+    else:
+        cbar.set_label(col_label)#)(r'Confirmation bias, $\theta$')
+        ax.set_xlabel(row_label)#(r"Number of behaviours per agent, M")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_line_matrix_plot_stoch_fill_%s_%s" % (Y_param, col_axis_x)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")  
+
+
 def main(
     fileName = "results/splitting_eco_warriors_single_add_greens_17_44_05__01_02_2023",
     PLOT_TYPE = 2,
@@ -86,7 +138,7 @@ def main(
     #matrix_emissions = results_emissions.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"]))
 
     matrix_emissions = np.mean(results_emissions, axis=2)
-    #double_phase_diagram(fileName, matrix_emissions, r"Total normalised emissions $E/NM$", "emissions",variable_parameters_dict, get_cmap("Reds"),dpi_save, levels,latex_bool = latex_bool)  
+    double_phase_diagram(fileName, matrix_emissions, r"Total normalised emissions $E/NM$", "emissions",variable_parameters_dict, get_cmap("Reds"),dpi_save, levels,latex_bool = latex_bool)  
     
     col_dict = variable_parameters_dict["col"]
     #print("col dict",col_dict)
@@ -98,13 +150,15 @@ def main(
 
     row_label = row_dict["title"]#r"Attitude Beta parameters, $(a,b)$"#r"Number of behaviours per agent, M"
     col_label = col_dict["title"]#r'Confirmation bias, $\theta$'
-    y_label = "Emissions stock, $E/(NM)$"#col_dict["title"]#r"Identity variance, $\sigma^2$"
+    y_label = "Emissions stock, $E$"#col_dict["title"]#r"Identity variance, $\sigma^2$"
         
     #multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 1, col_label, row_label, y_label)#y_ticks_pos, y_ticks_label
     multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label)#y_ticks_pos, y_ticks_label
-    seed_reps_select = 4
+    seed_reps_select = 3
     multi_line_matrix_plot_stacked(fileName,results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label,seed_reps_select)
     
+
+    multi_line_matrix_plot_stoch_bands(fileName, results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label)
     
 
 
@@ -114,6 +168,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_average_16_23_26__23_11_2023",
+        fileName="results/two_param_sweep_average_13_18_04__24_11_2023",
         PLOT_TYPE=2
     )

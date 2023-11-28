@@ -61,8 +61,8 @@ class Individual:
         self.utility,self.pseudo_utility = self.calc_utility_nested_CES()
 
         #print("self.t",self.t, self.burn_in_duration)
-        if self.t == self.burn_in_duration and self.save_timeseries_data:
-            self.set_up_time_series()
+        #if self.t == self.burn_in_duration and self.save_timeseries_data:
+        #    self.set_up_time_series()
     
     def set_up_time_series(self):
         self.history_low_carbon_preferences = [self.low_carbon_preferences]
@@ -192,7 +192,7 @@ class Individual:
         self.flow_carbon_emissions = self.calc_total_emissions()
 
         if self.save_timeseries_data:
-            if self.t == self.burn_in_duration:
+            if self.t == self.burn_in_duration + 1:
                 self.utility,self.pseudo_utility = self.calc_utility_nested_CES()
                 self.set_up_time_series()
             elif (self.t % self.compression_factor == 0) and (self.t > self.burn_in_duration):

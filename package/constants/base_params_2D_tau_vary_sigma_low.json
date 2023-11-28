@@ -7,13 +7,13 @@
     "network_structure_seed": 8,
     "init_vals_seed": 14,
     "set_seed": 4,
-    "seed_reps": 4,
-    "carbon_price_duration": 3000,
+    "seed_reps": 3,
+    "carbon_price_duration": 300,
     "burn_in_duration": 0,
-    "N": 200,
-    "M": 5,
+    "N": 10,
+    "M": 2,
     "phi": 0.005,
-    "network_density": 0.1,
+    "network_density": 0.3,
     "prob_rewire": 0.1,
     "learning_error_scale": 0.01,
     "homophily": 0.95,
@@ -26,5 +26,5 @@
     "clipping_epsilon": 1e-5,
     "std_low_carbon_preference":0.01,
     "confirmation_bias":5,
-    "budget":10
+    "budget":1
 }
