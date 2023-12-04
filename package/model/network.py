@@ -47,9 +47,9 @@ class Network:
 
         
         # network
-        self.network_density = parameters["network_density"]
+        self.network_density_input = parameters["network_density"]
         self.N = int(round(parameters["N"]))
-        self.K = int(round((self.N - 1)*self.network_density)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
+        self.K = int(round((self.N - 1)*self.network_density_input)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
         #print("self.K",self.K)
         self.prob_rewire = parameters["prob_rewire"]
 
@@ -95,6 +95,7 @@ class Network:
         ) = self.create_weighting_matrix()
 
         self.network_density = nx.density(self.network)
+        #print("self.network_density",self.network_density, self.network_density_input)
 
         if self.heterogenous_preferences == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION

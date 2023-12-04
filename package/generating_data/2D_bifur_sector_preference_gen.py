@@ -123,9 +123,9 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_bifur_conf_sigma.json",#"package/constants/base_params_bifur_ratio_preference_or_consumption.json",#"package/constants/base_params_bifur_ratio_preference_or_consumption_and_a.json",#"package/constants/base_params_bifur_a.json",#"package/constants/base_params_bifur_seed.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_bifur_sigma_ratio.json",#"package/constants/base_params_bifur_ratio_preference_or_consumption.json",#"package/constants/base_params_bifur_ratio_preference_or_consumption_and_a.json",#"package/constants/base_params_bifur_a.json",#"package/constants/base_params_bifur_seed.json",
         VARIABLE_PARAMS_LOAD_1 = "package/constants/oneD_dict_bifur_sigma.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json"
-        VARIABLE_PARAMS_LOAD_2 = "package/constants/oneD_dict_bifur_conf.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json",
+        VARIABLE_PARAMS_LOAD_2 = "package/constants/oneD_dict_bifur_ratio_preference_or_consumption.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json",
         RUN_TYPE = 3,
 )
 

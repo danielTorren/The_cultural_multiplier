@@ -47,7 +47,8 @@ class Individual:
 
         self.sector_substitutability = individual_params["sector_substitutability"]
 
-        self.prices_high_carbon_instant = self.prices_high_carbon_m + individual_params["init_carbon_price_m"]
+        self.update_prices(individual_params["init_carbon_price_m"])
+        #self.prices_high_carbon_instant = self.prices_high_carbon_m + individual_params["init_carbon_price_m"]
 
         self.id = id_n
 
@@ -106,7 +107,10 @@ class Individual:
         return H_m, L_m
     
     def calc_consumption_ratio(self):
-        return self.L_m/(self.L_m + self.H_m)
+        #correct
+        ratio = self.L_m/(self.L_m + self.H_m)
+        #C =  (self.low_carbon_preferences**self.low_carbon_substitutability_array)/( (self.low_carbon_preferences)**self.low_carbon_substitutability_array + (self.Q*(1- self.low_carbon_preferences))**self.low_carbon_substitutability_array)
+        return ratio
     
     def calc_outward_social_influence(self):
         return self.ratio_preference_or_consumption*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*self.consumption_ratio
@@ -144,6 +148,9 @@ class Individual:
     def calc_total_emissions(self):      
         return sum(self.H_m)
 
+    def update_prices(self,carbon_price_m):
+        self.prices_high_carbon_instant = self.prices_high_carbon_m + carbon_price_m
+        self.Q = self.prices_low_carbon_m/self.prices_high_carbon_instant
 
     def save_timeseries_data_individual(self):
         """
@@ -173,10 +180,7 @@ class Individual:
         self.t = t
 
         #update prices
-        self.prices_high_carbon_instant = self.prices_high_carbon_m + carbon_price_m
-
-        #print("self.prices_high_carbon_instant",self.prices_high_carbon_instant)
-        #quit()
+        self.update_prices(carbon_price_m)
 
         #update preferences 
         if self.alpha_change != "fixed_preferences":

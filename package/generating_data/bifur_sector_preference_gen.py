@@ -40,6 +40,8 @@ def main(
     property_values_list = generate_vals(
         var_params
     )
+    #property_values_list = np.asarray([1.001,1.005,1.01,1.05, 1.1,1.5, 2, 2.5, 5,10, 15, 100])
+    property_values_list = np.asarray([1.1e-1,1.1e0,1.2e0,1.5e0,1.1e1])
     #property_values_list = np.linspace(property_min, property_max, property_reps)
 
     f = open(BASE_PARAMS_LOAD)
@@ -49,11 +51,14 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
     
-    createFolder(fileName)
+ 
 
     # look at splitting of the last behaviour with preference dissonance
     params_list = produce_param_list(params, property_values_list, property_varied)
     data_array = preferences_parallel_run(params_list)
+
+    createFolder(fileName)
+    
     save_object(data_array, fileName + "/Data", "data_array")
 
     
@@ -65,7 +70,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_bifur_ratio_preference_or_consumption.json",#"package/constants/base_params_bifur_a.json",#"package/constants/base_params_bifur_seed.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_bifur_ratio_preference_or_consumption.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json"
+        BASE_PARAMS_LOAD = "package/constants/base_params_bifur_sigma.json",#"package/constants/base_params_bifur_a.json",#"package/constants/base_params_bifur_seed.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_bifur_sigma.json"#"package/constants/oneD_dict_bifur_ratio_preference_or_consumption.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json"
 )
 
