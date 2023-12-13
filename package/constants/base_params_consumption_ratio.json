@@ -1,9 +1,9 @@
 {
-    "save_timeseries_data": 1, 
+    "save_timeseries_data_state": 1, 
     "heterogenous_expenditure":0,
-    "heterogenous_intrasector_preferences": 1.0,
-    "alpha_change": "dynamic_culturally_determined_weights",
-    "compression_factor":10,
+    "heterogenous_intrasector_preferences_state": 1.0,
+    "alpha_change_state": "dynamic_culturally_determined_weights",
+    "compression_factor_state":10,
     "time_steps_max": 100,
     "carbon_price_duration": 0,
     "seed_reps": 10,
@@ -25,5 +25,5 @@
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "linear",
     "carbon_price_increased" : 0.5, 
-    "ratio_preference_or_consumption_identity": 1.0
+    "ratio_preference_or_consumption_state_identity": 1.0
 }

@@ -39,8 +39,8 @@ def main(
     #Gen burn in socieity no carbon price
 
     params["carbon_price_increased"] = 0
-    params["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
-    params["alpha_change"] = "dynamic_culturally_determined_weights"#burn in we do want preference change to stabalize system
+    params["ratio_preference_or_consumption_state"] = 0 #WE ASSUME Consumption BASE LEARNING
+    params["alpha_change_state"] = "dynamic_culturally_determined_weights"#burn in we do want preference change to stabalize system
     params["burn_in_duration"] = burn_in_duration
     params["carbon_price_duration"] = 0
 

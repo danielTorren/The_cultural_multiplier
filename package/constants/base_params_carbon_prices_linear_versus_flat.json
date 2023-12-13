@@ -1,6 +1,6 @@
 {
-    "save_timeseries_data": 0, 
-    "compression_factor":10,
+    "save_timeseries_data_state": 0, 
+    "compression_factor_state":10,
     "heterogenous_expenditure":0,
     "time_steps_max": 2000,
     "carbon_price_duration": 500,
@@ -24,6 +24,6 @@
     "b_low_carbon_preference": 1,
     "init_carbon_price": 0,
     "dividend_progressiveness": 0,
-    "ratio_preference_or_consumption": 1.0,
+    "ratio_preference_or_consumption_state": 1.0,
     "clipping_epsilon": 1e-4
 }

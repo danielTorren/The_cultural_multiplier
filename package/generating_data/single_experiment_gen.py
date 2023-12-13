@@ -37,11 +37,11 @@ def main(
 
 if __name__ == '__main__':
     base_params = {
-        'save_timeseries_data': 1,
-        'heterogenous_intrasector_preferences': 1.0,
-        'compression_factor': 10, 
-        'ratio_preference_or_consumption': 0.0, 
-        "alpha_change": "dynamic_culturally_determined_weights",
+        'save_timeseries_data_state': 1,
+        'heterogenous_intrasector_preferences_state': 1.0,
+        'compression_factor_state': 10, 
+        'ratio_preference_or_consumption_state': 0.0, 
+        "alpha_change_state": "dynamic_culturally_determined_weights",
         'network_structure_seed': 8, 
         'init_vals_seed': 14, 
         'set_seed': 4, 
@@ -73,11 +73,11 @@ if __name__ == '__main__':
     
     
     """{
-    "save_timeseries_data": 1, 
-    "heterogenous_intrasector_preferences": 1.0,
-    "compression_factor":10,
-    "ratio_preference_or_consumption":0.0,
-    "alpha_change": "dynamic_culturally_determined_weights",
+    "save_timeseries_data_state": 1, 
+    "heterogenous_intrasector_preferences_state": 1.0,
+    "compression_factor_state":10,
+    "ratio_preference_or_consumption_state":0.0,
+    "alpha_change_state": "dynamic_culturally_determined_weights",
     "network_structure_seed": 8,
     "init_vals_seed": 14,
     "set_seed": 4,

@@ -27,32 +27,30 @@ class Network:
             Dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters
 
         """
-        
-        self.network_structure_seed = parameters["network_structure_seed"]    
-        
-        #THIS IS THE CORRECT WAY
-        #self.init_vals_seed = parameters["init_vals_seed"] 
-        #self.set_seed = int(round(parameters["set_seed"]))
-        #THIS IS FOR VARYING INITAL CONDITONS
-        self.init_vals_seed = int(round(parameters["set_seed"]))
-        self.set_seed = parameters["init_vals_seed"] 
-
-        #For inital construction set a seed, this is the same for all runs, then later change it to set_seed
-        np.random.seed(self.init_vals_seed)
 
         #INITAL STATE OF THE SYSTEMS, WHAT ARE THE RUN CONDITIONS
-        self.burn_in_duration = parameters["burn_in_duration"]
-        self.carbon_price_duration = parameters["carbon_price_duration"]
-        self.sector_substitutability = parameters["sector_substitutability"]
-        self.heterogenous_intrasector_preferences = parameters["heterogenous_intrasector_preferences"]
-        self.heterogenous_intersector_preferences = parameters["heterogenous_intersector_preferences"]
-        self.heterogenous_intersector_preferences_parameterized = parameters["heterogenous_intersector_preferences_parameterized"]
-        self.heterogenous_carbon_price = parameters["heterogenous_carbon_price"]
-        self.heterogenous_sector_substitutabilities = parameters["heterogenous_sector_substitutabilities"]
-        self.heterogenous_expenditure = parameters["heterogenous_expenditure"]
-        self.heterogenous_expenditure_parameterized = parameters["heterogenous_expenditure_parameterized"]
-        self.imperfect_learning = parameters["imperfect_learning"]
-        self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
+        self.heterogenous_intrasector_preferences_state = parameters["heterogenous_intrasector_preferences_state"]
+        self.heterogenous_carbon_price_state = parameters["heterogenous_carbon_price_state"]
+        self.heterogenous_sector_substitutabilities_state = parameters["heterogenous_sector_substitutabilities_state"]
+        self.heterogenous_phi_state = parameters["heterogenous_phi_state"]
+        self.imperfect_learning_state = parameters["imperfect_learning_state"]
+        self.ratio_preference_or_consumption_state = parameters["ratio_preference_or_consumption_state"]
+        self.alpha_change_state = parameters["alpha_change_state"]
+        self.save_timeseries_data_state = parameters["save_timeseries_data_state"]
+        self.compression_factor_state = parameters["compression_factor_state"]
+        self.vary_seed_imperfect_learning_state_or_initial_preferences_state = parameters["vary_seed_imperfect_learning_state_or_initial_preferences_state"]
+
+        #seeds
+        if self.vary_seed_imperfect_learning_state_or_initial_preferences_state:
+            #if its 1 then very seed imperfect_learning_state
+            self.init_vals_seed = parameters["init_vals_seed"] 
+            self.set_seed = int(round(parameters["set_seed"]))
+        else:
+            #if not 1 then do vary seed initial preferences
+            self.init_vals_seed = int(round(parameters["set_seed"]))
+            self.set_seed = parameters["init_vals_seed"] 
+        self.network_structure_seed = parameters["network_structure_seed"]
+        np.random.seed(self.init_vals_seed)#For inital construction set a seed, this is the same for all runs, then later change it to set_seed
         
         # network
         self.network_density_input = parameters["network_density"]
@@ -60,20 +58,18 @@ class Network:
         self.K = int(round((self.N - 1)*self.network_density_input)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
         #print("self.K",self.K)
         self.prob_rewire = parameters["prob_rewire"]
-
         self.M = int(round(parameters["M"]))
-        self.alpha_change = parameters["alpha_change"]
-        self.save_timeseries_data = parameters["save_timeseries_data"]
-        self.compression_factor = parameters["compression_factor"]
 
         # time
         self.t = 0
+        self.burn_in_duration = parameters["burn_in_duration"]
+        self.carbon_price_duration = parameters["carbon_price_duration"]
 
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
         self.prices_high_carbon =  np.asarray([1]*self.M)#start them at the same value
         self.carbon_price_m = np.asarray([0]*self.M)
-        if self.heterogenous_carbon_price:
+        if self.heterogenous_carbon_price_state:
             #RIGHTWAY 
             self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
         else:
@@ -81,7 +77,7 @@ class Network:
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
-        if self.imperfect_learning:
+        if self.imperfect_learning_state:
             self.std_learning_error = parameters["std_learning_error"]
             self.clipping_epsilon = parameters["clipping_epsilon"]
         else:
@@ -89,8 +85,10 @@ class Network:
             self.clipping_epsilon = 0        
         self.clipping_epsilon_init_preference = parameters["clipping_epsilon_init_preference"]
         
-        # setting arrays with lin space
-        self.phi_array = np.asarray([parameters["phi"]]*self.M)
+        if self.heterogenous_phi_state:
+            self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_upper"], num=self.M)
+        else:
+            self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_lower"], num=self.M)
 
         # network homophily
         self.homophily = parameters["homophily"]  # 0-1
@@ -106,9 +104,8 @@ class Network:
         ) = self.create_weighting_matrix()
 
         self.network_density = nx.density(self.network)
-        #print("self.network_density",self.network_density, self.network_density_input)
 
-        if self.heterogenous_intrasector_preferences == 1:
+        if self.heterogenous_intrasector_preferences_state == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
@@ -119,35 +116,18 @@ class Network:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
         
-        if self.heterogenous_expenditure:
-            #Inequality in budget
-            self.budget_inequality_const = parameters["budget_inequality_const"]
-            u = np.linspace(0.01,1,self.N)
-            no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
-            self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
-            self.gini = self.calc_gini(self.individual_budget_array)
-        elif self.heterogenous_expenditure_parameterized:
-            #load in the data for the 10 economic groups and do stuff
-            print("NOT CODED YET")
-        else:
-            #Uniform expenditure
-            self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
+        self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
         
-        if self.heterogenous_sector_substitutabilities:
+        if self.heterogenous_sector_substitutabilities_state:
             ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
             self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
         else:
             self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
             #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
-
-        if self.heterogenous_intersector_preferences:
-            #NOTE THE CHANGE EHRE FROM UNIFORM TO ASSYMETRIC!
-            self.sector_preferences = np.linspace(parameters["sector_preferences_lower"], parameters["sector_preferences_upper"], num=self.M)
-        elif self.heterogenous_intersector_preferences_parameterized:
-            #load in the sectoral expenditure preferences.
-            print("NOT CODED YET")
-        else:
-            self.sector_preferences = np.asarray([1/self.M]*self.M)
+        
+        self.sector_substitutability = parameters["sector_substitutability"]
+            
+        self.sector_preferences = np.asarray([1/self.M]*self.M)
         
         self.agent_list = self.create_agent_list()
 
@@ -156,12 +136,12 @@ class Network:
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
 
-        if self.alpha_change == "fixed_preferences":
+        if self.alpha_change_state == "fixed_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
-            if self.alpha_change in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_culturally_determined_weights"):
+            if self.alpha_change_state in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_culturally_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
+            elif self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()
             self.social_component_matrix = self.calc_social_component_matrix()
 
@@ -217,14 +197,6 @@ class Network:
         norm_matrix = matrix / row_sums[:, np.newaxis]
 
         return norm_matrix
-
-    #define function to calculate Gini coefficient
-    # take from: https://www.statology.org/gini-coefficient-python/
-    def calc_gini(self,x):
-        total = 0
-        for i, xi in enumerate(x[:-1], 1):
-            total += np.sum(np.abs(xi - x[i:]))
-        return total / (len(x)**2 * np.mean(x))
 
     def create_weighting_matrix(self) -> tuple[npt.NDArray, npt.NDArray, nx.Graph]:
         """
@@ -313,18 +285,18 @@ class Network:
         individual_params = {
             "t": self.t,
             "M": self.M,
-            "save_timeseries_data": self.save_timeseries_data,
+            "save_timeseries_data_state": self.save_timeseries_data_state,
             "phi_array": self.phi_array,
-            "compression_factor": self.compression_factor,
+            "compression_factor_state": self.compression_factor_state,
             "init_carbon_price_m": self.carbon_price_m,
             "low_carbon_substitutability": self.low_carbon_substitutability_array,
             "prices_low_carbon_m": self.prices_low_carbon,
             "prices_high_carbon_m":self.prices_high_carbon,
             "clipping_epsilon" :self.clipping_epsilon,
-            "ratio_preference_or_consumption": self.ratio_preference_or_consumption,
+            "ratio_preference_or_consumption_state": self.ratio_preference_or_consumption_state,
             "sector_preferences" : self.sector_preferences,
             "burn_in_duration": self.burn_in_duration,
-            "alpha_change": self.alpha_change
+            "alpha_change_state": self.alpha_change_state
         }
 
         individual_params["sector_substitutability"] = self.sector_substitutability
@@ -353,16 +325,16 @@ class Network:
 
         attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
         """
-        if self.ratio_preference_or_consumption == 1.0:
+        if self.ratio_preference_or_consumption_state == 1.0:
             attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
             #attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
-        elif self.ratio_preference_or_consumption == 0.0:
+        elif self.ratio_preference_or_consumption_state == 0.0:
             attribute_matrix = np.asarray(list(map(attrgetter('consumption_ratio'), self.agent_list)))
             #attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
-        elif self.ratio_preference_or_consumption > 0.0 and self.ratio_preference_or_consumption < 1.0:
-            attribute_matrix = np.asarray([self.ratio_preference_or_consumption*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
+        elif self.ratio_preference_or_consumption_state > 0.0 and self.ratio_preference_or_consumption_state < 1.0:
+            attribute_matrix = np.asarray([self.ratio_preference_or_consumption_state*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
         else:
-            raise("Invalid ratio_preference_or_consumption = [0,1]", self.ratio_preference_or_consumption)
+            raise("Invalid ratio_preference_or_consumption_state = [0,1]", self.ratio_preference_or_consumption_state)
         """
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
@@ -378,16 +350,16 @@ class Network:
 
         attribute_matrix =np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
         """
-        if self.ratio_preference_or_consumption == 1.0:
+        if self.ratio_preference_or_consumption_state == 1.0:
             attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
             #attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
-        elif self.ratio_preference_or_consumption == 0.0:
+        elif self.ratio_preference_or_consumption_state == 0.0:
             #attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
             attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
-        elif self.ratio_preference_or_consumption > 0.0 and self.ratio_preference_or_consumption < 1.0:
-            attribute_matrix = np.asarray([self.ratio_preference_or_consumption*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
+        elif self.ratio_preference_or_consumption_state > 0.0 and self.ratio_preference_or_consumption_state < 1.0:
+            attribute_matrix = np.asarray([self.ratio_preference_or_consumption_state*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
         else:
-            raise("Invalid ratio_preference_or_consumption = [0,1]", self.ratio_preference_or_consumption)
+            raise("Invalid ratio_preference_or_consumption_state = [0,1]", self.ratio_preference_or_consumption_state)
         """
 
         neighbour_influence = np.matmul(self.weighting_matrix, attribute_matrix)
@@ -410,7 +382,7 @@ class Network:
             NxM array giving the influence of social learning from neighbours for that time step
         """
 
-        if self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
+        if self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
             #print("updating socially")
             ego_influence = self.calc_ego_influence_degroot_independent()
         else:#culturally determined either static or dynamic
@@ -555,12 +527,12 @@ class Network:
         ))
         
     def switch_from_dynamic_to_fixed_preferences(self):
-        self.alpha_change = "fixed_preferences"
+        self.alpha_change_state = "fixed_preferences"
         for i in range(self.N):
-            self.agent_list[i].alpha_change = "fixed_preferences"
+            self.agent_list[i].alpha_change_state = "fixed_preferences"
         
 
-    def save_timeseries_data_network(self):
+    def save_timeseries_data_state_network(self):
         """
         Save time series data
 
@@ -612,12 +584,12 @@ class Network:
         self.update_individuals()
 
         # update network parameters for next step
-        if self.alpha_change != "fixed_preferences":
-            if self.alpha_change == "dynamic_culturally_determined_weights":
-                #print("updating culturally list",self.alpha_change)
+        if self.alpha_change_state != "fixed_preferences":
+            if self.alpha_change_state == "dynamic_culturally_determined_weights":
+                #print("updating culturally list",self.alpha_change_state)
                 self.weighting_matrix = self.update_weightings()
-            elif self.alpha_change == "dynamic_socially_determined_weights":#independent behaviours
-                #print("updating socially list",self.alpha_change)
+            elif self.alpha_change_state == "dynamic_socially_determined_weights":#independent behaviours
+                #print("updating socially list",self.alpha_change_state)
                 self.weighting_matrix_list = self.update_weightings_list()
             else:
                 pass #this is for "uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights"
@@ -633,10 +605,10 @@ class Network:
             self.welfare_flow = self.calc_welfare()
             self.welfare_stock = self.welfare_stock + self.welfare_flow
             
-        if self.save_timeseries_data:
+        if self.save_timeseries_data_state:
             if self.t == self.burn_in_duration + 1:#want to create it the step after burn in is finished
                 self.set_up_time_series()
-            elif (self.t % self.compression_factor == 0) and (self.t > self.burn_in_duration):
+            elif (self.t % self.compression_factor_state == 0) and (self.t > self.burn_in_duration):
                 (
                         self.average_identity,
                         self.std_identity,
@@ -644,4 +616,4 @@ class Network:
                         self.min_identity,
                         self.max_identity,
                 ) = self.calc_network_identity()
-                self.save_timeseries_data_network()
+                self.save_timeseries_data_state_network()

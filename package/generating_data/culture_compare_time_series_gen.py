@@ -18,7 +18,7 @@ def main(
     culture_list = ["dynamic_culturally_determined_weights","dynamic_socially_determined_weights","static_culturally_determined_weights", "fixed_preferences"]
     params_list = []
     for i in culture_list:
-        base_params["alpha_change"] =  i
+        base_params["alpha_change_state"] =  i
         params_list.append(
                 base_params.copy()
             )  

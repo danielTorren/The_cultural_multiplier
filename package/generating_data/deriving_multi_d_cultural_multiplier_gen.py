@@ -18,7 +18,7 @@ def main(
     var_params = json.load(f_var) 
 
     #vary the tau value 
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
     property_min = var_params["property_min"]#0,
     property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,
@@ -41,7 +41,7 @@ def main(
 
     #social multiplier
     params_list = []
-    params["alpha_change"] = "dynamic_socially_determined_weights"
+    params["alpha_change_state"] = "dynamic_socially_determined_weights"
     for i in phi_list:
         params["phi"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)
@@ -51,7 +51,7 @@ def main(
     print("social_multiplier_len",social_multiplier_len)
 
     #cultural_multiplier
-    params["alpha_change"] = "dynamic_culturally_determined_weights"
+    params["alpha_change_state"] = "dynamic_culturally_determined_weights"
     for i in phi_list:
         params["phi"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, property_varied)

@@ -19,7 +19,7 @@ def main(
     f_var = open(VARIABLE_PARAMS_LOAD)
     var_params = json.load(f_var) 
 
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
     property_min = var_params["property_min"]#0,
     property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,
@@ -39,7 +39,7 @@ def main(
 
     params_list = produce_param_list_stochastic(params, property_values_list, property_varied)
 
-    time_array = np.arange(0,params["time_steps_max"] + params["compression_factor"],params["compression_factor"])
+    time_array = np.arange(0,params["time_steps_max"] + params["compression_factor_state"],params["compression_factor_state"])
 
     #print("HEYEYU",params_list, len(params_list))
     __, emissions_flow_timeseries, __= multi_emissions_flow_stock_run(params_list)

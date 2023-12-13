@@ -19,7 +19,7 @@ def main(
     emissions_array = load_object(fileName + "/Data", "emissions_array")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     base_params = load_object(fileName + "/Data", "base_params")
-    time_array = np.arange(0,base_params["time_steps_max"] + base_params["compression_factor"],base_params["compression_factor"])
+    time_array = np.arange(0,base_params["time_steps_max"] + base_params["compression_factor_state"],base_params["compression_factor_state"])
 
     plot_emissions_timeseries(fileName, emissions_array, property_values_list, time_array)
     

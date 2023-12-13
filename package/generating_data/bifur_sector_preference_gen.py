@@ -34,7 +34,7 @@ def main(
 
     #print("params", var_params)
 
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
     property_reps = var_params["property_reps"]#10,
 
     property_values_list = generate_vals(
@@ -71,6 +71,6 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_bifur_sigma.json",#"package/constants/base_params_bifur_a.json",#"package/constants/base_params_bifur_seed.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_bifur_sigma.json"#"package/constants/oneD_dict_bifur_ratio_preference_or_consumption.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json"
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_bifur_sigma.json"#"package/constants/oneD_dict_bifur_ratio_preference_or_consumption_state.json",#"package/constants/oneD_dict_bifur_a.json",#"package/constants/oneD_dict_bifur_seed.json"
 )
 

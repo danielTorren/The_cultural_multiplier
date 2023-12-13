@@ -33,17 +33,17 @@ class Individual:
 
         self.M = individual_params["M"]
         self.t = individual_params["t"]
-        self.save_timeseries_data = individual_params["save_timeseries_data"]
-        self.compression_factor = individual_params["compression_factor"]
+        self.save_timeseries_data_state = individual_params["save_timeseries_data_state"]
+        self.compression_factor_state = individual_params["compression_factor_state"]
         self.phi_array = individual_params["phi_array"]
         self.sector_preferences = individual_params["sector_preferences"]
         self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
         self.prices_low_carbon_m = individual_params["prices_low_carbon_m"]
         self.prices_high_carbon_m = individual_params["prices_high_carbon_m"]
         self.clipping_epsilon = individual_params["clipping_epsilon"]
-        self.ratio_preference_or_consumption = individual_params["ratio_preference_or_consumption"]
+        self.ratio_preference_or_consumption_state = individual_params["ratio_preference_or_consumption_state"]
         self.burn_in_duration = individual_params["burn_in_duration"]
-        self.alpha_change = individual_params["alpha_change"]
+        self.alpha_change_state = individual_params["alpha_change_state"]
 
         self.sector_substitutability = individual_params["sector_substitutability"]
 
@@ -62,7 +62,7 @@ class Individual:
         self.utility,self.pseudo_utility = self.calc_utility_nested_CES()
 
         #print("self.t",self.t, self.burn_in_duration)
-        #if self.t == self.burn_in_duration and self.save_timeseries_data:
+        #if self.t == self.burn_in_duration and self.save_timeseries_data_state:
         #    self.set_up_time_series()
     
     def set_up_time_series(self):
@@ -114,7 +114,7 @@ class Individual:
         return ratio
     
     def calc_outward_social_influence(self):
-        return self.ratio_preference_or_consumption*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption)*self.consumption_ratio
+        return self.ratio_preference_or_consumption_state*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*self.consumption_ratio
 
     def update_consumption(self):
         #calculate consumption
@@ -153,7 +153,7 @@ class Individual:
         self.prices_high_carbon_instant = self.prices_high_carbon_m + carbon_price_m
         self.Q = self.prices_low_carbon_m/self.prices_high_carbon_instant
 
-    def save_timeseries_data_individual(self):
+    def save_timeseries_data_state_individual(self):
         """
         Save time series data
 
@@ -185,7 +185,7 @@ class Individual:
         self.update_prices(carbon_price_m)
 
         #update preferences 
-        if self.alpha_change != "fixed_preferences":
+        if self.alpha_change_state != "fixed_preferences":
             self.update_preferences(social_component)
 
         #update_consumption
@@ -197,10 +197,10 @@ class Individual:
         #calc_emissions
         self.flow_carbon_emissions = self.calc_total_emissions()
 
-        if self.save_timeseries_data:
+        if self.save_timeseries_data_state:
             if self.t == self.burn_in_duration + 1:
                 self.utility,self.pseudo_utility = self.calc_utility_nested_CES()
                 self.set_up_time_series()
-            elif (self.t % self.compression_factor == 0) and (self.t > self.burn_in_duration):
+            elif (self.t % self.compression_factor_state == 0) and (self.t > self.burn_in_duration):
                 self.utility,self.pseudo_utility = self.calc_utility_nested_CES()
-                self.save_timeseries_data_individual()
+                self.save_timeseries_data_state_individual()

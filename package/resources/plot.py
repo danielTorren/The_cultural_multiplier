@@ -1032,7 +1032,7 @@ def plot_total_carbon_emissions_timeseries_sweep(
 
     cmap = get_cmap("plasma")
 
-    c = np.asarray([i.ratio_preference_or_consumption for i in Data_list])
+    c = np.asarray([i.ratio_preference_or_consumption_state for i in Data_list])
     #print("yooo",c)
     #colour_adjust = Normalize(vmin=c.min(), vmax=c.max())
     ani_step_colours = cmap(c)

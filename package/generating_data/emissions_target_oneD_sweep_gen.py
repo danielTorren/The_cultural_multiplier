@@ -77,7 +77,7 @@ def main(
     f_var = open(VARIABLE_PARAMS_LOAD)
     var_params = json.load(f_var) 
 
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
     property_min = var_params["property_min"]#0,
     property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,
@@ -101,11 +101,11 @@ def main(
     ##################################
     #Gen burn in socieities for different seeds no carbon price, with preference change!!, Runs: seeds
     #OUTPUT: societies list array of length seed [socities_1, E_2,...,E_seed]
-    #params["alpha_change"] = "fixed_preferences"
+    #params["alpha_change_state"] = "fixed_preferences"
     params["carbon_price_duration"] =  0#no carbon price duration, only burn in
     params["carbon_price_increased"] = 0
-    params["ratio_preference_or_consumption"] = 0 #WE ASSUME Consumption BASE LEARNING
-    params["alpha_change"] = "dynamic_culturally_determined_weights"#burn in we do want preference change to stabalize system
+    params["ratio_preference_or_consumption_state"] = 0 #WE ASSUME Consumption BASE LEARNING
+    params["alpha_change_state"] = "dynamic_culturally_determined_weights"#burn in we do want preference change to stabalize system
     params_list_no_price_no_preference_change = produce_param_list_just_stochastic(params)
     #seed_list = [x["set_seed"] for x in params_list_no_price_no_preference_change]
     
@@ -191,7 +191,7 @@ def main(
     societies_model_targect_attiude_preference_change_list = []
     for i, model_seed in enumerate(societies_list):
         model_copy = deepcopy(model_seed)
-        model_copy.ratio_preference_or_consumption = 1.0
+        model_copy.ratio_preference_or_consumption_state = 1.0
         #model_copy.t = 0#reset time!
         #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration#set the carbon price duration, with no burn in period
@@ -216,13 +216,13 @@ def main(
         #model_copy.burn_in_duration = 0
         model_copy.carbon_price_duration = carbon_price_duration
         model_copy.emissions_stock_target = emissions_target_seeds[i]
-        #model_seed.alpha_change = "dynamic_culturally_determined_weights"#It should already be dynamic but just in case
+        #model_seed.alpha_change_state = "dynamic_culturally_determined_weights"#It should already be dynamic but just in case
         for j in property_values_list: #loop trough the different param values
             model_copy_param = deepcopy(model_copy)
             setattr(model_copy_param, property_varied, j)#BETTER THAN EVAL!
             societies_model_targect_preference_change_list.append(model_copy_param)
 
-    #params["alpha_change"] = "dynamic_culturally_determined_weights"
+    #params["alpha_change_state"] = "dynamic_culturally_determined_weights"
     #params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "emissions_stock_target", seed_list)
     #print("params_list_emissions_target_preference_change",params_list_emissions_target_preference_change)
     
@@ -275,14 +275,14 @@ def main(
             #model_copy.burn_in_duration = 0
             model_copy.carbon_price_duration = carbon_price_duration
             model_copy.emissions_stock_target = emissions_target_seeds[i]
-            model_copy.alpha_change = "static_culturally_determined_weights"
-            #model_seed.alpha_change = "dynamic_culturally_determined_weights"#It should already be dynamic but just in case
+            model_copy.alpha_change_state = "static_culturally_determined_weights"
+            #model_seed.alpha_change_state = "dynamic_culturally_determined_weights"#It should already be dynamic but just in case
             for j in property_values_list: #loop trough the different param values
                 model_copy_param = deepcopy(model_copy)
                 setattr(model_copy_param, property_varied, j)#BETTER THAN EVAL!
                 societies_model_targect_static_weighting_preference_change_list.append(model_copy_param)
 
-        #params["alpha_change"] = "dynamic_culturally_determined_weights"
+        #params["alpha_change_state"] = "dynamic_culturally_determined_weights"
         #params_list_emissions_target_preference_change = produce_param_list_emissions_target_params_and_stochastic(params,property_values_list, property_varied,emissions_target_seeds, "emissions_stock_target", seed_list)
         #print("params_list_emissions_target_preference_change",params_list_emissions_target_preference_change)
         

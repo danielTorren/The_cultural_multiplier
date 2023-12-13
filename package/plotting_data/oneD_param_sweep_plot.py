@@ -568,7 +568,7 @@ def main(
     var_params  = load_object(fileName + "/Data" , "var_params")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
 
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
     property_min = var_params["property_min"]#0,
     property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,

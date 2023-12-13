@@ -310,13 +310,13 @@ def main(
     #print("property_values_list_1", property_values_list_1)
     #print("property_values_list_2", property_values_list_2)
 
-    property_varied_1 = var_params_1["property_varied"]#"ratio_preference_or_consumption",
+    property_varied_1 = var_params_1["property_varied"]#"ratio_preference_or_consumption_state",
     property_min_1 = var_params_1["property_min"]#0,
     property_max_1 = var_params_1["property_max"]#1,
     property_reps_1 = var_params_1["property_reps"]#10,
     property_varied_title_1 = var_params_1["property_varied_title"]
 
-    property_varied_2 = var_params_2["property_varied"]#"ratio_preference_or_consumption",
+    property_varied_2 = var_params_2["property_varied"]#"ratio_preference_or_consumption_state",
     property_min_2 = var_params_2["property_min"]#0,
     property_max_2 = var_params_2["property_max"]#1,
     property_reps_2 = var_params_2["property_reps"]#10,

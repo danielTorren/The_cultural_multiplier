@@ -19,7 +19,7 @@ def main(
     f_var = open(VARIABLE_PARAMS_LOAD)
     var_params = json.load(f_var) 
 
-    propertprice_autocorried = var_params["propertprice_autocorried"]#"ratio_preference_or_consumption",
+    propertprice_autocorried = var_params["propertprice_autocorried"]#"ratio_preference_or_consumption_state",
     property_min = var_params["property_min"]#0,
     property_max = var_params["property_max"]#1,
     property_reps = var_params["property_reps"]#10,
@@ -43,10 +43,10 @@ def main(
     # Attitude BASED learning and identity
     data_holder_attitude_learn_attitude_identity = []
     params_list_attitude_learn_attitude_identity= []
-    params["ratio_preference_or_consumption"] = 1.0
-    params["ratio_preference_or_consumption_identity"] = 1.0
+    params["ratio_preference_or_consumption_state"] = 1.0
+    params["ratio_preference_or_consumption_state_identity"] = 1.0
     for i in scenarios:
-        params["alpha_change"] = i
+        params["alpha_change_state"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_attitude_learn_attitude_identity.extend(params_sub_list)#append to an emply list!
 
@@ -57,10 +57,10 @@ def main(
     # Attitude BASED learning and consumption based identity
     data_holder_attitude_learn_consumption_identity = []
     params_list_attitude_learn_consumption_identity= []
-    params["ratio_preference_or_consumption"] = 1.0
-    params["ratio_preference_or_consumption_identity"] = 0.0
+    params["ratio_preference_or_consumption_state"] = 1.0
+    params["ratio_preference_or_consumption_state_identity"] = 0.0
     for i in scenarios:
-        params["alpha_change"] = i
+        params["alpha_change_state"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_attitude_learn_consumption_identity.extend(params_sub_list)#append to an emply list!
 
@@ -72,10 +72,10 @@ def main(
 
     data_holder_consumption_learn_attitude_identity = []
     params_list_consumption_learn_attitude_identity = []
-    params["ratio_preference_or_consumption"] = 0.0
-    params["ratio_preference_or_consumption_identity"] = 1.0
+    params["ratio_preference_or_consumption_state"] = 0.0
+    params["ratio_preference_or_consumption_state_identity"] = 1.0
     for i in scenarios:
-        params["alpha_change"] = i
+        params["alpha_change_state"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_consumption_learn_attitude_identity.extend(params_sub_list)
     #print("adfsdf", params_list_consumption_based)
@@ -87,10 +87,10 @@ def main(
 
     data_holder_consumption_learn_consumption_identity = []
     params_list_consumption_learn_consumption_identity = []
-    params["ratio_preference_or_consumption"] = 0.0
-    params["ratio_preference_or_consumption_identity"] = 0.0
+    params["ratio_preference_or_consumption_state"] = 0.0
+    params["ratio_preference_or_consumption_state_identity"] = 0.0
     for i in scenarios:
-        params["alpha_change"] = i
+        params["alpha_change_state"] = i
         params_sub_list = produce_param_list_stochastic(params, property_values_list, propertprice_autocorried)
         params_list_consumption_learn_consumption_identity.extend(params_sub_list)
     #print("adfsdf", params_list_consumption_based)

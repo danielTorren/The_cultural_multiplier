@@ -83,7 +83,7 @@ def main(
     f_var = open(VARIABLE_PARAMS_LOAD)
     var_params = json.load(f_var) 
 
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption",
+    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
     property_reps = var_params["property_reps"]#10,
 
     property_values_list = generate_vals(
