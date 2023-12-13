@@ -1,7 +1,7 @@
 {
     "save_timeseries_data": 0, 
-    "budget_inequality_state":0,
-    "heterogenous_preferences": 1.0,
+    "heterogenous_expenditure":0,
+    "heterogenous_intrasector_preferences": 1.0,
     "redistribution_state": 0,
     "static_internal_A_state": 0,
     "utility_function_state": "nested_CES",

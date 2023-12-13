@@ -1,8 +1,8 @@
 {
-    "property_varied" : "budget",
+    "property_varied" : "expenditure",
     "property_min" :1,
     "property_max" :100,
     "property_reps": 4,
-    "property_varied_title" : "Budget",
+    "property_varied_title" : "expenditure",
     "property_divisions": "linear"
 }

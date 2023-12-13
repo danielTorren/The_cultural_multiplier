@@ -38,7 +38,7 @@ def main(
 if __name__ == '__main__':
     base_params = {
         'save_timeseries_data': 1,
-        'heterogenous_preferences': 1.0,
+        'heterogenous_intrasector_preferences': 1.0,
         'compression_factor': 10, 
         'ratio_preference_or_consumption': 0.0, 
         "alpha_change": "dynamic_culturally_determined_weights",
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         'std_low_carbon_preference': 0.01, 
         'std_learning_error': 0.02, 
         'confirmation_bias': 5, 
-        'budget': 10,
+        'expenditure': 10,
         'init_carbon_price': 0, 
         "carbon_price_increased_lower": 0.0,
         "carbon_price_increased_upper": 0.0,
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     
     """{
     "save_timeseries_data": 1, 
-    "heterogenous_preferences": 1.0,
+    "heterogenous_intrasector_preferences": 1.0,
     "compression_factor":10,
     "ratio_preference_or_consumption":0.0,
     "alpha_change": "dynamic_culturally_determined_weights",
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     "clipping_epsilon": 1e-5,
     "std_low_carbon_preference":0.01,
     "confirmation_bias":5,
-    "budget":10,
+    "expenditure":10,
     "carbon_price_increased_lower": 0.42,
     "carbon_price_increased_upper": 0.42,
 }"""

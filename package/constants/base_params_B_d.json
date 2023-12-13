@@ -1,7 +1,7 @@
 {
     "save_timeseries_data": 0, 
-    "budget_inequality_state":1,
-    "heterogenous_preferences": 1.0,
+    "heterogenous_expenditure":1,
+    "heterogenous_intrasector_preferences": 1.0,
     "redistribution_state": 1.0,
     "alpha_change": "dynamic_culturally_determined_weights",
     "compression_factor":10,

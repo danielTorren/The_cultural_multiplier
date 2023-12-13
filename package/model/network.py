@@ -40,11 +40,19 @@ class Network:
         #For inital construction set a seed, this is the same for all runs, then later change it to set_seed
         np.random.seed(self.init_vals_seed)
 
+        #INITAL STATE OF THE SYSTEMS, WHAT ARE THE RUN CONDITIONS
         self.burn_in_duration = parameters["burn_in_duration"]
         self.carbon_price_duration = parameters["carbon_price_duration"]
         self.sector_substitutability = parameters["sector_substitutability"]
-        self.heterogenous_preferences = parameters["heterogenous_preferences"]
-
+        self.heterogenous_intrasector_preferences = parameters["heterogenous_intrasector_preferences"]
+        self.heterogenous_intersector_preferences = parameters["heterogenous_intersector_preferences"]
+        self.heterogenous_intersector_preferences_parameterized = parameters["heterogenous_intersector_preferences_parameterized"]
+        self.heterogenous_carbon_price = parameters["heterogenous_carbon_price"]
+        self.heterogenous_sector_substitutabilities = parameters["heterogenous_sector_substitutabilities"]
+        self.heterogenous_expenditure = parameters["heterogenous_expenditure"]
+        self.heterogenous_expenditure_parameterized = parameters["heterogenous_expenditure_parameterized"]
+        self.imperfect_learning = parameters["imperfect_learning"]
+        self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
         
         # network
         self.network_density_input = parameters["network_density"]
@@ -64,19 +72,21 @@ class Network:
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
         self.prices_high_carbon =  np.asarray([1]*self.M)#start them at the same value
-
-        #carbon_price
         self.carbon_price_m = np.asarray([0]*self.M)
-        #RIGHTWAY 
-        self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
-        #WRONG WAY CHANGE
-        #self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_lower"], num=self.M)
+        if self.heterogenous_carbon_price:
+            #RIGHTWAY 
+            self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
+        else:
+            self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_lower"], num=self.M)
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
-        self.std_learning_error = parameters["std_learning_error"]
-        self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
-        self.clipping_epsilon = parameters["clipping_epsilon"]
+        if self.imperfect_learning:
+            self.std_learning_error = parameters["std_learning_error"]
+            self.clipping_epsilon = parameters["clipping_epsilon"]
+        else:
+            self.std_learning_error = 0
+            self.clipping_epsilon = 0        
         self.clipping_epsilon_init_preference = parameters["clipping_epsilon_init_preference"]
         
         # setting arrays with lin space
@@ -98,7 +108,7 @@ class Network:
         self.network_density = nx.density(self.network)
         #print("self.network_density",self.network_density, self.network_density_input)
 
-        if self.heterogenous_preferences == 1:
+        if self.heterogenous_intrasector_preferences == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
@@ -109,19 +119,35 @@ class Network:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
         
-        #Uniform budget
-        self.individual_budget_array =  np.asarray([parameters["budget"]]*self.N)#sums to 1
-            
-        ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
-        #CHANGE THIS !!!!!!!!!!!!!!!!!!!!!!!!!
-        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
-        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        if self.heterogenous_expenditure:
+            #Inequality in budget
+            self.budget_inequality_const = parameters["budget_inequality_const"]
+            u = np.linspace(0.01,1,self.N)
+            no_norm_individual_budget_array = u**(-1/self.budget_inequality_const)       
+            self.individual_budget_array =  self.normalize_vector_sum(no_norm_individual_budget_array)
+            self.gini = self.calc_gini(self.individual_budget_array)
+        elif self.heterogenous_expenditure_parameterized:
+            #load in the data for the 10 economic groups and do stuff
+            print("NOT CODED YET")
+        else:
+            #Uniform expenditure
+            self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
+        
+        if self.heterogenous_sector_substitutabilities:
+            ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
+            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        else:
+            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
+            #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
 
-        #self.low_carbon_substitutability_array = np.asarray([3])
-        #NOTE THE CHANGE EHRE FROM UNIFORM TO ASSYMETRIC!
-        self.sector_preferences = np.linspace(parameters["sector_preferences_lower"], parameters["sector_preferences_upper"], num=self.M)
-        #self.sector_preferences = np.asarray([1/self.M]*self.M)
+        if self.heterogenous_intersector_preferences:
+            #NOTE THE CHANGE EHRE FROM UNIFORM TO ASSYMETRIC!
+            self.sector_preferences = np.linspace(parameters["sector_preferences_lower"], parameters["sector_preferences_upper"], num=self.M)
+        elif self.heterogenous_intersector_preferences_parameterized:
+            #load in the sectoral expenditure preferences.
+            print("NOT CODED YET")
+        else:
+            self.sector_preferences = np.asarray([1/self.M]*self.M)
         
         self.agent_list = self.create_agent_list()
 
@@ -130,28 +156,14 @@ class Network:
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
 
-        #print("BEFORE")
         if self.alpha_change == "fixed_preferences":
-            #print("fixed",self.alpha_change)
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
             if self.alpha_change in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_culturally_determined_weights"):
-                #print("cultural",self.alpha_change,self.confirmation_bias)
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
-                #print("social",self.alpha_change,self.confirmation_bias)
                 self.weighting_matrix_list = self.update_weightings_list()
-            #print("update_done")
             self.social_component_matrix = self.calc_social_component_matrix()
-
-        """
-        if self.alpha_change == "uniform_network_weighting":
-            print("uniform",self.weighting_matrix)
-
-        if self.alpha_change == "static_socially_determined_weights":
-            print("static_socially_determined_weights",self.weighting_matrix_list)
-        """
-
 
         self.total_carbon_emissions_stock = 0#this are for post tax
 
@@ -164,13 +176,7 @@ class Network:
                 self.max_identity,
         ) = self.calc_network_identity()
 
-        #self.init_welfare_flow = self.calc_welfare()
         self.welfare_stock = 0
-
-        #if self.t == self.burn_in_duration:#in the case that we load in and there is no burn in period i want to calculate the emissions immedialty
-        #    self.total_carbon_emissions_flow = self.init_total_carbon_emissions
-        #    self.total_carbon_emissions_stock = self.total_carbon_emissions_flow
-        #    self.set_up_time_series()
 
     def set_up_time_series(self):
         self.history_weighting_matrix = [self.weighting_matrix]
@@ -288,7 +294,7 @@ class Network:
 
         low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
-        return low_carbon_preference_matrix#,individual_budget_matrix#, norm_sector_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
+        return low_carbon_preference_matrix#,individual_expenditure_matrix#, norm_sector_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
 
     def create_agent_list(self) -> list[Individual]:
         """
@@ -328,7 +334,7 @@ class Network:
                 individual_params,
                 self.low_carbon_preference_matrix_init[n],
                 #self.sector_preference_matrix_init,
-                self.individual_budget_array[n],
+                self.individual_expenditure_array[n],
                 n
             )
             for n in range(self.N)

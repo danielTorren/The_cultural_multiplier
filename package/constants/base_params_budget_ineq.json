@@ -1,6 +1,6 @@
 {
     "save_timeseries_data": 0, 
-    "budget_inequality_state":1,
+    "heterogenous_expenditure":1,
     "redistribution_state":0,
     "compression_factor":10,
     "time_steps_max": 2000,
@@ -29,5 +29,5 @@
     "carbon_tax_implementation": "flat",
     "carbon_price_increased" : 0.5,
     "dividend_progressiveness": 0,
-    "budget_gen_min":1e-3
+    "expenditure_gen_min":1e-3
 }

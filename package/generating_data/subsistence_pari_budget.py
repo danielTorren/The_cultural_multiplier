@@ -71,13 +71,13 @@ def calc_root(
     c_1 = calculate_cm(Omega_1, P_L1, P_H1)
     #sanity_check 
     min_H_1 = u_1/((A_1*(Omega_1**psi_1) +(1-A_1))**(1/psi_1)) #use this as the initial guess?
-    max_H_1 = B/c_1#what is the maximum amount of H_1 you could buy with your budget if you didnt get any H_2
+    max_H_1 = B/c_1#what is the maximum amount of H_1 you could buy with your expenditure if you didnt get any H_2
 
 
     min_cost = P_H1*min_H_1 + P_L1*min_H_1*Omega_1#the min amount of H1 and therefore the min amount of L1
     
     #THIS IF STATEMENT DOESNT SEEM TO BE THE PROBLEM
-    if B < min_cost:#if the budget isnt sufficent then do the best you can
+    if B < min_cost:#if the expenditure isnt sufficent then do the best you can
         H_1 = min_H_1
         H_2 = 0
         print("insufficient dosh", B, min_cost)
@@ -125,9 +125,9 @@ def multi_emissions_low_carbon(
 
     return np.asarray(emissions), np.asarray(low_carbon_consumption_prop)
 
-def gen_params_dict(params_dict,budget_list, carbon_price_list, property_row, property_col):
+def gen_params_dict(params_dict,expenditure_list, carbon_price_list, property_row, property_col):
     params_list = []
-    for i in budget_list:
+    for i in expenditure_list:
         for j in carbon_price_list:
             params_dict[property_row] = i
             params_dict[property_col] = j
@@ -182,22 +182,22 @@ def multi_line_matrix_plot(
     #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     #fig.savefig(f + ".png", dpi=dpi_save, format="png")   
 
-def main(budget_list, carbon_price_list,params_dict):
-    params_list = gen_params_dict(params_dict,budget_list, carbon_price_list, "B", "tau")
+def main(expenditure_list, carbon_price_list,params_dict):
+    params_list = gen_params_dict(params_dict,expenditure_list, carbon_price_list, "B", "tau")
     
     data_emissions, data_low_carbon_prop = multi_emissions_low_carbon(params_list)
 
-    data_emissions = data_emissions.reshape((len(budget_list),len(carbon_price_list)))
-    data_low_carbon_prop = data_low_carbon_prop.reshape((len(budget_list),len(carbon_price_list)))
+    data_emissions = data_emissions.reshape((len(expenditure_list),len(carbon_price_list)))
+    data_low_carbon_prop = data_low_carbon_prop.reshape((len(expenditure_list),len(carbon_price_list)))
     
     #print("data_emissions",data_emissions.shape)
-    row_label = "Budget"#row_dict["title"]#r"Attitude Beta parameters, $(a,b)$"#r"Number of behaviours per agent, M"
+    row_label = "expenditure"#row_dict["title"]#r"Attitude Beta parameters, $(a,b)$"#r"Number of behaviours per agent, M"
     col_label = "Carbon price"#col_dict["title"]#r'Confirmation bias, $\theta$'
 
     quit()
 
-    multi_line_matrix_plot(data_emissions, carbon_price_list, budget_list, get_cmap("plasma"), 0, col_label, row_label, "Emissions")#y_ticks_pos, y_ticks_label
-    multi_line_matrix_plot(data_low_carbon_prop, carbon_price_list, budget_list, get_cmap("plasma"), 0, col_label, row_label, "Low carbon proportion")#y_ticks_pos, y_ticks_label
+    multi_line_matrix_plot(data_emissions, carbon_price_list, expenditure_list, get_cmap("plasma"), 0, col_label, row_label, "Emissions")#y_ticks_pos, y_ticks_label
+    multi_line_matrix_plot(data_low_carbon_prop, carbon_price_list, expenditure_list, get_cmap("plasma"), 0, col_label, row_label, "Low carbon proportion")#y_ticks_pos, y_ticks_label
 
     
     plt.show()
@@ -222,8 +222,8 @@ if __name__ == "__main__":
         "H1_0" : 1,
         "tau" : 0#carbon tax
     }
-    budget_list = np.logspace(-1,1,4)
-    print("budget_list",budget_list)
+    expenditure_list = np.logspace(-1,1,4)
+    print("expenditure_list",expenditure_list)
     carbon_price_list = np.linspace(0.0,1.0,3)# for low values of carbon tax it works
 
-    main(budget_list, carbon_price_list,params_dict)
+    main(expenditure_list, carbon_price_list,params_dict)

@@ -1,8 +1,8 @@
 {
     "save_timeseries_data": 1, 
-    "budget_inequality_state":0,
+    "heterogenous_expenditure":0,
     "redistribution_state":1,
-    "heterogenous_preferences":1,
+    "heterogenous_intrasector_preferences":1,
     "compression_factor":10,
     "time_steps_max": 2000,
     "carbon_price_duration": 500,

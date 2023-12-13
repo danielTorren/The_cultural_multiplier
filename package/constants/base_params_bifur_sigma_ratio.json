@@ -1,6 +1,6 @@
 {
     "save_timeseries_data": 0, 
-    "heterogenous_preferences": 1.0,
+    "heterogenous_intrasector_preferences": 1.0,
     "compression_factor":10,
     "alpha_change": "dynamic_culturally_determined_weights",
     "network_structure_seed": 8,
@@ -24,5 +24,5 @@
     "carbon_price_increased_lower": 0,
     "carbon_price_increased_upper": 0,
     "confirmation_bias":5,
-    "budget":1
+    "expenditure":1
 }

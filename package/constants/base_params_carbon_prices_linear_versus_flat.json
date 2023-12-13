@@ -1,7 +1,7 @@
 {
     "save_timeseries_data": 0, 
     "compression_factor":10,
-    "budget_inequality_state":0,
+    "heterogenous_expenditure":0,
     "time_steps_max": 2000,
     "carbon_price_duration": 500,
     "seed_reps": 20,

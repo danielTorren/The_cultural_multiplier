@@ -1,8 +1,8 @@
 {
-    "property_varied" : "budget_inequality_const",
+    "property_varied" : "expenditure_inequality_const",
     "property_min" : 0,
     "property_max" :1,
     "property_reps": 20,
-    "property_varied_title" : "Budget Inequality",
+    "property_varied_title" : "expenditure Inequality",
     "property_divisions": "log"
 }

@@ -589,7 +589,7 @@ def main(
     elif PLOT_TYPE == 3:
         gini_array = load_object(fileName + "/Data", "gini_array")
 
-        plot_end_points_emissions(fileName, emissions_array, "Budget inequality (Pareto distribution constant)", property_varied, property_values_list, dpi_save)
+        plot_end_points_emissions(fileName, emissions_array, "expenditure inequality (Pareto distribution constant)", property_varied, property_values_list, dpi_save)
         plot_end_points_emissions_scatter_gini(fileName, emissions_array, "Initial Gini index", property_varied, property_values_list,gini_array, dpi_save)
         plot_end_points_emissions_lines_gini(fileName, emissions_array, "Initial Gini index", property_varied, property_values_list,gini_array, dpi_save)
     elif PLOT_TYPE == 4:

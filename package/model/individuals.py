@@ -22,14 +22,14 @@ class Individual:
         self,
         individual_params,
         low_carbon_preferences,
-        budget,
+        expenditure,
         id_n,
     ):
 
         self.low_carbon_preferences_init = low_carbon_preferences   
         self.low_carbon_preferences = self.low_carbon_preferences_init       
-        self.init_budget = budget
-        self.instant_budget = self.init_budget
+        self.init_expenditure = expenditure
+        self.instant_expenditure = self.init_expenditure
 
         self.M = individual_params["M"]
         self.t = individual_params["t"]
@@ -103,7 +103,7 @@ class Individual:
         return Z
     
     def calc_consumption_quantities_nested_CES(self):
-        H_m = (self.instant_budget*(self.chi_m**self.sector_substitutability))/self.Z
+        H_m = (self.instant_expenditure*(self.chi_m**self.sector_substitutability))/self.Z
         L_m = H_m*self.Omega_m
         return H_m, L_m
     

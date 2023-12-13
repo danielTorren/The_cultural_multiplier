@@ -37,11 +37,11 @@ def plot_H_against_A(sigma_values,A_values):
     for sigma in sigma_values:
         H_values = calculate_H(A_values, sigma)
         L_values = calc_L(H_values,A_values,sigma)
-        L_values_budget = 1 - H_values
+        L_values_expenditure = 1 - H_values
         axes[0].plot(A_values, H_values, label=f'$\sigma$={sigma}')
         axes[1].plot(A_values, L_values, label=f'$\sigma$={sigma}')
         axes[2].plot(H_values, L_values, label=f'$\sigma$={sigma}')
-        axes[3].plot(H_values, L_values_budget, label=f'$\sigma$={sigma}')
+        axes[3].plot(H_values, L_values_expenditure, label=f'$\sigma$={sigma}')
 
     #fig.tight_layout()
     axes[0].set_title('H vs A for Different Sigma Values')
@@ -62,9 +62,9 @@ def plot_H_against_A(sigma_values,A_values):
     axes[2].legend()
     axes[2].grid(True)
 
-    axes[3].set_title('L budget vs H for Different Sigma Values')
+    axes[3].set_title('L expenditure vs H for Different Sigma Values')
     axes[3].set_xlabel('H')
-    axes[3].set_ylabel('L budget')
+    axes[3].set_ylabel('L expenditure')
     axes[3].legend()
     axes[3].grid(True)
 

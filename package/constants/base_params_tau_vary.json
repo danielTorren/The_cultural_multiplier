@@ -1,6 +1,6 @@
 {
     "save_timeseries_data": 0, 
-    "heterogenous_preferences": 1.0,
+    "heterogenous_intrasector_preferences": 1.0,
     "compression_factor":10,
     "ratio_preference_or_consumption":0.0,
     "network_structure_seed": 8,
@@ -25,5 +25,5 @@
     "clipping_epsilon": 1e-5,
     "std_low_carbon_preference":0.01,
     "confirmation_bias":5,
-    "budget":1
+    "expenditure":1
 }
