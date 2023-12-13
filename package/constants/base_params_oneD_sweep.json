@@ -15,7 +15,7 @@
     "phi": 0.005,
     "network_density": 0.1,
     "prob_rewire": 0.1,
-    "learning_error_scale": 0.01,
+    "std_learning_error": 0.01,
     "homophily": 0.95,
     "init_carbon_price": 0,
     "sector_substitutability": 5,

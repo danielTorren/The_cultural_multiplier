@@ -20,7 +20,7 @@
     "phi": 0.025,
     "network_density": 0.1,
     "prob_rewire": 0.1,
-    "learning_error_scale": 0.02,
+    "std_learning_error": 0.02,
     "homophily": 0.95,
     "confirmation_bias": 5,
     "carbon_price_increased": 0.5,

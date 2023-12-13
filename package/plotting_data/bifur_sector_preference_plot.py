@@ -124,7 +124,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/bifur_one_param_sweep_12_42_14__04_12_2023",
+        fileName= "results/2D_bifur_param_sweep_14_52_59__04_12_2023",
         PLOT_TYPE = 1
     )
 

@@ -68,15 +68,16 @@ class Network:
         #carbon_price
         self.carbon_price_m = np.asarray([0]*self.M)
         #RIGHTWAY 
-        #self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
+        self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
         #WRONG WAY CHANGE
-        self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_lower"], num=self.M)
+        #self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_lower"], num=self.M)
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
-        self.learning_error_scale = parameters["learning_error_scale"]
+        self.std_learning_error = parameters["std_learning_error"]
         self.ratio_preference_or_consumption = parameters["ratio_preference_or_consumption"]
         self.clipping_epsilon = parameters["clipping_epsilon"]
+        self.clipping_epsilon_init_preference = parameters["clipping_epsilon_init_preference"]
         
         # setting arrays with lin space
         self.phi_array = np.asarray([parameters["phi"]]*self.M)
@@ -112,13 +113,15 @@ class Network:
         self.individual_budget_array =  np.asarray([parameters["budget"]]*self.N)#sums to 1
             
         ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
         #CHANGE THIS !!!!!!!!!!!!!!!!!!!!!!!!!
         #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
-        self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
+        #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
 
         #self.low_carbon_substitutability_array = np.asarray([3])
-        self.sector_preferences = np.asarray([1/self.M]*self.M)
+        #NOTE THE CHANGE EHRE FROM UNIFORM TO ASSYMETRIC!
+        self.sector_preferences = np.linspace(parameters["sector_preferences_lower"], parameters["sector_preferences_upper"], num=self.M)
+        #self.sector_preferences = np.asarray([1/self.M]*self.M)
         
         self.agent_list = self.create_agent_list()
 
@@ -281,9 +284,9 @@ class Network:
 
         indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
 
-        preferences_uncapped = np.asarray([np.random.normal(identity,self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
+        preferences_uncapped = np.asarray([np.random.normal(loc=identity,scale=self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
 
-        low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)
+        low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
         return low_carbon_preference_matrix#,individual_budget_matrix#, norm_sector_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
 
@@ -407,7 +410,7 @@ class Network:
         else:#culturally determined either static or dynamic
             ego_influence = self.calc_ego_influence_degroot()           
          
-        social_influence = ego_influence + np.random.normal(loc=0, scale=self.learning_error_scale, size=(self.N, self.M))
+        social_influence = ego_influence + np.random.normal(loc=0, scale=self.std_learning_error, size=(self.N, self.M))
 
         return social_influence
 

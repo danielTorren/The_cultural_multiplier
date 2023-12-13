@@ -11,7 +11,7 @@
     "M": 3,
     "K": 50,
     "prob_rewire": 0.1,
-    "learning_error_scale": 0.02,
+    "std_learning_error": 0.02,
     "homophily": 0.95,
     "confirmation_bias": 10,
     "phi": 0.05,

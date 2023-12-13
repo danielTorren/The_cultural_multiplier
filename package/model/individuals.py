@@ -75,6 +75,7 @@ class Individual:
         self.history_pseudo_utility = [self.pseudo_utility]
         self.history_H_m = [self.H_m]
         self.history_L_m = [self.L_m]
+        self.history_Z = [self.Z]
     
     #####################################################################################
     #NESTED CES
@@ -173,6 +174,7 @@ class Individual:
         self.history_pseudo_utility.append(self.pseudo_utility)
         self.history_H_m.append(self.H_m)
         self.history_L_m.append(self.L_m)
+        self.history_Z.append(self.Z)
 
 
     def next_step(self, t: int, social_component: npt.NDArray, carbon_price_m):

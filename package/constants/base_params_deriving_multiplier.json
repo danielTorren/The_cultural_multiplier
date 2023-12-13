@@ -15,7 +15,7 @@
     "M": 1,
     "network_density": 0.1,
     "prob_rewire": 0.1,
-    "learning_error_scale": 0.02,
+    "std_learning_error": 0.02,
     "homophily": 0.95,
     "confirmation_bias": 0,
     "sector_substitutability": 2,

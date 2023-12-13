@@ -28,6 +28,23 @@ from package.resources.plot import (
     plot_total_flow_carbon_emissions_timeseries
 )
 
+def plot_Z_timeseries(fileName, Data, dpi_save,latex_bool = False):
+
+    fig, ax = plt.subplots(figsize=(10,6))
+    y_title = r"$Z_{t,i}$"
+
+    for v in Data.agent_list:
+        ax.plot(np.asarray(Data.history_time), np.asarray(v.history_Z))
+        ax.set_xlabel(r"Time")
+        ax.set_ylabel(r"%s" % y_title)
+        #ax.set_ylim(0, 1)
+
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_Z_timeseries"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
 
 def plot_consumption_no_burn_in(fileName, data, dpi_save):
 
@@ -361,13 +378,13 @@ def multi_col_fixed_animation_distribution(fileName, data_sim,property_plot,x_ax
     # Set up the initial KDE plot
     if direction == "y":
         for i,data in enumerate(data_pd_list):
-            initial_kde = sns.kdeplot(y = data['Distribution'].iloc[0], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
+            initial_kde = sns.kdeplot(y = data['Distribution'].iloc[0], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
         ax.set_ylabel(x_axis_label)
         ax.set_xlabel('Density')
         ax.set_ylim(min_lim,max_lim)
     else:
         for i,data in enumerate(data_pd_list):
-            initial_kde = sns.kdeplot(x = data['Distribution'].iloc[0], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))#color='b'
+            initial_kde = sns.kdeplot(x = data['Distribution'].iloc[0], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))#color='b'
         ax.set_xlabel(x_axis_label)
         ax.set_ylabel('Density')
         ax.set_xlim(min_lim,max_lim)
@@ -380,13 +397,13 @@ def multi_col_fixed_animation_distribution(fileName, data_sim,property_plot,x_ax
         ax.clear()
         if direction == "y":
             for i,data in enumerate(data_pd_list):
-                kde = sns.kdeplot(y=data['Distribution'].iloc[frame], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
+                kde = sns.kdeplot(y=data['Distribution'].iloc[frame], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
             ax.set_ylabel(x_axis_label)
             ax.set_ylim(min_lim,max_lim)
             ax.set_xlabel('Density')
         else:
             for i,data in enumerate(data_pd_list):
-                kde = sns.kdeplot(x=data['Distribution'].iloc[frame], label="Sector %s, $\sigma_m$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
+                kde = sns.kdeplot(x=data['Distribution'].iloc[frame], label="$\sigma_{%s}$ = %s" % (i+1,data_sim.low_carbon_substitutability_array[i] ))
             ax.set_xlabel(x_axis_label)
             ax.set_xlim(min_lim,max_lim)
             ax.set_ylabel('Density')
@@ -476,6 +493,7 @@ def plot_omega(
                     np.asarray(data.history_time),
                     data_indivdiual[:,j]
                 )
+                #axes[j].set_ylim(0,100)
 
     fig.supxlabel(r"Time")
     fig.supylabel(r"%s" % y_title)
@@ -483,6 +501,50 @@ def plot_omega(
     plotName = fileName + "/Prints"
 
     f = plotName + "/timeseries_omega"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_consum_ratio(
+    fileName, 
+    data, 
+    dpi_save,
+    ):
+
+    y_title = "Consumption ratio, $C_{t,i,m}$"
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M)
+
+    for v in range(data.N):
+        data_indivdiual = np.asarray(data.agent_list[v].history_omega_m)
+        
+        if data.M == 1:
+            #print("data_indivdiual",data_indivdiual)
+            #quit()
+            data_ind = np.asarray(data_indivdiual)
+            consum_ratio = data_ind/(1+data_ind) 
+            axes.plot(
+                    np.asarray(data.history_time),
+                    consum_ratio
+                )
+            axes.set_ylim(0,1)
+        else:
+            for j in range(data.M):
+                #print("HI", len(data.history_time), len(data_indivdiual[:,j]))
+                #quit()
+                data_ind = np.asarray(data_indivdiual[:,j])
+                consum_ratio = data_ind/(1+data_ind) 
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    consum_ratio
+                )
+                axes[j].set_ylim(0,1)
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_consum_ratio"
     #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
@@ -592,8 +654,10 @@ def main(
     plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
     plot_chi(fileName, Data, dpi_save)
     plot_omega(fileName, Data, dpi_save)
+    plot_consum_ratio(fileName, Data, dpi_save)
     plot_L(fileName, Data, dpi_save)
     plot_H(fileName, Data, dpi_save)
+    plot_Z_timeseries(fileName, Data, dpi_save)
     #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
     #emissions_threshold_range = np.arange(0,0.005,0.000001)
     #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
@@ -614,7 +678,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_20_18_21__16_11_2023"
+        fileName = "results/single_experiment_16_16_09__04_12_2023",#
     )
 
 

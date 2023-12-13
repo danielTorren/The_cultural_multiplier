@@ -89,7 +89,6 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
     
-    createFolder(fileName)
 
     # look at splitting of the last behaviour with preference dissonance
     
@@ -109,6 +108,11 @@ def main(
         data_array = data_array_serial.reshape(property_reps_1,property_reps_2, params["N"],params["M"])
         data_array_H = data_consumption_H_serial.reshape(property_reps_1,property_reps_2, params["N"],params["M"])
         data_array_L = data_consumption_L_serial.reshape(property_reps_1,property_reps_2, params["N"],params["M"])
+
+    
+    createFolder(fileName)
+
+    if RUN_TYPE == 3:
         save_object(data_array_H, fileName + "/Data", "data_array_H")
         save_object(data_array_L, fileName + "/Data", "data_array_L")
 
