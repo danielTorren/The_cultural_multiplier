@@ -29,6 +29,8 @@ class Network:
         """
 
         #INITAL STATE OF THE SYSTEMS, WHAT ARE THE RUN CONDITIONS
+        self.save_timeseries_data_state = parameters["save_timeseries_data_state"]
+        self.compression_factor_state = parameters["compression_factor_state"]
         self.heterogenous_intrasector_preferences_state = parameters["heterogenous_intrasector_preferences_state"]
         self.heterogenous_carbon_price_state = parameters["heterogenous_carbon_price_state"]
         self.heterogenous_sector_substitutabilities_state = parameters["heterogenous_sector_substitutabilities_state"]
@@ -36,9 +38,8 @@ class Network:
         self.imperfect_learning_state = parameters["imperfect_learning_state"]
         self.ratio_preference_or_consumption_state = parameters["ratio_preference_or_consumption_state"]
         self.alpha_change_state = parameters["alpha_change_state"]
-        self.save_timeseries_data_state = parameters["save_timeseries_data_state"]
-        self.compression_factor_state = parameters["compression_factor_state"]
         self.vary_seed_imperfect_learning_state_or_initial_preferences_state = parameters["vary_seed_imperfect_learning_state_or_initial_preferences_state"]
+        self.static_internal_preference_state = parameters["static_internal_preference_state"]
 
         #seeds
         if self.vary_seed_imperfect_learning_state_or_initial_preferences_state:
@@ -91,9 +92,9 @@ class Network:
             self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_lower"], num=self.M)
 
         # network homophily
-        self.homophily = parameters["homophily"]  # 0-1
+        self.homophily_state = parameters["homophily_state"]  # 0-1
         self.shuffle_reps = int(
-            round(self.N*(1 - self.homophily))
+            round(self.N*(1 - self.homophily_state))
         )
 
         # create network
@@ -139,7 +140,7 @@ class Network:
         if self.alpha_change_state == "fixed_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
-            if self.alpha_change_state in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_culturally_determined_weights"):
+            if self.alpha_change_state in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_culturally_determined_weights", "common_knowledge_dynamic_culturally_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()
@@ -296,7 +297,8 @@ class Network:
             "ratio_preference_or_consumption_state": self.ratio_preference_or_consumption_state,
             "sector_preferences" : self.sector_preferences,
             "burn_in_duration": self.burn_in_duration,
-            "alpha_change_state": self.alpha_change_state
+            "alpha_change_state": self.alpha_change_state,
+            "static_internal_preference_state": self.static_internal_preference_state
         }
 
         individual_params["sector_substitutability"] = self.sector_substitutability
@@ -585,7 +587,7 @@ class Network:
 
         # update network parameters for next step
         if self.alpha_change_state != "fixed_preferences":
-            if self.alpha_change_state == "dynamic_culturally_determined_weights":
+            if self.alpha_change_state in ("dynamic_culturally_determined_weights", "common_knowledge_dynamic_culturally_determined_weights"):
                 #print("updating culturally list",self.alpha_change_state)
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":#independent behaviours

@@ -87,6 +87,36 @@ def plot_means_end_points_emissions(
     f = plotName + "/plot_means_end_points_emissions"
     fig.savefig(f+ ".png", dpi=600, format="png") 
 
+def plot_mean_emissions(
+    fileName, emissions, scenarios_titles, property_vals
+):
+
+    #print(c,emissions_final)
+    fig, ax = plt.subplots(figsize=(10,6), constrained_layout = True)
+
+    colors = iter(rainbow(np.linspace(0, 1, len(emissions))))
+
+    for i in range(len(emissions)):
+        color = next(colors)#set color for whole scenario?
+        Data = emissions[i]
+        #print("Data", Data.shape)
+        mu_emissions =  Data.mean(axis=1)
+        #min_emissions =  Data.min(axis=1)
+        #max_emissions=  Data.max(axis=1)
+
+        #print("mu_emissions",mu_emissions)
+        ax.plot(property_vals, mu_emissions, c= color, label=scenarios_titles[i])
+        #ax.fill_between(property_vals, min_emissions, max_emissions, facecolor=color , alpha=0.5)
+
+    ax.legend()
+    ax.set_xlabel(r"Carbon Tax")
+    ax.set_ylabel(r"Carbon Emissions")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_mean_emissions"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+
 def plot_emissions_ratio_scatter(
     fileName, emissions_no_tax, emissions_tax, scenarios_titles, property_vals
 ):
@@ -343,9 +373,11 @@ def main(
         plot_emissions_ratio_scatter(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
         plot_emissions_ratio_line(fileName,emissions_no_tax, emissions_tax, scenarios ,property_values_list)
     #"""
+        
+    plot_mean_emissions(fileName, emissions_tax, scenarios ,property_values_list)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/tax_sweep_13_36_35__28_11_2023",
-    )
+        fileName="results/tax_sweep_static_A_16_49_29__08_01_2024",
+    )#tax_sweep_static_A_16_41_31__20_12_2023

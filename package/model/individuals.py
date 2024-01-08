@@ -27,7 +27,7 @@ class Individual:
     ):
 
         self.low_carbon_preferences_init = low_carbon_preferences   
-        self.low_carbon_preferences = self.low_carbon_preferences_init       
+        self.low_carbon_preferences = low_carbon_preferences  
         self.init_expenditure = expenditure
         self.instant_expenditure = self.init_expenditure
 
@@ -44,6 +44,7 @@ class Individual:
         self.ratio_preference_or_consumption_state = individual_params["ratio_preference_or_consumption_state"]
         self.burn_in_duration = individual_params["burn_in_duration"]
         self.alpha_change_state = individual_params["alpha_change_state"]
+        self.static_internal_preference_state = individual_params["static_internal_preference_state"]
 
         self.sector_substitutability = individual_params["sector_substitutability"]
 
@@ -114,8 +115,12 @@ class Individual:
         return ratio
     
     def calc_outward_social_influence(self):
-        return self.ratio_preference_or_consumption_state*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*self.consumption_ratio
+        if self.alpha_change_state == "common_knowledge_dynamic_culturally_determined_weights":
+            outward_social_influence = self.prices_low_carbon_m/(self.prices_high_carbon_instant*(1/self.Omega_m**(1/self.low_carbon_substitutability_array)) + self.prices_low_carbon_m)
+        else: 
+            outward_social_influence = self.ratio_preference_or_consumption_state*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*self.consumption_ratio
 
+        return outward_social_influence
     def update_consumption(self):
         #calculate consumption
         self.Omega_m = self.calc_Omega_m()
@@ -128,7 +133,11 @@ class Individual:
         self.outward_social_influence = self.calc_outward_social_influence()
 
     def update_preferences(self, social_component):
-        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + self.phi_array*social_component
+        if self.static_internal_preference_state:
+            low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences_init + self.phi_array*social_component
+        else:
+            low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences + self.phi_array*social_component
+
         self.low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
 
     def calc_utility_nested_CES(self):
