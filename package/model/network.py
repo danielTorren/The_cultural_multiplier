@@ -40,6 +40,7 @@ class Network:
         self.alpha_change_state = parameters["alpha_change_state"]
         self.vary_seed_imperfect_learning_state_or_initial_preferences_state = parameters["vary_seed_imperfect_learning_state_or_initial_preferences_state"]
         self.static_internal_preference_state = parameters["static_internal_preference_state"]
+        self.network_type = parameters["network_type"]
 
         #seeds
         if self.vary_seed_imperfect_learning_state_or_initial_preferences_state:
@@ -201,7 +202,7 @@ class Network:
 
     def create_weighting_matrix(self) -> tuple[npt.NDArray, npt.NDArray, nx.Graph]:
         """
-        Create watts-strogatz small world graph using Networkx library
+        Create graph using Networkx library
 
         Parameters
         ----------
@@ -209,26 +210,37 @@ class Network:
 
         Returns
         -------
-        weighting_matrix: npt.NDArray[bool]
+        adjacency_matrix: npt.NDArray[bool]
             adjacency matrix, array giving social network structure where 1 represents a connection between agents and 0 no connection. It is symetric about the diagonal
-        norm_weighting_matrix: npt.NDArray[float]
-            an NxN array how how much each agent values the opinion of their neighbour. Note that is it not symetric and agent i doesn't need to value the
-            opinion of agent j as much as j does i's opinion
         ws: nx.Graph
             a networkx watts strogatz small world graph
         """
-
-        G = nx.watts_strogatz_graph(n=self.N, k=self.K, p=self.prob_rewire, seed=self.network_structure_seed)#FIX THE NETWORK STRUCTURE
-
+        if self.network_type == "scale_free":
+            G = nx.scale_free_graph(self.N)
+        elif self.network_type == "random":
+            G = nx.erdos_renyi_graph(self.N, 0.2)
+        elif self.network_type == "small-world":
+            G = nx.watts_strogatz_graph(n=self.N, k=self.K, p=self.prob_rewire, seed=self.set_seed)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
+        elif self.network_type == "SBM":
+            block_sizes = [int(self.N/2), int(self.N/2)]  # Adjust the sizes as needed
+            num_blocks = len(block_sizes)
+            # Create the stochastic block model
+            block_probs = np.asarray([[0.1, 0.001],[0.001, 0.1]])  # Make the matrix symmetric
+            G = nx.stochastic_block_model(block_sizes, block_probs, seed=self.set_seed)
+        
         weighting_matrix = nx.to_numpy_array(G)
+        #remove self loops, for the scale free network 
+        np.fill_diagonal(weighting_matrix, 0)
 
         norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
 
+        #print("Network density:", nx.density(G))
         return (
             weighting_matrix,
             norm_weighting_matrix,
             G,
         )
+    
     
     def circular_agent_list(self) -> list:
         """
