@@ -49,11 +49,11 @@ if __name__ == '__main__':
         "alpha_change_state": "dynamic_culturally_determined_weights",
         "vary_seed_imperfect_learning_state_or_initial_preferences_state": 0,
         "static_internal_preference_state": 0,
-        'homophily_state': 0, 
+        'homophily_state': 0.8, 
         'network_structure_seed': 8, 
         'init_vals_seed': 14, 
         'set_seed': 4, 
-        'carbon_price_duration': 1000, 
+        'carbon_price_duration': 100, 
         'burn_in_duration': 0, 
         'N': 200, 
         'M': 2, 
@@ -82,7 +82,8 @@ if __name__ == '__main__':
         "SBM_block_num": 2,
         "SBM_network_density_input_intra_block": 0.2,
         "SBM_network_density_input_inter_block": 0.005,
-        "BA_nodes": 11
+        "BA_nodes": 11,
+        "BA_green_or_brown_hegemony": 1
         }
     
     fileName = main(base_params=base_params)

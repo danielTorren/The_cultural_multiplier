@@ -60,16 +60,12 @@ class Network:
             self.SW_network_density_input = parameters["SW_network_density"]
             self.SW_K = int(round((self.N - 1)*self.SW_network_density_input)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
             self.SW_prob_rewire = parameters["SW_prob_rewire"]
-        elif self.network_type == "SF":
-            self.SF_alpha = parameters["SF_alpha"]
-            self.SF_beta = parameters["SF_beta"]
-            self.SF_gamma = parameters["SF_gamma"]
-            #haven't included parameters for delta in and out
         elif self.network_type == "SBM":
             self.SBM_block_num = parameters["SBM_block_num"]
             self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
             self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
         elif self.network_type == "BA":
+            self.BA_green_or_brown_hegemony = parameters["BA_green_or_brown_hegemony"]
             self.BA_nodes = parameters["BA_nodes"]
         
         self.M = int(round(parameters["M"]))
@@ -143,15 +139,10 @@ class Network:
         
         self.agent_list = self.create_agent_list()
 
-        if self.network_type == "SW":
+        if self.network_type in ("SW", "SBM"):
             self.shuffle_agent_list()#partial shuffle of the list based on identity
-        elif self.network_type == "SBM":
-            self.SBM_block_num = parameters["SBM_block_num"]
-            self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
-            self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
-        elif self.network_type == "BA":
-            self.BA_nodes = parameters["BA_nodes"]
-        
+        elif (self.network_type == "BA") and (self.BA_green_or_brown_hegemony != 0):#1(green) or -1(brown)
+            self.shuffle_agent_list_BA()#partial shuffle of the list based on identity
 
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
@@ -250,7 +241,6 @@ class Network:
 
         return norm_matrix
 
-
     def split_into_groups(self):
         if self.SBM_block_num <= 0:
             raise ValueError("SBM_block_num must be greater than zero.")
@@ -278,10 +268,7 @@ class Network:
         ws: nx.Graph
             a networkx watts strogatz small world graph
         """
-        if self.network_type == "SF":
-            #G = nx.scale_free_graph(n = self.N, alpha = self.SF_alpha, beta = self.SF_beta, gamma = self.SF_gamma, seed=self.set_seed )# leave defaults ? alpha=0.41, beta=0.54, gamma=0.05, want similar density need to calc that
-            G = nx.scale_free_graph(n = self.N,seed=self.set_seed )# leave defaults ? alpha=0.41, beta=0.54, gamma=0.05, want similar density need to calc that
-        elif self.network_type == "SW":
+        if self.network_type == "SW":
             G = nx.watts_strogatz_graph(n=self.N, k=self.SW_K, p=self.SW_prob_rewire, seed=self.set_seed)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
         elif self.network_type == "SBM":
             self.SBM_block_sizes = self.split_into_groups()
@@ -289,34 +276,16 @@ class Network:
             # Create the stochastic block model, i can make it so that density between certain groups is different
             block_probs = np.full((num_blocks,num_blocks), self.SBM_network_density_input_inter_block)
             np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
-            #print("block_probs",block_probs)
-            #block_probs = np.asarray([[self.SBM_network_density_input_intra_block, self.SBM_network_density_input_inter_block]for i in range(num_blocks)])
-            #np.asarray([[0.1, 0.001],[0.001, 0.1]])  # Make the matrix symmetric
             G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.set_seed)
         elif self.network_type == "BA":
             G = nx.barabasi_albert_graph(n = self.N, m = self.BA_nodes)
 
         weighting_matrix = nx.to_numpy_array(G)
-        #print("check if any self loops",np.sum(weighting_matrix, axis=0),np.sum(weighting_matrix, axis=1))
-        #quit()
-        #remove self loops, for the scale free network 
-        #np.fill_diagonal(weighting_matrix, 0)
 
-        #check if any of the rows have one 1 and are thus isolated: 
-        #if any(np.sum(weighting_matrix, axis=1) == 1):
-        #if any(np.sum(weighting_matrix, axis=0) == 0):
-        #    raise ValueError("Invalid density, isolated individuals", weighting_matrix)
-
-        if self.network_type == "SF":
-            norm_weighting_matrix = self.adjust_normlize_matrix(weighting_matrix)
-        else:
-            norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
+        norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
         
         self.network_density = nx.density(G)
         print("Network density:", self.network_density)
-        #quit()
-        #print("norm_weighting_matrix",norm_weighting_matrix)
-        #quit()
         
         #quit()
         return (
@@ -416,6 +385,14 @@ class Network:
         #make list cirucalr then partial shuffle it
         self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
         self.circular_agent_list()#agent list is now circular in terms of identity
+        self.partial_shuffle_agent_list()#partial shuffle of the list
+
+    def shuffle_agent_list_BA(self,): 
+        #make list cirucalr then partial shuffle it
+        self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
+        if self.BA_green_or_brown_hegemony == 1:#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
+            self.agent_list.reverse()
+        #self.circular_agent_list()#agent list is now circular in terms of identity
         self.partial_shuffle_agent_list()#partial shuffle of the list
 
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
