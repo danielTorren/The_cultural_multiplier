@@ -1637,14 +1637,17 @@ def plot_SBM_low_carbon_preferences_timeseries(
     #data_list = []
 
     cmap = get_cmap('viridis')
-
+    #print("data.SBM_block_sizes",data.SBM_block_sizes)
     colours = iter(cmap(np.linspace(0, 1, len(data.SBM_block_sizes))))
-    #print("colours", colours)
+    
+    colours_list = [next(colours) for i in data.SBM_block_sizes]
+    block_colours = np.repeat(colours_list,  data.SBM_block_sizes, axis=0)   
 
-    block_colours_array = np.asarray([[next(colours)]*i for i in data.SBM_block_sizes])
-    block_colours = np.reshape(block_colours_array, (data.N,4))
-
-    block_label = np.asarray([[i+1]*data.SBM_block_sizes[i] for i in range(len(data.SBM_block_sizes))]).flatten()
+    labels_list = [i+1 for i in range(len(data.SBM_block_sizes))]
+    block_label = np.repeat(labels_list,  data.SBM_block_sizes, axis=0)
+    #print("block_label",block_label,block_label.shape)
+    #quit()
+    #block_label = np.asarray([[i+1]*data.SBM_block_sizes[i] for i in range(len(data.SBM_block_sizes))]).flatten()
     
     for v in range(data.N):
         data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)

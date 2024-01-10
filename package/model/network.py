@@ -60,13 +60,16 @@ class Network:
             self.SW_network_density_input = parameters["SW_network_density"]
             self.SW_K = int(round((self.N - 1)*self.SW_network_density_input)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
             self.SW_prob_rewire = parameters["SW_prob_rewire"]
+            self.block_heterogenous_sector_substitutabilities_state = 0#crude solution
         elif self.network_type == "SBM":
+            self.block_heterogenous_sector_substitutabilities_state = parameters["block_heterogenous_sector_substitutabilities_state"]
             self.SBM_block_num = parameters["SBM_block_num"]
             self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
             self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
         elif self.network_type == "BA":
             self.BA_green_or_brown_hegemony = parameters["BA_green_or_brown_hegemony"]
             self.BA_nodes = parameters["BA_nodes"]
+            self.block_heterogenous_sector_substitutabilities_state = 0#crude solution
         
         self.M = int(round(parameters["M"]))
 
@@ -126,11 +129,19 @@ class Network:
         
         self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
         
+
         if self.heterogenous_sector_substitutabilities_state:
             ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
             self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+            self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
+        elif self.block_heterogenous_sector_substitutabilities_state:#fix this solution
+            block_substitutabilities = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.SBM_block_num)
+            low_carbon_substitutability_matrix = np.tile(block_substitutabilities[:, np.newaxis], (1, self.M))
+            # Repeat each row according to the values in self.SBM_block_sizes
+            self.low_carbon_substitutability_array_list = np.repeat(low_carbon_substitutability_matrix, self.SBM_block_sizes, axis=0)
         else:
             self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
+            self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
             #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
         
         self.sector_substitutability = parameters["sector_substitutability"]
@@ -355,7 +366,7 @@ class Network:
             "phi_array": self.phi_array,
             "compression_factor_state": self.compression_factor_state,
             "init_carbon_price_m": self.carbon_price_m,
-            "low_carbon_substitutability": self.low_carbon_substitutability_array,
+            #"low_carbon_substitutability": self.low_carbon_substitutability_array,
             "prices_low_carbon_m": self.prices_low_carbon,
             "prices_high_carbon_m":self.prices_high_carbon,
             "clipping_epsilon" :self.clipping_epsilon,
@@ -374,6 +385,7 @@ class Network:
                 self.low_carbon_preference_matrix_init[n],
                 #self.sector_preference_matrix_init,
                 self.individual_expenditure_array[n],
+                self.low_carbon_substitutability_array_list[n],
                 n
             )
             for n in range(self.N)

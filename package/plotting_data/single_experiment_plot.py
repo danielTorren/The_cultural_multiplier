@@ -774,7 +774,9 @@ def plot_SBM_network_end_preferences(
     if data.SBM_block_num > len(block_markers_list):
         raise ValueError("Not enough markers for number of blocks")
     
-    node_shapes = np.asarray([[block_markers_list[i]]*data.SBM_block_sizes[i] for i in range(data.SBM_block_num)]).flatten()
+    #node_shapes = np.asarray([[block_markers_list[i]]*data.SBM_block_sizes[i] for i in range(data.SBM_block_num)]).flatten()
+    present_block_markers_list = [block_markers_list[i] for i in range(data.SBM_block_num)]
+    node_shapes = np.repeat(present_block_markers_list,  data.SBM_block_sizes, axis=0)  
 
     G = data.network
 
@@ -874,7 +876,9 @@ def plot_SBM_network_start_preferences(
     if data.SBM_block_num > len(block_markers_list):
         raise ValueError("Not enough markers for number of blocks")
     
-    node_shapes = np.asarray([[block_markers_list[i]]*data.SBM_block_sizes[i] for i in range(data.SBM_block_num)]).flatten()
+    #node_shapes = np.asarray([[block_markers_list[i]]*data.SBM_block_sizes[i] for i in range(data.SBM_block_num)]).flatten()
+    present_block_markers_list = [block_markers_list[i] for i in range(data.SBM_block_num)]
+    node_shapes = np.repeat(present_block_markers_list,  data.SBM_block_sizes, axis=0)   
 
     G = data.network
 
@@ -980,6 +984,8 @@ def main(
         plot_consumption(fileName, Data, dpi_save)
     """
     plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
+    plot_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
+    plot_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
     
     #plot_emissions_individuals(fileName, Data, dpi_save)
     #plot_identity_timeseries(fileName, Data, dpi_save)
@@ -991,13 +997,11 @@ def main(
     #plot_L(fileName, Data, dpi_save)
     #plot_H(fileName, Data, dpi_save)
     #plot_Z_timeseries(fileName, Data, dpi_save)
-    plot_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
-    plot_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
-    
+
     if Data.network_type =="SBM":
         plot_SBM_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
-        plot_SBM_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
-        plot_SBM_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
+        #plot_SBM_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
+        #plot_SBM_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
 
     #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
     #emissions_threshold_range = np.arange(0,0.005,0.000001)
@@ -1019,7 +1023,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_16_45_11__10_01_2024",
+        fileName = "results/single_experiment_22_02_56__10_01_2024",
     )
 
 

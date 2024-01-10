@@ -23,6 +23,7 @@ class Individual:
         individual_params,
         low_carbon_preferences,
         expenditure,
+        low_carbon_substitutability_array,
         id
     ):
 
@@ -37,7 +38,8 @@ class Individual:
         self.compression_factor_state = individual_params["compression_factor_state"]
         self.phi_array = individual_params["phi_array"]
         self.sector_preferences = individual_params["sector_preferences"]
-        self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
+        self.low_carbon_substitutability_array = low_carbon_substitutability_array
+        #self.low_carbon_substitutability_array = individual_params["low_carbon_substitutability"]
         self.prices_low_carbon_m = individual_params["prices_low_carbon_m"]
         self.prices_high_carbon_m = individual_params["prices_high_carbon_m"]
         self.clipping_epsilon = individual_params["clipping_epsilon"]
