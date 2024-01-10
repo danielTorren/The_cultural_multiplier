@@ -69,7 +69,8 @@ class Network:
             self.SBM_block_num = parameters["SBM_block_num"]
             self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
             self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
-
+        elif self.network_type == "BA":
+            self.BA_nodes = parameters["BA_nodes"]
         
         self.M = int(round(parameters["M"]))
 
@@ -116,8 +117,6 @@ class Network:
             self.network,
         ) = self.create_weighting_matrix()
 
-        self.network_density = nx.density(self.network)
-
         if self.heterogenous_intrasector_preferences_state == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
@@ -144,7 +143,15 @@ class Network:
         
         self.agent_list = self.create_agent_list()
 
-        self.shuffle_agent_list()#partial shuffle of the list based on identity
+        if self.network_type == "SW":
+            self.shuffle_agent_list()#partial shuffle of the list based on identity
+        elif self.network_type == "SBM":
+            self.SBM_block_num = parameters["SBM_block_num"]
+            self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
+            self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
+        elif self.network_type == "BA":
+            self.BA_nodes = parameters["BA_nodes"]
+        
 
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
@@ -211,6 +218,38 @@ class Network:
 
         return norm_matrix
 
+    def adjust_normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
+        """
+        Row normalize an array, dela with isolated individuals
+
+        Parameters
+        ----------
+        matrix: npt.NDArrayf
+            array to be row normalized
+
+        Returns
+        -------
+        norm_matrix: npt.NDArray
+            row normalized array
+        """
+        # Find rows where all entries are 0
+        zero_rows = (matrix.sum(axis=1) == 0)
+        #print("zero_rows",zero_rows)
+
+        # Set these rows to 1 to avoid division by zero
+        matrix[zero_rows, :] = 1
+
+        # Row sums after setting 0 rows to 1
+        row_sums = matrix.sum(axis=1)
+
+        # Row normalize the array
+        norm_matrix = matrix / row_sums[:, np.newaxis]
+
+        # Put back the original 0 rows
+        norm_matrix[zero_rows, :] = 0
+
+        return norm_matrix
+
 
     def split_into_groups(self):
         if self.SBM_block_num <= 0:
@@ -221,7 +260,7 @@ class Network:
 
         # Distribute the remainder among the first few groups
         group_counts = [base_count + 1] * remainder + [base_count] * (self.SBM_block_num - remainder)
-        print("group_counts",group_counts) 
+        #print("group_counts",group_counts) 
         return group_counts
 
     def create_weighting_matrix(self) -> tuple[npt.NDArray, npt.NDArray, nx.Graph]:
@@ -240,7 +279,8 @@ class Network:
             a networkx watts strogatz small world graph
         """
         if self.network_type == "SF":
-            G = nx.scale_free_graph(n = self.N, alpha = self.SF_alpha, beta = self.SF_beta, gamma = self.SF_gamma, seed=self.set_seed )# leave defaults ? alpha=0.41, beta=0.54, gamma=0.05, want similar density need to calc that
+            #G = nx.scale_free_graph(n = self.N, alpha = self.SF_alpha, beta = self.SF_beta, gamma = self.SF_gamma, seed=self.set_seed )# leave defaults ? alpha=0.41, beta=0.54, gamma=0.05, want similar density need to calc that
+            G = nx.scale_free_graph(n = self.N,seed=self.set_seed )# leave defaults ? alpha=0.41, beta=0.54, gamma=0.05, want similar density need to calc that
         elif self.network_type == "SW":
             G = nx.watts_strogatz_graph(n=self.N, k=self.SW_K, p=self.SW_prob_rewire, seed=self.set_seed)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
         elif self.network_type == "SBM":
@@ -249,22 +289,34 @@ class Network:
             # Create the stochastic block model, i can make it so that density between certain groups is different
             block_probs = np.full((num_blocks,num_blocks), self.SBM_network_density_input_inter_block)
             np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
-            print("block_probs",block_probs)
+            #print("block_probs",block_probs)
             #block_probs = np.asarray([[self.SBM_network_density_input_intra_block, self.SBM_network_density_input_inter_block]for i in range(num_blocks)])
             #np.asarray([[0.1, 0.001],[0.001, 0.1]])  # Make the matrix symmetric
             G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.set_seed)
-        
+        elif self.network_type == "BA":
+            G = nx.barabasi_albert_graph(n = self.N, m = self.BA_nodes)
+
         weighting_matrix = nx.to_numpy_array(G)
+        #print("check if any self loops",np.sum(weighting_matrix, axis=0),np.sum(weighting_matrix, axis=1))
+        #quit()
         #remove self loops, for the scale free network 
-        np.fill_diagonal(weighting_matrix, 0)
+        #np.fill_diagonal(weighting_matrix, 0)
 
         #check if any of the rows have one 1 and are thus isolated: 
-        if any(np.sum(weighting_matrix, axis=1) == 1):
-            raise ValueError("Invalid density, isolated individuals", weighting_matrix)
-    
-        norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
+        #if any(np.sum(weighting_matrix, axis=1) == 1):
+        #if any(np.sum(weighting_matrix, axis=0) == 0):
+        #    raise ValueError("Invalid density, isolated individuals", weighting_matrix)
+
+        if self.network_type == "SF":
+            norm_weighting_matrix = self.adjust_normlize_matrix(weighting_matrix)
+        else:
+            norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
         
-        print("Network density:", nx.density(G))
+        self.network_density = nx.density(G)
+        print("Network density:", self.network_density)
+        #quit()
+        #print("norm_weighting_matrix",norm_weighting_matrix)
+        #quit()
         
         #quit()
         return (

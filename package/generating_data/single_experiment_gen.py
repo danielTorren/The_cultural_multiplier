@@ -39,7 +39,7 @@ if __name__ == '__main__':
     base_params = {
         "save_timeseries_data_state": 1,
         "compression_factor_state": 1,
-        "network_type": "SBM",
+        "network_type": "BA",
         "heterogenous_intrasector_preferences_state": 1,
         "heterogenous_carbon_price_state": 0,
         "heterogenous_sector_substitutabilities_state": 0,
@@ -76,12 +76,13 @@ if __name__ == '__main__':
         #NETWORK STUFF
         "SW_network_density": 0.1, 
         "SW_prob_rewire": 0.1,
-        "SF_alpha": 0.41,
-        "SF_beta":0.54,
-        "SF_gamma":0.05,
+        "SF_alpha": 0.35,
+        "SF_beta":0.3,
+        "SF_gamma":0.35,
         "SBM_block_num": 2,
         "SBM_network_density_input_intra_block": 0.2,
         "SBM_network_density_input_inter_block": 0.005,
+        "BA_nodes": 11
         }
     
     fileName = main(base_params=base_params)
