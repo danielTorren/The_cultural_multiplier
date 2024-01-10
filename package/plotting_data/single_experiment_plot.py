@@ -5,14 +5,16 @@ Created: 10/10/2022
 # imports
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize
-from matplotlib.cm import get_cmap
+from matplotlib.cm import get_cmap, ScalarMappable
 import numpy as np
+import matplotlib.markers as mmarkers
 from matplotlib.animation import FuncAnimation
 from package.resources.utility import ( 
     load_object,
 )
 import pandas as pd
 import seaborn as sns
+import networkx as nx
 from package.resources.plot import (
     plot_identity_timeseries,
     plot_value_timeseries,
@@ -25,7 +27,9 @@ from package.resources.plot import (
     print_live_initial_identity_network,
     live_animate_identity_network_weighting_matrix,
     plot_low_carbon_preferences_timeseries,
-    plot_total_flow_carbon_emissions_timeseries
+    plot_total_flow_carbon_emissions_timeseries,
+    prod_pos,
+    plot_SBM_low_carbon_preferences_timeseries
 )
 
 def plot_Z_timeseries(fileName, Data, dpi_save,latex_bool = False):
@@ -624,11 +628,336 @@ def plot_H(
     #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
+def plot_network_end_preferences(    
+        fileName, 
+        data, 
+        cmap,
+        dpi_save,
+        node_sizes,
+        norm
+    ):
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M,figsize=(10,6))
+
+    
+
+    data_list = []
+    for v in range(data.N):
+        data_list.append(data.agent_list[v].low_carbon_preferences)
+    
+    data_array = np.asarray(data_list).T#now its M by N
+    
+    G = data.network
+
+    if data.network_type == "SW":
+        pos = prod_pos("circular", G)
+    else:
+        pos = nx.spring_layout(G,seed=1)  # You can use other layout algorithms
+
+    if data.M == 1:
+        colour_adjust = norm(data_array)
+        ani_step_colours = cmap(colour_adjust)
+        nx.draw(
+            G,
+            node_color=ani_step_colours,
+            ax=axes,
+            pos=pos,
+            node_size=node_sizes,
+            edgecolors="black",
+        )
+    else:
+        for i, ax in enumerate(axes.flat):
+            colour_adjust = norm(data_array[i])
+            ani_step_colours = cmap(colour_adjust)
+            nx.draw(
+                G,
+                node_color=ani_step_colours,
+                ax=ax,
+                pos=pos,
+                node_size=node_sizes,
+                edgecolors="black",
+            )
+            ax.set_title("Sector = %s" % (i+1))
+    
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap, norm=norm), ax=axes[-1]
+    )
+    cbar.set_label(r"Final preference, $A_{t_{max},i,m}$")
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/network_end_preference"
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_network_start_preferences(    
+        fileName, 
+        data, 
+        cmap,
+        dpi_save,
+        node_sizes,
+        norm
+    ):
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M,figsize=(10,6))
+
+    data_list = []
+    for v in range(data.N):
+        data_list.append(data.agent_list[v].history_low_carbon_preferences[0])
+    
+    data_array = np.asarray(data_list).T#now its M by N
+    
+    G = data.network
+
+    if data.network_type == "SW":
+        pos = prod_pos("circular", G)
+    else:
+        pos = nx.spring_layout(G,seed=1)  # You can use other layout algorithms
+
+    if data.M == 1:
+        colour_adjust = norm(data_array)
+        ani_step_colours = cmap(colour_adjust)
+        nx.draw(
+            G,
+            node_color=ani_step_colours,
+            ax=axes,
+            pos=pos,
+            node_size=node_sizes,
+            edgecolors="black",
+        )
+    else:
+        for i, ax in enumerate(axes.flat):
+            colour_adjust = norm(data_array[i])
+            ani_step_colours = cmap(colour_adjust)
+            nx.draw(
+                G,
+                node_color=ani_step_colours,
+                ax=ax,
+                pos=pos,
+                node_size=node_sizes,
+                edgecolors="black",
+            )
+            ax.set_title("Sector = %s" % (i+1))
+    
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap, norm=norm), ax=axes[-1]
+    )
+    cbar.set_label(r"Initial preference, $A_{0,i,m}$")
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/network_start_preference"
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
+def plot_SBM_network_end_preferences(    
+        fileName, 
+        data, 
+        cmap,
+        dpi_save,
+        node_sizes,
+        norm,
+        block_markers_list,
+        legend_loc,
+        lines_alpha
+    ):
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M,figsize=(10,6))
+
+    data_list = []
+    for v in range(data.N):
+        data_list.append(data.agent_list[v].low_carbon_preferences)
+    
+    data_array = np.asarray(data_list).T#now its M by N
+
+    if data.SBM_block_num > len(block_markers_list):
+        raise ValueError("Not enough markers for number of blocks")
+    
+    node_shapes = np.asarray([[block_markers_list[i]]*data.SBM_block_sizes[i] for i in range(data.SBM_block_num)]).flatten()
+
+    G = data.network
+
+    if data.network_type == "SW":
+        pos = prod_pos("circular", G)
+    else:
+        pos = nx.spring_layout(G, seed=1)  # You can use other layout algorithms
+
+    if data.M == 1:
+        colour_adjust = norm(data_array)
+        ani_step_colours = cmap(colour_adjust)
+
+        for j,node in enumerate(G.nodes()):
+            G.nodes[node]['color'] = ani_step_colours[j]
+            G.nodes[node]['shape'] = node_shapes[j]
+
+        # Draw the nodes for each shape with the shape specified
+        for shape in set(node_shapes):
+            # the nodes with the desired shapes
+            node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+            nx.draw_networkx_nodes(
+                G,
+                pos,
+                ax = ax,
+                nodelist = node_list,
+                node_size = node_sizes,
+                node_color= [G.nodes[node]['color'] for node in node_list],
+                node_shape = shape
+            )
+            nx.draw_networkx_edges(G,pos, ax=ax, alpha=lines_alpha) # draw edges
+
+    else:  
+        for i, ax in enumerate(axes.flat):
+
+            colour_adjust = norm(data_array[i])
+            ani_step_colours = cmap(colour_adjust)
+
+            for j,node in enumerate(G.nodes()):
+                G.nodes[node]['color'] = ani_step_colours[j]
+                G.nodes[node]['shape'] = node_shapes[j]
+    
+            # Draw the nodes for each shape with the shape specified
+            for shape in set(node_shapes):
+                # the nodes with the desired shapes
+                node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+                nx.draw_networkx_nodes(
+                    G,
+                    pos,
+                    ax = ax,
+                    nodelist = node_list,
+                    node_size = node_sizes,
+                    node_color= [G.nodes[node]['color'] for node in node_list],
+                    node_shape = shape
+                )
+                nx.draw_networkx_edges(G,pos, ax=ax, alpha=lines_alpha) # draw edges
+
+            ax.set_title("Sector = %s" % (i+1))
+
+    # Add legend
+    unique_shapes = list(set([G.nodes[node]['shape'] for node in G.nodes()]))
+    legend_labels = [f"Block {i+1}" for i in range(len(unique_shapes))]
+    for i,marker in enumerate(unique_shapes):
+        axes[-1].scatter([],[], label=legend_labels[i], marker = marker, c="black")
+    axes[-1].legend(loc=legend_loc)
+    
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap, norm=norm), ax=axes.ravel().tolist()
+    )
+    cbar.set_label(r"Final preference, $A_{t_{max},i,m}$")
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/SBM_network_start_preference"
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_SBM_network_start_preferences(    
+        fileName, 
+        data, 
+        cmap,
+        dpi_save,
+        node_sizes,
+        norm,
+        block_markers_list,
+        legend_loc,
+        lines_alpha
+    ):
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M,figsize=(10,6))
+
+    data_list = []
+    for v in range(data.N):
+        data_list.append(data.agent_list[v].history_low_carbon_preferences[0])
+    
+    data_array = np.asarray(data_list).T#now its M by N
+
+    if data.SBM_block_num > len(block_markers_list):
+        raise ValueError("Not enough markers for number of blocks")
+    
+    node_shapes = np.asarray([[block_markers_list[i]]*data.SBM_block_sizes[i] for i in range(data.SBM_block_num)]).flatten()
+
+    G = data.network
+
+    if data.network_type == "SW":
+        pos = prod_pos("circular", G)
+    else:
+        pos = nx.spring_layout(G, seed=1)  # You can use other layout algorithms
+
+    if data.M == 1:
+        colour_adjust = norm(data_array)
+        ani_step_colours = cmap(colour_adjust)
+
+        for j,node in enumerate(G.nodes()):
+            G.nodes[node]['color'] = ani_step_colours[j]
+            G.nodes[node]['shape'] = node_shapes[j]
+
+        # Draw the nodes for each shape with the shape specified
+        for shape in set(node_shapes):
+            # the nodes with the desired shapes
+            node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+            nx.draw_networkx_nodes(
+                G,
+                pos,
+                ax = ax,
+                nodelist = node_list,
+                node_size = node_sizes,
+                node_color= [G.nodes[node]['color'] for node in node_list],
+                node_shape = shape
+            )
+            nx.draw_networkx_edges(G,pos, ax=ax, alpha=lines_alpha) # draw edges
+
+    else:  
+        for i, ax in enumerate(axes.flat):
+
+            colour_adjust = norm(data_array[i])
+            ani_step_colours = cmap(colour_adjust)
+
+            for j,node in enumerate(G.nodes()):
+                G.nodes[node]['color'] = ani_step_colours[j]
+                G.nodes[node]['shape'] = node_shapes[j]
+    
+            # Draw the nodes for each shape with the shape specified
+            for shape in set(node_shapes):
+                # the nodes with the desired shapes
+                node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+                nx.draw_networkx_nodes(
+                    G,
+                    pos,
+                    ax = ax,
+                    nodelist = node_list,
+                    node_size = node_sizes,
+                    node_color= [G.nodes[node]['color'] for node in node_list],
+                    node_shape = shape
+                )
+                nx.draw_networkx_edges(G,pos, ax=ax, alpha=lines_alpha) # draw edges
+
+            ax.set_title("Sector = %s" % (i+1))
+
+    # Add legend
+    unique_shapes = list(set([G.nodes[node]['shape'] for node in G.nodes()]))
+    legend_labels = [f"Block {i+1}" for i in range(len(unique_shapes))]
+    for i,marker in enumerate(unique_shapes):
+        axes[-1].scatter([],[], label=legend_labels[i], marker = marker, c="black")
+    axes[-1].legend(loc=legend_loc)
+    
+    cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap, norm=norm), ax=axes.ravel().tolist()
+    )
+    cbar.set_label(r"Initial preference, $A_{0,i,m}$")
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/SBM_network_start_preference"
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     dpi_save = 600,
     ) -> None: 
-
+    block_markers_list = ["o","s","^", "v","*","H","P","<",">"]#generate_scatter_markers(data.SBM_block_num)
+    legend_loc = "upper right"
+    lines_alpha = 0.2
     cmap_multi = get_cmap("plasma")
     cmap_weighting = get_cmap("Reds")
 
@@ -636,8 +965,11 @@ def main(
     cmap = LinearSegmentedColormap.from_list(
         "BrownGreen", ["sienna", "whitesmoke", "olivedrab"], gamma=1
     )
+    node_sizes = 100   
 
     Data = load_object(fileName + "/Data", "social_network")
+
+    node_shape_list = ["o","s","^","v"]
 
     anim_save_bool = False#Need to install the saving thing
     ###PLOTS
@@ -648,16 +980,25 @@ def main(
         plot_consumption(fileName, Data, dpi_save)
     """
     plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
-    plot_emissions_individuals(fileName, Data, dpi_save)
-    plot_identity_timeseries(fileName, Data, dpi_save)
-    plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
-    plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
-    plot_chi(fileName, Data, dpi_save)
-    plot_omega(fileName, Data, dpi_save)
-    plot_consum_ratio(fileName, Data, dpi_save)
-    plot_L(fileName, Data, dpi_save)
-    plot_H(fileName, Data, dpi_save)
-    plot_Z_timeseries(fileName, Data, dpi_save)
+    
+    #plot_emissions_individuals(fileName, Data, dpi_save)
+    #plot_identity_timeseries(fileName, Data, dpi_save)
+    #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    #plot_chi(fileName, Data, dpi_save)
+    #plot_omega(fileName, Data, dpi_save)
+    #plot_consum_ratio(fileName, Data, dpi_save)
+    #plot_L(fileName, Data, dpi_save)
+    #plot_H(fileName, Data, dpi_save)
+    #plot_Z_timeseries(fileName, Data, dpi_save)
+    plot_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
+    plot_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
+    
+    if Data.network_type =="SBM":
+        plot_SBM_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
+        plot_SBM_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
+        plot_SBM_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
+
     #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
     #emissions_threshold_range = np.arange(0,0.005,0.000001)
     #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
@@ -678,7 +1019,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_16_16_09__04_12_2023",#
+        fileName = "results/single_experiment_16_45_11__10_01_2024",
     )
 
 

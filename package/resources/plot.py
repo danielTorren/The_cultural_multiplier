@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.colors import Normalize, LinearSegmentedColormap, SymLogNorm, BoundaryNorm
-from matplotlib.cm import get_cmap,rainbow
+from matplotlib.cm import get_cmap, rainbow
 from matplotlib.collections import LineCollection
 from typing import Union
 from package.model.network import Network
@@ -48,13 +48,13 @@ def set_latex(
 def prod_pos(layout_type: str, network: nx.Graph) -> nx.Graph:
 
     if layout_type == "circular":
-        pos_identity_network = nx.circular_layout(network)
+        pos_identity_network = nx.circular_layout(network,seed=1)
     elif layout_type == "spring":
-        pos_identity_network = nx.spring_layout(network)
+        pos_identity_network = nx.spring_layout(network,seed=1)
     elif layout_type == "kamada_kawai":
-        pos_identity_network = nx.kamada_kawai_layout(network)
+        pos_identity_network = nx.kamada_kawai_layout(network,seed=1)
     elif layout_type == "planar":
-        pos_identity_network = nx.planar_layout(network)
+        pos_identity_network = nx.planar_layout(network,seed=1)
     else:
         raise Exception("Invalid layout given")
 
@@ -1541,9 +1541,9 @@ def plot_low_carbon_preferences_timeseries(
     dpi_save,
     ):
 
-    y_title = r"Low carbon preference"
+    y_title = r"Low carbon preference, $A_{t,i,m}$"
 
-    fig, axes = plt.subplots(nrows=1,ncols=data.M, sharey=True)
+    fig, axes = plt.subplots(nrows=1,ncols=data.M, sharey=True,constrained_layout=True,figsize=(10,6) )
     data_list = []
     for v in range(data.N):
         data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)
@@ -1610,7 +1610,71 @@ def plot_low_carbon_preferences_timeseries(
                 
     fig.tight_layout()
 
-    fig.supxlabel(r"Time")
+    fig.supxlabel(r"Time, t")
+    fig.supylabel(r"%s" % y_title)
+
+    plotName = fileName + "/Prints"
+
+    f = plotName + "/timeseries_preference"
+    #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
+def legend_without_duplicate_labels(figure, loc):
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    figure.legend(by_label.values(), by_label.keys(), loc=loc)
+
+def plot_SBM_low_carbon_preferences_timeseries(
+    fileName, 
+    data, 
+    dpi_save,
+    ):
+
+    y_title = r"Low carbon preference, $A_{t,i,m}$"
+
+    fig, axes = plt.subplots(nrows=1,ncols=data.M, sharey=True, constrained_layout=True,figsize=(10,6))
+    #data_list = []
+
+    cmap = get_cmap('viridis')
+
+    colours = iter(cmap(np.linspace(0, 1, len(data.SBM_block_sizes))))
+    #print("colours", colours)
+
+    block_colours_array = np.asarray([[next(colours)]*i for i in data.SBM_block_sizes])
+    block_colours = np.reshape(block_colours_array, (data.N,4))
+
+    block_label = np.asarray([[i+1]*data.SBM_block_sizes[i] for i in range(len(data.SBM_block_sizes))]).flatten()
+    
+    for v in range(data.N):
+        data_indivdiual = np.asarray(data.agent_list[v].history_low_carbon_preferences)
+        #data_list.append(data_indivdiual)
+
+        if data.M == 1:
+            #print("data_indivdiual",data_indivdiual)
+            #quit()
+            axes.plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual,
+                    color = block_colours[v],
+                    label = "Block = %s" % (block_label[v]) 
+                )
+        else:
+            for j in range(data.M):
+                #print("HI", len(data.history_time), len(data_indivdiual[:,j]))
+                #quit()
+                axes[j].plot(
+                    np.asarray(data.history_time),
+                    data_indivdiual[:,j],
+                    color= block_colours[v],
+                    label = "Block = %s" % (block_label[v]) 
+                )
+
+    legend_without_duplicate_labels(fig,"center right")
+
+    fig.tight_layout()
+
+    fig.supxlabel(r"Time, t")
     fig.supylabel(r"%s" % y_title)
 
     plotName = fileName + "/Prints"

@@ -23,7 +23,7 @@ class Individual:
         individual_params,
         low_carbon_preferences,
         expenditure,
-        id_n,
+        id
     ):
 
         self.low_carbon_preferences_init = low_carbon_preferences   
@@ -51,7 +51,7 @@ class Individual:
         self.update_prices(individual_params["init_carbon_price_m"])
         #self.prices_high_carbon_instant = self.prices_high_carbon_m + individual_params["init_carbon_price_m"]
 
-        self.id = id_n
+        self.id = id
 
         #update_consumption
         self.update_consumption()

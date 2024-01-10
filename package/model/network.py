@@ -55,11 +55,22 @@ class Network:
         np.random.seed(self.init_vals_seed)#For inital construction set a seed, this is the same for all runs, then later change it to set_seed
         
         # network
-        self.network_density_input = parameters["network_density"]
         self.N = int(round(parameters["N"]))
-        self.K = int(round((self.N - 1)*self.network_density_input)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
-        #print("self.K",self.K)
-        self.prob_rewire = parameters["prob_rewire"]
+        if self.network_type == "SW":
+            self.SW_network_density_input = parameters["SW_network_density"]
+            self.SW_K = int(round((self.N - 1)*self.SW_network_density_input)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
+            self.SW_prob_rewire = parameters["SW_prob_rewire"]
+        elif self.network_type == "SF":
+            self.SF_alpha = parameters["SF_alpha"]
+            self.SF_beta = parameters["SF_beta"]
+            self.SF_gamma = parameters["SF_gamma"]
+            #haven't included parameters for delta in and out
+        elif self.network_type == "SBM":
+            self.SBM_block_num = parameters["SBM_block_num"]
+            self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
+            self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
+
+        
         self.M = int(round(parameters["M"]))
 
         # time
@@ -200,6 +211,19 @@ class Network:
 
         return norm_matrix
 
+
+    def split_into_groups(self):
+        if self.SBM_block_num <= 0:
+            raise ValueError("SBM_block_num must be greater than zero.")
+
+        base_count = self.N//self.SBM_block_num
+        remainder = self.N % self.SBM_block_num
+
+        # Distribute the remainder among the first few groups
+        group_counts = [base_count + 1] * remainder + [base_count] * (self.SBM_block_num - remainder)
+        print("group_counts",group_counts) 
+        return group_counts
+
     def create_weighting_matrix(self) -> tuple[npt.NDArray, npt.NDArray, nx.Graph]:
         """
         Create graph using Networkx library
@@ -215,26 +239,34 @@ class Network:
         ws: nx.Graph
             a networkx watts strogatz small world graph
         """
-        if self.network_type == "scale_free":
-            G = nx.scale_free_graph(self.N)
-        elif self.network_type == "random":
-            G = nx.erdos_renyi_graph(self.N, 0.2)
-        elif self.network_type == "small-world":
-            G = nx.watts_strogatz_graph(n=self.N, k=self.K, p=self.prob_rewire, seed=self.set_seed)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
+        if self.network_type == "SF":
+            G = nx.scale_free_graph(n = self.N, alpha = self.SF_alpha, beta = self.SF_beta, gamma = self.SF_gamma, seed=self.set_seed )# leave defaults ? alpha=0.41, beta=0.54, gamma=0.05, want similar density need to calc that
+        elif self.network_type == "SW":
+            G = nx.watts_strogatz_graph(n=self.N, k=self.SW_K, p=self.SW_prob_rewire, seed=self.set_seed)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
         elif self.network_type == "SBM":
-            block_sizes = [int(self.N/2), int(self.N/2)]  # Adjust the sizes as needed
-            num_blocks = len(block_sizes)
-            # Create the stochastic block model
-            block_probs = np.asarray([[0.1, 0.001],[0.001, 0.1]])  # Make the matrix symmetric
-            G = nx.stochastic_block_model(block_sizes, block_probs, seed=self.set_seed)
+            self.SBM_block_sizes = self.split_into_groups()
+            num_blocks = len(self.SBM_block_sizes)
+            # Create the stochastic block model, i can make it so that density between certain groups is different
+            block_probs = np.full((num_blocks,num_blocks), self.SBM_network_density_input_inter_block)
+            np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
+            print("block_probs",block_probs)
+            #block_probs = np.asarray([[self.SBM_network_density_input_intra_block, self.SBM_network_density_input_inter_block]for i in range(num_blocks)])
+            #np.asarray([[0.1, 0.001],[0.001, 0.1]])  # Make the matrix symmetric
+            G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.set_seed)
         
         weighting_matrix = nx.to_numpy_array(G)
         #remove self loops, for the scale free network 
         np.fill_diagonal(weighting_matrix, 0)
 
+        #check if any of the rows have one 1 and are thus isolated: 
+        if any(np.sum(weighting_matrix, axis=1) == 1):
+            raise ValueError("Invalid density, isolated individuals", weighting_matrix)
+    
         norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
-
-        #print("Network density:", nx.density(G))
+        
+        print("Network density:", nx.density(G))
+        
+        #quit()
         return (
             weighting_matrix,
             norm_weighting_matrix,
@@ -338,18 +370,7 @@ class Network:
         #not sure if this stuff is correct tbh.
 
         attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
-        """
-        if self.ratio_preference_or_consumption_state == 1.0:
-            attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
-            #attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
-        elif self.ratio_preference_or_consumption_state == 0.0:
-            attribute_matrix = np.asarray(list(map(attrgetter('consumption_ratio'), self.agent_list)))
-            #attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
-        elif self.ratio_preference_or_consumption_state > 0.0 and self.ratio_preference_or_consumption_state < 1.0:
-            attribute_matrix = np.asarray([self.ratio_preference_or_consumption_state*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
-        else:
-            raise("Invalid ratio_preference_or_consumption_state = [0,1]", self.ratio_preference_or_consumption_state)
-        """
+
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
 
@@ -363,18 +384,7 @@ class Network:
     def calc_ego_influence_degroot(self) -> npt.NDArray:
 
         attribute_matrix =np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
-        """
-        if self.ratio_preference_or_consumption_state == 1.0:
-            attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
-            #attribute_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
-        elif self.ratio_preference_or_consumption_state == 0.0:
-            #attribute_matrix = np.asarray(list(map(attrgetter('low_carbon_preferences'), self.agent_list)))
-            attribute_matrix = np.asarray([n.L_m/(n.L_m + n.H_m) for n in self.agent_list])
-        elif self.ratio_preference_or_consumption_state > 0.0 and self.ratio_preference_or_consumption_state < 1.0:
-            attribute_matrix = np.asarray([self.ratio_preference_or_consumption_state*n.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*(n.L_m/(n.L_m + n.H_m)) for n in self.agent_list])
-        else:
-            raise("Invalid ratio_preference_or_consumption_state = [0,1]", self.ratio_preference_or_consumption_state)
-        """
+
 
         neighbour_influence = np.matmul(self.weighting_matrix, attribute_matrix)
         #print("neighbour_influence",neighbour_influence)
