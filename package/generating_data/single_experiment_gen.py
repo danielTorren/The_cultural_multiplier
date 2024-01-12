@@ -39,7 +39,7 @@ if __name__ == '__main__':
     base_params = {
         "save_timeseries_data_state": 1,
         "compression_factor_state": 1,
-        "network_type": "BA",
+        "network_type": "SBM",
         "heterogenous_intrasector_preferences_state": 1,
         "heterogenous_carbon_price_state": 0,
         "heterogenous_sector_substitutabilities_state": 0,
@@ -70,8 +70,8 @@ if __name__ == '__main__':
         'confirmation_bias': 1, 
         'expenditure': 1,
         'init_carbon_price': 0, 
-        "carbon_price_increased_lower": 0.1,
-        "carbon_price_increased_upper": 0.1,
+        "carbon_price_increased_lower": 0.5,
+        "carbon_price_increased_upper": 0.5,
         'phi_lower': 0.01, 
         'phi_upper': 0.01, 
         #NETWORK STUFF
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         "SBM_network_density_input_intra_block": 0.2,
         "SBM_network_density_input_inter_block": 0.005,
         "BA_nodes": 11,
-        "BA_green_or_brown_hegemony": -1
+        "BA_brown_or_green_hegemony": 0
         }
     
     fileName = main(base_params=base_params)

@@ -1,0 +1,8 @@
+{
+    "property_varied" : "SBM_network_density_input_inter_block",
+    "property_min" : 0,
+    "property_max" :0.1,
+    "property_reps": 10,
+    "property_varied_title" : "Inter-block link density",
+    "property_divisions": "linear"
+}

@@ -1,0 +1,8 @@
+{
+    "property_varied" : "homophily_state",
+    "property_min" : 0,
+    "property_max" :1,
+    "property_reps": 10,
+    "property_varied_title" : "Identity homophily",
+    "property_divisions": "linear"
+}

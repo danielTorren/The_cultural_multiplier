@@ -27,6 +27,7 @@ class Network:
             Dictionary of parameters used to generate attributes, dict used for readability instead of super long list of input parameters
 
         """
+        self.parameters = parameters
 
         #INITAL STATE OF THE SYSTEMS, WHAT ARE THE RUN CONDITIONS
         self.save_timeseries_data_state = parameters["save_timeseries_data_state"]
@@ -67,7 +68,7 @@ class Network:
             self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
             self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
         elif self.network_type == "BA":
-            self.BA_green_or_brown_hegemony = parameters["BA_green_or_brown_hegemony"]
+            self.BA_brown_or_green_hegemony = parameters["BA_brown_or_green_hegemony"]
             self.BA_nodes = parameters["BA_nodes"]
             self.block_heterogenous_sector_substitutabilities_state = 0#crude solution
         
@@ -104,10 +105,12 @@ class Network:
             self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_lower"], num=self.M)
 
         # network homophily
-        self.homophily_state = parameters["homophily_state"]  # 0-1
+        self.homophily_state = parameters["homophily_state"]  # 0-1, if 1 then no mixing, if 0 then complete mixing
+
         self.shuffle_reps = int(
             round(self.N*(1 - self.homophily_state))
         )
+
 
         # create network
         (
@@ -128,7 +131,6 @@ class Network:
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
         
         self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
-        
 
         if self.heterogenous_sector_substitutabilities_state:
             ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
@@ -150,10 +152,7 @@ class Network:
         
         self.agent_list = self.create_agent_list()
 
-        if self.network_type in ("SW", "SBM"):
-            self.shuffle_agent_list()#partial shuffle of the list based on identity
-        elif (self.network_type == "BA") and (self.BA_green_or_brown_hegemony != 0):#1(green) or -1(brown)
-            self.shuffle_agent_list_BA()#partial shuffle of the list based on identity
+        self.shuffle_agent_list()#partial shuffle of the list based on identity
 
         #NOW SET SEED FOR THE IMPERFECT LEARNING
         np.random.seed(self.set_seed)
@@ -236,7 +235,6 @@ class Network:
         """
         # Find rows where all entries are 0
         zero_rows = (matrix.sum(axis=1) == 0)
-        #print("zero_rows",zero_rows)
 
         # Set these rows to 1 to avoid division by zero
         matrix[zero_rows, :] = 1
@@ -261,7 +259,6 @@ class Network:
 
         # Distribute the remainder among the first few groups
         group_counts = [base_count + 1] * remainder + [base_count] * (self.SBM_block_num - remainder)
-        #print("group_counts",group_counts) 
         return group_counts
 
     def create_weighting_matrix(self) -> tuple[npt.NDArray, npt.NDArray, nx.Graph]:
@@ -296,7 +293,7 @@ class Network:
         norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
         
         self.network_density = nx.density(G)
-        print("Network density:", self.network_density)
+        #print("Network density:", self.network_density)
         
         #quit()
         return (
@@ -396,15 +393,12 @@ class Network:
     def shuffle_agent_list(self): 
         #make list cirucalr then partial shuffle it
         self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
-        self.circular_agent_list()#agent list is now circular in terms of identity
-        self.partial_shuffle_agent_list()#partial shuffle of the list
-
-    def shuffle_agent_list_BA(self,): 
-        #make list cirucalr then partial shuffle it
-        self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
-        if self.BA_green_or_brown_hegemony == 1:#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
+        if (self.network_type== "BA") and (self.BA_brown_or_green_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
             self.agent_list.reverse()
-        #self.circular_agent_list()#agent list is now circular in terms of identity
+        elif (self.network_type== "SW"):
+            self.circular_agent_list()#agent list is now circular in terms of identity
+        elif (self.network_type == "SBM"):
+            pass
         self.partial_shuffle_agent_list()#partial shuffle of the list
 
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
@@ -415,9 +409,7 @@ class Network:
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
 
-        #print("attribute_matrix", attribute_matrix, attribute_matrix.shape)
         for m in range(self.M):
-            #print("self.weighting_matrix_list[m]", self.weighting_matrix_list[m], (self.weighting_matrix_list[m]).shape)
             neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], attribute_matrix[:,m])
         
         return neighbour_influence
@@ -428,9 +420,7 @@ class Network:
 
 
         neighbour_influence = np.matmul(self.weighting_matrix, attribute_matrix)
-        #print("neighbour_influence",neighbour_influence)
-        
-        
+
         return neighbour_influence
 
     def calc_social_component_matrix(self) -> npt.NDArray:
@@ -448,7 +438,6 @@ class Network:
         """
 
         if self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
-            #print("updating socially")
             ego_influence = self.calc_ego_influence_degroot_independent()
         else:#culturally determined either static or dynamic
             ego_influence = self.calc_ego_influence_degroot()           
@@ -459,20 +448,13 @@ class Network:
 
     def calc_weighting_matrix_attribute(self,attribute_array):
 
-        #print("attribute array", attribute_array,attribute_array.shape, np.mean(attribute_array))
-
         difference_matrix = np.subtract.outer(attribute_array, attribute_array) #euclidean_distances(attribute_array,attribute_array)# i think this actually not doing anything? just squared at the moment
-        #print("difference matrix", difference_matrix,difference_matrix.shape)
-        #quit()
 
         alpha_numerator = np.exp(-np.multiply(self.confirmation_bias, np.abs(difference_matrix)))
-        #print("alpha numerator", alpha_numerator)
 
         non_diagonal_weighting_matrix = (
             self.adjacency_matrix*alpha_numerator
         )  # We want onlythose values that have network connections
-
-        #print("BEFORE NORMALIZING THE MATRIX<",non_diagonal_weighting_matrix )
 
         norm_weighting_matrix = self.normlize_matrix(
             non_diagonal_weighting_matrix
@@ -511,11 +493,9 @@ class Network:
 
         #take the transpose so that you can access through m, this may make it way slower
         attribute_matrix = (np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list)))).T
-        #print("update_weightings_list", attribute_matrix, attribute_matrix.shape)
+
         for m in range(self.M):
             low_carbon_preferences_list = attribute_matrix[m]
-            #print("low_carbon_preferences_list",low_carbon_preferences_list)
-            #low_carbon_preferences_list = np.array([x.low_carbon_preferences[m] for x in self.agent_list])
             norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
             weighting_matrix_list.append(norm_weighting_matrix)
 
@@ -651,10 +631,8 @@ class Network:
         # update network parameters for next step
         if self.alpha_change_state != "fixed_preferences":
             if self.alpha_change_state in ("dynamic_culturally_determined_weights", "common_knowledge_dynamic_culturally_determined_weights"):
-                #print("updating culturally list",self.alpha_change_state)
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":#independent behaviours
-                #print("updating socially list",self.alpha_change_state)
                 self.weighting_matrix_list = self.update_weightings_list()
             else:
                 pass #this is for "uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights"

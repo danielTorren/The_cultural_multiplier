@@ -1682,7 +1682,7 @@ def plot_SBM_low_carbon_preferences_timeseries(
 
     plotName = fileName + "/Prints"
 
-    f = plotName + "/timeseries_preference"
+    f = plotName + "/block_timeseries_preference"
     #fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 

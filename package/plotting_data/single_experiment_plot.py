@@ -684,6 +684,8 @@ def plot_network_end_preferences(
     )
     cbar.set_label(r"Final preference, $A_{t_{max},i,m}$")
 
+    fig.suptitle("Final preference")
+
     plotName = fileName + "/Prints"
 
     f = plotName + "/network_end_preference"
@@ -743,6 +745,8 @@ def plot_network_start_preferences(
         plt.cm.ScalarMappable(cmap=cmap, norm=norm), ax=axes[-1]
     )
     cbar.set_label(r"Initial preference, $A_{0,i,m}$")
+
+    fig.suptitle("Initial preference")
 
     plotName = fileName + "/Prints"
 
@@ -847,9 +851,11 @@ def plot_SBM_network_end_preferences(
     )
     cbar.set_label(r"Final preference, $A_{t_{max},i,m}$")
 
+    fig.suptitle("Final preference")
+
     plotName = fileName + "/Prints"
 
-    f = plotName + "/SBM_network_start_preference"
+    f = plotName + "/SBM_network_end_preference"
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
@@ -949,6 +955,8 @@ def plot_SBM_network_start_preferences(
     )
     cbar.set_label(r"Initial preference, $A_{0,i,m}$")
 
+    fig.suptitle("Initial preference")
+    
     plotName = fileName + "/Prints"
 
     f = plotName + "/SBM_network_start_preference"
@@ -983,9 +991,10 @@ def main(
     else:
         plot_consumption(fileName, Data, dpi_save)
     """
-    plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
-    plot_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
-    plot_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
+
+    print(Data.parameters)
+    #quit()
+
     
     #plot_emissions_individuals(fileName, Data, dpi_save)
     #plot_identity_timeseries(fileName, Data, dpi_save)
@@ -1000,9 +1009,12 @@ def main(
 
     if Data.network_type =="SBM":
         plot_SBM_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
-        #plot_SBM_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
-        #plot_SBM_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
-
+        plot_SBM_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
+        plot_SBM_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
+    else:
+        plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
+        plot_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
+        plot_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
     #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
     #emissions_threshold_range = np.arange(0,0.005,0.000001)
     #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
@@ -1023,7 +1035,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_22_02_56__10_01_2024",
+        fileName = "results/single_experiment_14_01_32__12_01_2024",
     )
 
 
