@@ -87,12 +87,8 @@ def main(
     params["carbon_price_increased_lower"] = 0.5   
     params_list_high_tau_both = produce_param_list_stochastic(params, property_values_list, property_varied)
 
-    a= [b[""] for b in params_list_high_tau_both]
-    print()
-
     params_list_both = params_list_no_tau_both + params_list_low_tau_both + params_list_high_tau_both
-    print("TOTAL RUNS", len(params_list)+ len(params_list_both))
-    
+
     emissions_stock_serial = multi_emissions_stock(params_list)
     emissions_array = emissions_stock_serial.reshape(3, property_reps, params["seed_reps"])#3 is for the 3 differents states
 
