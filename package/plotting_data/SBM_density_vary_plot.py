@@ -19,6 +19,48 @@ import seaborn as sns
 from matplotlib.cm import get_cmap
 from matplotlib.cm import ScalarMappable
 
+def plot_relative_end_points_emissions_two(
+    fileName: str, Data_arr_no_homophily, Data_arr_homophily, property_title, property_save, property_vals, labels
+):
+
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 6), constrained_layout=True, sharey=True)
+
+    data = [Data_arr_no_homophily, Data_arr_homophily]
+    ax_titles = [r"No identity homophily, h = 0", r"High identity homophily, h = 1"]
+
+    for j, ax in enumerate(axes.flat):
+        Data_arr = data[j]
+
+        for i, Data_list in enumerate(Data_arr):
+            mu_emissions = Data_list.mean(axis=1)
+            min_emissions = Data_list.min(axis=1)
+            max_emissions = Data_list.max(axis=1)
+
+            # Calculate percentage increase relative to the first value
+            mu_relative_emissions = (mu_emissions / mu_emissions[0])
+            min_relative_emissions = (min_emissions / mu_emissions[0])
+            max_relative_emissions = (max_emissions / mu_emissions[0])
+
+            ax.plot(property_vals, mu_relative_emissions, label=labels[i])
+            ax.fill_between(
+                property_vals,
+                min_relative_emissions,
+                max_relative_emissions,
+                alpha=0.5,
+            )
+
+        ax.legend()
+        ax.set_xlabel(property_title)
+        ax.set_title(ax_titles[j])
+
+    axes[0].set_ylabel(r"Relative Cumulative Carbon Emissions ratio $E/E_{\tau =0}$")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_" + property_save + "_relative_emissions"
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+
 def plot_end_points_emissions_two(
     fileName: str, Data_arr_no_homophily,Data_arr_homophily, property_title, property_save, property_vals, labels
 ):
@@ -27,7 +69,7 @@ def plot_end_points_emissions_two(
     fig, axes = plt.subplots(nrows=1,ncols=2,figsize=(10,6),constrained_layout = True, sharey=True )
 
     data = [Data_arr_no_homophily,Data_arr_homophily]
-    ax_titles = ["No identity homophily", "High identity homophily"]
+    ax_titles = [r"No identity homophily, h = 0", r"High identity homophily, h = 1"]
     for j,ax in enumerate(axes.flat):
 
         Data_arr = data[j]
@@ -43,7 +85,7 @@ def plot_end_points_emissions_two(
         ax.set_xlabel(property_title)
         
         ax.set_title(ax_titles[j])
-    axes[0].set_ylabel(r"Cumulative carbon emissions")
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E")
         
     #print("what worong")
     plotName = fileName + "/Plots"
@@ -66,15 +108,15 @@ def main(
     property_varied = var_params["property_varied"]
 
     emissions_array_no_homophilly = load_object(fileName + "/Data", "emissions_array_no_homophilly")
-    emissions_array_homophilly = load_object(fileName + "/Data", "emissions_array_no_homophilly")
+    emissions_array_homophilly = load_object(fileName + "/Data", "emissions_array_homophilly")
         
-    plot_end_points_emissions_two(fileName,emissions_array_no_homophilly, emissions_array_homophilly, "Inter-block link density", property_varied, property_values_list, labels)
-
+    plot_end_points_emissions_two(fileName,emissions_array_no_homophilly, emissions_array_homophilly, r"Inter-block link density", property_varied, property_values_list, labels)
+    plot_relative_end_points_emissions_two(fileName,emissions_array_no_homophilly, emissions_array_homophilly, r"Inter-block link density", property_varied, property_values_list, labels)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/SBM_density_vary_17_40_05__12_01_2024",
+        fileName= "results/SBM_density_vary_14_10_24__15_01_2024",
     )
 

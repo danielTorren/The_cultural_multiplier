@@ -19,6 +19,40 @@ import seaborn as sns
 from matplotlib.cm import get_cmap
 from matplotlib.cm import ScalarMappable
 
+
+def plot_relative_end_points_emissions_multi(
+    fileName: str, Data_arr, property_title, property_save, property_vals, labels
+):
+
+    fig, ax = plt.subplots(figsize=(10, 6), constrained_layout=True)
+
+    for i, Data_list in enumerate(Data_arr):
+        mu_emissions = Data_list.mean(axis=1)
+        min_emissions = Data_list.min(axis=1)
+        max_emissions = Data_list.max(axis=1)
+
+        # Calculate percentage increase relative to the first value
+        mu_relative_emissions = (mu_emissions / mu_emissions[0])
+        min_relative_emissions = (min_emissions / mu_emissions[0])
+        max_relative_emissions = (max_emissions / mu_emissions[0])
+
+        ax.plot(property_vals, mu_relative_emissions, label=labels[i])
+        ax.fill_between(
+            property_vals,
+            min_relative_emissions,
+            max_relative_emissions,
+            alpha=0.5,
+        )
+
+    ax.legend()
+    ax.set_xlabel(property_title)
+    ax.set_ylabel(r"Relative Cumulative Carbon Emissions ratio $E/E_{\tau =0}$")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_" + property_save + "_relative_emissions"
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+
 def plot_end_points_emissions_multi(
     fileName: str, Data_arr, property_title, property_save, property_vals, labels
 ):
@@ -36,7 +70,7 @@ def plot_end_points_emissions_multi(
 
     ax.legend()
     ax.set_xlabel(property_title)
-    ax.set_ylabel(r"Cumulative carbon emissions")
+    ax.set_ylabel(r"Cumulative carbon emissions, E")
 
     #print("what worong")
     plotName = fileName + "/Plots"
@@ -60,13 +94,14 @@ def main(
 
     emissions_array = load_object(fileName + "/Data", "emissions_array")
         
-    plot_end_points_emissions_multi(fileName, emissions_array, "Identity homophily", property_varied, property_values_list, labels)
-
+    plot_end_points_emissions_multi(fileName, emissions_array, r"Identity homophily, h", property_varied, property_values_list, labels)
+    #relative
+    plot_relative_end_points_emissions_multi(fileName, emissions_array, r"Identity homophily, h", property_varied, property_values_list, labels)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/SBM_homo_tau_vary_16_15_40__12_01_2024",
+        fileName= "results/SBM_homo_tau_vary_14_04_10__15_01_2024",
     )
 

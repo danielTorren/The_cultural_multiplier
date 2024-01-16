@@ -22,7 +22,7 @@
     "N": 200, 
     "M": 2, 
     "sector_substitutability": 1.5, 
-    "low_carbon_substitutability_lower": 1.01, 
+    "low_carbon_substitutability_lower": 1.5, 
     "a_identity": 2, 
     "b_identity": 2, 
     "clipping_epsilon": 1e-5, 

@@ -51,7 +51,6 @@ def main(
     createFolder(fileName)
 
     ########################################################################################################
-    
     #ONE SECTOR ONLY
     #NO carbon_price
     params["carbon_price_increased_lower"] = 0    
@@ -69,13 +68,13 @@ def main(
 
     ########################################################################################################
     #Both SECTORS
+    var_params["block_heterogenous_sector_substitutabilities_state"] = 0 #EVERYONE HAS THE SAME SUBSTITUTABILITES FOR BOTH SECTORS AND BLOCKS, THIS IS THE REFERENCE CASE FOR WHAT THE EFFECT OF INCREASING SUBSTITUTABILITIES IS
     var_params["property_varied"] = "low_carbon_substitutability_upper"
     property_varied = var_params["property_varied"]
     property_values_list = generate_vals(
         var_params
     )
-    params["block_heterogenous_sector_substitutabilities_state"] = 0
-    
+
     #NO carbon_price
     params["carbon_price_increased_lower"] = 0    
     params_list_no_tau_both = produce_param_list_stochastic(params, property_values_list, property_varied)
@@ -87,6 +86,9 @@ def main(
     #High carbon rpice
     params["carbon_price_increased_lower"] = 0.5   
     params_list_high_tau_both = produce_param_list_stochastic(params, property_values_list, property_varied)
+
+    a= [b[""] for b in params_list_high_tau_both]
+    print()
 
     params_list_both = params_list_no_tau_both + params_list_low_tau_both + params_list_high_tau_both
     print("TOTAL RUNS", len(params_list)+ len(params_list_both))

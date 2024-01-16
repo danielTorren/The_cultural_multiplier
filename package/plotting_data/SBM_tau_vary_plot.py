@@ -36,7 +36,7 @@ def plot_end_points_emissions_multi(
 
     ax.legend()
     ax.set_xlabel(property_title)
-    ax.set_ylabel(r"Cumulative carbon emissions")
+    ax.set_ylabel(r"Cumulative carbon emissions, E")
 
     #print("what worong")
     plotName = fileName + "/Plots"

@@ -68,7 +68,7 @@ class Network:
             self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
             self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
         elif self.network_type == "BA":
-            self.BA_brown_or_green_hegemony = parameters["BA_brown_or_green_hegemony"]
+            self.BA_green_or_brown_hegemony = parameters["BA_green_or_brown_hegemony"]
             self.BA_nodes = parameters["BA_nodes"]
             self.block_heterogenous_sector_substitutabilities_state = 0#crude solution
         
@@ -142,7 +142,8 @@ class Network:
             # Repeat each row according to the values in self.SBM_block_sizes
             self.low_carbon_substitutability_array_list = np.repeat(low_carbon_substitutability_matrix, self.SBM_block_sizes, axis=0)
         else:
-            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_lower"], num=self.M)
+            #NOTE THAT ITS UPPER HERE NOT LOWER AS I USUALLY WANT TO MAKE STUFF MORE SUBSTITUTABLE NOT LESS, AS I ASSUME THAT THE DIRECTION OF TECHNOLOGY IN GENERAL
+            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
             self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
             #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
         
@@ -393,7 +394,7 @@ class Network:
     def shuffle_agent_list(self): 
         #make list cirucalr then partial shuffle it
         self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
-        if (self.network_type== "BA") and (self.BA_brown_or_green_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
+        if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
             self.agent_list.reverse()
         elif (self.network_type== "SW"):
             self.circular_agent_list()#agent list is now circular in terms of identity

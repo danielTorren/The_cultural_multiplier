@@ -36,7 +36,7 @@ def plot_end_points_emissions_multi(
 
     ax.legend()
     ax.set_xlabel(property_title)
-    ax.set_ylabel(r"Cumulative carbon emissions")
+    ax.set_ylabel(r"Cumulative carbon emissions, E")
 
     #print("what worong")
     plotName = fileName + "/Plots"
@@ -54,19 +54,25 @@ def main(
     print(base_params)
     var_params  = load_object(fileName + "/Data" , "var_params")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
-    labels = ["No homophily", "High-carbon hedgemony", "Low-carbon hedgemony"]
+    #####
+    #JUST FOR THIS ONE TIME I FLIP THE LABELS AS I DID IT WRONG WHEN RUNNING THE CODE
+    labels = ["No homophily", "High-carbon hedgemony","Low-carbon hedgemony"]
+    #CORRECT IS BELOW
+    #labels = ["No homophily", "Low-carbon hedgemony", "High-carbon hedgemony"]
+
+    #params_list_no_heg + params_list_green_heg + params_list_brown_heg
 
     property_varied = var_params["property_varied"]
 
     emissions_array = load_object(fileName + "/Data", "emissions_array")
         
-    plot_end_points_emissions_multi(fileName, emissions_array, "Carbon price, $\tau$", property_varied, property_values_list, labels)
+    plot_end_points_emissions_multi(fileName, emissions_array, "Carbon price, $\\tau$", property_varied, property_values_list, labels)
 
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_heg_tau_vary_15_32_56__12_01_2024",
+        fileName= "results/BA_heg_tau_vary_14_03_43__15_01_2024",
     )
 

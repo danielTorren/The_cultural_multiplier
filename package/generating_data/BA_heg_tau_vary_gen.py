@@ -52,17 +52,17 @@ def main(
     createFolder(fileName)
 
     #NO HEGEMONOY AND COMPLETE MIXING
-    params["BA_brown_or_green_hegemony"] = 0    
+    params["BA_green_or_brown_hegemony"] = 0    
     params["homophily_state"] = 0
     params_list_no_heg = produce_param_list_stochastic(params, property_values_list, property_varied)
 
     #Green HEGEMONOY AND homophily
-    params["BA_brown_or_green_hegemony"] = -1   
+    params["BA_green_or_brown_hegemony"] = 1   
     params["homophily_state"] = 1
     params_list_green_heg = produce_param_list_stochastic(params, property_values_list, property_varied)
 
     #Brown HEGEMONOY AND homophily
-    params["BA_brown_or_green_hegemony"] = 1   
+    params["BA_green_or_brown_hegemony"] = -1   
     params["homophily_state"] = 1
     params_list_brown_heg = produce_param_list_stochastic(params, property_values_list, property_varied)
 
