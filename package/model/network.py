@@ -61,16 +61,16 @@ class Network:
             self.SW_network_density_input = parameters["SW_network_density"]
             self.SW_K = int(round((self.N - 1)*self.SW_network_density_input)) #reverse engineer the links per person using the density  d = 2m/n(n-1) where n is nodes and m number of edges
             self.SW_prob_rewire = parameters["SW_prob_rewire"]
-            self.block_heterogenous_sector_substitutabilities_state = 0#crude solution
+            self.SBM_block_heterogenous_individuals_substitutabilities_state = 0#crude solution
         elif self.network_type == "SBM":
-            self.block_heterogenous_sector_substitutabilities_state = parameters["block_heterogenous_sector_substitutabilities_state"]
+            self.SBM_block_heterogenous_individuals_substitutabilities_state = parameters["SBM_block_heterogenous_individuals_substitutabilities_state"]
             self.SBM_block_num = parameters["SBM_block_num"]
             self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
             self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
         elif self.network_type == "BA":
             self.BA_green_or_brown_hegemony = parameters["BA_green_or_brown_hegemony"]
             self.BA_nodes = parameters["BA_nodes"]
-            self.block_heterogenous_sector_substitutabilities_state = 0#crude solution
+            self.SBM_block_heterogenous_individuals_substitutabilities_state = 0#crude solution
         
         self.M = int(round(parameters["M"]))
 
@@ -132,21 +132,36 @@ class Network:
         
         self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
 
-        if self.heterogenous_sector_substitutabilities_state:
+
+        if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
+            #case 2 (based on the presentation, EXPLAIN THIS BETTER LATER)
+            #YOU NEED TO HAVE UPPER AND LOWER BE DIFFERENT!
             ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
             self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
             self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
-        elif self.block_heterogenous_sector_substitutabilities_state:#fix this solution
+        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 0):#fix this solution
+            #case 3
             block_substitutabilities = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.SBM_block_num)
             low_carbon_substitutability_matrix = np.tile(block_substitutabilities[:, np.newaxis], (1, self.M))
             # Repeat each row according to the values in self.SBM_block_sizes
             self.low_carbon_substitutability_array_list = np.repeat(low_carbon_substitutability_matrix, self.SBM_block_sizes, axis=0)
+        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 1):
+            #case 4 - each block has different substitutabilities and so do the sectors,(base is the same?)
+            self.SBM_sub_add_on = parameters["SBM_sub_add_on"]
+            self.low_carbon_substitutability_array_list = []
+            upper_val = parameters["low_carbon_substitutability_upper"]
+            for i, block_num in enumerate(self.SBM_block_sizes):
+                block_low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], upper_val , num=self.M)
+                block_subs = [block_low_carbon_substitutability_array]*block_num
+                self.low_carbon_substitutability_array_list.extend(block_subs)
+                upper_val += self.SBM_sub_add_on #with each block increase it a bit
         else:
+            #case 1
             #NOTE THAT ITS UPPER HERE NOT LOWER AS I USUALLY WANT TO MAKE STUFF MORE SUBSTITUTABLE NOT LESS, AS I ASSUME THAT THE DIRECTION OF TECHNOLOGY IN GENERAL
             self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
             self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
             #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
-        
+
         self.sector_substitutability = parameters["sector_substitutability"]
             
         self.sector_preferences = np.asarray([1/self.M]*self.M)

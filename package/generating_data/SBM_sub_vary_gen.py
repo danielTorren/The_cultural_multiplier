@@ -68,7 +68,7 @@ def main(
 
     ########################################################################################################
     #Both SECTORS
-    var_params["block_heterogenous_sector_substitutabilities_state"] = 0 #EVERYONE HAS THE SAME SUBSTITUTABILITES FOR BOTH SECTORS AND BLOCKS, THIS IS THE REFERENCE CASE FOR WHAT THE EFFECT OF INCREASING SUBSTITUTABILITIES IS
+    var_params["SBM_block_heterogenous_individuals_substitutabilities_state"] = 0 #EVERYONE HAS THE SAME SUBSTITUTABILITES FOR BOTH SECTORS AND BLOCKS, THIS IS THE REFERENCE CASE FOR WHAT THE EFFECT OF INCREASING SUBSTITUTABILITIES IS
     var_params["property_varied"] = "low_carbon_substitutability_upper"
     property_varied = var_params["property_varied"]
     property_values_list = generate_vals(
@@ -87,8 +87,10 @@ def main(
     params["carbon_price_increased_lower"] = 0.5   
     params_list_high_tau_both = produce_param_list_stochastic(params, property_values_list, property_varied)
 
-    params_list_both = params_list_no_tau_both + params_list_low_tau_both + params_list_high_tau_both
 
+    params_list_both = params_list_no_tau_both + params_list_low_tau_both + params_list_high_tau_both
+    print("TOTAL RUNS", len(params_list)+ len(params_list_both))
+    
     emissions_stock_serial = multi_emissions_stock(params_list)
     emissions_array = emissions_stock_serial.reshape(3, property_reps, params["seed_reps"])#3 is for the 3 differents states
 

@@ -5,7 +5,7 @@
     "heterogenous_intrasector_preferences_state": 1,
     "heterogenous_carbon_price_state": 0,
     "heterogenous_sector_substitutabilities_state": 0,
-    "block_heterogenous_sector_substitutabilities_state": 0,
+    "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "ratio_preference_or_consumption_state": 0,

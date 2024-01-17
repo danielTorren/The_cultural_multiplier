@@ -60,13 +60,13 @@ def main(
 
     emissions_array = load_object(fileName + "/Data", "emissions_array")
         
-    plot_end_points_emissions_multi(fileName, emissions_array, "Carbon price, $\tau$", property_varied, property_values_list, labels)
+    plot_end_points_emissions_multi(fileName, emissions_array, r"Carbon price, $\tau$", property_varied, property_values_list, labels)
 
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/SBM_tau_vary_16_28_05__12_01_2024",
+        fileName= "results/SBM_tau_vary_12_52_15__16_01_2024",
     )
 

@@ -56,9 +56,9 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     #####
     #JUST FOR THIS ONE TIME I FLIP THE LABELS AS I DID IT WRONG WHEN RUNNING THE CODE
-    labels = ["No homophily", "High-carbon hedgemony","Low-carbon hedgemony"]
+    labels = ["No homophily", "High-carbon hegemony","Low-carbon hegemony"]
     #CORRECT IS BELOW
-    #labels = ["No homophily", "Low-carbon hedgemony", "High-carbon hedgemony"]
+    #labels = ["No homophily", "Low-carbon hegemony", "High-carbon hegemony"]
 
     #params_list_no_heg + params_list_green_heg + params_list_brown_heg
 
