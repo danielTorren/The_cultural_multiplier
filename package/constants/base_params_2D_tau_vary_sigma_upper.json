@@ -37,5 +37,5 @@
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2,
     "SBM_network_density_input_inter_block": 0.005,
-    "SBM_sub_add_on": 1
+    "SBM_sub_add_on": 3
     }
