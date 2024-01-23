@@ -73,6 +73,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_heg_tau_vary_14_03_43__15_01_2024",
+        fileName= "results/BA_heg_tau_vary_14_51_56__17_01_2024",
     )
 

@@ -41,7 +41,7 @@ def plot_end_points_emissions_multi_BA_SBM(
         min_emissions =  Data_list.min(axis=1)
         max_emissions=  Data_list.max(axis=1)
 
-        ax.plot(property_vals_SBM, mu_emissions, label = labels_SBM[i])
+        ax.plot(property_vals_SBM, mu_emissions, label = labels_SBM[i], linestyle="dashed")
         ax.fill_between(property_vals_SBM, min_emissions, max_emissions, alpha=0.5)
 
     ax.legend()
@@ -130,6 +130,117 @@ def plot_price_elasticies_BA_SBM_seeds(
     f = plotName + "/plot_price_elasticies_BA_SBM_seeds_" + property_save_BA + "_" + property_save_SBM
     fig.savefig(f + ".png", dpi=600, format="png")
 
+def plot_price_elasticies_BA_SBM_seeds_2_3(
+    fileName: str, Data_arr_BA, property_title, property_save_BA, property_vals_BA, labels_BA, Data_arr_SBM, property_save_SBM, property_vals_SBM, labels_SBM, seed_reps
+):
+    #nrows=seed_reps
+    fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(10, 6), constrained_layout=True)
+    
+    for j, Data_list in enumerate(Data_arr_BA):
+
+        stochastic_array_price_elasticities_BA = calc_price_elasticities_2D((Data_arr_BA[j]).T, property_vals_BA)
+        stochastic_array_price_elasticities_SBM = calc_price_elasticities_2D((Data_arr_SBM[j]).T, property_vals_SBM)
+        #print(stochastic_array_price_elasticities_BA.shape, seed_reps)
+
+        #quit()
+        for i in range(seed_reps):
+        #for i, ax in enumerate(axes.flat):
+            axes[0][j].plot(property_vals_BA[1:], stochastic_array_price_elasticities_BA[i])
+            axes[1][j].plot(property_vals_SBM[1:], stochastic_array_price_elasticities_SBM[i], linestyle="dashed")
+
+        axes[0][j].set_title(labels_BA[j])
+        axes[1][j].set_title(labels_SBM[j])
+        axes[0][j].grid()
+        axes[1][j].grid()
+    
+    fig.supxlabel(property_title)
+    fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
+
+    #CANT SEE IT FOR SOME REASON!!!!
+    # Add a common legend to the right of all subplots
+    #lines, labels = axes[-1].get_legend_handles_labels()
+    #fig.legend(lines, labels, loc='center left', bbox_to_anchor=(1.05, 0.5))
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_price_elasticies_BA_SBM_seeds_2_3" + property_save_BA + "_" + property_save_SBM
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+def plot_end_points_emissions_multi_BA_SBM_2_3(
+    fileName: str, Data_arr_BA, property_title, property_save_BA, property_vals_BA, labels_BA, Data_arr_SBM, property_save_SBM, property_vals_SBM, labels_SBM, seed_reps
+):
+    #nrows=seed_reps
+    fig, axes = plt.subplots(nrows=2, ncols=Data_arr_BA.shape[0], figsize=(10, 6), constrained_layout=True)
+    
+    for j, Data_list in enumerate(Data_arr_BA):
+        #stochastic_array_price_elasticities_BA = calc_price_elasticities_2D((Data_arr_BA[j]).T, property_vals_BA)
+        #stochastic_array_price_elasticities_SBM = calc_price_elasticities_2D((Data_arr_SBM[j]).T, property_vals_SBM)
+        #print(Data_arr_BA.shape, seed_reps)
+        #print(seed_reps)
+        #quit()
+        #quit()
+        data_BA = Data_arr_BA[j].T
+        data_SBM = Data_arr_SBM[j].T
+        for i in range(seed_reps):#loop through seeds
+
+            #for i, ax in enumerate(axes.flat):
+            axes[0][j].plot(property_vals_BA, data_BA[i])
+            axes[1][j].plot(property_vals_SBM, data_SBM[i], linestyle="dashed")
+
+            axes[0][j].set_title(labels_BA[j])
+            axes[1][j].set_title(labels_SBM[j])
+            axes[0][j].grid()
+            axes[1][j].grid()
+    
+    fig.supxlabel(property_title)
+    fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
+
+    #CANT SEE IT FOR SOME REASON!!!!
+    # Add a common legend to the right of all subplots
+    #lines, labels = axes[-1].get_legend_handles_labels()
+    #fig.legend(lines, labels, loc='center left', bbox_to_anchor=(1.05, 0.5))
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_BA_SBM_seeds_2_3" + property_save_BA + "_" + property_save_SBM
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+def plot_scatter_end_emissions_multi_BA_SBM_2_3(
+    fileName: str, Data_arr_BA, property_title, property_save_BA, property_vals_BA, labels_BA, Data_arr_SBM, property_save_SBM, property_vals_SBM, labels_SBM, seed_reps
+):
+    #nrows=seed_reps
+    fig, axes = plt.subplots(nrows=2, ncols=Data_arr_BA.shape[0], figsize=(10, 6), constrained_layout=True)
+    
+    for j, Data_list in enumerate(Data_arr_BA):
+        #stochastic_array_price_elasticities_BA = calc_price_elasticities_2D((Data_arr_BA[j]).T, property_vals_BA)
+        #stochastic_array_price_elasticities_SBM = calc_price_elasticities_2D((Data_arr_SBM[j]).T, property_vals_SBM)
+        #print(Data_arr_BA.shape, seed_reps)
+        #print(seed_reps)
+        #quit()
+        #quit()
+        data_BA = Data_arr_BA[j].T
+        data_SBM = Data_arr_SBM[j].T
+        for i in range(seed_reps):#loop through seeds
+
+            #for i, ax in enumerate(axes.flat):
+            axes[0][j].scatter(property_vals_BA, data_BA[i], marker='.')
+            axes[1][j].scatter(property_vals_SBM, data_SBM[i],  marker='.')
+
+            axes[0][j].set_title(labels_BA[j])
+            axes[1][j].set_title(labels_SBM[j])
+            axes[0][j].grid()
+            axes[1][j].grid()
+    
+    fig.supxlabel(property_title)
+    fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
+
+    #CANT SEE IT FOR SOME REASON!!!!
+    # Add a common legend to the right of all subplots
+    #lines, labels = axes[-1].get_legend_handles_labels()
+    #fig.legend(lines, labels, loc='center left', bbox_to_anchor=(1.05, 0.5))
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_scatter_emissions_BA_SBM_seeds_2_3" + property_save_BA + "_" + property_save_SBM
+    fig.savefig(f + ".png", dpi=600, format="png")
+
 
 def main(
     fileName_BA,
@@ -144,8 +255,11 @@ def main(
     property_values_list_BA = load_object(fileName_BA + "/Data", "property_values_list")
     property_varied_BA = var_params_BA["property_varied"]
     emissions_array_BA = load_object(fileName_BA + "/Data", "emissions_array")
-    labels_BA = [r"No homophily, $h = 0$", r"High-carbon hegemony, $h = 1$",r"Low-carbon hegemony, $h = 1$"]
-
+    labels_BA = [r"BA, No homophily, $h = 0$", r"BA, High-carbon hegemony, $h = 1$",r"BA, Low-carbon hegemony, $h = 1$"]
+    #print("INFO BA")
+    #print("base_params_BA", base_params_BA)
+    #print("var_params_BA", var_params_BA)
+    
     #SBM
     base_params_SBM = load_object(fileName_SBM + "/Data", "base_params")
     #print("base_params_SBM", base_params_SBM)
@@ -153,18 +267,25 @@ def main(
     property_values_list_SBM = load_object(fileName_SBM + "/Data", "property_values_list")
     property_varied_SBM = var_params_SBM["property_varied"]
     emissions_array_SBM = load_object(fileName_SBM + "/Data", "emissions_array")
-    labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = 0.5$", r"High homophily, $h = 1$"]
+    labels_SBM = [r"SBM, No homophily, $h = 0$", r"SBM, Low homophily, $h = 0.5$", r"SBM, High homophily, $h = 1$"]
+
+    #print("INFO SBM")
+    #print("base_params_SBM", base_params_SBM)
+    #print("var_params_SBM", var_params_SBM)
 
     seed_reps = base_params_BA["seed_reps"]
 
-    #plot_end_points_emissions_multi_BA_SBM(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM)
-    #plot_price_elasticies_BA_SBM(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM)
+    plot_end_points_emissions_multi_BA_SBM(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM)
+    plot_end_points_emissions_multi_BA_SBM_2_3(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM,seed_reps)
+    plot_scatter_end_emissions_multi_BA_SBM_2_3(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM,seed_reps)
+    plot_price_elasticies_BA_SBM(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM)
     plot_price_elasticies_BA_SBM_seeds(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM,seed_reps)
+    plot_price_elasticies_BA_SBM_seeds_2_3(fileName_BA, emissions_array_BA, r"Carbon price, $\tau$", property_varied_BA, property_values_list_BA, labels_BA, emissions_array_SBM, property_varied_SBM, property_values_list_SBM, labels_SBM,seed_reps)
+    
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName_BA= "results/BA_heg_tau_vary_14_03_43__15_01_2024",
-        fileName_SBM= "results/SBM_tau_vary_12_52_15__16_01_2024",
+        fileName_BA= "results/BA_heg_tau_vary_14_51_56__17_01_2024",
+        fileName_SBM= "results/SBM_tau_vary_14_53_24__17_01_2024",
     )
-
