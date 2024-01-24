@@ -235,8 +235,10 @@ def main(
     #calc the fixed emissions
     emissions_min =  np.min([np.min(emissions_array_BA),np.min(emissions_array_SBM)])
     emissions_max = np.max([np.max(emissions_array_BA),np.max(emissions_array_SBM)])
-    print("emissions_min", emissions_min)
-    print("emissions_max", emissions_max)
+    
+    #print("emissions_min", emissions_min)
+    #print("emissions_max", emissions_max)
+
     initial_guess  = 1
     t_max, B, N, M, a, P_L, A, sigma, nu= (
         reference_run.carbon_price_duration + reference_run.burn_in_duration,
@@ -246,9 +248,21 @@ def main(
         reference_run.sector_preferences,
         reference_run.prices_low_carbon,
         reference_run.low_carbon_preference_matrix_init,
-        reference_run.low_carbon_substitutability_array,
+        np.asarray(reference_run.low_carbon_substitutability_array_list),
         reference_run.sector_substitutability
         )
+    #print("vals", t_max, B, N, M, a, P_L, sigma, nu)
+    #print("base_params_BA", base_params_BA["carbon_price_duration"]+base_params_BA["burn_in_duration"], base_params_BA["expenditure"], base_params_BA["N"],base_params_BA["M"])
+    #quit()
+    
+    E_list = [calculate_emissions(t_max, B, N, M, a, P_L, (1 + tau), A, sigma, nu) for tau in property_values_list]
+    #SO THIS IS JUST WRONG
+    print("E_list", E_list)
+    print("emissions_array_SBM_static", emissions_array_SBM_static)
+    print("emissions_array_BA_static",emissions_array_BA_static)
+    print(emissions_array_BA_static/np.asarray(E_list))
+    quit()
+
     calc_fitted_emissions_static_preference(1000,emissions_min, emissions_max, t_max, B, N, M, a, P_L, A, sigma, nu, initial_guess)
 
     #plot_end_points_emissions_multi_BA_SBM_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps)
@@ -259,5 +273,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_tau_vary_17_17_33__24_01_2024",
+        fileName= "results/BA_SBM_tau_vary_17_37_07__24_01_2024",
     )

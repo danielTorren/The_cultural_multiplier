@@ -120,7 +120,7 @@ def main(
 ########################################################################################################################
 #REFERENCE CASE, helps with the base values
     params_SBM["carbon_price_increased"] = 1
-    params_SBM["carbon_price_duration"] = 1
+    params_SBM["carbon_price_duration"] = 3
     reference_run = generate_data(params_SBM)  # run the simulation
     save_object(reference_run, fileName + "/Data", "reference_run")
 
