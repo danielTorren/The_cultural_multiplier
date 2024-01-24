@@ -111,14 +111,10 @@ class Network:
             round(self.N*(1 - self.homophily_state))
         )
 
-
-        # create network
-        (
-            self.adjacency_matrix,
-            self.weighting_matrix,
-            self.network,
-        ) = self.create_weighting_matrix()
-
+########################################################
+        #UP TO HEAR NUMPY RANDOM USED 1
+###################################################
+        # set preferences
         if self.heterogenous_intrasector_preferences_state == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
@@ -129,6 +125,15 @@ class Network:
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
+        print(self.low_carbon_preference_matrix_init)
+        quit()
+        
+        # create network
+        (
+            self.adjacency_matrix,
+            self.weighting_matrix,
+            self.network,
+        ) = self.create_weighting_matrix()
         
         self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
 

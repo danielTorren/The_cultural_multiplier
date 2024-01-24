@@ -20,7 +20,7 @@ import seaborn as sns
 from matplotlib.cm import get_cmap
 from matplotlib.cm import ScalarMappable
 from scipy.signal import savgol_filter, butter, filtfilt
-
+from scipy.interpolate import interp1d
 
 def calculate_price_elasticity(price, emissions):
     # Calculate the percentage change in quantity demanded (emissions)
@@ -116,6 +116,66 @@ def plot_end_points_emissions_multi_BA_SBM_2_3(
     f = plotName + "/plot_emissions_BA_SBM_seeds_2_3" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
 
+########################################################################################################################
+
+def trying_to_plot_theos_reduction(tau_list,y_line1,y_line2):
+
+    #print("inside", tau_list,y_line1,y_line2)
+    # Create interpolation functions for both lines
+    interp_line1 = interp1d(y_line1, tau_list, kind='linear')
+    interp_line2 = interp1d(y_line2, tau_list, kind='linear')
+
+    #print(tau_list,y_line1,y_line2)
+    # Define the range of y values you want to consider
+    y_min = max([min(y_line1)]+[min(y_line2)])
+    y_max = min([max(y_line1)]+[max(y_line2)])
+
+    #print("y_min max", y_min,y_max)
+    y_values = np.linspace(y_min, y_max, 100)
+
+    # Calculate the x values for each y value using interpolation
+    x_values_line1 = interp_line1(y_values)
+    x_values_line2 = interp_line2(y_values)
+
+    # Calculate the ratio of x values for each y value
+    x_ratio = x_values_line1 / x_values_line2
+    #print("x_ratio", x_ratio)
+    x_reduction = 1 - x_ratio
+
+    return y_values, x_reduction
+
+def plot_reduc_2_3(
+        fileName: str, emissions_array_BA_static, emissions_array_SBM_static, Data_arr_BA, property_title, property_save, property_vals, labels_BA, Data_arr_SBM, labels_SBM, seed_reps
+    ):
+
+    fig, axes = plt.subplots(nrows=2, ncols=3,constrained_layout=True, figsize=(14, 7))
+        
+    for j, Data_list in enumerate(Data_arr_BA):
+        data_BA = Data_arr_BA[j].T
+        data_SBM = Data_arr_SBM[j].T
+        for i in range(seed_reps):#loop through seeds
+            y_values_social_BA, x_reduction_social_BA = trying_to_plot_theos_reduction(property_vals,data_BA[i],emissions_array_BA_static)
+            y_values_social_SBM, x_reduction_social_SBM = trying_to_plot_theos_reduction(property_vals,data_SBM[i],emissions_array_SBM_static)
+            #for i, ax in enumerate(axes.flat):
+            axes[0][j].plot(y_values_social_BA, x_reduction_social_BA)
+            axes[1][j].plot(y_values_social_SBM, x_reduction_social_SBM, linestyle="dashed")
+
+        axes[0][j].set_title(labels_BA[j])
+        axes[1][j].set_title(labels_SBM[j])
+        axes[0][j].grid()
+        axes[1][j].grid()
+
+    fig.supxlabel(property_title)
+    fig.supylabel(r"Carbon price reduction")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/tax_reduct_SBM_BA_%s" % (property_save)
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png") 
+
+
+########################################################################################################################    
+
 def main(
     fileName
     ) -> None: 
@@ -130,7 +190,7 @@ def main(
 
     emissions_array_BA = load_object(fileName + "/Data", "emissions_array_BA")
     emissions_array_BA_static = load_object(fileName + "/Data", "emissions_array_BA_static")
-    labels_BA = [r"BA, No homophily, $h = 0$", r"BA, High-carbon hegemony, $h = 1$",r"BA, Low-carbon hegemony, $h = 1$"]
+    labels_BA = [r"BA, No homophily, $h = 0$", r"BA, Low-carbon hegemony, $h = 1$", r"BA, High-carbon hegemony, $h = 1$"]
     
     base_params_SBM = load_object(fileName + "/Data", "base_params_SBM")
 
@@ -138,14 +198,21 @@ def main(
     emissions_array_SBM_static = load_object(fileName + "/Data", "emissions_array_SBM_static")
     labels_SBM = [r"SBM, No homophily, $h = 0$", r"SBM, Low homophily, $h = 0.5$", r"SBM, High homophily, $h = 1$"]
 
+    #print("emissions_array_BA - emissions_array_sbm", emissions_array_BA_static - emissions_array_SBM_static)
+    print("percetn diff", (emissions_array_BA_static/emissions_array_SBM_static)*100 - 100)
+    #print(emissions_array_BA_static)
+    #print(emissions_array_SBM_static)
+    quit()
+
     seed_reps = base_params_BA["seed_reps"]
 
     plot_end_points_emissions_multi_BA_SBM_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps)
     plot_price_elasticies_BA_SBM_seeds_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
-
+    #plot_reduc_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
+    
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_tau_vary_12_52_07__24_01_2024",
+        fileName= "results/BA_SBM_tau_vary_12_59_25__24_01_2024",
     )

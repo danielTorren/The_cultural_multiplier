@@ -54,7 +54,7 @@ def main(
     #Green HEGEMONOY AND homophily
     params_BA["BA_green_or_brown_hegemony"] = 1   
     params_BA["homophily_state"] = 1
-    params_list_green_heg_BA= produce_param_list_stochastic(params_BA, property_values_list, property_varied)
+    params_list_green_heg_BA = produce_param_list_stochastic(params_BA, property_values_list, property_varied)
 
     #Brown HEGEMONOY AND homophily
     params_BA["BA_green_or_brown_hegemony"] = -1   
@@ -99,7 +99,7 @@ def main(
     params_BA["BA_green_or_brown_hegemony"] = 0    
     params_BA["homophily_state"] = 0
     params_BA["alpha_change_state"] = "fixed_preferences"
-    params_BA["phi"] = 0#double sure!
+    params_BA["phi"] = 0 #double sure!
     params_BA["seed_reps"] = 1
     params_list_no_heg_no_phi_BA = produce_param_list_stochastic(params_BA, property_values_list, property_varied)
     
@@ -109,13 +109,14 @@ def main(
 #SBM
     params_SBM["homophily_state"] = 0
     params_SBM["alpha_change_state"] = "fixed_preferences"
-    params_SBM["phi"] = 0#double sure!
+    params_SBM["phi"] = 0 #double sure!
     params_SBM["seed_reps"] = 1
     params_list_no_heg_no_phi_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
     
     emissions_stock_SBM = np.asarray(multi_emissions_stock(params_list_no_heg_no_phi_SBM))
     save_object(emissions_stock_SBM, fileName + "/Data", "emissions_array_SBM_static")
     print("STATIC DONE")
+    
 ###############################################################################################################
     save_object(var_params,fileName + "/Data" , "var_params")
     save_object(property_values_list,fileName + "/Data", "property_values_list")

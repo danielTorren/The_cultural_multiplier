@@ -991,7 +991,8 @@ def main(
     else:
         plot_consumption(fileName, Data, dpi_save)
     """
-
+    print("Data eminissions",Data.total_carbon_emissions_stock )
+    quit()
     print(Data.parameters)
     #quit()
 
