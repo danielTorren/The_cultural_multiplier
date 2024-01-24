@@ -125,9 +125,7 @@ class Network:
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
-        print(self.low_carbon_preference_matrix_init)
-        quit()
-        
+
         # create network
         (
             self.adjacency_matrix,
