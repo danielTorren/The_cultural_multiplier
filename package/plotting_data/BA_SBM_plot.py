@@ -4,23 +4,12 @@ Created: 10/10/2022
 """
 
 # imports
-from cProfile import label
-import black
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap, Normalize
 from package.resources.utility import load_object
-from package.resources.plot import (
-    plot_end_points_emissions,
-    plot_end_points_emissions_scatter,
-    plot_end_points_emissions_lines,
-)
 import numpy as np
-import pandas as pd
-import seaborn as sns
-from matplotlib.cm import get_cmap
-from matplotlib.cm import ScalarMappable
-from scipy.signal import savgol_filter, butter, filtfilt
 from scipy.interpolate import interp1d
+from scipy.optimize import minimize
+from package.generating_data.static_preferences_emissions_gen import calculate_emissions
 
 def calculate_price_elasticity(price, emissions):
     # Calculate the percentage change in quantity demanded (emissions)
@@ -110,7 +99,7 @@ def plot_end_points_emissions_multi_BA_SBM_2_3(
         axes[1][j].legend()
     
     fig.supxlabel(property_title)
-    fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
+    fig.supylabel(r"Cumulative emissions, E")
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_emissions_BA_SBM_seeds_2_3" + property_save
@@ -124,6 +113,8 @@ def trying_to_plot_theos_reduction(tau_list,y_line1,y_line2):
     # Create interpolation functions for both lines
     interp_line1 = interp1d(y_line1, tau_list, kind='linear')
     interp_line2 = interp1d(y_line2, tau_list, kind='linear')
+    #print("interp_line1", interp_line1)
+    #print("interp_line2", interp_line2)
 
     #print(tau_list,y_line1,y_line2)
     # Define the range of y values you want to consider
@@ -132,8 +123,9 @@ def trying_to_plot_theos_reduction(tau_list,y_line1,y_line2):
 
     #print("y_min max", y_min,y_max)
     y_values = np.linspace(y_min, y_max, 100)
-
+    #print("y_values", y_values)
     # Calculate the x values for each y value using interpolation
+    #GETS TO HERE
     x_values_line1 = interp_line1(y_values)
     x_values_line2 = interp_line2(y_values)
 
@@ -154,18 +146,23 @@ def plot_reduc_2_3(
         data_BA = Data_arr_BA[j].T
         data_SBM = Data_arr_SBM[j].T
         for i in range(seed_reps):#loop through seeds
-            y_values_social_BA, x_reduction_social_BA = trying_to_plot_theos_reduction(property_vals,data_BA[i],emissions_array_BA_static)
-            y_values_social_SBM, x_reduction_social_SBM = trying_to_plot_theos_reduction(property_vals,data_SBM[i],emissions_array_SBM_static)
-            #for i, ax in enumerate(axes.flat):
-            axes[0][j].plot(y_values_social_BA, x_reduction_social_BA)
-            axes[1][j].plot(y_values_social_SBM, x_reduction_social_SBM, linestyle="dashed")
+            #print(property_vals.shape,data_BA[i].shape,emissions_array_BA_static.shape)
+            if j == 1 and i >= 0: 
+                pass
+            else:
+                print(j,i)
+                y_values_social_BA, x_reduction_social_BA = trying_to_plot_theos_reduction(property_vals, data_BA[i], emissions_array_BA_static)
+                y_values_social_SBM, x_reduction_social_SBM = trying_to_plot_theos_reduction(property_vals, data_SBM[i], emissions_array_SBM_static)
+                #for i, ax in enumerate(axes.flat):
+                axes[0][j].plot(y_values_social_BA, x_reduction_social_BA)
+                axes[1][j].plot(y_values_social_SBM, x_reduction_social_SBM, linestyle="dashed")
 
         axes[0][j].set_title(labels_BA[j])
         axes[1][j].set_title(labels_SBM[j])
         axes[0][j].grid()
         axes[1][j].grid()
 
-    fig.supxlabel(property_title)
+    fig.supxlabel(r"Cumulative emissions, E")
     fig.supylabel(r"Carbon price reduction")
 
     plotName = fileName + "/Plots"
@@ -174,7 +171,40 @@ def plot_reduc_2_3(
     fig.savefig(f + ".png", dpi=600, format="png") 
 
 
-########################################################################################################################    
+
+##################################################################################################
+#REVERSE Engineer the carbon price based on the final emissions
+def objective_function(P_H, *args):
+    emissions_val, t_max, B, N, M, a, P_L, A, sigma, nu = args
+    E = calculate_emissions(t_max, B, N, M, a, P_L, P_H, A, sigma, nu)
+    return emissions_val - E 
+
+def optimize_PH(emissions_val, t_max, B, N, M, a, P_L, A, sigma, nu, initial_guess):
+
+    args = (emissions_val,t_max, B, N, M, a, P_L, A, sigma, nu)
+
+    # Set bounds for P_H values (you can adjust the bounds as needed)
+    bounds = [(-np.inf, np.inf)]
+    result = minimize(objective_function, initial_guess, args=args, bounds=bounds)
+
+    if result.success:
+        optimal_PH = result.x
+        return optimal_PH
+    else:
+        raise ValueError(f"Optimization failed: {result.message}")
+
+
+def calc_fitted_emissions_static_preference(reps,emissions_min, emissions_max, t_max, B, N, M, a, P_L, A, sigma, nu, initial_guess):
+    
+    min_P_H = optimize_PH(emissions_max, t_max, B, N, M, a, P_L, A, sigma, nu, initial_guess)
+    max_P_H = optimize_PH(emissions_min, t_max, B, N, M, a, P_L, A, sigma, nu, initial_guess)
+
+    P_H_array = np.linspace(min_P_H,max_P_H, reps)
+    E_list = [calculate_emissions(t_max, B, N, M, a, P_L, P_H, A, sigma, nu) for P_H in P_H_array]
+    return E_list
+
+
+
 
 def main(
     fileName
@@ -198,21 +228,36 @@ def main(
     emissions_array_SBM_static = load_object(fileName + "/Data", "emissions_array_SBM_static")
     labels_SBM = [r"SBM, No homophily, $h = 0$", r"SBM, Low homophily, $h = 0.5$", r"SBM, High homophily, $h = 1$"]
 
-    #print("emissions_array_BA - emissions_array_sbm", emissions_array_BA_static - emissions_array_SBM_static)
-    print("percetn diff", (emissions_array_BA_static/emissions_array_SBM_static)*100 - 100)
-    #print(emissions_array_BA_static)
-    #print(emissions_array_SBM_static)
-    quit()
 
     seed_reps = base_params_BA["seed_reps"]
 
-    plot_end_points_emissions_multi_BA_SBM_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps)
-    plot_price_elasticies_BA_SBM_seeds_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
+    reference_run = load_object(fileName + "/Data", "reference_run")
+    #calc the fixed emissions
+    emissions_min =  np.min([np.min(emissions_array_BA),np.min(emissions_array_SBM)])
+    emissions_max = np.max([np.max(emissions_array_BA),np.max(emissions_array_SBM)])
+    print("emissions_min", emissions_min)
+    print("emissions_max", emissions_max)
+    initial_guess  = 1
+    t_max, B, N, M, a, P_L, A, sigma, nu= (
+        reference_run.carbon_price_duration + reference_run.burn_in_duration,
+        reference_run.expenditure,
+        reference_run.N,
+        reference_run.M,
+        reference_run.sector_preferences,
+        reference_run.prices_low_carbon,
+        reference_run.low_carbon_preference_matrix_init,
+        reference_run.low_carbon_substitutability_array,
+        reference_run.sector_substitutability
+        )
+    calc_fitted_emissions_static_preference(1000,emissions_min, emissions_max, t_max, B, N, M, a, P_L, A, sigma, nu, initial_guess)
+
+    #plot_end_points_emissions_multi_BA_SBM_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps)
+    #plot_price_elasticies_BA_SBM_seeds_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
     #plot_reduc_2_3(fileName, emissions_array_BA_static, emissions_array_SBM_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_tau_vary_12_59_25__24_01_2024",
+        fileName= "results/BA_SBM_tau_vary_17_17_33__24_01_2024",
     )

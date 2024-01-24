@@ -3,7 +3,7 @@
 import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import multi_emissions_stock
+from package.resources.run import multi_emissions_stock,generate_data
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
 
 def generate_vals(variable_parameters_dict):
@@ -94,6 +94,7 @@ def main(
     save_object(params_SBM, fileName + "/Data", "base_params_SBM")
     print("SBM DONE")
 #####################################################################################################################
+#CONSIDER REPLACING THIS WITH THE FUNCTIONS
 #REFERENCE CASE NO SOCIAL EFFECTS - THESE SHOULD BE IDENTICAL BUT CHECK THIS!
 #BA
     params_BA["BA_green_or_brown_hegemony"] = 0    
@@ -116,7 +117,13 @@ def main(
     emissions_stock_SBM = np.asarray(multi_emissions_stock(params_list_no_heg_no_phi_SBM))
     save_object(emissions_stock_SBM, fileName + "/Data", "emissions_array_SBM_static")
     print("STATIC DONE")
-    
+########################################################################################################################
+#REFERENCE CASE, helps with the base values
+    params_SBM["carbon_price_increased"] = 1
+    params_SBM["carbon_price_duration"] = 1
+    reference_run = generate_data(params_SBM)  # run the simulation
+    save_object(reference_run, fileName + "/Data", "reference_run")
+
 ###############################################################################################################
     save_object(var_params,fileName + "/Data" , "var_params")
     save_object(property_values_list,fileName + "/Data", "property_values_list")

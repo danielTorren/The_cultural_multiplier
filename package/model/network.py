@@ -132,8 +132,9 @@ class Network:
             self.weighting_matrix,
             self.network,
         ) = self.create_weighting_matrix()
-        
-        self.individual_expenditure_array =  np.asarray([parameters["expenditure"]]*self.N)#sums to 1
+
+        self.expenditure = parameters["expenditure"]
+        self.individual_expenditure_array =  np.asarray([self.expenditure]*self.N)#sums to 1
 
 
         if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
@@ -359,7 +360,7 @@ class Network:
 
         low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
-        return low_carbon_preference_matrix#,individual_expenditure_matrix#, norm_sector_preference_matrix,  low_carbon_substitutability_matrix ,prices_high_carbon_matrix
+        return low_carbon_preference_matrix
 
     def create_agent_list(self) -> list[Individual]:
         """
