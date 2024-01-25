@@ -16,6 +16,7 @@ from package.resources.utility import (
     produce_name_datetime,
 )
 from package.resources.run import parallel_run_sa
+from package.plotting_data import sensitivity_analysis_plot
 
 # modules
 def generate_problem(
@@ -76,12 +77,6 @@ def generate_problem(
 
     ########################################
 
-    root = "sensitivity_analysis"
-    fileName = produce_name_datetime(root)
-    print("fileName:", fileName)
-
-    createFolder(fileName)
-
     # GENERATE PARAMETER VALUES
     param_values = saltelli.sample(
         problem, N_samples, calc_second_order=calc_second_order
@@ -92,7 +87,7 @@ def generate_problem(
         index_round = problem["names"].index(i)
         param_values[:,index_round] = np.round(param_values[:,index_round])
 
-    return problem, fileName, param_values
+    return problem, param_values
 
 def produce_param_list_SA(
     param_values: npt.NDArray, base_params: dict, variable_parameters_dict: dict[dict]
@@ -161,26 +156,25 @@ def main(
         variable_parameters_dict, N_samples, AV_reps, calc_second_order
     )   
 
-    #print("YO", param_values, len(param_values))
-    #quit()
-
     params_list_sa = produce_param_list_SA(
         param_values, base_params, variable_parameters_dict
     )
 
-    Y_emissions_stock, Y_emissions_flow,Y_mu, Y_var, Y_coefficient_of_variance, Y_emissions_change = parallel_run_sa(
+    Y_emissions_stock = parallel_run_sa(
         params_list_sa
     )
+
+    root = "sensitivity_analysis"
+    fileName = produce_name_datetime(root)
+    print("fileName:", fileName)
+
+    createFolder(fileName)
+
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(params_list_sa, fileName + "/Data", "params_list_sa")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
     save_object(problem, fileName + "/Data", "problem")
     save_object(Y_emissions_stock, fileName + "/Data", "Y_emissions_stock")
-    save_object(Y_emissions_flow, fileName + "/Data", "Y_emissions_flow")
-    save_object(Y_mu, fileName + "/Data", "Y_mu")
-    save_object(Y_var, fileName + "/Data", "Y_var")
-    save_object(Y_coefficient_of_variance, fileName + "/Data", "Y_coefficient_of_variance")
-    save_object(Y_emissions_change, fileName + "/Data", "Y_emissions_change")
     save_object(N_samples , fileName + "/Data","N_samples")
     save_object(calc_second_order, fileName + "/Data","calc_second_order")
 
@@ -189,6 +183,10 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_6 = main(
     N_samples = 4,
-    BASE_PARAMS_LOAD = "package/constants/base_params.json",
-    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json"
-)
+    BASE_PARAMS_LOAD = "package/constants/base_params_BA_sensitivity.json",#"package/constants/base_params_SBM_sensitivity.json"#"package/constants/base_params_SW_sensitivity.json",
+    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA_BA.json",#"package/constants/variable_parameters_dict_SA_SBM.json",#"package/constants/variable_parameters_dict_SA_SW.json"
+    )
+    RUN_PLOT = 0
+
+    if RUN_PLOT:
+        sensitivity_analysis_plot.main(fileName = fileName_Figure_6)

@@ -7,7 +7,6 @@ from package.resources.utility import createFolder,produce_name_datetime,save_ob
 from package.resources.run import multi_emissions_stock,generate_data
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
 from package.generating_data.static_preferences_emissions_gen import calculate_emissions
-
 from package.plotting_data import BA_SBM_plot
 
 def generate_vals(variable_parameters_dict):
