@@ -89,7 +89,7 @@ def generate_problem(
 
     return problem, param_values
 
-def produce_param_list_SA(
+def stochastic_produce_param_list_SA(
     param_values: npt.NDArray, base_params: dict, variable_parameters_dict: dict[dict]
 ) -> list:
     """
@@ -128,7 +128,23 @@ def produce_param_list_SA(
             base_params_copy[variable_parameters_dict_toList[v]["property"]] = X[
                 v
             ]  # replace the base variable value with the new value for that experiment
-        params_list.append(base_params_copy)
+        for v in range(base_params_copy["seed_reps"]):#copy with stochastic seeds
+            base_params_copy["set_seed"] = int(v+1)
+            params_list.append(
+                base_params_copy.copy()
+            )  
+        #params_list.append(base_params_copy)
+    return params_list
+
+def produce_param_list_stochastic(params: dict, property_list: list, property: str) -> list[dict]:
+    params_list = []
+    for i in property_list:
+        params[property] = i
+        for v in range(params["seed_reps"]):
+            params["set_seed"] = int(v+1)
+            params_list.append(
+                params.copy()
+            )  
     return params_list
 
 def main(
@@ -149,20 +165,26 @@ def main(
     f_variable_parameters.close()
 
     ##AVERAGE RUNS
-    AV_reps = len(base_params["seed_list"])
+    AV_reps = base_params["seed_reps"]
     print("Average reps: ", AV_reps)
 
-    problem, fileName, param_values = generate_problem(
+    problem, param_values = generate_problem(
         variable_parameters_dict, N_samples, AV_reps, calc_second_order
     )   
 
-    params_list_sa = produce_param_list_SA(
+    params_list_sa = stochastic_produce_param_list_SA(
         param_values, base_params, variable_parameters_dict
     )
+    print("Total runs: ", len(params_list_sa))
 
-    Y_emissions_stock = parallel_run_sa(
+    Y_emissions_stock_stochastic = parallel_run_sa(
         params_list_sa
     )
+
+    len_y = int(len(Y_emissions_stock_stochastic)/AV_reps)
+    Y_emissions_stock_reshape = Y_emissions_stock_stochastic.reshape(len_y,AV_reps)
+    Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=1)
+    print("shape",Y_emissions_stock.shape)
 
     root = "sensitivity_analysis"
     fileName = produce_name_datetime(root)
