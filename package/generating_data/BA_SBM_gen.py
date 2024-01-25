@@ -7,6 +7,7 @@ from package.resources.utility import createFolder,produce_name_datetime,save_ob
 from package.resources.run import multi_emissions_stock,generate_data
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
 from package.generating_data.static_preferences_emissions_gen import calculate_emissions
+
 from package.plotting_data import BA_SBM_plot
 
 def generate_vals(variable_parameters_dict):
@@ -223,35 +224,7 @@ if __name__ == '__main__':
         BASE_PARAMS_LOAD_SBM = "package/constants/base_params_SBM_tau.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_BA_SBM_tau.json",
     )
-    RUN_PLOT = 1
+    RUN_PLOT = 0
 
     if RUN_PLOT:
         BA_SBM_plot.main(fileName = fileName_Figure_1)
-
-#####################################################################################################################
-"""
-#CONSIDER REPLACING THIS WITH THE FUNCTIONS
-#REFERENCE CASE NO SOCIAL EFFECTS - THESE SHOULD BE IDENTICAL BUT CHECK THIS!
-#BA
-    
-    params_BA["BA_green_or_brown_hegemony"] = 0    
-    params_BA["homophily_state"] = 0
-    params_BA["alpha_change_state"] = "fixed_preferences"
-    params_BA["phi"] = 0 #double sure!
-    params_BA["seed_reps"] = 1
-    params_list_no_heg_no_phi_BA = produce_param_list_stochastic(params_BA, property_values_list, property_varied)
-    
-    emissions_stock_BA = np.asarray(multi_emissions_stock(params_list_no_heg_no_phi_BA))
-    save_object(emissions_stock_BA, fileName + "/Data", "emissions_array_BA_static")
-
-#SBM
-    params_SBM["homophily_state"] = 0
-    params_SBM["alpha_change_state"] = "fixed_preferences"
-    params_SBM["phi"] = 0 #double sure!
-    params_SBM["seed_reps"] = 1
-    params_list_no_heg_no_phi_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
-    
-    emissions_stock_SBM = np.asarray(multi_emissions_stock(params_list_no_heg_no_phi_SBM))
-    save_object(emissions_stock_SBM, fileName + "/Data", "emissions_array_SBM_static")
-    print("STATIC DONE")
-"""
