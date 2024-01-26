@@ -149,10 +149,9 @@ def produce_param_list_stochastic(params: dict, property_list: list, property: s
 def main(
         N_samples = 1024,
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json"
-         ) -> str: 
-    
-    calc_second_order = False
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
+        calc_second_order = False
+        ) -> str: 
 
     # load base params
     f = open(BASE_PARAMS_LOAD)
@@ -202,9 +201,10 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_6 = main(
-    N_samples = 32,
+    N_samples = 128,
     BASE_PARAMS_LOAD = "package/constants/base_params_SW_sensitivity.json",
     VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA_SW.json",
+    calc_second_order = True
     )
     RUN_PLOT = 0
 
