@@ -85,8 +85,7 @@ def generate_problem(
     print("round_variable_list:",round_variable_list)
     for i in round_variable_list:
         index_round = problem["names"].index(i)
-        param_values[:,index_round] = np.round(param_values[:,index_round])
-
+        param_values[:,index_round] = np.asarray([int(x) for x in np.round(param_values[:,index_round])])
     return problem, param_values
 
 def stochastic_produce_param_list_SA(
@@ -184,9 +183,8 @@ def main(
     len_y = int(len(Y_emissions_stock_stochastic)/AV_reps)
     Y_emissions_stock_reshape = Y_emissions_stock_stochastic.reshape(len_y,AV_reps)
     Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=1)
-    print("shape",Y_emissions_stock.shape)
 
-    root = "sensitivity_analysis"
+    root = "sensitivity_analysis_" + base_params["network_type"]
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
@@ -204,9 +202,9 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_6 = main(
-    N_samples = 4,
-    BASE_PARAMS_LOAD = "package/constants/base_params_BA_sensitivity.json",#"package/constants/base_params_SBM_sensitivity.json"#"package/constants/base_params_SW_sensitivity.json",
-    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA_BA.json",#"package/constants/variable_parameters_dict_SA_SBM.json",#"package/constants/variable_parameters_dict_SA_SW.json"
+    N_samples = 32,
+    BASE_PARAMS_LOAD = "package/constants/base_params_SW_sensitivity.json",
+    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA_SW.json",
     )
     RUN_PLOT = 0
 

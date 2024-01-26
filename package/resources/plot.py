@@ -185,44 +185,34 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
     fig, axes = plt.subplots(ncols=len(dict_list), nrows=1, constrained_layout=True , sharey=True,figsize=(12, 6))#,#sharex=True# figsize=(14, 7) # len(list(data_dict.keys())))
     
     plt.rc('ytick', labelsize=4) 
+
+
     if len(dict_list) == 1:
         if order == "First":
-            print("heyyyyyyyy")
-            print("data", data_dict[dict_list[i]]["data"]["S1"].tolist() ,len(data_dict[dict_list[i]]["data"]["S1"].tolist()))
-            print("errr",data_dict[dict_list[i]]["yerr"]["S1"].tolist(), len(data_dict[dict_list[i]]["yerr"]["S1"].tolist()))
-            print(data_dict[dict_list[i]]["colour"], len(data_dict[dict_list[i]]["colour"]))
-            print(data_dict[dict_list[i]]["title"], len(data_dict[dict_list[i]]["title"]))
-            print("names", names, len(names))
             axes.errorbar(
-                data_dict[dict_list[i]]["data"]["S1"].tolist(),
+                data_dict[dict_list[0]]["data"]["S1"].tolist(),
                 names,
-                xerr=data_dict[dict_list[i]]["yerr"]["S1"].tolist(),
+                xerr=data_dict[dict_list[0]]["yerr"]["S1"].tolist(),
                 fmt="o",
                 ecolor="k",
-                color=data_dict[dict_list[i]]["colour"],
-                label=data_dict[dict_list[i]]["title"],
+                color=data_dict[dict_list[0]]["colour"],
+                label=data_dict[dict_list[0]]["title"],
             )
         else:
             axes.errorbar(
-                data_dict[dict_list[i]]["data"]["ST"].tolist(),
+                data_dict[dict_list[0]]["data"]["ST"].tolist(),
                 names,
-                xerr=data_dict[dict_list[i]]["yerr"]["ST"].tolist(),
+                xerr=data_dict[dict_list[0]]["yerr"]["ST"].tolist(),
                 fmt="o",
                 ecolor="k",
-                color=data_dict[dict_list[i]]["colour"],
-                label=data_dict[dict_list[i]]["title"],
+                color=data_dict[dict_list[0]]["colour"],
+                label=data_dict[dict_list[0]]["title"],
             )
         axes.legend()
         axes.set_xlim(left=0)
     else:
         for i, ax in enumerate(axes.flat):
             if order == "First":
-                print("heyyyyyyyy")
-                print("data", data_dict[dict_list[i]]["data"]["S1"].tolist() ,len(data_dict[dict_list[i]]["data"]["S1"].tolist()))
-                print("errr",data_dict[dict_list[i]]["yerr"]["S1"].tolist(), len(data_dict[dict_list[i]]["yerr"]["S1"].tolist()))
-                print(data_dict[dict_list[i]]["colour"], len(data_dict[dict_list[i]]["colour"]))
-                print(data_dict[dict_list[i]]["title"], len(data_dict[dict_list[i]]["title"]))
-                print("names", names, len(names))
                 ax.errorbar(
                     data_dict[dict_list[i]]["data"]["S1"].tolist(),
                     names,
@@ -244,7 +234,6 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
                 )
             ax.legend()
             ax.set_xlim(left=0)
-    print("out?")
     fig.supxlabel(r"%s order Sobol index" % (order))
 
     plt.tight_layout()

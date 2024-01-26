@@ -12,7 +12,7 @@
     "alpha_change_state": "dynamic_culturally_determined_weights",
     "vary_seed_imperfect_learning_state_or_initial_preferences_state": 1,
     "static_internal_preference_state": 0,
-    "seed_reps": 5,
+    "seed_reps": 10,
     "network_structure_seed": 8, 
     "init_vals_seed": 14, 
     "carbon_price_duration": 1000, 
@@ -21,5 +21,7 @@
     "b_identity": 2, 
     "clipping_epsilon": 1e-5, 
     "clipping_epsilon_init_preference": 1e-5,
-    "init_carbon_price": 0
+    "init_carbon_price": 0,
+    "BA_green_or_brown_hegemony": 0,
+    "BA_nodes": 11
     }

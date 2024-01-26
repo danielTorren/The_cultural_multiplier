@@ -64,12 +64,12 @@ class Network:
             self.SBM_block_heterogenous_individuals_substitutabilities_state = 0#crude solution
         elif self.network_type == "SBM":
             self.SBM_block_heterogenous_individuals_substitutabilities_state = parameters["SBM_block_heterogenous_individuals_substitutabilities_state"]
-            self.SBM_block_num = parameters["SBM_block_num"]
+            self.SBM_block_num = int(parameters["SBM_block_num"])
             self.SBM_network_density_input_intra_block = parameters["SBM_network_density_input_intra_block"]#within blocks
             self.SBM_network_density_input_inter_block = parameters["SBM_network_density_input_inter_block"]#between blocks
         elif self.network_type == "BA":
             self.BA_green_or_brown_hegemony = parameters["BA_green_or_brown_hegemony"]
-            self.BA_nodes = parameters["BA_nodes"]
+            self.BA_nodes = int(parameters["BA_nodes"])
             self.SBM_block_heterogenous_individuals_substitutabilities_state = 0#crude solution
         
         self.M = int(round(parameters["M"]))
@@ -307,7 +307,7 @@ class Network:
             np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
             G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.set_seed)
         elif self.network_type == "BA":
-            G = nx.barabasi_albert_graph(n = self.N, m = self.BA_nodes)
+            G = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes)
 
         weighting_matrix = nx.to_numpy_array(G)
 

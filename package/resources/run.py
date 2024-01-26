@@ -90,25 +90,19 @@ def parallel_run(params_dict: dict[dict]) -> list[Network]:
     )
     return data_parallel
 
+def generate_sensitivity_output_flat(params: dict):
+    data = generate_data(params)
+    return data.total_carbon_emissions_stock
+
 def parallel_run_sa(
-    params_dict: dict[dict],
-) -> tuple[npt.NDArray, npt.NDArray, npt.NDArray, npt.NDArray]:
-    """
-    Generate data for sensitivity analysis for model varying lots of parameters dictated by params_dict, producing output
-    measures emissions,mean,variance and coefficient of variance. Results averaged over multiple runs with different stochastic seed
-
-    """
-
-    #print("params_dict", params_dict)
+    params_dict: list[dict],
+):
+    print("params_dict len", len(params_dict))
     num_cores = multiprocessing.cpu_count()
-    #res = [generate_sensitivity_output(i) for i in params_dict]
-    results_emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_sensitivity_output)(i) for i in params_dict
-    )
+    #results_emissions_stock =[generate_sensitivity_output_flat(i) for i in params_dict]
+    results_emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_sensitivity_output_flat)(i) for i in params_dict)
 
-    return (
-        np.asarray(results_emissions_stock)
-    )
+    return np.asarray(results_emissions_stock)
 
 
 def generate_emissions_stock_res(params):

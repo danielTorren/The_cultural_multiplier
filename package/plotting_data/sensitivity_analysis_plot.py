@@ -160,24 +160,85 @@ def main(
     ###############################
 
     multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first,plot_outputs, titles, N_samples, "First", latex_bool = latex_bool)
-    multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first,plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
+    #TOTAL I DONT THINK WORKS AT THE MOMENT
+    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_total,plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
     plt.show()
 
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_13_13_24__25_04_2023",
+        fileName="results/sensitivity_analysis_09_39_50__26_01_2024",
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
-            "emissions_stock": {"title": r"$E/NM$", "colour": "red", "linestyle": "--"},
+            "emissions_stock": {"title": r"$Cumulative emissions, E$", "colour": "red", "linestyle": "--"},
         },
-        titles = [
-        r"sector substitutability $\nu$",
-        r"Initial low carbon preference Beta $b_A$",
-        r"sector preference Beta $b_{a}$",
-        r"Low carbon substitutability Beta $b_{\sigma}$",
-        r"High carbon goods prices Beta $b_{P_H}$"
+        titles = [    
+            "phi_lower",
+            "carbon_price",
+            "N",
+            "M",
+            "sector_substitutability",
+            "low_carbon_substitutability_lower",
+            "low_carbon_substitutability_upper",
+            "std_low_carbon_preference",
+            "std_learning_error",
+            "confirmation_bias",
+            "homophily_state",
+            "SBM_block_num",
+            "SBM_network_density_input_intra_block",
+            "SBM_network_density_input_inter_block"
         ]
     )
+
+    """
+    BA: 
+            titles = [    
+            "phi_lower",
+            "carbon_price",
+            "N",
+            "M",
+            "sector_substitutability",
+            "low_carbon_substitutability_lower",
+            "low_carbon_substitutability_upper",
+            "std_low_carbon_preference",
+            "std_learning_error",
+            "confirmation_bias",
+            "homophily_state",
+            "BA_nodes"
+        ]
+    SBM:
+            titles = [    
+            "phi_lower",
+            "carbon_price",
+            "N",
+            "M",
+            "sector_substitutability",
+            "low_carbon_substitutability_lower",
+            "low_carbon_substitutability_upper",
+            "std_low_carbon_preference",
+            "std_learning_error",
+            "confirmation_bias",
+            "homophily_state",
+            "SBM_block_num",
+            "SBM_network_density_input_intra_block",
+            "SBM_network_density_input_inter_block"
+        ]
+    SW:
+            titles = [    
+            "phi_lower",
+            "carbon_price",
+            "N",
+            "M",
+            "sector_substitutability",
+            "low_carbon_substitutability_lower",
+            "low_carbon_substitutability_upper",
+            "std_low_carbon_preference",
+            "std_learning_error",
+            "confirmation_bias",
+            "homophily_state",
+            "SW_network_density",
+            "SW_prob_rewire"
+            ]
+    """
 
 
