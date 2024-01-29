@@ -21,5 +21,6 @@
     "b_identity": 2, 
     "clipping_epsilon": 1e-5, 
     "clipping_epsilon_init_preference": 1e-5,
-    "init_carbon_price": 0
+    "init_carbon_price": 0,
+    "SW_prob_rewire": 0.1
 }
