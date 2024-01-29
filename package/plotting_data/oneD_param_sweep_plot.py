@@ -631,7 +631,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/one_param_sweep_multi_15_42_27__01_12_2023",
-        PLOT_TYPE = 5
+        fileName= "results/one_param_sweep_multi_13_11_24__29_01_2024",
+        PLOT_TYPE = 10
     )
 

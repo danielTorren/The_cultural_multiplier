@@ -231,5 +231,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_tau_vary_12_52_41__25_01_2024",
+        fileName= "results/BA_SBM_tau_vary_14_36_26__25_01_2024",
     )

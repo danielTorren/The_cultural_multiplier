@@ -61,7 +61,7 @@ def main(
 
     #base_params_SW = load_object(fileName + "/Data", "base_params_SW")
 
-    emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SBM")
+    emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
     labels_SW = [r"SW, No carbon price, $\tau = 0$", r"SW, Low carbon price, $\tau = 0.1$", r"SW, High carbon price, $\tau = 1$"]
 
     seed_reps = base_params_BA["seed_reps"]
@@ -71,5 +71,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_SW_phi_vary_10_33_58__26_01_2024",
+        fileName= "results/BA_SBM_SW_phi_vary_10_40_18__26_01_2024",
     )

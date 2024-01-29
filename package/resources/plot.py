@@ -186,7 +186,6 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
     
     plt.rc('ytick', labelsize=4) 
 
-
     if len(dict_list) == 1:
         if order == "First":
             axes.errorbar(

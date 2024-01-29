@@ -80,8 +80,8 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_oneD_sweep_sigma.json",#"package/constants/base_params_set_seed.json",#"package/constants/base_params_confirmation_bias.json",#"package/constants/base_params_std_low_carbon_preference.json"
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_sigma.json",#"package/constants/oneD_dict_sigma.json",#"package/constants/oneD_dict_confirmation_bias.json",#"package/constants/oneD_dict_std_low_carbon_preference.json"
-        RUN_TYPE = 5
+        BASE_PARAMS_LOAD = "package/constants/base_params_SW_N.json",#"package/constants/base_params_set_seed.json",#"package/constants/base_params_confirmation_bias.json",#"package/constants/base_params_std_low_carbon_preference.json"
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_N.json",#"package/constants/oneD_dict_sigma.json",#"package/constants/oneD_dict_confirmation_bias.json",#"package/constants/oneD_dict_std_low_carbon_preference.json"
+        RUN_TYPE = 4
 )
 

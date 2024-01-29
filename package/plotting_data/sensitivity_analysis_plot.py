@@ -9,10 +9,12 @@ from SALib.analyze import sobol
 import numpy.typing as npt
 from package.resources.utility import (
     load_object,
+    save_object
 )
 from package.resources.plot import (
     multi_scatter_seperate_total_sensitivity_analysis_plot,
 )
+import math
 
 def get_plot_data(
     problem: dict,
@@ -44,7 +46,10 @@ def get_plot_data(
 
     Si_emissions_stock = analyze_results(problem,Y_emissions_stock,calc_second_order) 
 
-    total_emissions_stock, first_emissions_stock = Si_emissions_stock.to_df()
+    if calc_second_order:
+        total_emissions_stock, first_emissions_stock, second_emissions_stock = Si_emissions_stock.to_df()
+    else:
+        total_emissions_stock, first_emissions_stock = Si_emissions_stock.to_df()
 
 
     total_data_sa_emissions_stock, total_yerr_emissions_stock = get_data_bar_chart(total_emissions_stock)
@@ -63,7 +68,12 @@ def get_plot_data(
         },
     }
 
-    return data_sa_dict_total, data_sa_dict_first
+    if calc_second_order:
+        return data_sa_dict_total, data_sa_dict_first, second_emissions_stock
+    else:
+        return data_sa_dict_total, data_sa_dict_first, calc_second_order#return nothing for second order
+    
+    
 
 def get_data_bar_chart(Si_df):
     """
@@ -150,27 +160,45 @@ def main(
 
 
     Y_emissions_stock = load_object(fileName + "/Data", "Y_emissions_stock")
+    print(" Y_emissions_stock", Y_emissions_stock)
+    print(sum(math.isnan(x) for x in Y_emissions_stock))
+    quit()
 
     N_samples = load_object(fileName + "/Data","N_samples" )
     calc_second_order = load_object(fileName + "/Data", "calc_second_order")
 
-    data_sa_dict_total, data_sa_dict_first = get_plot_data(problem, Y_emissions_stock,calc_second_order)
+    if calc_second_order:
+        data_sa_dict_total, data_sa_dict_first, second_emissions_stock_df  = get_plot_data(problem, Y_emissions_stock,calc_second_order)  
+    else:
+        data_sa_dict_total, data_sa_dict_first, ___ = get_plot_data(problem, Y_emissions_stock,calc_second_order)
 
     data_sa_dict_first = Merge_dict_SA(data_sa_dict_first, plot_dict)
+    data_sa_dict_total = Merge_dict_SA(data_sa_dict_total, plot_dict)
     ###############################
 
-    multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first,plot_outputs, titles, N_samples, "First", latex_bool = latex_bool)
+    multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first, plot_outputs, titles, N_samples, "First", latex_bool = latex_bool)
     #TOTAL I DONT THINK WORKS AT THE MOMENT
-    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_total,plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
+    multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_total, plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
+    
+
+    array_first = data_sa_dict_first['emissions_stock']["data"]["S1"].to_numpy() 
+    array_total = data_sa_dict_total['emissions_stock']["data"]["ST"].to_numpy() 
+    diff = array_total- array_first
+    print("Difference total - first", diff)
+    save_object(diff, fileName + "/Data","diff")
+    #a = second_emissions_stock_df.plot()
+    #print(a)
     plt.show()
+
+    
 
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_09_39_50__26_01_2024",
+        fileName="results/sensitivity_analysis_SW_20_17_04__26_01_2024",
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
-            "emissions_stock": {"title": r"$Cumulative emissions, E$", "colour": "red", "linestyle": "--"},
+            "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},
         },
         titles = [    
             "phi_lower",
@@ -184,9 +212,8 @@ if __name__ == '__main__':
             "std_learning_error",
             "confirmation_bias",
             "homophily_state",
-            "SBM_block_num",
-            "SBM_network_density_input_intra_block",
-            "SBM_network_density_input_inter_block"
+            "SW_network_density",
+            "SW_prob_rewire"
         ]
     )
 

@@ -134,9 +134,7 @@ class Network:
         ) = self.create_weighting_matrix()
 
         #self.expenditure = parameters["expenditure"]
-        #self.individual_expenditure_array =  np.asarray([self.expenditure]*self.N)#sums to 1
-        self.individual_expenditure_array =  np.asarray([1/(self.N*self.M)]*self.N)#sums to 1, constant total system expenditure 
-
+        self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
 
         if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
             #case 2 (based on the presentation, EXPLAIN THIS BETTER LATER)

@@ -175,6 +175,12 @@ def main(
     )
     print("Total runs: ", len(params_list_sa))
 
+    root = "sensitivity_analysis_" + base_params["network_type"]
+    fileName = produce_name_datetime(root)
+    print("fileName:", fileName)
+
+    createFolder(fileName)
+
     Y_emissions_stock_stochastic = parallel_run_sa(
         params_list_sa
     )
@@ -182,12 +188,6 @@ def main(
     len_y = int(len(Y_emissions_stock_stochastic)/AV_reps)
     Y_emissions_stock_reshape = Y_emissions_stock_stochastic.reshape(len_y,AV_reps)
     Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=1)
-
-    root = "sensitivity_analysis_" + base_params["network_type"]
-    fileName = produce_name_datetime(root)
-    print("fileName:", fileName)
-
-    createFolder(fileName)
 
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(params_list_sa, fileName + "/Data", "params_list_sa")
