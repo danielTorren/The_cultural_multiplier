@@ -160,9 +160,9 @@ def main(
 
 
     Y_emissions_stock = load_object(fileName + "/Data", "Y_emissions_stock")
-    print(" Y_emissions_stock", Y_emissions_stock)
-    print(sum(math.isnan(x) for x in Y_emissions_stock))
-    quit()
+    #print(" Y_emissions_stock", Y_emissions_stock)
+    #print(sum(math.isnan(x) for x in Y_emissions_stock))
+    #quit()
 
     N_samples = load_object(fileName + "/Data","N_samples" )
     calc_second_order = load_object(fileName + "/Data", "calc_second_order")
@@ -195,7 +195,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_SW_20_17_04__26_01_2024",
+        fileName="results/sensitivity_analysis_SW_13_47_02__29_01_2024",
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},
