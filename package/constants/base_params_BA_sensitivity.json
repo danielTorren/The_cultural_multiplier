@@ -4,7 +4,7 @@
     "network_type": "BA",
     "heterogenous_intrasector_preferences_state": 1,
     "heterogenous_carbon_price_state": 0,
-    "heterogenous_sector_substitutabilities_state": 1,
+    "heterogenous_sector_substitutabilities_state": 0,
     "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
@@ -22,6 +22,5 @@
     "clipping_epsilon": 1e-5, 
     "clipping_epsilon_init_preference": 1e-5,
     "init_carbon_price": 0,
-    "BA_green_or_brown_hegemony": 0,
-    "BA_nodes": 11
+    "BA_green_or_brown_hegemony": 0
     }
