@@ -157,11 +157,11 @@ def main(
     ) -> None: 
 
     problem = load_object(fileName + "/Data", "problem")
-
+    print("problem",problem)
 
     Y_emissions_stock = load_object(fileName + "/Data", "Y_emissions_stock")
-    #print(" Y_emissions_stock", Y_emissions_stock)
-    #print(sum(math.isnan(x) for x in Y_emissions_stock))
+    print(" Y_emissions_stock", Y_emissions_stock, len(Y_emissions_stock))
+    print(sum(math.isnan(x) for x in Y_emissions_stock))
     #quit()
 
     N_samples = load_object(fileName + "/Data","N_samples" )
@@ -195,7 +195,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_SW_13_47_02__29_01_2024",
+        fileName="results/sensitivity_analysis_SW_18_25_15__29_01_2024",
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},
@@ -206,14 +206,14 @@ if __name__ == '__main__':
             "N",
             "M",
             "sector_substitutability",
-            "low_carbon_substitutability_lower",
+            #"low_carbon_substitutability_lower",
             "low_carbon_substitutability_upper",
             "std_low_carbon_preference",
             "std_learning_error",
             "confirmation_bias",
             "homophily_state",
             "SW_network_density",
-            "SW_prob_rewire"
+            #"SW_prob_rewire"
         ]
     )
 
