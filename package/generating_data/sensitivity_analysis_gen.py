@@ -202,8 +202,8 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_6 = main(
     N_samples = 128,
-    BASE_PARAMS_LOAD = "package/constants/base_params_SBM_sensitivity.json",
-    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA_SBM.json",
+    BASE_PARAMS_LOAD = "package/constants/base_params_BA_sensitivity.json",
+    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA_BA.json",
     calc_second_order = True
     )
     RUN_PLOT = 0
