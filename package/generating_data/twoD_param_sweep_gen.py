@@ -47,6 +47,9 @@ def generate_vals_variable_parameters_and_norms(variable_parameters_dict):
         elif i["divisions"] == "log":
             i["vals"] = np.logspace(i["min"], i["max"], i["reps"])
             i["norm"] = LogNorm()
+        elif i["divisions"] == "geo":
+            i["vals"] = np.geomspace(i["min"], i["max"], i["reps"])
+            i["norm"] = LogNorm()
         else:
             raiseExceptions("Invalid divisions, try linear or log")
     return variable_parameters_dict
@@ -93,6 +96,6 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_11 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_2D_tau_vary_sigma_upper.json",#"package/constants/base_params_2D_sigma_sigma.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_tau_vary_sigma_upper.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"
+        BASE_PARAMS_LOAD = "package/constants/base_params_2D_sigma_sigma.json",#"package/constants/base_params_2D_sigma_sigma.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_sigma_sigma.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"
     )
