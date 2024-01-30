@@ -20,7 +20,7 @@
     "burn_in_duration": 0, 
     "N": 200, 
     "M": 2, 
-    "sector_substitutability": 1.05, 
+    "sector_substitutability": 1.5, 
     "phi_lower": 0.01,
     "a_identity": 2, 
     "b_identity": 2, 
@@ -34,5 +34,5 @@
     "homophily_state": 0,
     "SW_network_density": 0.1,
     "SW_prob_rewire": 0.1,
-    "carbon_price_increased_lower":0.1
+    "carbon_price_increased_lower":0.5
     }
