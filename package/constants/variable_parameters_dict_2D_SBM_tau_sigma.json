@@ -1,4 +1,4 @@
 {
     "row":{"property":"carbon_price_increased_lower","min":0, "max": 1, "title": "Carbon price","divisions": "linear", "reps": 200}, 
-    "col":{"property":"low_carbon_substitutability_upper","min":1.05, "max": 8, "title": "low_carbon_substitutability_lower","divisions": "geo", "reps": 10} 
+    "col":{"property":"low_carbon_substitutability_upper","min":1.05, "max": 8, "title": "low_carbon_substitutability_lower","divisions": "geo", "reps": 20} 
 }
