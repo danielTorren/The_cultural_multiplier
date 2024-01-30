@@ -96,6 +96,6 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_11 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_2D_sigma_sigma.json",#"package/constants/base_params_2D_sigma_sigma.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_sigma_sigma.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"
+        BASE_PARAMS_LOAD = "package/constants/base_params_2D_SBM_sigma_tau.json",#"package/constants/base_params_2D_sigma_sigma.json",#"package/constants/base_params_2D_sigma_sigma.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_SBM_tau_sigma.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"
     )
