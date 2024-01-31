@@ -179,7 +179,7 @@ def main(
     multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first, plot_outputs, titles, N_samples, "First", latex_bool = latex_bool)
     #TOTAL I DONT THINK WORKS AT THE MOMENT
     multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_total, plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
-    
+
     """
     array_first = data_sa_dict_first['emissions_stock']["data"]["S1"].to_numpy() 
     array_total = data_sa_dict_total['emissions_stock']["data"]["ST"].to_numpy() 
