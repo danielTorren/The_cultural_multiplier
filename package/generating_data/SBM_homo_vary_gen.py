@@ -15,15 +15,7 @@ from package.resources.utility import createFolder,produce_name_datetime,save_ob
 from package.resources.run import multi_emissions_stock, multi_emissions_stock_ineq,parallel_run
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic,produce_param_list
 from package.generating_data.twoD_param_sweep_gen import generate_vals_variable_parameters_and_norms
-
-def generate_vals(variable_parameters_dict):
-    if variable_parameters_dict["property_divisions"] == "linear":
-        property_values_list  = np.linspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
-    elif variable_parameters_dict["property_divisions"] == "log":
-        property_values_list  = np.logspace(np.log10(variable_parameters_dict["property_min"]),np.log10( variable_parameters_dict["property_max"]), variable_parameters_dict["property_reps"])
-    else:
-        print("Invalid divisions, try linear or log")
-    return property_values_list 
+from package.resources.utility import generate_vals
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",

@@ -15,15 +15,7 @@ import json
 import numpy as np
 from package.resources.utility import createFolder, produce_name_datetime, save_object
 from package.resources.run import multi_burn_in_societies,multi_emissions_load, multi_target_emissions_load
-
-def generate_vals(variable_parameters_dict):
-    if variable_parameters_dict["property_divisions"] == "linear":
-        property_values_list  = np.linspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
-    elif variable_parameters_dict["property_divisions"] == "log":
-        property_values_list  = np.logspace(np.log10(variable_parameters_dict["property_min"]),np.log10( variable_parameters_dict["property_max"]), variable_parameters_dict["property_reps"])
-    else:
-        print("Invalid divisions, try linear or log")
-    return property_values_list 
+from package.resources.utility import generate_vals
 
 def produce_param_list_just_stochastic(params: dict) -> list[dict]:
     params_list = []

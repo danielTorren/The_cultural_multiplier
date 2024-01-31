@@ -14,15 +14,7 @@ import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
 from package.resources.run import preferences_parallel_run,preferences_consumption_parallel_run
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list
-
-def generate_vals(variable_parameters_dict):
-    if variable_parameters_dict["property_divisions"] == "linear":
-        property_values_list  = np.linspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
-    elif variable_parameters_dict["property_divisions"] == "log":
-        property_values_list  = np.logspace(np.log10(variable_parameters_dict["property_min"]),np.log10( variable_parameters_dict["property_max"]), variable_parameters_dict["property_reps"])
-    else:
-        print("Invalid divisions, try linear or log")
-    return property_values_list 
+from package.resources.utility import generate_vals
 
 def produce_param_list_2D_single_seed(params, property_values_list_1,property_values_list_2, property_varied_1, property_varied_2):
 

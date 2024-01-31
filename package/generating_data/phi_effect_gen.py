@@ -8,15 +8,7 @@ from package.resources.run import multi_emissions_stock,generate_data
 from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
 from package.generating_data.static_preferences_emissions_gen import calculate_emissions
 from package.plotting_data import phi_effect_plot
-
-def generate_vals(variable_parameters_dict):
-    if variable_parameters_dict["property_divisions"] == "linear":
-        property_values_list  = np.linspace(variable_parameters_dict["property_min"], variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
-    elif variable_parameters_dict["property_divisions"] == "log":
-        property_values_list  = np.logspace(np.log10(variable_parameters_dict["property_min"]),np.log10( variable_parameters_dict["property_max"]), variable_parameters_dict["property_reps"])
-    else:
-        print("Invalid divisions, try linear or log")
-    return property_values_list 
+from package.resources.utility import generate_vals
 ##################################################################################################
 #REVERSE Engineer the carbon price based on the final emissions
 
