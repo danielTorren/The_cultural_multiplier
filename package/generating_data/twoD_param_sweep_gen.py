@@ -18,7 +18,7 @@ from package.resources.utility import (
     produce_name_datetime,
 )
 from package.resources.run import (
-    multi_emissions_stock, emissions_parallel_run
+    multi_emissions_stock, emissions_parallel_run, emissions_parallel_run_BLOCKS
 )
 
 # modules
@@ -56,7 +56,8 @@ def generate_vals_variable_parameters_and_norms(variable_parameters_dict):
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D.json"
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D.json",
+        RUN_TYPE = 1
     ) -> str: 
 
     # load base params
@@ -79,12 +80,27 @@ def main(
     print("fileName:", fileName)
 
     params_list,key_param_array = produce_param_list_stochastic_n_double(base_params, variable_parameters_dict)
-    print("TOTAL RUNS: ", len(params_list))
-    results_emissions_stock_series = emissions_parallel_run(params_list)
+    params_list,key_param_array = produce_param_list_stochastic_n_double(base_params, variable_parameters_dict)
+    
+    if RUN_TYPE == 1:
+        
+        print("TOTAL RUNS: ", len(params_list))
+        results_emissions_stock_series,results_emissions_stock_series_blocks  = emissions_parallel_run_BLOCKS(params_list)
 
-    results_emissions_stock = results_emissions_stock_series.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], base_params["seed_reps"]))
+        results_emissions_stock = results_emissions_stock_series.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], base_params["seed_reps"]))
+        results_emissions_stock_blocks= results_emissions_stock_series_blocks.reshape((base_params["SBM_block_num"], variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], base_params["seed_reps"]))
+        
+        createFolder(fileName)
 
-    createFolder(fileName)
+        save_object(results_emissions_stock_blocks, fileName + "/Data", "results_emissions_stock_blocks")
+    else:
+       
+        print("TOTAL RUNS: ", len(params_list))
+        results_emissions_stock_series = emissions_parallel_run(params_list)
+
+        results_emissions_stock = results_emissions_stock_series.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], base_params["seed_reps"]))
+        createFolder(fileName)
+    
 
     save_object(params_list, fileName + "/Data", "params_list")
     save_object(base_params, fileName + "/Data", "base_params")
@@ -97,6 +113,6 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_11 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_2D_SBM_sigma_tau.json",#"package/constants/base_params_2D_sigma_sigma.json",#"package/constants/base_params_2D_sigma_sigma.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_SBM_tau_sigma.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"
-        
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_SBM_tau_sigma.json",#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"#"package/constants/variable_parameters_dict_2D_sigma_sigma.json"
+        RUN_TYPE = 1
     )

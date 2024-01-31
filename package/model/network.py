@@ -170,6 +170,9 @@ class Network:
         self.sector_preferences = np.asarray([1/self.M]*self.M)
         
         self.agent_list = self.create_agent_list()
+        
+        if self.network_type == "SBM":
+            self.init_block_id()
 
         self.shuffle_agent_list()#partial shuffle of the list based on identity
 
@@ -186,6 +189,9 @@ class Network:
             self.social_component_matrix = self.calc_social_component_matrix()
 
         self.total_carbon_emissions_stock = 0#this are for post tax
+
+        if self.network_type == "SBM":
+            self.total_carbon_emissions_stock_blocks = np.asarray([0]*self.SBM_block_num)
 
         self.identity_list = list(map(attrgetter('identity'), self.agent_list))
         (
@@ -406,9 +412,19 @@ class Network:
             )
             for n in range(self.N)
         ]
-
         return agent_list
-        
+    
+    def init_block_id(self):
+        block_ids = []
+        block_id = 0
+        for block_size in self.SBM_block_sizes:
+            block_ids.extend([block_id for i in range(block_size)])
+            block_id = block_id + 1
+
+        for i, agent in enumerate(self.agent_list):
+            agent.block_id = block_ids[i]
+
+
     def shuffle_agent_list(self): 
         #make list cirucalr then partial shuffle it
         self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
@@ -595,6 +611,13 @@ class Network:
         for i in range(self.N):
             self.agent_list[i].alpha_change_state = "fixed_preferences"
         
+    def calc_block_emissions(self):
+        bloc_flows = [0]*self.SBM_block_num
+        for i, agent in enumerate(self.agent_list):
+            block_id = agent.block_id 
+            bloc_flows[block_id] += agent.flow_carbon_emissions
+
+        return np.asarray(bloc_flows)
 
     def save_timeseries_data_state_network(self):
         """
@@ -664,6 +687,9 @@ class Network:
         if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
             self.total_carbon_emissions_flow = self.calc_total_emissions()
             self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
+            if self.network_type == "SBM":
+                block_flows = self.calc_block_emissions()
+                self.total_carbon_emissions_stock_blocks = self.total_carbon_emissions_stock_blocks + block_flows# [self.total_carbon_emissions_stock_blocks[x]+ block_flows[x] for x in range(self.SBM_block_num)]
             self.welfare_flow = self.calc_welfare()
             self.welfare_stock = self.welfare_stock + self.welfare_flow
             
