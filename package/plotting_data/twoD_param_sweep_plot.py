@@ -132,6 +132,9 @@ def main(
 
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     results_emissions = load_object(fileName + "/Data", "results_emissions_stock")
+    print("variable_parameters_dict",variable_parameters_dict)
+    #quit()
+
     #print(results_emissions.shape)
     #quit()
     #results_emissions
@@ -154,11 +157,12 @@ def main(
         
     #multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 1, col_label, row_label, y_label)#y_ticks_pos, y_ticks_label
     multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label)#y_ticks_pos, y_ticks_label
+    multi_line_matrix_plot(fileName,matrix_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 1, col_label, row_label, y_label)
     seed_reps_select = 3
-    multi_line_matrix_plot_stacked(fileName,results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label,seed_reps_select)
+    #multi_line_matrix_plot_stacked(fileName,results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"),dpi_save, 0, col_label, row_label, y_label,seed_reps_select)
     
 
-    multi_line_matrix_plot_stoch_bands(fileName, results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label)
+    #multi_line_matrix_plot_stoch_bands(fileName, results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label)
     
 
 
@@ -168,6 +172,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_16_23_23__17_01_2024",
-        PLOT_TYPE=2
+        fileName="results/two_param_sweep_21_53_41__30_01_2024",
     )

@@ -157,11 +157,11 @@ def main(
     ) -> None: 
 
     problem = load_object(fileName + "/Data", "problem")
-    print("problem",problem)
-
+    print("problem",problem,len(problem["names"]) - len(titles))
+    #quit()
     Y_emissions_stock = load_object(fileName + "/Data", "Y_emissions_stock")
     print(" Y_emissions_stock", Y_emissions_stock, len(Y_emissions_stock))
-    print(sum(math.isnan(x) for x in Y_emissions_stock))
+    print(sum(math.isnan(x) for x in Y_emissions_stock)) 
     #quit()
 
     N_samples = load_object(fileName + "/Data","N_samples" )
@@ -180,7 +180,7 @@ def main(
     #TOTAL I DONT THINK WORKS AT THE MOMENT
     multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_total, plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
     
-
+    """
     array_first = data_sa_dict_first['emissions_stock']["data"]["S1"].to_numpy() 
     array_total = data_sa_dict_total['emissions_stock']["data"]["ST"].to_numpy() 
     diff = array_total- array_first
@@ -188,6 +188,7 @@ def main(
     save_object(diff, fileName + "/Data","diff")
     #a = second_emissions_stock_df.plot()
     #print(a)
+    """
     plt.show()
 
     
@@ -195,7 +196,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_SW_18_25_15__29_01_2024",
+        fileName="results/sensitivity_analysis_BA_11_26_31__30_01_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},
@@ -212,8 +213,7 @@ if __name__ == '__main__':
             "std_learning_error",
             "confirmation_bias",
             "homophily_state",
-            "SW_network_density",
-            #"SW_prob_rewire"
+            "BA_nodes"
         ]
     )
 
@@ -234,13 +234,13 @@ if __name__ == '__main__':
             "BA_nodes"
         ]
     SBM:
-            titles = [    
+        titles = [    
             "phi_lower",
             "carbon_price",
             "N",
             "M",
             "sector_substitutability",
-            "low_carbon_substitutability_lower",
+            #"low_carbon_substitutability_lower",
             "low_carbon_substitutability_upper",
             "std_low_carbon_preference",
             "std_learning_error",
