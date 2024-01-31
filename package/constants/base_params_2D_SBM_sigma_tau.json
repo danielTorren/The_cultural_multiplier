@@ -33,7 +33,7 @@
     "init_carbon_price": 0, 
     "homophily_state": 1,
     "SBM_block_num": 2,
-    "SBM_network_density_input_intra_block": 0.2,
+    "SBM_network_density_input_intra_block": 0.3,
     "SBM_network_density_input_inter_block": 0,
     "low_carbon_substitutability_lower": 1.05
     }
