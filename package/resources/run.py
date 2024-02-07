@@ -137,6 +137,7 @@ def emissions_parallel_run_BLOCKS(
         *res
     )
     return np.asarray(emissions_list),np.asarray(emissions_list_blocks)
+
 def generate_emissions_stock_res_timeseries(params):
     data = generate_data(params)
     return data.history_stock_carbon_emissions

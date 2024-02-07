@@ -84,6 +84,9 @@ def multi_line_matrix_plot_stoch_bands(
 
             ax.plot(col_vals, ys_mean, ls="-", linewidth = 0.5, color = cmap(c[i]))
             ax.fill_between(col_vals, ys_min, ys_max, facecolor=cmap(c[i]), alpha=0.5)
+        cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap,norm=Normalize(vmin=min( row_vals), vmax=max(row_vals))), ax=ax
+    )
     else:
         Z_array_T = np.transpose(Z_array,(1,0,2))#put (sigma, tau,seeds) from (tau,sigma, seeds)
         c = Normalize()(col_vals)
@@ -96,12 +99,14 @@ def multi_line_matrix_plot_stoch_bands(
             ax.plot(row_vals, ys_mean, ls="-", linewidth = 0.5,color=cmap(c[i]))
             ax.fill_between(row_vals, ys_min, ys_max, facecolor=cmap(c[i]), alpha=0.5)
 
+        cbar = fig.colorbar(
+            plt.cm.ScalarMappable(cmap=cmap,norm=Normalize(vmin=min( col_vals), vmax=max(col_vals))), ax=ax
+        )   
+
     #quit()
     ax.set_ylabel(y_label)#(r"First behaviour attitude variance, $\sigma^2$")
 
-    cbar = fig.colorbar(
-        plt.cm.ScalarMappable(cmap=cmap), ax=ax
-    )
+
     
     if col_axis_x:
         cbar.set_label(row_label)#(r"Number of behaviours per agent, M")
@@ -114,6 +119,67 @@ def multi_line_matrix_plot_stoch_bands(
     f = plotName + "/multi_line_matrix_plot_stoch_fill_%s_%s" % (Y_param, col_axis_x)
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")  
+
+def multi_line_matrix_plot_stoch_bands_inset(
+    fileName, Z_array, col_vals, row_vals,  Y_param, cmap, dpi_save, col_axis_x, col_label, row_label, y_label
+    ):
+    
+    fig, ax = plt.subplots( constrained_layout=True)#figsize=(14, 7)
+    inset_ax = ax.inset_axes([0.4, 0.4, 0.55, 0.55])
+    
+    #cmap = plt.get_cmap("cividis")
+
+    if col_axis_x:#= 1
+        c = Normalize()(row_vals)
+        for i in range(len(Z_array)):
+            data = Z_array_T[i]#(sigma, seeds)
+            ys_mean = data.mean(axis=1)
+            ys_min = data.min(axis=1)
+            ys_max= data.max(axis=1)
+
+            ax.plot(col_vals, ys_mean, ls="-", linewidth = 0.5, color = cmap(c[i]))
+            ax.fill_between(col_vals, ys_min, ys_max, facecolor=cmap(c[i]), alpha=0.5)
+
+            inset_ax.plot(col_vals[-10:-1], ys_mean[-10:-1])
+            inset_ax.fill_between(col_vals[-10:-1], ys_min[-10:-1], ys_max[-10:-1], facecolor=cmap(c[i]), alpha=0.5)
+
+        cbar = fig.colorbar(
+        plt.cm.ScalarMappable(cmap=cmap,norm=Normalize(vmin=min( row_vals), vmax=max(row_vals))), ax=ax
+    )
+    else:
+        Z_array_T = np.transpose(Z_array,(1,0,2))#put (sigma, tau,seeds) from (tau,sigma, seeds)
+        c = Normalize()(col_vals)
+        for i in range(len(Z_array_T)):#loop through sigma
+            data = Z_array_T[i]
+            ys_mean = data.mean(axis=1)
+            ys_min = data.min(axis=1)
+            ys_max= data.max(axis=1)
+
+            ax.plot(row_vals, ys_mean, ls="-", linewidth = 0.5,color=cmap(c[i]))
+            ax.fill_between(row_vals, ys_min, ys_max, facecolor=cmap(c[i]), alpha=0.5)
+            inset_ax.plot(row_vals[-10:-1], ys_mean[-10:-1])
+            inset_ax.fill_between(row_vals[-10:-1], ys_min[-10:-1], ys_max[-10:-1], facecolor=cmap(c[i]), alpha=0.5)
+            
+        cbar = fig.colorbar(
+            plt.cm.ScalarMappable(cmap=cmap,norm=Normalize(vmin=min( col_vals), vmax=max(col_vals))), ax=ax
+        )   
+
+    #quit()
+    ax.set_ylabel(y_label)#(r"First behaviour attitude variance, $\sigma^2$")
+
+
+    
+    if col_axis_x:
+        cbar.set_label(row_label)#(r"Number of behaviours per agent, M")
+        ax.set_xlabel(col_label)#(r'Confirmation bias, $\theta$')
+    else:
+        cbar.set_label(col_label)#)(r'Confirmation bias, $\theta$')
+        ax.set_xlabel(row_label)#(r"Number of behaviours per agent, M")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_line_matrix_plot_stoch_fill_%s_%s" % (Y_param, col_axis_x)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png") 
 
 def extremes_plot(fileName, Z_array,col_vals, row_vals):
     
@@ -163,7 +229,7 @@ def main(
     print("base params",base_params)
 
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
-    variable_parameters_dict["title"] = "Block 2 substitutability"
+    #variable_parameters_dict["title"] = "Block 2 substitutability"
     results_emissions = load_object(fileName + "/Data", "results_emissions_stock")
     print("variable_parameters_dict",variable_parameters_dict)
     #quit()
@@ -173,7 +239,7 @@ def main(
     #results_emissions
     #matrix_emissions = results_emissions.reshape((variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"]))
 
-    #matrix_emissions = np.mean(results_emissions, axis=2)
+    matrix_emissions = np.mean(results_emissions, axis=2)
     #double_phase_diagram(fileName, matrix_emissions, r"Cumulative emissions $E$", "emissions",variable_parameters_dict, get_cmap("Reds"),dpi_save, levels,latex_bool = latex_bool)  
     
     col_dict = variable_parameters_dict["col"]
@@ -196,9 +262,9 @@ def main(
     
 
     #multi_line_matrix_plot_stoch_bands(fileName, results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label)
-    
+    multi_line_matrix_plot_stoch_bands_inset(fileName, results_emissions, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label)
         
-    extremes_plot(fileName, results_emissions, col_dict["vals"], row_dict["vals"])
+    #extremes_plot(fileName, results_emissions, col_dict["vals"], row_dict["vals"])
 
 
 
@@ -207,5 +273,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName="results/two_param_sweep_21_53_41__30_01_2024",
+        fileName="results/two_param_sweep_21_40_32__30_01_2024",
     )

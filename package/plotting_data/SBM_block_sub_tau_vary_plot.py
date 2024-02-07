@@ -74,6 +74,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/SBM_BLOCK_sub_tau_vary_19_09_08__31_01_2024",
+        fileName= "results/SBM_BLOCK_sub_tau_vary_19_15_36__31_01_2024",
     )
 

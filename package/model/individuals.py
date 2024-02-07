@@ -79,6 +79,7 @@ class Individual:
         self.history_H_m = [self.H_m]
         self.history_L_m = [self.L_m]
         self.history_Z = [self.Z]
+        self.history_carbon_dividend = [np.nan]
     
     #####################################################################################
     #NESTED CES
@@ -186,11 +187,15 @@ class Individual:
         self.history_H_m.append(self.H_m)
         self.history_L_m.append(self.L_m)
         self.history_Z.append(self.Z)
+        #self.history_expenditure.append(self.instant_expenditure)
+        self.history_carbon_dividend.append(self.carbon_dividend)
 
-
-    def next_step(self, t: int, social_component: npt.NDArray, carbon_price_m):
+    def next_step(self, t: int, social_component: npt.NDArray, carbon_price_m, carbon_dividend):
 
         self.t = t
+        
+        self.carbon_dividend = carbon_dividend
+        self.instant_expenditure = self.init_expenditure + self.carbon_dividend
 
         #update prices
         self.update_prices(carbon_price_m)

@@ -193,6 +193,8 @@ class Network:
         if self.network_type == "SBM":
             self.total_carbon_emissions_stock_blocks = np.asarray([0]*self.SBM_block_num)
 
+        self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        
         self.identity_list = list(map(attrgetter('identity'), self.agent_list))
         (
                 self.average_identity,
@@ -593,7 +595,13 @@ class Network:
         welfare = sum(map(attrgetter('utility'), self.agent_list))
         #welfare = sum(i.utility for i in self.agent_list)
         return welfare
+    
+    def calc_carbon_dividend_array(self):
+        tax_income_R =  sum(self.carbon_price_m*self.H_m)        
+        carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
 
+        return carbon_dividend_array
+    
     def update_individuals(self):
         """
         Update Individual objects with new information regarding social interactions, prices and dividend
@@ -601,15 +609,11 @@ class Network:
 
         # Assuming you have self.agent_list as the list of objects
         ____ = list(map(
-            lambda agent, scm: agent.next_step(self.t, scm, self.carbon_price_m),
+            lambda agent, scm, carbon_dividend: agent.next_step(self.t, scm, self.carbon_price_m, carbon_dividend),
             self.agent_list,
-            self.social_component_matrix
+            self.social_component_matrix,
+            self.carbon_dividend_array
         ))
-        
-    def switch_from_dynamic_to_fixed_preferences(self):
-        self.alpha_change_state = "fixed_preferences"
-        for i in range(self.N):
-            self.agent_list[i].alpha_change_state = "fixed_preferences"
         
     def calc_block_emissions(self):
         bloc_flows = [0]*self.SBM_block_num
@@ -681,7 +685,7 @@ class Network:
             #This still updates for the case of the static weightings
             self.social_component_matrix = self.calc_social_component_matrix()
 
-        #quit()
+        self.carbon_dividend_array = self.calc_carbon_dividend_array()
 
         #check the exact timings on these
         if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
