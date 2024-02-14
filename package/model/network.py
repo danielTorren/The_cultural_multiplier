@@ -597,9 +597,9 @@ class Network:
         return welfare
     
     def calc_carbon_dividend_array(self):
-        tax_income_R =  sum(self.carbon_price_m*self.H_m)        
+        total_quantities_m = sum(map(attrgetter('H_m'), self.agent_list))
+        tax_income_R =  sum(self.carbon_price_m*total_quantities_m)      
         carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
-
         return carbon_dividend_array
     
     def update_individuals(self):

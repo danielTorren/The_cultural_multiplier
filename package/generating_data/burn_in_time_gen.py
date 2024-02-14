@@ -6,7 +6,7 @@ Run simulation to compare the results for different cultural and preference chan
 import json
 from package.resources.utility import createFolder,produce_name_datetime,save_object
 from package.resources.run import multi_emissions_flow_stock_run
-from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list_stochastic
+from package.resources.utility import produce_param_list_stochastic
 #from package.generating_data.twoD_param_sweep_gen import generate_vals_variable_parameters_and_norms
 import numpy as np
 

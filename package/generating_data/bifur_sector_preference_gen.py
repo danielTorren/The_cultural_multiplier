@@ -13,7 +13,7 @@ import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
 from package.resources.run import preferences_parallel_run
-from package.generating_data.mu_sweep_carbon_price_gen import produce_param_list
+from package.resources.utility import produce_param_list
 from package.resources.utility import generate_vals
 
 def main(

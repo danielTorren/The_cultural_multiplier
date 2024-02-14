@@ -118,3 +118,31 @@ def generate_vals(variable_parameters_dict):
     else:
         print("Invalid divisions, try linear or log")
     return property_values_list 
+
+def produce_param_list(params: dict, property_list: list, property: str) -> list[dict]:
+    """
+    Produce a list of the dicts for each experiment
+
+    Parameters
+    ----------
+    params: dict
+        base parameters from which we vary e.g
+            params["time_steps_max"] = int(params["total_time"] / params["delta_t"])
+    porperty_list: list
+        list of values for the property to be varied
+    property: str
+        property to be varied
+
+    Returns
+    -------
+    params_list: list[dict]
+        list of parameter dicts, each entry corresponds to one experiment to be tested
+    """
+
+    params_list = []
+    for i in property_list:
+        params[property] = i
+        params_list.append(
+            params.copy()
+        )  # have to make a copy so that it actually appends a new dict and not just the location of the params dict
+    return params_list
