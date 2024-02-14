@@ -111,9 +111,9 @@ class Network:
             round(self.N*(1 - self.homophily_state))
         )
 
-########################################################
-        #UP TO HEAR NUMPY RANDOM USED 1
-###################################################
+        ########################################################
+                #UP TO HEAR NUMPY RANDOM USED 1
+        ###################################################
         # set preferences
         if self.heterogenous_intrasector_preferences_state == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
@@ -188,12 +188,12 @@ class Network:
                 self.weighting_matrix_list = self.update_weightings_list()
             self.social_component_matrix = self.calc_social_component_matrix()
 
-        self.total_carbon_emissions_stock = 0#this are for post tax
+        self.carbon_dividend_array = self.calc_carbon_dividend_array()
 
+        #BURN IN PEIOD PREP
+        self.total_carbon_emissions_stock = 0#this are for post tax
         if self.network_type == "SBM":
             self.total_carbon_emissions_stock_blocks = np.asarray([0]*self.SBM_block_num)
-
-        self.carbon_dividend_array = self.calc_carbon_dividend_array()
         
         self.identity_list = list(map(attrgetter('identity'), self.agent_list))
         (
@@ -204,7 +204,7 @@ class Network:
                 self.max_identity,
         ) = self.calc_network_identity()
 
-        self.welfare_stock = 0
+        #self.welfare_stock = 0
 
     def set_up_time_series(self):
         self.history_weighting_matrix = [self.weighting_matrix]
@@ -219,8 +219,8 @@ class Network:
         self.history_min_identity = [self.min_identity]
         self.history_max_identity = [self.max_identity]
         self.history_identity_list = [self.identity_list]
-        self.history_welfare_flow = [self.welfare_flow]
-        self.history_welfare_stock = [self.welfare_stock]
+        #self.history_welfare_flow = [self.welfare_flow]
+        #self.history_welfare_stock = [self.welfare_stock]
         self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]
         self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
     
@@ -591,10 +591,10 @@ class Network:
         identity_min = min(self.identity_list)
         return (identity_mean, identity_std, identity_variance, identity_max, identity_min)
     
-    def calc_welfare(self):
-        welfare = sum(map(attrgetter('utility'), self.agent_list))
-        #welfare = sum(i.utility for i in self.agent_list)
-        return welfare
+    #def calc_welfare(self):
+    #    welfare = sum(map(attrgetter('utility'), self.agent_list))
+    #    #welfare = sum(i.utility for i in self.agent_list)
+    #    return welfare
     
     def calc_carbon_dividend_array(self):
         total_quantities_m = sum(map(attrgetter('H_m'), self.agent_list))
@@ -648,8 +648,8 @@ class Network:
         self.history_stock_carbon_emissions.append(self.total_carbon_emissions_stock)
         self.history_flow_carbon_emissions.append(self.total_carbon_emissions_flow)
         self.history_identity_list.append(self.identity_list)
-        self.history_welfare_flow.append(self.welfare_flow)
-        self.history_welfare_stock.append(self.welfare_stock)
+        #self.history_welfare_flow.append(self.welfare_flow)
+        #self.history_welfare_stock.append(self.welfare_stock)
 
     def next_step(self):
         """
@@ -694,9 +694,9 @@ class Network:
             if self.network_type == "SBM":
                 block_flows = self.calc_block_emissions()
                 self.total_carbon_emissions_stock_blocks = self.total_carbon_emissions_stock_blocks + block_flows# [self.total_carbon_emissions_stock_blocks[x]+ block_flows[x] for x in range(self.SBM_block_num)]
-            self.welfare_flow = self.calc_welfare()
-            self.welfare_stock = self.welfare_stock + self.welfare_flow
-            
+            #self.welfare_flow = self.calc_welfare()
+            #self.welfare_stock = self.welfare_stock + self.welfare_flow
+
         if self.save_timeseries_data_state:
             if self.t == self.burn_in_duration + 1:#want to create it the step after burn in is finished
                 self.set_up_time_series()
