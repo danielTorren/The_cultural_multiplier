@@ -112,7 +112,7 @@ class Network:
         )
 
         ########################################################
-                #UP TO HEAR NUMPY RANDOM USED 1
+                #UP TO HEAR NUMPY RANDOM USED 1 - CANT HAVE ANYTHING USE NUMPY RANDOM BEFORE THIS
         ###################################################
         # set preferences
         if self.heterogenous_intrasector_preferences_state == 1:
@@ -126,6 +126,9 @@ class Network:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
 
+        ################################################################################################
+            #I NEED EVERYTHING TO BE SET WITH A SEED UP UNTIL THIS POINT SO THAT ITS THE SAME
+        ###############################################################################################
         # create network
         (
             self.adjacency_matrix,
