@@ -12,20 +12,6 @@ def main(
         print_simu = 1,
         ) -> str: 
 
-    f_var = open(VARIABLE_PARAMS_LOAD)
-    var_params = json.load(f_var) 
-
-    property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
-    property_min = var_params["property_min"]#0,
-    property_max = var_params["property_max"]#1,
-    property_reps = var_params["property_reps"]#10,
-    property_varied_title = var_params["property_varied_title"]# #"A to Omega ratio"
-
-    property_values_list = generate_vals(
-        var_params
-    )
-    #property_values_list = np.linspace(property_min, property_max, property_reps)
-
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
 
@@ -39,7 +25,7 @@ def main(
         variable_parameters_dict
     )
 
-    root = "tax_sweep_networks"
+    root = "network_conf_tau"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
@@ -68,9 +54,11 @@ def main(
     
     params_list = params_list_identity + params_list_social
     print("Total runs: ",len(params_list))
-    
+    #print(variable_parameters_dict["row"]["reps"])
+    #quit()
     Data_serial = emissions_parallel_run(params_list)
-    data_array = Data_serial.reshape(2,3,(variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], params["seed_reps"]))
+
+    data_array = Data_serial.reshape(2,3,variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], params["seed_reps"])
     #3 is for the networks, 2 is for the scenario
 
     if print_simu:
@@ -86,9 +74,7 @@ def main(
 
     save_object(data_array, fileName + "/Data", "emissions_data_2_3")
     save_object(params, fileName + "/Data", "base_params")
-    save_object(property_varied, fileName + "/Data", "property_varied")
-    save_object(property_varied_title, fileName + "/Data", "property_varied_title")
-    save_object(property_values_list, fileName + "/Data", "property_values_list")
+    save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
 
     return fileName
 

@@ -535,26 +535,26 @@ def main(
     #print(scenarios)
     #"""
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
-    #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #EMISSIONS RATIOS ALL TOGETHER, THIS IS THE RATIO OF EMISSIONS TO THE CASE OF NO CARBON PRICE
-    #plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    #plot_emissions_ratio_line(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_emissions_ratio_line(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
     
     #SEED EMISSIOSN PLOTS
     seed_reps = base_params["seed_reps"]
     seeds_to_show = 3
-    #plot_seeds_scatter_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
-    #plot_seeds_plot_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    plot_seeds_scatter_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    plot_seeds_plot_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
 
     #PRICE ELASTICITIES
-    #plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
     plot_price_elasticies_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #PLOT MULTIPLIER RELATIVE TO THE CASE OF PRICE EFFECT
-    #plot_emissions_ratio_seeds(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
-    #plot_emissions_ratio_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_emissions_ratio_seeds(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    plot_emissions_ratio_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
     
     
     #"""
@@ -582,6 +582,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_20_59_24__15_02_2024",
+        fileName= "results/tax_sweep_networks_10_09_06__16_02_2024",
         LOAD_STATIC_FULL = 0
     )
