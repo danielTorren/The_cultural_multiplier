@@ -118,7 +118,7 @@ class Individual:
         return ratio
     
     def calc_outward_social_influence(self):
-        if self.alpha_change_state == "common_knowledge_dynamic_culturally_determined_weights":
+        if self.alpha_change_state == "common_knowledge_dynamic_identity_determined_weights":
             outward_social_influence = self.prices_low_carbon_m/(self.prices_high_carbon_instant*(1/self.Omega_m**(1/self.low_carbon_substitutability_array)) + self.prices_low_carbon_m)
         else: 
             outward_social_influence = self.ratio_preference_or_consumption_state*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*self.consumption_ratio

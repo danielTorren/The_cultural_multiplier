@@ -3,7 +3,7 @@
     "heterogenous_intrasector_preferences_state": 1.0,
     "compression_factor_state":10,
     "ratio_preference_or_consumption_state":0.0,
-    "alpha_change_state": "dynamic_culturally_determined_weights",
+    "alpha_change_state": "dynamic_identity_determined_weights",
     "network_structure_seed": 8,
     "init_vals_seed": 14,
     "set_seed": 4,

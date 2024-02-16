@@ -1,6 +1,6 @@
 {
     "save_timeseries_data_state": 1, 
-    "alpha_change_state": "dynamic_culturally_determined_weights",
+    "alpha_change_state": "dynamic_identity_determined_weights",
     "heterogenous_expenditure":0,
     "heterogenous_intrasector_preferences_state": 1.0,
     "redistribution_state": 0,

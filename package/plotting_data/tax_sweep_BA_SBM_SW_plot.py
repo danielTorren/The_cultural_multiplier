@@ -12,13 +12,13 @@ from package.resources.utility import (
     save_object
 )
 from package.generating_data.static_preferences_emissions_gen import calc_required_static_carbon_tax_seeds
-from package.plotting_data.price_elasticity_plot import calculate_price_elasticity
-from matplotlib.cm import rainbow
+from package.plotting_data.price_elasticity_plot import calculate_price_elasticity,calc_price_elasticities_2D
+from matplotlib.cm import rainbow,  get_cmap
 import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline,UnivariateSpline
 
 def plot_scatter_end_points_emissions_scatter(
-    fileName, emissions_networks, scenarios_titles, property_vals, network_titles
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
 ):
 
     fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,6), constrained_layout = True, sharey=True)
@@ -34,7 +34,7 @@ def plot_scatter_end_points_emissions_scatter(
             #print("data",data)
             for j in range(len(data)):
                 #ax.scatter(property_vals,  data[j], color = color, label=scenarios_titles[i] if j == 0 else "")
-                ax.scatter(property_vals,  data[j], label=scenarios_titles[i] if j == 0 else "")
+                ax.scatter(property_vals,  data[j], label=scenarios_titles[i] if j == 0 else "", c = colors_scenarios[i])
 
         
         ax.set_xlabel(r"Carbon price, $\tau$")
@@ -49,7 +49,7 @@ def plot_scatter_end_points_emissions_scatter(
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
 def plot_means_end_points_emissions(
-    fileName, emissions_networks, scenarios_titles, property_vals, network_titles
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
 ):
 
     #print(c,emissions_final)
@@ -69,9 +69,9 @@ def plot_means_end_points_emissions(
 
             #print("mu_emissions",mu_emissions)
             #ax.plot(property_vals, mu_emissions, c= color, label=scenarios_titles[i])
-            #ax.fill_between(property_vals, min_emissions, max_emissions, facecolor=color , alpha=0.5)
-            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i])
-            ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.5)
+            #ax.fill_between(property_vals, min_emissions, max_emissions, facecolor=color , alpha=0.2)
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
+            ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.2, facecolor = colors_scenarios[i])
 
         #ax.legend()
         ax.set_xlabel(r"Carbon price, $\tau$")
@@ -85,7 +85,7 @@ def plot_means_end_points_emissions(
     fig.savefig(f+ ".png", dpi=600, format="png") 
 
 def plot_emissions_ratio_scatter(
-    fileName, emissions_networks, scenarios_titles, property_vals, network_titles
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
 ):
     
     fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,6), constrained_layout = True, sharey=True)
@@ -111,7 +111,7 @@ def plot_emissions_ratio_scatter(
 
             #print("data",data)
             for j in range(len(data_ratio)):#loop over seeds
-                ax.scatter(property_vals,  data_ratio[j], label=scenarios_titles[i] if j == 0 else "") #, color = color
+                ax.scatter(property_vals,  data_ratio[j], label=scenarios_titles[i] if j == 0 else "",c = colors_scenarios[i]) #, color = color
     
     axes[0].set_xlabel(r"Carbon price, $\tau$")
     axes[0].set_ylabel(r'Ratio of cumulative emissions relative to no carbon price')
@@ -123,7 +123,7 @@ def plot_emissions_ratio_scatter(
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
 def plot_emissions_ratio_line(
-    fileName, emissions_networks, scenarios_titles, property_vals, network_titles
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
 ):
     
     fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,6), constrained_layout = True, sharey=True)
@@ -153,8 +153,8 @@ def plot_emissions_ratio_line(
 
             #print("mu_emissions",mu_emissions)
             #print(property_vals, mu_emissions)
-            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i])#c= color
-            ax.fill_between(property_vals, min_emissions, max_emissions , alpha=0.5)#facecolor=color
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])#c= color
+            ax.fill_between(property_vals, min_emissions, max_emissions , alpha=0.2, facecolor = colors_scenarios[i])#facecolor=color
     
     axes[0].set_xlabel(r"Carbon price, $\tau$")
     axes[0].set_ylabel(r'Ratio of cumulative emissions relative to no carbon price')
@@ -166,7 +166,7 @@ def plot_emissions_ratio_line(
     fig.savefig(f+ ".png", dpi=600, format="png") 
 
 def plot_seeds_scatter_emissions(
-    fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles
+    fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles, colors_scenarios
 ):
     
     fig, axes = plt.subplots(nrows=seeds_to_show, ncols= 3, figsize=(20,10), sharex=True, constrained_layout = True)
@@ -189,7 +189,7 @@ def plot_seeds_scatter_emissions(
                 #color = next(colors)#set color for whole scenario?
                 data = emissions[k]#its now seed then tax
                 #print("data",data)
-                axes[j,i].scatter(property_vals,  data, label=scenarios_titles[k], s=8)
+                axes[j,i].scatter(property_vals,  data, label=scenarios_titles[k], s=8, c = colors_scenarios[k])
 
           
     fig.supxlabel(r"Carbon price, $\tau$")
@@ -202,7 +202,7 @@ def plot_seeds_scatter_emissions(
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
 def plot_seeds_plot_emissions(
-    fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles
+    fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles, colors_scenarios
 ):
     
     fig, axes = plt.subplots(nrows=seeds_to_show, ncols= 3, figsize=(20,10), sharex=True, constrained_layout = True)
@@ -225,7 +225,7 @@ def plot_seeds_plot_emissions(
                 #color = next(colors)#set color for whole scenario?
                 data = emissions[k]#its now seed then tax
                 #print("data",data)
-                axes[j,i].plot(property_vals,  data, label=scenarios_titles[k])
+                axes[j,i].plot(property_vals,  data, label=scenarios_titles[k],c = colors_scenarios[k])
 
           
     fig.supxlabel(r"Carbon price, $\tau$")
@@ -238,7 +238,7 @@ def plot_seeds_plot_emissions(
     fig.savefig(f+ ".png", dpi=600, format="png") 
 
 def plot_price_elasticies_seeds(
-     fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles
+     fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles,colors_scenarios
 ):
     #nrows=seed_reps
     fig, axes = plt.subplots(nrows=seeds_to_show, ncols=3, figsize=(20, 10), constrained_layout=True)
@@ -259,7 +259,7 @@ def plot_price_elasticies_seeds(
                 #DO CONVERSION
                 data = emissions[k]
                 price_elasticities = calculate_price_elasticity(property_vals,data)
-                axes[j,i].plot(property_vals[1:], price_elasticities, label=scenarios_titles[k])
+                axes[j,i].plot(property_vals[1:], price_elasticities, label=scenarios_titles[k], c=colors_scenarios[k])
     
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
@@ -269,7 +269,42 @@ def plot_price_elasticies_seeds(
     f = plotName + "/plot_price_elasticies_seeds"
     fig.savefig(f + ".png", dpi=600, format="png")
 
-def plot_emissions_ratio_seeds(fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles):
+def plot_price_elasticies_mean(fileName, emissions_network, scenarios_titles, property_vals, network_titles,colors_scenarios):
+
+    fig, axes = plt.subplots(nrows= 1, ncols=3, figsize=(10, 6), constrained_layout=True)
+
+    #print("scenarios_titles",scenarios_titles)
+
+    for i, emissions_network_specific in enumerate(emissions_network):#(network, scenario, reps, seed)
+
+        axes[i].set_title(network_titles[i])
+        axes[i].grid() 
+
+        for j,emissions_scenario in enumerate(emissions_network_specific):#cycle through scenarios
+            #DO CONVERSION
+            data_trans_full = []
+            data_trans  = emissions_scenario.T
+            for k in range(len(data_trans)):
+                data_trans_full.append(calculate_price_elasticity(property_vals, data_trans[k]))
+            Data = np.asarray(data_trans_full).T
+
+            mu_emissions =  Data.mean(axis=1)
+            min_emissions =  Data.min(axis=1)
+            max_emissions=  Data.max(axis=1)
+
+            axes[i].plot(property_vals[1:], mu_emissions, label=scenarios_titles[j], c=colors_scenarios[j+1])#c= color
+            axes[i].fill_between(property_vals[1:], min_emissions, max_emissions , alpha=0.2, facecolor=colors_scenarios[j+1])#facecolor=color
+    
+    fig.supxlabel(r"Carbon price, $\tau$")
+    axes[0].set_ylabel(r"Price elasticity of emissions, $\epsilon$")
+    axes[-1].legend( fontsize="6")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_price_elasticies_mean"
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+
+def plot_emissions_ratio_seeds(fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles,colors_scenarios):
 
     fig, axes = plt.subplots(nrows=seeds_to_show, ncols=3, figsize=(20, 10), constrained_layout=True)
     #print("scenarios_titles",scenarios_titles)
@@ -310,7 +345,7 @@ def plot_emissions_ratio_seeds(fileName, emissions_network, scenarios_titles, pr
                 #print(data_static_emissions)
                 #quit()
                 emissions_ratio = data/data_static_emissions
-                axes[j,i].plot(property_vals, emissions_ratio, label=scenarios_titles_reduc[k])
+                axes[j,i].plot(property_vals, emissions_ratio, label=scenarios_titles_reduc[k] , c=colors_scenarios[k+1])
     
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"Cumulative emissions ratio, $E/E_{\phi =0}$")
@@ -319,6 +354,48 @@ def plot_emissions_ratio_seeds(fileName, emissions_network, scenarios_titles, pr
     plotName = fileName + "/Plots"
     f = plotName + "/plot_emissions_ratio_seeds"
     fig.savefig(f + ".png", dpi=600, format="png")
+
+def plot_emissions_ratio_mean(fileName, emissions_network, scenarios_titles, property_vals, network_titles,colors_scenarios):
+
+    fig, axes = plt.subplots(nrows= 1, ncols=3, figsize=(10, 6), constrained_layout=True)
+
+    property_vals_fixed_preferences_index = scenarios_titles.index("Fixed preferences")
+
+    #print("scenarios_titles",scenarios_titles)
+
+    for i, emissions_network_specific in enumerate(emissions_network):#(network, scenario, reps, seed)
+
+        emissions_fixed_preferences_seed_reps = emissions_network_specific[property_vals_fixed_preferences_index,:,:]#(scenario, reps, seed)
+
+        emissions_network_specific_no_fixed = np.delete(emissions_network_specific, property_vals_fixed_preferences_index, axis=0)
+        scenarios_titles_reduc = scenarios_titles[1:] 
+        #print("scenarios_titles_reduc",scenarios_titles_reduc)
+        #quit()
+        axes[i].set_title(network_titles[i])
+        axes[i].grid() 
+
+        for j,emissions_scenario in enumerate(emissions_network_specific_no_fixed):#cycle through scenarios
+            #DO CONVERSION
+            Data = emissions_scenario/emissions_fixed_preferences_seed_reps[j]
+            #Data = emissions_ratio.T
+
+            mu_emissions =  Data.mean(axis=1)
+            min_emissions =  Data.min(axis=1)
+            max_emissions=  Data.max(axis=1)
+
+            axes[i].plot(property_vals, mu_emissions, label=scenarios_titles_reduc[j], c=colors_scenarios[j+1])#c= color
+            axes[i].fill_between(property_vals, min_emissions, max_emissions , alpha=0.2, facecolor=colors_scenarios[j+1])#facecolor=color
+    
+    fig.supxlabel(r"Carbon price, $\tau$")
+    axes[0].set_ylabel(r"Cumulative emissions ratio, $E/E_{\phi =0}$")
+    axes[-1].legend( fontsize="6")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_ratio_mean"
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+
+#####################################################################################################
 
 def calc_M(tau_social,tau_static):
 
@@ -340,7 +417,7 @@ def calc_M_vector(tau_social_vec ,tau_static_vec, emissions_social, emissions_st
 
     return M_vals
 
-def plot_reduc_seeds(fileName, emissions_network, scenarios_titles, property_vals,tau_matrix, emissions_matrix, seed_reps, seeds_to_show, network_titles):
+def plot_reduc_seeds(fileName, emissions_network, scenarios_titles, property_vals,tau_matrix, emissions_matrix, seed_reps, seeds_to_show, network_titles,colors_scenarios):
 
     fig, axes = plt.subplots(nrows=seeds_to_show, ncols=3, figsize=(20, 10), constrained_layout=True)
     property_vals_fixed_preferences_index = scenarios_titles.index("Fixed preferences")
@@ -368,7 +445,7 @@ def plot_reduc_seeds(fileName, emissions_network, scenarios_titles, property_val
                 tax_reduc = calc_M_vector(property_vals, tau_matrix[j], data, emissions_matrix[j])
                 #print("tax_reduc",tax_reduc )
                 #quit()
-                axes[j,i].plot(property_vals, tax_reduc, label=scenarios_titles_reduc[k])
+                axes[j,i].plot(property_vals, tax_reduc, label=scenarios_titles_reduc[k], c=colors_scenarios[k+1])
     
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"\% Carbon price reduction")
@@ -382,7 +459,7 @@ def plot_emissions_fixed(tau_matrix, emissions_matrix):
     fig, ax = plt.subplots(figsize=(10, 10), constrained_layout=True)
     ax.scatter(tau_matrix, emissions_matrix)
 
-def plot_reduc_mean(fileName, emissions_network, scenarios_titles, property_vals,tau_matrix, emissions_matrix, seed_reps, network_titles):
+def plot_reduc_mean(fileName, emissions_network, scenarios_titles, property_vals,tau_matrix, emissions_matrix, seed_reps, network_titles,colors_scenarios):
 
     fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(20, 10), constrained_layout=True)
 
@@ -420,8 +497,8 @@ def plot_reduc_mean(fileName, emissions_network, scenarios_titles, property_vals
             min_emissions =  Data.min(axis=1)
             max_emissions=  Data.max(axis=1)
 
-            axes[i].plot(property_vals, mu_emissions, label=scenarios_titles_reduc[q])#c= color
-            axes[i].fill_between(property_vals, min_emissions, max_emissions , alpha=0.5)#facecolor=color
+            axes[i].plot(property_vals, mu_emissions, label=scenarios_titles_reduc[q],c=colors_scenarios[q+1])#c= color
+            axes[i].fill_between(property_vals, min_emissions, max_emissions , alpha=0.2)#facecolor=color
     
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"\% Carbon price reduction")
@@ -437,7 +514,13 @@ def main(
     fileName = "results/tax_sweep_11_29_20__28_09_2023",
     LOAD_STATIC_FULL = 0
 ) -> None:
-        
+    
+    name = "Set2"
+    cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
+    colors_scenarios = cmap.colors  # type: list
+    #print(colors)
+
+    #quit()
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
     emissions_SBM = load_object(fileName + "/Data","emissions_SBM")
     emissions_BA = load_object(fileName + "/Data","emissions_BA")
@@ -452,24 +535,28 @@ def main(
     #print(scenarios)
     #"""
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
-    plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles)
-    plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles)
+    #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
-    #EMISSIONS RATIOS ALL TOGETHER
-    plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles)
-    plot_emissions_ratio_line(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles)
+    #EMISSIONS RATIOS ALL TOGETHER, THIS IS THE RATIO OF EMISSIONS TO THE CASE OF NO CARBON PRICE
+    #plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_emissions_ratio_line(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
     
     #SEED EMISSIOSN PLOTS
     seed_reps = base_params["seed_reps"]
     seeds_to_show = 3
-    plot_seeds_scatter_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles)
-    plot_seeds_plot_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles)
+    #plot_seeds_scatter_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    #plot_seeds_plot_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
 
     #PRICE ELASTICITIES
-    plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list,seed_reps,seeds_to_show,network_titles)
+    #plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    plot_price_elasticies_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #PLOT MULTIPLIER RELATIVE TO THE CASE OF PRICE EFFECT
-    plot_emissions_ratio_seeds(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles)
+    #plot_emissions_ratio_seeds(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    #plot_emissions_ratio_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    
+    
     #"""
     """
     seed_reps = base_params["seed_reps"]
@@ -487,8 +574,8 @@ def main(
         save_object(emissions_matrix,fileName + "/Data", "emissions_matrix")
 
     #plot_emissions_fixed(tau_matrix, emissions_matrix)
-    plot_reduc_seeds(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,seeds_to_show,network_titles)
-    plot_reduc_mean(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,network_titles)
+    plot_reduc_seeds(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    plot_reduc_mean(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,network_titles,colors_scenarios)
     #"""
 
     plt.show()

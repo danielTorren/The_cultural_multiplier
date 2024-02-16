@@ -185,7 +185,7 @@ class Network:
         if self.alpha_change_state == "fixed_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
-            if self.alpha_change_state in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_culturally_determined_weights", "common_knowledge_dynamic_culturally_determined_weights"):
+            if self.alpha_change_state in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_identity_determined_weights", "common_knowledge_dynamic_identity_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()
@@ -679,7 +679,7 @@ class Network:
 
         # update network parameters for next step
         if self.alpha_change_state != "fixed_preferences":
-            if self.alpha_change_state in ("dynamic_culturally_determined_weights", "common_knowledge_dynamic_culturally_determined_weights"):
+            if self.alpha_change_state in ("dynamic_identity_determined_weights", "common_knowledge_dynamic_identity_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":#independent behaviours
                 self.weighting_matrix_list = self.update_weightings_list()

@@ -31,5 +31,5 @@
     "clipping_epsilon": 1e-4,
     "carbon_tax_implementation": "flat",
     "carbon_price_increased" : 0.5,
-    "alpha_change_state": "dynamic_culturally_determined_weights"
+    "alpha_change_state": "dynamic_identity_determined_weights"
 }

@@ -60,9 +60,9 @@ def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
         params_list.extend(params_sub_list_5)
 
     # 6.  Run with cultural learning, Emissions: [S_n]
-    if "dynamic_culturally_determined_weights" in scenarios:
+    if "dynamic_identity_determined_weights" in scenarios:
         base_params_copy_6 = deepcopy(base_params_tax_copy)
-        base_params_copy_6["alpha_change_state"] = "dynamic_culturally_determined_weights"
+        base_params_copy_6["alpha_change_state"] = "dynamic_identity_determined_weights"
         params_sub_list_6 = produce_param_list_scenarios_tax(base_params_copy_6, carbon_tax_vals,"carbon_price_increased_lower")
         params_list.extend(params_sub_list_6)
 
@@ -81,7 +81,7 @@ def main(
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_tau_vary.json",
         print_simu = 1,
-        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
+        scenarios = ["fixed_preferences","uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights", "dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ],
         ) -> str: 
 
     scenario_reps = len(scenarios)
@@ -154,6 +154,6 @@ if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_networks_tau_vary.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_tau_vary.json",
-        scenarios = ["fixed_preferences","uniform_network_weighting","static_socially_determined_weights","static_culturally_determined_weights","dynamic_socially_determined_weights", "dynamic_culturally_determined_weights" ],
+        scenarios = ["fixed_preferences","uniform_network_weighting","static_socially_determined_weights","static_culturally_determined_weights","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ],
     )
 

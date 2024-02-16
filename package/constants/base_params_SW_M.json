@@ -9,7 +9,7 @@
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "ratio_preference_or_consumption_state": 0,
-    "alpha_change_state": "dynamic_culturally_determined_weights",
+    "alpha_change_state": "dynamic_identity_determined_weights",
     "vary_seed_imperfect_learning_state_or_initial_preferences_state": 1,
     "static_internal_preference_state": 0,
     "seed_reps": 1,
