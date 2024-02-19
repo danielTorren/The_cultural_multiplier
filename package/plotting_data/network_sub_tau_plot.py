@@ -111,7 +111,7 @@ def main(
     
     property_values_list_row = row_dict["vals"]
 
-    row_titles = ["Confirmation bias, $\theta$ = %s" % (i) for i in property_values_list_row]
+    row_titles = ["Elasticity of substitution, $\sigma_m$ = %s" % (i) for i in property_values_list_row]
     print("row_titles",row_titles)
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
     #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list_col, property_values_list_row,network_titles,colors_scenarios)

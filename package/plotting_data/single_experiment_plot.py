@@ -991,9 +991,9 @@ def main(
     else:
         plot_consumption(fileName, Data, dpi_save)
     """
-    print("Data eminissions",Data.total_carbon_emissions_stock )
-    quit()
-    print(Data.parameters)
+    #print("Data eminissions",Data.total_carbon_emissions_stock )
+    #quit()
+    #print(Data.parameters)
     #quit()
 
     
@@ -1036,7 +1036,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_14_01_32__12_01_2024",
+        fileName = "results/single_experiment_11_02_44__19_02_2024",
     )
 
 

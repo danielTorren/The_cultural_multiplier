@@ -32,6 +32,6 @@
     "confirmation_bias": 1, 
     "expenditure": 1,
     "init_carbon_price": 0, 
-    "phi_lower": 0.01, 
+    "phi_lower": 0.02, 
     "BA_nodes": 11
     }

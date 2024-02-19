@@ -48,13 +48,13 @@ def set_latex(
 def prod_pos(layout_type: str, network: nx.Graph) -> nx.Graph:
 
     if layout_type == "circular":
-        pos_identity_network = nx.circular_layout(network,seed=1)
+        pos_identity_network = nx.circular_layout(network)
     elif layout_type == "spring":
-        pos_identity_network = nx.spring_layout(network,seed=1)
+        pos_identity_network = nx.spring_layout(network)
     elif layout_type == "kamada_kawai":
-        pos_identity_network = nx.kamada_kawai_layout(network,seed=1)
+        pos_identity_network = nx.kamada_kawai_layout(network)
     elif layout_type == "planar":
-        pos_identity_network = nx.planar_layout(network,seed=1)
+        pos_identity_network = nx.planar_layout(network)
     else:
         raise Exception("Invalid layout given")
 

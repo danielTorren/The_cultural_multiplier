@@ -32,7 +32,7 @@
     "confirmation_bias": 1, 
     "expenditure": 1,
     "init_carbon_price": 0, 
-    "phi_lower": 0.01, 
+    "phi_lower": 0.02, 
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2
     }

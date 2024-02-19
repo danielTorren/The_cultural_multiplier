@@ -21,7 +21,7 @@
     "N": 200, 
     "M": 2, 
     "sector_substitutability": 1.05, 
-    "phi_lower": 0.01,
+    "phi_lower": 0.02,
     "a_identity": 2, 
     "b_identity": 2, 
     "clipping_epsilon": 1e-5, 
