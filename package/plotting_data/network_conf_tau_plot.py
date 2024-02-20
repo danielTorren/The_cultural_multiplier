@@ -37,7 +37,7 @@ def plot_means_end_points_emissions(
                 max_emissions=  Data.max(axis=1)
 
                 axes[i][j].plot(property_values_list_col, mu_emissions, label=row_titles[k], c = colors[k])
-                axes[i][j].fill_between(property_values_list_col, min_emissions, max_emissions, alpha=0.2, facecolor = colors[k])
+                axes[i][j].fill_between(property_values_list_col, min_emissions, max_emissions, alpha=0.4, facecolor = colors[k])
         
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"Cumulative carbon emissions, E")
@@ -54,8 +54,9 @@ def plot_price_elasticies_mean(fileName, emissions_networks, scenarios_titles, p
     ncols = 3 
     nrows = 2
     #print(c,emissions_final)
-    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, figsize=(15,6), constrained_layout = True, sharey=True)
-
+    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, figsize=(15,6), constrained_layout = True)
+    #print(emissions_networks.shape, len(property_values_list_col), len(property_values_list_row))
+    #quit()
     #shapre is 2,3,row,cols, seed
     for i in range(nrows):
         axes[i][0].set_ylabel(scenarios_titles[i])
@@ -64,10 +65,14 @@ def plot_price_elasticies_mean(fileName, emissions_networks, scenarios_titles, p
             for k in range(len(property_values_list_row)):
                 #color = next(colors)#set color for whole scenario?
                 axes[i][j].grid()
-                Data = emissions_networks[i][j][k]
+                Data_em = (emissions_networks[i][j][k]).T
+                #print(Data_em.shape)
+                #quit()
                 data_trans_full = []
-                for q in range(len(Data)):
-                    data_trans_full.append(calculate_price_elasticity(property_values_list_col, Data[q]))
+                for q in range(len(Data_em)):
+                    #print(property_values_list_col.shape, Data_em[q].shape)
+                    #quit()
+                    data_trans_full.append(calculate_price_elasticity(property_values_list_col, Data_em[q]))
                 Data = np.asarray(data_trans_full).T
                 #print("Data", Data.shape)
                 mu_emissions =  Data.mean(axis=1)
@@ -75,7 +80,7 @@ def plot_price_elasticies_mean(fileName, emissions_networks, scenarios_titles, p
                 max_emissions=  Data.max(axis=1)
                 
                 axes[i][j].plot(property_values_list_col[1:], mu_emissions, label=row_titles[k], c = colors[k])
-                axes[i][j].fill_between(property_values_list_col[1:], min_emissions, max_emissions, alpha=0.2, facecolor = colors[k])
+                axes[i][j].fill_between(property_values_list_col[1:], min_emissions, max_emissions, alpha=0.4, facecolor = colors[k])
         
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
@@ -111,16 +116,16 @@ def main(
     
     property_values_list_row = row_dict["vals"]
 
-    row_titles = ["Confirmation bias, $\theta$ = %s" % (i) for i in property_values_list_row]
+    row_titles = [r"Confirmation bias, $\theta$ = %s" % (i) for i in property_values_list_row]
     print("row_titles",row_titles)
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
     #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list_col, property_values_list_row,network_titles,colors_scenarios)
                                     #fileName, emissions_networks, scenarios_titles, property_values_list_col, property_values_list_row, network_titles, row_titles, colors
-    plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)
+    #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)
 
     #PRICE ELASTICITIES
     #plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list_col, property_values_list_row,seed_reps,seeds_to_show,network_titles,colors_scenarios)
-    #plot_price_elasticies_mean(fileName, emissions_networks, scenario_labels, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)
+    plot_price_elasticies_mean(fileName, emissions_networks, scenario_labels, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)
 
     plt.show()
 

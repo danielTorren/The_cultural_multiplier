@@ -37,7 +37,7 @@ def plot_means_end_points_emissions(
                 max_emissions=  Data.max(axis=1)
 
                 axes[i][j].plot(property_values_list_col, mu_emissions, label=row_titles[k], c = colors[k])
-                axes[i][j].fill_between(property_values_list_col, min_emissions, max_emissions, alpha=0.2, facecolor = colors[k])
+                axes[i][j].fill_between(property_values_list_col, min_emissions, max_emissions, alpha=0.4, facecolor = colors[k])
         
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"Cumulative carbon emissions, E")
@@ -75,7 +75,7 @@ def plot_price_elasticies_mean(fileName, emissions_networks, scenarios_titles, p
                 max_emissions=  Data.max(axis=1)
                 
                 axes[i][j].plot(property_values_list_col[1:], mu_emissions, label=row_titles[k], c = colors[k])
-                axes[i][j].fill_between(property_values_list_col[1:], min_emissions, max_emissions, alpha=0.2, facecolor = colors[k])
+                axes[i][j].fill_between(property_values_list_col[1:], min_emissions, max_emissions, alpha=0.4, facecolor = colors[k])
         
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
@@ -101,7 +101,7 @@ def main(
     scenario_labels = ["Dynamic social weighting", "Dynamic identity weighting"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     base_params = load_object(fileName + "/Data", "base_params") 
-
+    print("base_params",base_params)
 
     col_dict = variable_parameters_dict["col"]
     row_dict = variable_parameters_dict["row"]
@@ -111,7 +111,7 @@ def main(
     
     property_values_list_row = row_dict["vals"]
 
-    row_titles = ["Elasticity of substitution, $\sigma_m$ = %s" % (i) for i in property_values_list_row]
+    row_titles = ["Elasticity of substitution, $\sigma_m$ = %s" % (round(i,3)) for i in property_values_list_row]
     print("row_titles",row_titles)
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
     #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list_col, property_values_list_row,network_titles,colors_scenarios)
@@ -126,5 +126,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/network_conf_tau_19_21_22__16_02_2024"
+        fileName= "results/network_sub_tau_11_27_56__19_02_2024"
     )

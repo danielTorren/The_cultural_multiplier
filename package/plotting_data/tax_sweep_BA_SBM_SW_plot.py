@@ -69,9 +69,9 @@ def plot_means_end_points_emissions(
 
             #print("mu_emissions",mu_emissions)
             #ax.plot(property_vals, mu_emissions, c= color, label=scenarios_titles[i])
-            #ax.fill_between(property_vals, min_emissions, max_emissions, facecolor=color , alpha=0.2)
+            #ax.fill_between(property_vals, min_emissions, max_emissions, facecolor=color , alpha=0.4)
             ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
-            ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.2, facecolor = colors_scenarios[i])
+            ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.4, facecolor = colors_scenarios[i])
 
         #ax.legend()
         ax.set_xlabel(r"Carbon price, $\tau$")
@@ -154,7 +154,7 @@ def plot_emissions_ratio_line(
             #print("mu_emissions",mu_emissions)
             #print(property_vals, mu_emissions)
             ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])#c= color
-            ax.fill_between(property_vals, min_emissions, max_emissions , alpha=0.2, facecolor = colors_scenarios[i])#facecolor=color
+            ax.fill_between(property_vals, min_emissions, max_emissions , alpha=0.4, facecolor = colors_scenarios[i])#facecolor=color
     
     axes[0].set_xlabel(r"Carbon price, $\tau$")
     axes[0].set_ylabel(r'Ratio of cumulative emissions relative to no carbon price')
@@ -293,7 +293,7 @@ def plot_price_elasticies_mean(fileName, emissions_network, scenarios_titles, pr
             max_emissions=  Data.max(axis=1)
 
             axes[i].plot(property_vals[1:], mu_emissions, label=scenarios_titles[j], c=colors_scenarios[j+1])#c= color
-            axes[i].fill_between(property_vals[1:], min_emissions, max_emissions , alpha=0.2, facecolor=colors_scenarios[j+1])#facecolor=color
+            axes[i].fill_between(property_vals[1:], min_emissions, max_emissions , alpha=0.4, facecolor=colors_scenarios[j+1])#facecolor=color
     
     fig.supxlabel(r"Carbon price, $\tau$")
     axes[0].set_ylabel(r"Price elasticity of emissions, $\epsilon$")
@@ -384,7 +384,7 @@ def plot_emissions_ratio_mean(fileName, emissions_network, scenarios_titles, pro
             max_emissions=  Data.max(axis=1)
 
             axes[i].plot(property_vals, mu_emissions, label=scenarios_titles_reduc[j], c=colors_scenarios[j+1])#c= color
-            axes[i].fill_between(property_vals, min_emissions, max_emissions , alpha=0.2, facecolor=colors_scenarios[j+1])#facecolor=color
+            axes[i].fill_between(property_vals, min_emissions, max_emissions , alpha=0.4, facecolor=colors_scenarios[j+1])#facecolor=color
     
     fig.supxlabel(r"Carbon price, $\tau$")
     axes[0].set_ylabel(r"Cumulative emissions ratio, $E/E_{\phi =0}$")
@@ -498,7 +498,7 @@ def plot_reduc_mean(fileName, emissions_network, scenarios_titles, property_vals
             max_emissions=  Data.max(axis=1)
 
             axes[i].plot(property_vals, mu_emissions, label=scenarios_titles_reduc[q],c=colors_scenarios[q+1])#c= color
-            axes[i].fill_between(property_vals, min_emissions, max_emissions , alpha=0.2)#facecolor=color
+            axes[i].fill_between(property_vals, min_emissions, max_emissions , alpha=0.4)#facecolor=color
     
     fig.supxlabel(r"Carbon price, $\tau$")
     fig.supylabel(r"\% Carbon price reduction")
