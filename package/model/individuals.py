@@ -121,7 +121,9 @@ class Individual:
         if self.alpha_change_state == "common_knowledge_dynamic_identity_determined_weights":
             outward_social_influence = self.prices_low_carbon_m/(self.prices_high_carbon_instant*(1/self.Omega_m**(1/self.low_carbon_substitutability_array)) + self.prices_low_carbon_m)
         else: 
-            outward_social_influence = self.ratio_preference_or_consumption_state*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*self.consumption_ratio
+            #outward_social_influence = self.ratio_preference_or_consumption_state*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*self.consumption_ratio
+            outward_social_influence = (self.L_m*self.prices_low_carbon_m)/self.instant_expenditure
+
 
         return outward_social_influence
     def update_consumption(self):

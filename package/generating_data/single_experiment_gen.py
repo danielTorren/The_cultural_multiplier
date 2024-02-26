@@ -39,7 +39,7 @@ if __name__ == '__main__':
     
     base_params = {
     "alpha_change_state": "dynamic_identity_determined_weights",
-    "network_type": "SW",
+    "network_type": "BA",
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
     "heterogenous_intrasector_preferences_state": 1,
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     "heterogenous_sector_substitutabilities_state": 0,
     "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
     "heterogenous_phi_state": 0,
-    "imperfect_learning_state": 1,
+    "imperfect_learning_state": 0,
     "ratio_preference_or_consumption_state": 0,
     "vary_seed_imperfect_learning_state_or_initial_preferences_state": 0,
     "static_internal_preference_state": 0,
@@ -60,10 +60,10 @@ if __name__ == '__main__':
     "M": 3, 
     "sector_substitutability": 1.5, 
     #"low_carbon_substitutability_lower": 1.5, 
-    "low_carbon_substitutability_upper": 5, 
+    "low_carbon_substitutability_upper": 1.5, 
     "a_identity": 2, 
     "b_identity": 2, 
-    "clipping_epsilon": 1e-5, 
+    "clipping_epsilon": 0, 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
     "std_learning_error": 0.02, 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     "SBM_network_density_input_inter_block": 0.005,
     "SW_network_density": 0.1,
     "SW_prob_rewire": 0.1,
-    "carbon_price_increased_lower": 0.8
+    "carbon_price_increased_lower": 0.2
     }
 
     """

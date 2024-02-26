@@ -980,7 +980,7 @@ def main(
     node_sizes = 100   
 
     Data = load_object(fileName + "/Data", "social_network")
-
+    print("Data EMissions", Data.total_carbon_emissions_stock)
     node_shape_list = ["o","s","^","v"]
 
     anim_save_bool = False#Need to install the saving thing
