@@ -180,6 +180,10 @@ class Network:
         self.shuffle_agent_list()#partial shuffle of the list based on identity
 
         #NOW SET SEED FOR THE IMPERFECT LEARNING
+        ####################################################################################################################################
+        #FROM HERE THIGNS SHOULD BE DIFFERENT IN EVERY SINGEL SEED RUNS
+        #####################################################################################################################################
+        
         np.random.seed(self.set_seed)
 
         if self.alpha_change_state == "fixed_preferences":
@@ -307,16 +311,16 @@ class Network:
             a networkx watts strogatz small world graph
         """
         if self.network_type == "SW":
-            G = nx.watts_strogatz_graph(n=self.N, k=self.SW_K, p=self.SW_prob_rewire, seed=self.set_seed)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
+            G = nx.watts_strogatz_graph(n=self.N, k=self.SW_K, p=self.SW_prob_rewire, seed=self.network_structure_seed)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
         elif self.network_type == "SBM":
             self.SBM_block_sizes = self.split_into_groups()
             num_blocks = len(self.SBM_block_sizes)
             # Create the stochastic block model, i can make it so that density between certain groups is different
             block_probs = np.full((num_blocks,num_blocks), self.SBM_network_density_input_inter_block)
             np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
-            G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.set_seed)
+            G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.network_structure_seed)
         elif self.network_type == "BA":
-            G = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes)
+            G = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes, seed= self.network_structure_seed)
 
         weighting_matrix = nx.to_numpy_array(G)
 

@@ -1,0 +1,4 @@
+{
+    "row":{"property":"sector_substitutability","min":1.001, "max": 10, "title": "sector substitutability","divisions": "geo", "reps": 10}, 
+    "col":{"property":"carbon_price_increased_upper","min":0, "max": 1, "title": "Carbon price upper","divisions": "linear", "reps": 100} 
+}
