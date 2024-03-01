@@ -53,7 +53,7 @@ def plot_means_end_points_emissions(
 ):
 
     #print(c,emissions_final)
-    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,6), constrained_layout = True, sharey=True)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,6), constrained_layout = True)
 
     #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
 
@@ -530,31 +530,31 @@ def main(
     scenario_labels = ["Fixed preferences","Uniform weighting","Static social weighting","Static identity weighting","Dynamic social weighting", "Dynamic identity weighting"]
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
-    #print("base params", base_params)
+    print("base params", base_params)
     scenarios = load_object(fileName + "/Data", "scenarios")
     #print(scenarios)
     #"""
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
-    plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
     plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #EMISSIONS RATIOS ALL TOGETHER, THIS IS THE RATIO OF EMISSIONS TO THE CASE OF NO CARBON PRICE
-    plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    plot_emissions_ratio_line(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_emissions_ratio_line(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
     
     #SEED EMISSIOSN PLOTS
-    seed_reps = base_params["seed_reps"]
-    seeds_to_show = 3
-    plot_seeds_scatter_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
-    plot_seeds_plot_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    #seed_reps = base_params["seed_reps"]
+    #seeds_to_show = 3
+    #plot_seeds_scatter_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    #plot_seeds_plot_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
 
     #PRICE ELASTICITIES
-    plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    #plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
     plot_price_elasticies_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #PLOT MULTIPLIER RELATIVE TO THE CASE OF PRICE EFFECT
-    plot_emissions_ratio_seeds(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
-    plot_emissions_ratio_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_emissions_ratio_seeds(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    #plot_emissions_ratio_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
     
     
     #"""
