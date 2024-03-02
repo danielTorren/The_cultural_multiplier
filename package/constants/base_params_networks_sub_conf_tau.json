@@ -9,7 +9,7 @@
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "ratio_preference_or_consumption_state": 0,
-    "vary_seed_imperfect_learning_state_or_initial_preferences_state": 1,
+    "vary_seed_state": "learning",
     "static_internal_preference_state": 0,
     "seed_reps": 5,
     "network_structure_seed": 8, 

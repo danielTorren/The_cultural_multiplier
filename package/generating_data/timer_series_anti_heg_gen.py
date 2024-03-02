@@ -1,12 +1,3 @@
-"""Runs a single simulation to produce data which is saved
-
-A module that use dictionary of data for the simulation run. The single shot simulztion is run
-for a given initial set seed.
-
-
-
-Created: 10/10/2022
-"""
 # imports
 from package.resources.run import generate_data
 from package.resources.utility import (
@@ -14,30 +5,38 @@ from package.resources.utility import (
     save_object, 
     produce_name_datetime
 )
-from package.plotting_data import single_experiment_plot
+from package.plotting_data import timer_series_anti_heg_plot
 import pyperclip
 
 def main(
-    base_params
+    base_params,
+    tau_vals
 ) -> str: 
 
-    root = "single_experiment"
+    root = "time_brown_heg"
     fileName = produce_name_datetime(root)
     pyperclip.copy(fileName)
     print("fileName:", fileName)
+    
+    base_params["carbon_price_increased_lower"] = tau_vals[0]#s0.15   
+    Data_low = generate_data(base_params)  # run the simulation
+    
+    base_params["carbon_price_increased_lower"] = tau_vals[0]#0.2
+    Data_high = generate_data(base_params)  # run the simulation
 
-    Data = generate_data(base_params)  # run the simulation
-    #print(Data.average_identity)
-
+    Data_list = [Data_low,Data_high]
     createFolder(fileName)
-    save_object(Data, fileName + "/Data", "social_network")
+    save_object(Data_list, fileName + "/Data", "social_networks")
+    save_object(tau_vals, fileName + "/Data", "tau_vals")
     save_object(base_params, fileName + "/Data", "base_params")
 
     return fileName
 
 if __name__ == '__main__':
-    
+    """
     base_params = {
+    "BA_green_or_brown_hegemony": -1,
+    "homophily_state": 1,
     "alpha_change_state": "dynamic_identity_determined_weights",
     "network_type": "BA",
     "save_timeseries_data_state": 1,
@@ -71,23 +70,16 @@ if __name__ == '__main__':
     "expenditure": 1,
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
-    "homophily_state": 0.9,
-    "BA_nodes": 11,
-    "BA_green_or_brown_hegemony": 0,
-    "SBM_block_num": 2,
-    "SBM_network_density_input_intra_block": 0.2,
-    "SBM_network_density_input_inter_block": 0.005,
-    "SW_network_density": 0.1,
-    "SW_prob_rewire": 0.1,
-    "carbon_price_increased_lower": 0.2
+    "BA_nodes": 11
     }
-
     """
-    base_params = {#SBM
-    "carbon_price_increased_lower": 0.1,
-    "save_timeseries_data_state": 0,
+
+    base_params = {
+    "BA_green_or_brown_hegemony": -1,
+    "homophily_state": 1,
+    "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-    "network_type": "SBM",
+    "network_type": "BA",
     "heterogenous_intrasector_preferences_state": 1,
     "heterogenous_carbon_price_state": 0,
     "heterogenous_sector_substitutabilities_state": 0,
@@ -119,21 +111,12 @@ if __name__ == '__main__':
     "expenditure": 1,
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
-    "SBM_block_num": 2,
-    "SBM_network_density_input_intra_block": 0.2,
-    "SBM_network_density_input_inter_block": 0.005
+    "BA_nodes": 11
     }
-    #"""
-
-    #base_params["BA_green_or_brown_hegemony"] = 0    
-    #base_params["homophily_state"] = 0
-    #base_params["alpha_change_state"] = "fixed_preferences"
-    #base_params["phi"] = 0 #double sure!
-    #base_params["seed_reps"] = 1
-    
-    fileName = main(base_params=base_params)
+    tau_vals = [0.2,0.8]
+    fileName = main(base_params=base_params, tau_vals = tau_vals)
 
     RUN_PLOT = 1
 
     if RUN_PLOT:
-        single_experiment_plot.main(fileName = fileName)
+        timer_series_anti_heg_plot.main(fileName = fileName)

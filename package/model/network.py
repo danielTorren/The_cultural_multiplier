@@ -39,20 +39,27 @@ class Network:
         self.imperfect_learning_state = parameters["imperfect_learning_state"]
         self.ratio_preference_or_consumption_state = parameters["ratio_preference_or_consumption_state"]
         self.alpha_change_state = parameters["alpha_change_state"]
-        self.vary_seed_imperfect_learning_state_or_initial_preferences_state = parameters["vary_seed_imperfect_learning_state_or_initial_preferences_state"]
+        self.vary_seed_state = parameters["vary_seed_state"]
         self.static_internal_preference_state = parameters["static_internal_preference_state"]
         self.network_type = parameters["network_type"]
 
         #seeds
-        if self.vary_seed_imperfect_learning_state_or_initial_preferences_state:
+        if self.vary_seed_state =="learning":
             #if its 1 then very seed imperfect_learning_state
-            self.init_vals_seed = parameters["init_vals_seed"] 
+            self.init_vals_seed = parameters["init_vals_seed"]
+            self.network_structure_seed = parameters["network_structure_seed"]
             self.set_seed = int(round(parameters["set_seed"]))
-        else:
+        elif self.vary_seed_state =="init_preferences":
             #if not 1 then do vary seed initial preferences
+            self.network_structure_seed = parameters["network_structure_seed"]
             self.init_vals_seed = int(round(parameters["set_seed"]))
             self.set_seed = parameters["init_vals_seed"] 
-        self.network_structure_seed = parameters["network_structure_seed"]
+        elif self.vary_seed_state =="network":
+            #vARY network structures
+            self.network_structure_seed = int(round(parameters["set_seed"]))
+            self.init_vals_seed = parameters["init_vals_seed"]  
+            self.set_seed = parameters["network_structure_seed"]
+        
         np.random.seed(self.init_vals_seed)#For inital construction set a seed, this is the same for all runs, then later change it to set_seed
         
         # network
