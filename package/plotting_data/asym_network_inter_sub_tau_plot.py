@@ -97,7 +97,7 @@ def multi_line_matrix_plot_stoch_bands_23(
     ncols = 3 
     nrows = 2
 
-    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, constrained_layout=True)#figsize=(14, 7)
+    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, constrained_layout=True,figsize=(20, 7))#
     #cmap = plt.get_cmap("cividis")
 
     for i in range(nrows):
@@ -171,7 +171,7 @@ def main(
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     base_params = load_object(fileName + "/Data", "base_params") 
     print("base_params",base_params)
-
+    quit()
     col_dict = variable_parameters_dict["col"]
     row_dict = variable_parameters_dict["row"]
     row_label = row_dict["title"]#r"Attitude Beta parameters, $(a,b)$"#r"Number of behaviours per agent, M"

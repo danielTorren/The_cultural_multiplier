@@ -33,7 +33,7 @@
     "expenditure": 1,
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
-    "homophily_state": 0.9,
+    "homophily_state": 0,
     "BA_nodes": 11,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
