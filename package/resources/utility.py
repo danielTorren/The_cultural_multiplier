@@ -10,6 +10,8 @@ import os
 import numpy as np
 import datetime
 import matplotlib.pyplot as plt
+from scipy import stats
+
 
 # modules
 def produce_name_datetime(root):
@@ -146,3 +148,22 @@ def produce_param_list(params: dict, property_list: list, property: str) -> list
             params.copy()
         )  # have to make a copy so that it actually appends a new dict and not just the location of the params dict
     return params_list
+
+def calc_bounds(data, confidence_level):
+    # Calculate mean and standard deviation across rows
+    ys_mean = data.mean(axis=1)
+    ys_std = data.std(axis=1)
+
+    # Calculate the standard error of the mean (SEM)
+    n = data.shape[1]  # Number of samples
+    ys_sem = ys_std / np.sqrt(n)
+
+    # Calculate margin of error
+    z_score = np.abs(stats.norm.ppf((1 - confidence_level) / 2))  # For a two-tailed test
+    margin_of_error = z_score * ys_sem
+
+    # Calculate confidence intervals
+    lower_bound = ys_mean - margin_of_error
+    upper_bound = ys_mean + margin_of_error
+
+    return ys_mean,lower_bound, upper_bound

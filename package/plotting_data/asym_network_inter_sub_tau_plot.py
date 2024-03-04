@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from package.resources.utility import (
     load_object,
+    calc_bounds
 )
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 from package.plotting_data.price_elasticity_plot import calculate_price_elasticity,calc_price_elasticities_2D
@@ -152,6 +153,78 @@ def multi_line_matrix_plot_stoch_bands_23(
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")  
 
+
+def multi_line_matrix_plot_stoch_bands_23_95_confidence(
+    fileName, emissions_networks, col_vals, row_vals,  Y_param, cmap, dpi_save, col_axis_x, col_label, row_label, y_label, scenarios_titles,network_titles, confidence_level
+    ):
+    
+    ncols = 3 
+    nrows = 2
+
+    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, constrained_layout=True,figsize=(20, 7))#
+    #cmap = plt.get_cmap("cividis")
+
+    for i in range(nrows):
+        axes[i][0].set_ylabel(scenarios_titles[i])
+        for j in range(ncols):
+            axes[0][j].set_title(network_titles[j])
+            Z_array = emissions_networks[i][j]
+            if col_axis_x:#= 1
+                c = Normalize()(row_vals)
+                for k in range(len(Z_array)):
+                    data = Z_array[k]#(sigma, seeds)
+                    ys_mean, ys_min, ys_max = calc_bounds(data, confidence_level)
+                    #ys_mean = data.mean(axis=1)
+                    #ys_min = data.min(axis=1)
+                    #test_ys_max= data.max(axis=1)
+                    #print("difference", test_ys_max,ys_max,test_ys_max- ys_max )
+                    #quit()
+
+                    axes[i][j].plot(col_vals, ys_mean, ls="-", linewidth = 0.5, color = cmap(c[k]))
+                    axes[i][j].fill_between(col_vals, ys_min, ys_max, facecolor=cmap(c[k]), alpha=0.5)
+                cbar = fig.colorbar(
+                plt.cm.ScalarMappable(cmap=cmap,norm=Normalize(vmin=min( row_vals), vmax=max(row_vals))), ax=axes[i][j]
+            )
+            else:
+                Z_array_T = np.transpose(Z_array,(1,0,2))#put (sigma, tau,seeds) from (tau,sigma, seeds)
+                c = Normalize()(col_vals)
+                for k in range(len(Z_array_T)):#loop through sigma
+                    data = Z_array_T[k]
+
+                    ys_mean, ys_min, ys_max = calc_bounds(data, confidence_level)
+                    #ys_mean = data.mean(axis=1)
+                    #ys_min = data.min(axis=1)
+                    test_ys_max= data.max(axis=1)
+                    print("difference", test_ys_max,ys_max,test_ys_max- ys_max )
+                    quit()
+                    axes[i][j].plot(row_vals, ys_mean, ls="-", linewidth = 0.5,color=cmap(c[k]))
+                    axes[i][j].fill_between(row_vals, ys_min, ys_max, facecolor=cmap(c[k]), alpha=0.5)
+
+                cbar = fig.colorbar(
+                    plt.cm.ScalarMappable(cmap=cmap,norm=Normalize(vmin=min( col_vals), vmax=max(col_vals))), ax=axes[i][j]
+                )   
+
+            #quit()
+                            
+            fig.supylabel(r"Cumulative carbon emissions, E")
+            #axes[i][j].set_ylabel(y_label)#(r"First behaviour attitude variance, $\sigma^2$")
+
+            if col_axis_x:
+                fig.supxlabel(col_label)#(r"Carbon price, $\tau$")
+                cbar.set_label(row_label)#(r"Number of behaviours per agent, M")
+                #axes[i][j].set_xlabel(col_label)#(r'Confirmation bias, $\theta$')
+            else:
+                cbar.set_label(col_label)#)(r'Confirmation bias, $\theta$')
+                #axes[i][j].set_xlabel(row_label)#(r"Number of behaviours per agent, M")
+                fig.supxlabel(row_label)
+    plotName = fileName + "/Plots"
+    f = plotName + "/confidence_23_multi_line_matrix_plot_stoch_fill_%s_%s" % (Y_param, col_axis_x)
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")  
+
+
+
+
 def main(
     fileName = "results/tax_sweep_11_29_20__28_09_2023"
 ) -> None:
@@ -160,6 +233,8 @@ def main(
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
     colors = cmap.colors  # type: list
     #print(colors)
+
+    confidence_level = 0.95
 
     #quit()
     emissions_networks = load_object(fileName + "/Data","emissions_data_2_3")
@@ -170,8 +245,8 @@ def main(
     scenario_labels = ["low_carbon_substitutability_upper = 1.5", "low_carbon_substitutability_upper = 5"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     base_params = load_object(fileName + "/Data", "base_params") 
-    print("base_params",base_params)
-    quit()
+    #print("base_params",base_params)
+    #quit()
     col_dict = variable_parameters_dict["col"]
     row_dict = variable_parameters_dict["row"]
     row_label = row_dict["title"]#r"Attitude Beta parameters, $(a,b)$"#r"Number of behaviours per agent, M"
@@ -204,11 +279,12 @@ def main(
     y_label = "Cumulative emissions, $E$"#col_dict["title"]#r"Identity variance, $\sigma^2$"
         
     #multi_line_matrix_plot_stoch_bands_23(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label, scenario_labels,network_titles)
-    multi_line_matrix_plot_stoch_bands_23(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, col_label, row_label, y_label, scenario_labels,network_titles)
-    
+    #multi_line_matrix_plot_stoch_bands_23(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, col_label, row_label, y_label, scenario_labels,network_titles)
+    multi_line_matrix_plot_stoch_bands_23_95_confidence(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, col_label, row_label, y_label, scenario_labels,network_titles,confidence_level)
+
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/asym_network_inter_sub_tau_14_14_25__01_03_2024"
+        fileName= "results/asym_network_inter_sub_tau_19_58_39__02_03_2024"
     )

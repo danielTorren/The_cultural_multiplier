@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from package.resources.utility import (
     load_object,
-    save_object
+    save_object,
+    calc_bounds
 )
 from package.generating_data.static_preferences_emissions_gen import calc_required_static_carbon_tax_seeds
 from package.plotting_data.price_elasticity_plot import calculate_price_elasticity,calc_price_elasticities_2D
@@ -63,9 +64,10 @@ def plot_means_end_points_emissions(
             #color = next(colors)#set color for whole scenario?
             Data = emissions[i]
             #print("Data", Data.shape)
-            mu_emissions =  Data.mean(axis=1)
-            min_emissions =  Data.min(axis=1)
-            max_emissions=  Data.max(axis=1)
+            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            #mu_emissions =  Data.mean(axis=1)
+            #min_emissions =  Data.min(axis=1)
+            #max_emissions=  Data.max(axis=1)
 
             #print("mu_emissions",mu_emissions)
             #ax.plot(property_vals, mu_emissions, c= color, label=scenarios_titles[i])
@@ -287,10 +289,10 @@ def plot_price_elasticies_mean(fileName, emissions_network, scenarios_titles, pr
             for k in range(len(data_trans)):
                 data_trans_full.append(calculate_price_elasticity(property_vals, data_trans[k]))
             Data = np.asarray(data_trans_full).T
-
-            mu_emissions =  Data.mean(axis=1)
-            min_emissions =  Data.min(axis=1)
-            max_emissions=  Data.max(axis=1)
+            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            #mu_emissions =  Data.mean(axis=1)
+            #min_emissions =  Data.min(axis=1)
+            #max_emissions=  Data.max(axis=1)
 
             axes[i].plot(property_vals[1:], mu_emissions, label=scenarios_titles[j], c=colors_scenarios[j+1])#c= color
             axes[i].fill_between(property_vals[1:], min_emissions, max_emissions , alpha=0.4, facecolor=colors_scenarios[j+1])#facecolor=color
