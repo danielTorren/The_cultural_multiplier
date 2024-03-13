@@ -2,8 +2,6 @@
 A module that defines "individuals" that have vectors of attitudes towards behaviours whose evolution
 is determined through weighted social interactions.
 
-
-
 Created: 10/10/2022
 """
 
