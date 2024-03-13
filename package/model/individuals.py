@@ -8,6 +8,7 @@ Created: 10/10/2022
 """
 
 # imports
+from logging import raiseExceptions
 import numpy as np
 import numpy.typing as npt
 # modules
@@ -36,6 +37,7 @@ class Individual:
         self.t = individual_params["t"]
         self.save_timeseries_data_state = individual_params["save_timeseries_data_state"]
         self.compression_factor_state = individual_params["compression_factor_state"]
+        self.imitation_state = individual_params["imitation_state"]
         self.phi_array = individual_params["phi_array"]
         self.sector_preferences = individual_params["sector_preferences"]
         self.low_carbon_substitutability_array = low_carbon_substitutability_array
@@ -43,7 +45,6 @@ class Individual:
         self.prices_low_carbon_m = individual_params["prices_low_carbon_m"]
         self.prices_high_carbon_m = individual_params["prices_high_carbon_m"]
         self.clipping_epsilon = individual_params["clipping_epsilon"]
-        self.ratio_preference_or_consumption_state = individual_params["ratio_preference_or_consumption_state"]
         self.burn_in_duration = individual_params["burn_in_duration"]
         self.alpha_change_state = individual_params["alpha_change_state"]
         self.static_internal_preference_state = individual_params["static_internal_preference_state"]
@@ -118,12 +119,14 @@ class Individual:
         return ratio
     
     def calc_outward_social_influence(self):
-        if self.alpha_change_state == "common_knowledge_dynamic_identity_determined_weights":
+        if self.imitation_state == "consumption":
+            outward_social_influence = self.consumption_ratio
+        elif self.imitation_state == "expenditure": 
+            outward_social_influence = (self.L_m*self.prices_low_carbon_m)/self.instant_expenditure
+        elif self.imitation_state == "common_knowledge":
             outward_social_influence = self.prices_low_carbon_m/(self.prices_high_carbon_instant*(1/self.Omega_m**(1/self.low_carbon_substitutability_array)) + self.prices_low_carbon_m)
         else: 
-            #outward_social_influence = self.ratio_preference_or_consumption_state*self.low_carbon_preferences + (1 - self.ratio_preference_or_consumption_state)*self.consumption_ratio
-            outward_social_influence = (self.L_m*self.prices_low_carbon_m)/self.instant_expenditure
-
+            raise ValueError("Invalid imitaiton_state:common_knowledge, expenditure, consumption")
 
         return outward_social_influence
     def update_consumption(self):

@@ -8,7 +8,7 @@
     "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
-    "ratio_preference_or_consumption_state": 0,
+    "imitation_state": "consumption",
     "vary_seed_state": "learning",
     "static_internal_preference_state": 0,
     "seed_reps": 5,

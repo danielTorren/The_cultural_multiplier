@@ -152,8 +152,8 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_networks_tau_vary.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_tau_vary.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_networks_tau_vary_alt.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_tau_vary_alt.json",
         scenarios = ["fixed_preferences","uniform_network_weighting","static_socially_determined_weights","static_culturally_determined_weights","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ],
     )
 

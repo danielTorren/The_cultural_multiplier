@@ -34,7 +34,7 @@ def main(
     
     #Gen params lists
     #ENVIRONMENTAL IDENTITY
-    params["alpha_change_state"] = "dynamic_identity_determined_weights"
+    params["imitation_state"] = "expenditure"
     params["network_type"] = "SW"
     params_list_tax_SW_identity,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
     params["network_type"] = "SBM"
@@ -43,7 +43,7 @@ def main(
     params_list_tax_BA_identity,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
     params_list_identity = params_list_tax_SW_identity + params_list_tax_SBM_identity + params_list_tax_BA_identity
     #SOCIAL
-    params["alpha_change_state"] = "dynamic_socially_determined_weights"
+    params["imitation_state"] = "consumption"
     params["network_type"] = "SW"
     params_list_tax_SW_social,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
     params["network_type"] = "SBM"
@@ -80,7 +80,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_networks_sub_tau.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_networks_sub_tau.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_networks_imitation_tau.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_networks_imitation_tau.json",
     )
 

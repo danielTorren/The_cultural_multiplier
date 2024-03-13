@@ -37,7 +37,7 @@ class Network:
         self.heterogenous_sector_substitutabilities_state = parameters["heterogenous_sector_substitutabilities_state"]
         self.heterogenous_phi_state = parameters["heterogenous_phi_state"]
         self.imperfect_learning_state = parameters["imperfect_learning_state"]
-        self.ratio_preference_or_consumption_state = parameters["ratio_preference_or_consumption_state"]
+        self.imitation_state = parameters["imitation_state"]
         self.alpha_change_state = parameters["alpha_change_state"]
         self.vary_seed_state = parameters["vary_seed_state"]
         self.static_internal_preference_state = parameters["static_internal_preference_state"]
@@ -403,12 +403,11 @@ class Network:
             "save_timeseries_data_state": self.save_timeseries_data_state,
             "phi_array": self.phi_array,
             "compression_factor_state": self.compression_factor_state,
+            "imitation_state": self.imitation_state,
             "init_carbon_price_m": self.carbon_price_m,
-            #"low_carbon_substitutability": self.low_carbon_substitutability_array,
             "prices_low_carbon_m": self.prices_low_carbon,
             "prices_high_carbon_m":self.prices_high_carbon,
             "clipping_epsilon" :self.clipping_epsilon,
-            "ratio_preference_or_consumption_state": self.ratio_preference_or_consumption_state,
             "sector_preferences" : self.sector_preferences,
             "burn_in_duration": self.burn_in_duration,
             "alpha_change_state": self.alpha_change_state,
