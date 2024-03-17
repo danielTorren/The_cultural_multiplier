@@ -294,8 +294,8 @@ def plot_price_elasticies_mean(fileName, emissions_network, scenarios_titles, pr
             #min_emissions =  Data.min(axis=1)
             #max_emissions=  Data.max(axis=1)
 
-            axes[i].plot(property_vals[1:], mu_emissions, label=scenarios_titles[j], c=colors_scenarios[j+1])#c= color
-            axes[i].fill_between(property_vals[1:], min_emissions, max_emissions , alpha=0.4, facecolor=colors_scenarios[j+1])#facecolor=color
+            axes[i].plot(property_vals[1:], mu_emissions, label=scenarios_titles[j], c=colors_scenarios[j])#c= color
+            axes[i].fill_between(property_vals[1:], min_emissions, max_emissions , alpha=0.4, facecolor=colors_scenarios[j])#facecolor=color
     
     fig.supxlabel(r"Carbon price, $\tau$")
     axes[0].set_ylabel(r"Price elasticity of emissions, $\epsilon$")
@@ -584,6 +584,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_12_35_19__13_03_2024",
+        fileName= "results/tax_sweep_networks_12_33_21__13_03_2024",
         LOAD_STATIC_FULL = 0
     )
