@@ -305,40 +305,18 @@ def analytic_derivatives():
 
     # Define symbols
     tau1_sym, tau2_sym, B_sym, nu_sym, h1_sym, h2_sym, PBH1_sym, PBH2_sym, A1_sym, A2_sym, PL1_sym, PL2_sym, sigma1_sym, sigma2_sym, a1_sym, a2_sym = symbols('tau1 tau2 B nu h1 h2 PBH1 PBH2 A1 A2 PL1 PL2 sigma1 sigma2 a1 a2')
-    #tau1     tau2       B      nu     h1      h2       PBH1      PBH2     A1       A2       PL1      PL2     sigma1       sigma2      a1      a2
+    
     # Define BD equation
     BD_sym = B_sym - h1_sym * (PBH1_sym + tau1_sym) - h2_sym * (PBH2_sym + tau2_sym)
     derv_BD_sym = simplify(diff(BD_sym, tau1_sym))
     manual_derv_BD_sym = simplify(-h1_sym)
-    #print("derv_BD_sym vs manual",derv_BD_sym,manual_derv_BD_sym )
-    """
-    if derv_BD_sym == manual_derv_BD_sym:
-        print("BD Expressions match after simplification.")
-    else:
-        print("BD Expressions do not match after simplification.")
-    """
+
     # Define Omega1 equation
     Omega1_sym = ((PBH1_sym + tau1_sym) * A1_sym / (PL1_sym * (1 - A1_sym)))**sigma1_sym
-    #derv_Omega1_sym = simplify(diff(Omega1_sym, tau1_sym))
-    #manual_derv_Omega1_sym = simplify((sigma1_sym * Omega1_sym) / (PBH1_sym + tau1_sym))
-    #print("derv_Omega1_sym vs manual",derv_Omega1_sym,manual_derv_Omega1_sym )
-    """
-    if derv_Omega1_sym == manual_derv_Omega1_sym :
-        print(" Omega1 Expressions match after simplification.")
-    else:
-        print(" Omega1 Expressions do not match after simplification.")
-    """
+
     # Define Omega2 equation
     Omega2_sym = ((PBH2_sym + tau2_sym) * A2_sym / (PL2_sym * (1 - A2_sym)))**sigma2_sym
-    #derv_Omega2_sym = simplify(diff(Omega2_sym, tau1_sym))
-    #manual_derv_Omega2_sym = 0
-    #print("derv_Omega2_sym vs manual",derv_Omega2_sym,manual_derv_Omega2_sym )
-    """
-    if derv_Omega2_sym == manual_derv_Omega2_sym :
-        print(" Omega2 Expressions match after simplification.")
-    else:
-        print(" Omega2 Expressions do not match after simplification.")
-    """
+
     subs_dict = {#BASE PARAMS
                 "A1": 0.5,
                 "A2": 0.5,
@@ -360,65 +338,19 @@ def analytic_derivatives():
 
     # Define chi1 equation
     chi1_sym = (a1_sym / (PBH1_sym + tau1_sym)) * ((A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) + (1 - A1_sym))**(((nu_sym - 1) * sigma1_sym) / (nu_sym * (sigma1_sym - 1)))
-    #"""
     derv_chi1_sym = diff(chi1_sym, tau1_sym)
-    manual_derv_chi1_sym = (chi1_sym / (PBH1_sym + tau1_sym)) * (
-        (sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1
-    )
-    alt_manual = -(a1_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))**(((nu_sym - 1) * sigma1_sym) / (nu_sym * (sigma1_sym - 1))) / (PBH1_sym + tau1_sym)**2) + (a1_sym * A1_sym * (nu_sym - 1) * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))**((nu_sym - sigma1_sym) / (nu_sym * (sigma1_sym - 1))) / (nu_sym * (PBH1_sym + tau1_sym) * Omega1_sym**(1 / sigma1_sym))) * (sigma1_sym * Omega1_sym / (PBH1_sym + tau1_sym))
-    
-    alt_alt_maanual = -(a1_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))**(((nu_sym - 1) * sigma1_sym) / (nu_sym * (sigma1_sym - 1))) / (PBH1_sym + tau1_sym)**2) + (sigma1_sym * a1_sym * A1_sym * (nu_sym - 1) * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))**((nu_sym - sigma1_sym) / (nu_sym * (sigma1_sym - 1))) / (nu_sym * (PBH1_sym + tau1_sym)**2))
-    
-    #"""
+    manual_derv_chi1_sym = (chi1_sym / (PBH1_sym + tau1_sym)) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1)
 
-    #derv_chi1_sym_value = derv_chi1_sym.subs(subs_dict)
-    #alt_manual_value = alt_manual.subs(subs_dict)
-    #alt_alt_maanual_value = alt_alt_maanual.subs(subs_dict)
-    #print("Vlaues of derv chi", derv_chi1_sym_value, alt_manual_value, alt_alt_maanual_value )
-    #quit()
-
-    #print("derv_chi1_sym vs manual")
-    #print_latex(derv_chi1_sym)
-    #print("HOOOOOOOOOOO")
-    #print_latex(manual_derv_chi1_sym)
-    #quit()
-    
-    #if derv_chi1_sym == manual_derv_chi1_sym  :
-    """
-    print("CHECK INTERNAL CONSISETECNY")
-    if alt_alt_maanual == alt_manual  :
-        print(" chi1 Expressions match after simplification.")
-    else:
-        print(" chi1 Expressions do not match after simplification.")
-    print("CHECK INTERNAL CONSISETECNY")
-    if manual_derv_chi1_sym == alt_alt_maanual:
-        print(" chi1 Expressions match after simplification.")
-    else:
-        print(" chi1 Expressions do not match after simplification.")
-    """
-    #quit()
     # Define chi2 equation
     chi2_sym = (a2_sym / (PBH2_sym + tau2_sym)) * ((A2_sym * Omega2_sym**((sigma2_sym - 1) / sigma2_sym)) + (1 - A2_sym))**(((nu_sym - 1) * sigma2_sym) / (nu_sym * (sigma2_sym - 1)))
     derv_chi2_sym = diff(chi2_sym, tau1_sym)
     manual_derv_chi2_sym = 0
-    #print("derv_chi2_sym vs manual",derv_chi2_sym,manual_derv_chi2_sym )
-   
-    """
-    if derv_chi2_sym == manual_derv_chi2_sym  :
-        print(" chi2 Expressions match after simplification.")
-    else:
-        print(" chi2 Expressions do not match after simplification.")
-    """
+
 #############################################################################################
     # Define Z equation
     Z_sym = (chi1_sym**nu_sym * (Omega1_sym * PL1_sym + PBH1_sym + tau1_sym)) + (chi2_sym**nu_sym * (Omega2_sym * PL2_sym + PBH2_sym + tau2_sym))
     derv_Z_sym = diff(Z_sym, tau1_sym)
     manual_derv_Z_sym = ((Omega1_sym * PL1_sym + PBH1_sym + tau1_sym) * nu_sym * chi1_sym**nu_sym) / (PBH1_sym + tau1_sym) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym))/(nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1) + chi1_sym**nu_sym * (PL1_sym * (sigma1_sym * Omega1_sym) / (PBH1_sym + tau1_sym) + 1)
-
-    derv_Z_sym_value = derv_Z_sym.subs(subs_dict)
-    alt_manual_Z_value = manual_derv_Z_sym.subs(subs_dict)
-    print("Vlaues of derv Z", derv_Z_sym_value , alt_manual_Z_value)
-    quit()
 
 #########################################################################################################
     #H1
@@ -433,12 +365,6 @@ def analytic_derivatives():
    #USE MY DERIVATIV
     alt_partial_H1_tau1_manual = -(BD_sym * chi1_sym**nu_sym) / Z_sym**2 *  manual_derv_Z_sym  + Z_sym**(-1) * (chi1_sym**nu_sym * manual_derv_BD_sym  + BD_sym * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym)
 
-    #derv_H1_sym_value = partial_H1_tau1_sympy .subs(subs_dict)
-    #partial_H1_tau1_manual_value = partial_H1_tau1_manual.subs(subs_dict)
-    #alt_partial_H1_tau1_manual_value = alt_partial_H1_tau1_manual.subs(subs_dict)
-    #alt_alt_maanual_value = alt_alt_maanual.subs(subs_dict)
-    #print("Vlaues of derv H1", derv_H1_sym_value , partial_H1_tau1_manual_value, alt_partial_H1_tau1_manual_value)
-    #quit()
 ##########################################################################################################
     
 #########################################################################################################
@@ -454,12 +380,6 @@ def analytic_derivatives():
    #USE MY DERIVATIV
     alt_partial_H2_tau1_manual = -(BD_sym * chi2_sym**nu_sym) * Z_sym**(-2) * manual_derv_Z_sym +  Z_sym**(-1) * (chi2_sym**nu_sym * manual_derv_BD_sym  +  BD_sym * nu_sym * chi2_sym**(nu_sym - 1) * manual_derv_chi2_sym)
 
-    #derv_H2_sym_value = partial_H2_tau1_sympy .subs(subs_dict)
-    #partial_H2_tau1_manual_value = partial_H2_tau1_manual.subs(subs_dict)
-    #alt_partial_H2_tau1_manual_value = alt_partial_H2_tau1_manual.subs(subs_dict)
-    #alt_alt_maanual_value = alt_alt_maanual.subs(subs_dict)
-    #print("Vlaues of derv H2", derv_H2_sym_value , partial_H2_tau1_manual_value, alt_partial_H2_tau1_manual_value)
-    #quit()
 ##########################################################################################################
 
     #quit()
@@ -473,34 +393,25 @@ def analytic_derivatives():
     EF_alt_sympy = H_1 + H_2
     alt_sympy_derv_EF = diff(EF_alt_sympy, tau1_sym)
 
-    manual_derv_EF_sym = -((BD_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym) * chi1_sym**nu_sym) / (Z_sym**2 * (PBH1_sym + tau1_sym))) * (
-        sigma1_sym * PL1_sym * Omega1_sym + PBH1_sym + tau1_sym + (Omega1_sym * PL1_sym + PBH1_sym + tau1_sym) * (
-            (sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym)) - nu_sym)
-    ) - (1 / Z_sym) * (
-        (BD_sym * nu_sym * chi1_sym**nu_sym) / (PBH1_sym + tau1_sym) * (
-            (sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1
-        ) - h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym)
-    )
+    #TEST 107
+    manual_derv_EF_sym_107 = BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym - Z_sym**(-1) * h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (chi1_sym**nu_sym + chi2_sym**nu_sym) * manual_derv_Z_sym
+    
+    manual_derv_EF_sym_108 = BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym - Z_sym**(-1) * h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (chi1_sym**nu_sym + chi2_sym**nu_sym) * ((Omega1_sym * PL1_sym + PBH1_sym + tau1_sym) * nu_sym * chi1_sym**nu_sym / (PBH1_sym + tau1_sym) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1) + chi1_sym**nu_sym * (PL1_sym * sigma1_sym * Omega1_sym / (PBH1_sym + tau1_sym) + 1))
+    
+    manual_derv_EF_sym_109_alt = BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * ((chi1_sym / (PBH1_sym + tau1_sym)) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1)) - Z_sym**(-1) * h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (chi1_sym**nu_sym + chi2_sym**nu_sym) * ((Omega1_sym * PL1_sym + PBH1_sym + tau1_sym) * nu_sym * chi1_sym**nu_sym / (PBH1_sym + tau1_sym) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1) + chi1_sym**nu_sym * (PL1_sym * sigma1_sym * Omega1_sym / (PBH1_sym + tau1_sym) + 1))
+    
+    manual_derv_EF_sym_109 = BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * (chi1_sym / (PBH1_sym + tau1_sym) * ((sigma1_sym * (nu_sym - 1) * PBH1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (PBH1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - PBH1_sym))) - 1)) - Z_sym**(-1) * h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (chi1_sym**nu_sym + chi2_sym**nu_sym) * ((Omega1_sym * PBH1_sym + PBH1_sym + tau1_sym) * nu_sym * chi1_sym**nu_sym / (PBH1_sym + tau1_sym) * ((sigma1_sym * (nu_sym - 1) * PBH1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (PBH1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - PBH1_sym))) - 1) + chi1_sym**nu_sym * (PL1_sym * sigma1_sym * Omega1_sym / (PBH1_sym + tau1_sym) + 1))
 
-    re_derived_manual_derv_EF_sym = (BD_sym * nu_sym * chi1_sym**(nu_sym - 1) / (Z_sym * (PBH1_sym + tau1_sym))) * ((sigma1_sym * (nu_sym - 1) * chi1_sym / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym)))) - 1) - (Z_sym**(-1) * h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym)) - (BD_sym * Z_sym**(-2) * (chi1_sym**nu_sym + chi2_sym**nu_sym) * (((PL1_sym * sigma1_sym * Omega1_sym) / (PBH1_sym + tau1_sym)) * nu_sym * chi1_sym**nu_sym / (PBH1_sym + tau1_sym) * ((sigma1_sym * (nu_sym - 1) * chi1_sym) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym)))) - 1 + chi1_sym**nu_sym * (PL1_sym * sigma1_sym * Omega1_sym / (PBH1_sym + tau1_sym) + 1)))
-
-    still_having_derivs_expression = -(BD_sym * chi1_sym**nu_sym / Z_sym**2 * manual_derv_Z_sym) + Z_sym**(-1) * (chi1_sym**nu_sym*manual_derv_BD_sym + BD_sym * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym) - (BD_sym * chi2_sym**nu_sym / Z_sym**2 * manual_derv_Z_sym) - Z_sym**(-1) * h1_sym * chi2_sym**nu_sym
-
-    still_having_derivs_later_expressiosn = BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym - Z_sym**(-1) * h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (chi1_sym**nu_sym + chi2_sym**nu_sym) * manual_derv_Z_sym
-
-
-    alt_manual_EF_derv = alt_partial_H1_tau1_manual + alt_partial_H2_tau1_manual
+    # Combine terms
 
     derv_EF_sym_value = partial_derivative_EF_tau1.subs(subs_dict)
-    manual_derv_EF_value = manual_derv_EF_sym.subs(subs_dict)
-    alt_manual_derv_EF_value = alt_manual_EF_derv.subs(subs_dict)
-    alt_sympy_derv_EF_value = alt_sympy_derv_EF.subs(subs_dict)
-    re_derived_manual_derv_EF_sym_value = re_derived_manual_derv_EF_sym.subs(subs_dict)
-    still_having_derivs_expression_value = still_having_derivs_expression.subs(subs_dict)
-    still_having_derivs_later_expressiosn_value = still_having_derivs_later_expressiosn.subs(subs_dict)
-    print("Vlaues of derv E", derv_EF_sym_value,manual_derv_EF_value, alt_manual_derv_EF_value, alt_sympy_derv_EF_value,re_derived_manual_derv_EF_sym_value,still_having_derivs_expression_value,still_having_derivs_later_expressiosn_value)
+    manual_derv_EF_sym_107_value = manual_derv_EF_sym_107.subs(subs_dict)
+    manual_derv_EF_sym_108_value = manual_derv_EF_sym_108.subs(subs_dict)
+    manual_derv_EF_sym_109_alt_value = manual_derv_EF_sym_109_alt.subs(subs_dict)
+    manual_derv_EF_sym_109_value = manual_derv_EF_sym_109.subs(subs_dict)
+ 
+    print("Vlaues of derv E", derv_EF_sym_value,manual_derv_EF_sym_109_alt_value)
     #print("Manually derived expression:", manual_derivative_sym)
-
 
     quit()
     
