@@ -58,7 +58,14 @@ def gen_2d_data(variable_parameters,parameters):
 
     return variable_parameters, parameters
 
-def plot_contours(scen, B_values, tau_values, E_F_values, derivative_values, axis_val):
+def gen_1d_data(variable_parameters,parameters):
+    variable_parameters["values"] = np.linspace(variable_parameters["min"], variable_parameters["max"], variable_parameters["reps"])
+
+    parameters[variable_parameters["property"]] = variable_parameters["values"]
+
+    return variable_parameters, parameters
+
+def plot_contours(fileName,scen, B_values, tau_values, E_F_values, derivative_values, axis_val):
     # Plotting
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
@@ -104,7 +111,7 @@ def plot_contours(scen, B_values, tau_values, E_F_values, derivative_values, axi
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png")
 
-def plot_contours_2_scen(B_values, tau_values, E_F_values1, derivative_values1, E_F_values2, derivative_values2, axis_val):
+def plot_contours_2_scen(fileName,B_values, tau_values, E_F_values1, derivative_values1, E_F_values2, derivative_values2, axis_val):
     # Plotting
     fig, axs = plt.subplots(2, 2, figsize=(10, 8), sharex=True, sharey='row')
 
@@ -368,45 +375,143 @@ def plot_quad(fileName, variable_parameters, E_F_values, partial_derivative_valu
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png")
 
+def plot_sector_emissions(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario):
+    # Plotting
+    fig, ax = plt.subplots(1, 1, figsize=(7, 7),constrained_layout = True)
+
+    var1_values = variable_parameters["values"]
+    var1_title = variable_parameters["title"]
+
+    # Plot E_F
+    ax.plot(var1_values, data_E_F, label = r'Emissions both sectors, $E_F$')
+    ax.plot(var1_values, data_E_F_1, label = r'Emissions sector 1, $E_{F,1}$')
+    ax.plot(var1_values, data_E_F_2, label = r'Emissions sector 2, $E_{F,2}$')
+    ax.set_xlabel(var1_title)
+    ax.set_ylabel(r'Emissions $E$')
+    ax.legend()
+
+    #plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/sector_emisisons" + variable_parameters["property"] 
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+def plot_sector_emissions_rebound_line(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario, parameters):
+    # Plotting
+    fig, ax = plt.subplots(1, 1, figsize=(7, 7),constrained_layout = True)
+
+    var1_values = variable_parameters["values"]
+    var1_title = variable_parameters["title"]
+
+    #CALCULATE WHAT THE EMISSIONS WOULD BE IF SECTOR 2 DIDNT EXIST
+    parameters["a1"] = 1#NEED TO CHANGE THIS ONE
+    data_E_F_1sector = calc_emissions_1_sector(parameters)
+    
+    # Plot E_F
+    ax.plot(var1_values, data_E_F, label = r'Emissions both sectors, $E_F$')
+    ax.plot(var1_values, data_E_F_1, label = r'Emissions sector 1, $E_{F,1}$')
+    ax.plot(var1_values, data_E_F_2, label = r'Emissions sector 2, $E_{F,2}$')
+    ax.plot(var1_values, data_E_F_1sector, label = r'Emissions no sector 2, $E^{*}_{F}$', ls="--")
+    ax.set_xlabel(var1_title)
+    ax.set_ylabel(r'Emissions, $E$')
+    ax.legend()
+
+    #plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/sector_emisisons_with_line" + variable_parameters["property"] 
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
 def run_plots(root,LOAD, init_params, scenario, LOAD_filename = "filename"):
     
     if LOAD:
-        #fileName, variable_parameters, parameters_run, scenario, init_params = set_up_data(root = "2_sector_analytic",LOAD = 0, init_params = init_params, scenario = scenario)
         print("LOADED D")
         fileName = LOAD_filename
         print("fileName", fileName)
         parameters_run = load_object(fileName + "/Data","parameters_run")
         variable_parameters = load_object(fileName + "/Data","variable_parameters")
-        data_E_F_1 = load_object(fileName + "/Data","data_E_F")
-        data_derv_E_F_1 = load_object(fileName + "/Data","data_derv_E_F")
+        data_E_F = load_object(fileName + "/Data","data_E_F")
+        data_E_F_1 = load_object(fileName + "/Data","data_E_F_1")
+        data_E_F_2 = load_object(fileName + "/Data","data_E_F_2")
+        data_derv_E_F = load_object(fileName + "/Data","data_derv_E_F")
         data_EF_tau1_tau2 = load_object(fileName + "/Data","data_EF_tau1_tau2")
         scenario = load_object(fileName + "/Data","scenario")
     else:
         fileName, variable_parameters, parameters_run, scenario, init_params = set_up_data(root, init_params, scenario)
         
         #data_E_F_1, data_derv_E_F_1 = calculate_data_alt(parameters_run)
-        data_E_F_1, data_derv_E_F_1 = calc_emissions_and_derivative(parameters_run)
+        data_E_F, data_derv_E_F, data_E_F_1, data_E_F_2  = calc_emissions_and_derivative(parameters_run)
 
         createFolder(fileName)
 
         save_object(variable_parameters, fileName + "/Data", "variable_parameters")
         save_object(parameters_run, fileName + "/Data", "parameters_run")
-        save_object(data_derv_E_F_1, fileName + "/Data", "data_derv_E_F")
+        save_object(data_derv_E_F, fileName + "/Data", "data_derv_E_F")
+        save_object(data_E_F_1, fileName + "/Data", "data_E_F_1")
+        save_object(data_E_F_2, fileName + "/Data", "data_E_F_2")
         save_object(data_E_F_1, fileName + "/Data", "data_E_F")
         save_object(scenario, fileName + "/Data", "scenario")
         save_object(init_params, fileName + "/Data", "init_params")
     
     levels = 20
     if scenario not in (2,3):
-        plot_contours_gen(fileName,variable_parameters, data_E_F_1, data_derv_E_F_1,levels, 1, scenario)
-    plot_line_with_colorbar(fileName,variable_parameters, data_E_F_1, data_derv_E_F_1, 0, scenario)
-    plot_line_with_colorbar(fileName, variable_parameters, data_E_F_1, data_derv_E_F_1, 1, scenario)
+        plot_contours_gen(fileName,variable_parameters, data_E_F, data_derv_E_F,levels, 1, scenario)
+    plot_line_with_colorbar(fileName,variable_parameters, data_E_F, data_derv_E_F, 0, scenario)
+    plot_line_with_colorbar(fileName, variable_parameters, data_E_F, data_derv_E_F, 1, scenario)
 
     #plot_contours(fileName, "Scenario 1",B_values, tau_values, data_E_F_1, data_derv_E_F_1, axis_val)
     #plot_contours(fileName, "Scenario 2",B_values, tau_values, data_E_F_2, data_derv_E_F_2, axis_val)
     #plot_contours_2_scen(fileName, B_values, tau_values, data_E_F_1, data_derv_E_F_1, data_E_F_2, data_derv_E_F_2, axis_val)
 
     plt.show()
+
+def run_plots_1D(root,LOAD, init_params, scenario, LOAD_filename = "filename"):
+    
+    if LOAD:
+        print("LOADED D")
+        fileName = LOAD_filename
+        print("fileName", fileName)
+        parameters_run = load_object(fileName + "/Data","parameters_run")
+        variable_parameters = load_object(fileName + "/Data","variable_parameters")
+        data_E_F = load_object(fileName + "/Data","data_E_F")
+        data_E_F_1 = load_object(fileName + "/Data","data_E_F_1")
+        data_E_F_2 = load_object(fileName + "/Data","data_E_F_2")
+        data_derv_E_F = load_object(fileName + "/Data","data_derv_E_F")
+        data_EF_tau1_tau2 = load_object(fileName + "/Data","data_EF_tau1_tau2")
+        scenario = load_object(fileName + "/Data","scenario")
+    else:
+        fileName, variable_parameters, parameters_run, scenario, init_params = set_up_data_1D(root, init_params, scenario)
+        
+        #data_E_F_1, data_derv_E_F_1 = calculate_data_alt(parameters_run)
+        data_E_F, data_derv_E_F, data_E_F_1, data_E_F_2  = calc_emissions_and_derivative(parameters_run)
+
+        createFolder(fileName)
+
+        save_object(variable_parameters, fileName + "/Data", "variable_parameters")
+        save_object(parameters_run, fileName + "/Data", "parameters_run")
+        save_object(data_derv_E_F, fileName + "/Data", "data_derv_E_F")
+        save_object(data_E_F_1, fileName + "/Data", "data_E_F_1")
+        save_object(data_E_F_2, fileName + "/Data", "data_E_F_2")
+        save_object(data_E_F_1, fileName + "/Data", "data_E_F")
+        save_object(scenario, fileName + "/Data", "scenario")
+        save_object(init_params, fileName + "/Data", "init_params")
+    
+    levels = 20
+    #if scenario not in (2,3):
+    #    plot_contours_gen(fileName,variable_parameters, data_E_F, data_derv_E_F,levels, 1, scenario)
+    #plot_line_with_colorbar(fileName,variable_parameters, data_E_F, data_derv_E_F, 0, scenario)
+    #plot_line_with_colorbar(fileName, variable_parameters, data_E_F, data_derv_E_F, 1, scenario)
+
+    plot_sector_emissions(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario)
+    #plot_sector_emissions_rebound_line(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario, parameters_run)
+    #plot_contours(fileName, "Scenario 1",B_values, tau_values, data_E_F_1, data_derv_E_F_1, axis_val)
+    #plot_contours(fileName, "Scenario 2",B_values, tau_values, data_E_F_2, data_derv_E_F_2, axis_val)
+    #plot_contours_2_scen(fileName, B_values, tau_values, data_E_F_1, data_derv_E_F_1, data_E_F_2, data_derv_E_F_2, axis_val)
+
+    plt.show()
+
 
 def analytic_derivatives():
 
@@ -726,6 +831,34 @@ def inequality_solutions():
     
     #print("SOLUTION", solution)
 
+def calc_emissions_1_sector(parameters):
+    A1 = parameters["A1"]
+    a1 = parameters["a1"]
+    sigma1 = parameters["sigma1"]
+    nu = parameters["nu"]
+    PL1 = parameters["PL1"]
+    PBH1 = parameters["PBH1"]
+    h1 = parameters["h1"]
+    B = parameters["B"] 
+    tau1 = parameters["tau1"]
+    gamma1 = parameters["gamma1"]
+
+    # Define BD equation
+    BD = B - h1 * (PBH1 + gamma1*tau1)
+
+    # Define Omega1 equation
+    Omega1 = ((PBH1 + gamma1*tau1) * A1 / (PL1 * (1 - A1)))**sigma1
+
+    # Define chi1 equation
+    chi1 = (a1 / (PBH1 + gamma1*tau1)) * ((A1 * Omega1**((sigma1 - 1) / sigma1)) + (1 - A1))**(((nu - 1) * sigma1) / (nu * (sigma1 - 1)))
+
+    # Define Z equation
+    Z = (chi1**nu * (Omega1 * PL1 + PBH1 + gamma1*tau1))
+
+    # Define EF equation with BD substituted
+    EF1 = (BD * gamma1*chi1**nu) / Z + gamma1*h1
+
+    return EF1
 
 def calc_emissions_and_derivative(parameters):
     A1 = parameters["A1"]
@@ -766,15 +899,16 @@ def calc_emissions_and_derivative(parameters):
     Z = (chi1**nu * (Omega1 * PL1 + PBH1 + gamma1*tau1)) + (chi2**nu * (Omega2 * PL2 + PBH2 + gamma2*tau2))
 
     # Define EF equation with BD substituted
+    EF1 = (BD * gamma1*chi1**nu) / Z + gamma1*h1
+    EF2 = (BD * gamma2*chi2**nu) / Z + gamma2*h2
     EF = (BD * (gamma1*chi1**nu + gamma2*chi2**nu) / Z) + gamma1*h1 + gamma2*h2
     manual_derv_EF_tau1 = gamma1 * BD * Z**(-1) * nu * chi1**(nu - 1) * ((gamma1*chi1 / (PBH1 + gamma1*tau1)) * ((sigma1 * (nu - 1) * A1 * Omega1**((sigma1 - 1) / sigma1)) / (nu * (A1 * Omega1**((sigma1 - 1) / sigma1) + (1 - A1))) - 1)) - Z**(-1) * gamma1 * h1 * (gamma1 * chi1**nu + gamma2 * chi2**nu) - BD * Z**(-2) * (gamma1 * chi1**nu + gamma2 * chi2**nu) * (((Omega1 * PL1 + PBH1 + gamma1*tau1) * gamma1 * nu * chi1**nu) / (PBH1 + gamma1*tau1) * ((sigma1 * (nu - 1) * A1 * Omega1**((sigma1 - 1) / sigma1))/(nu * (A1 * Omega1**((sigma1 - 1) / sigma1) + (1 - A1))) - 1) + gamma1*chi1**nu * (PL1 * (sigma1 * Omega1) / (PBH1 + gamma1*tau1) + 1))
 
-    return EF, manual_derv_EF_tau1
+    return EF, manual_derv_EF_tau1, EF1, EF2
 
 def plots_analytic(root = "2_sector_analytic",LOAD = 0, init_params = 4, scenario = 1, LOAD_filename = "filename"):
     
     if LOAD:
-        #fileName, variable_parameters, parameters_run, scenario, init_params = set_up_data(root = "2_sector_analytic",LOAD = 0, init_params = init_params, scenario = scenario)
         print("LOADED DONE")
         fileName = LOAD_filename
         #print("fileName", fileName)
@@ -839,6 +973,224 @@ def calc_emissions_derv(parameters):
     print("partial_derivative_value",partial_derivative_value)
 
     return EF_value, partial_derivative_value
+
+def set_up_data_1D(root = "2_sector_model", init_params = 4, scenario = 1):
+    """
+    Scenario 1: is that sector 1 is a basic good with high subsititutability(FOOD), similar prices between both goods but a minimum of the high carbon required. But there is low preference for this sector
+    Sector 2 has low substitutability, but more attractive (LONG DISTANCE TRAVEL), also the High carbon base price is much lower, howeer there is no minimum required
+    - Assume individuals are indifferent to the environment
+    """
+    #############################################
+    match init_params:
+        case 1:
+            parameters_1 = {#BASE PARAMS
+                "A1": 0.5,
+                "A2": 0.5,
+                "tau1": 0,
+                "tau2": 0,
+                "a1": 0.5,
+                "a2": 0.5,
+                "sigma1": 5,
+                "sigma2": 1.5,
+                "nu": 1.5,
+                "PL1": 1,
+                "PL2": 1,
+                "PBH1": 1,
+                "PBH2": 1,
+                "h1": 1,
+                "h2": 0,
+                "B": 5,
+                "gamma1":1,
+                "gamma2":2
+            }
+        case 2:
+            """
+            PARAMETERISED FOR:
+             - SECTOR 1 FOOD/short distance travel? - similar prices with low and high carbon options, minimum high carbon good required, not favoured, cheap!
+             - Sector 2 Long distance travel -  very large difference in prices, no minimum, favoured, expensive
+            """
+            parameters_1 = {
+                "A1": 0.5,
+                "A2": 0.1,
+                "tau1": 0,
+                "tau2": 0,
+                "a1": 0.2,
+                "a2": 0.8,
+                "sigma1": 3,
+                "sigma2": 3,
+                "nu": 3,
+                "PL1": 1,
+                "PL2": 10,
+                "PBH1": 1,
+                "PBH2": 10,
+                "h1": 3,
+                "h2": 0,
+                "B": 10
+            }
+        case 3:
+            parameters_1 = {
+                "A1": 0.5,
+                "A2": 0.5,
+                "tau1": 0,
+                "tau2": 0,
+                "a1": 0.5,
+                "a2": 0.5,
+                "sigma1": 5,
+                "sigma2": 1.5,
+                "nu": 1.5,
+                "PL1": 10,
+                "PL2": 10,
+                "PBH1": 10,
+                "PBH2": 1,
+                "h1": 0,
+                "h2": 0,
+                "B": 5,
+                "gamma1":1,
+                "gamma2":2
+            }
+        case 4:
+            parameters_1 = {
+                "A1": 0.5,
+                "A2": 0.5,
+                "tau1": 0,
+                "tau2": 0,
+                "a1": 0.5,
+                "a2": 0.5,
+                "sigma1": 2,
+                "sigma2": 2,
+                "nu": 2,
+                "PL1": 1,
+                "PL2": 1,
+                "PBH1": 1,
+                "PBH2": 1,
+                "h1": 0,
+                "h2": 0,
+                "B": 1,
+                "gamma1":1,
+                "gamma2":1
+            }
+        case 5:
+            parameters_1 = {
+                "A1": 0.5,
+                "A2": 0.5,
+                "tau1": 0,
+                "tau2": 0,
+                "a1": 0.5,
+                "a2": 0.5,
+                "sigma1": 5,
+                "sigma2": 5,
+                "nu": 5,
+                "PL1": 2,
+                "PL2": 2,
+                "PBH1": 2,
+                "PBH2": 1,
+                "h1": 0,
+                "h2": 0,
+                "B": 10
+            }
+        case 6:
+            parameters_1 = {
+                "A1": 0.5,
+                "A2": 0.5,
+                "tau1": 0,
+                "tau2": 0,
+                "a1": 0.5,
+                "a2": 0.5,
+                "sigma1": 2,
+                "sigma2": 2,
+                "nu": 2,
+                "PL1": 1,
+                "PL2": 1,
+                "PBH1": 1,
+                "PBH2": 1,
+                "h1": 0,
+                "h2": 0,
+                "B": 1,
+                "gamma1":1,
+                "gamma2":1
+            }
+        case 7:
+            parameters_1 = {
+                "A1": 0.5,
+                "A2": 0.1,
+                "tau1": 0,
+                "tau2": 0,
+                "a1": 0.5,
+                "a2": 0.5,
+                "sigma1": 2,
+                "sigma2": 2,
+                "nu": 2,
+                "PL1": 2,
+                "PL2": 2,
+                "PBH1": 2,
+                "PBH2": 1,
+                "h1": 0,
+                "h2": 0,
+                "B": 1,
+                "gamma1":1,
+                "gamma2":2
+            }
+        case 8:
+            parameters_1 = {
+                "A1": 0.5,
+                "A2": 0.5,
+                "tau1": 0.1,
+                "tau2": 0,
+                "a1": 0.5,
+                "a2": 0.5,
+                "sigma1": 2,
+                "sigma2": 2,
+                "nu": 2,
+                "PL1": 1,
+                "PL2": 1,
+                "PBH1": 1,
+                "PBH2": 1,
+                "h1": 0,
+                "h2": 0,
+                "B": 1,
+                "gamma1":1,
+                "gamma2":1
+            }
+    ##################################################
+    match scenario:
+        case 1:
+            variable_parameters = {
+                "property": "tau1",
+                "min":0,
+                "max": 1,
+                "reps": 1000,
+                "title": r'Sector 1 carbon price, $\tau_1$'
+            }
+        case 2:
+            variable_parameters = {
+                "property": "A1",
+                "min":0+1e-5,
+                "max": 1-1e-5,
+                "reps": 1000,
+                "title": r'Sector 1 low carbon preference, $A_1$'
+            }
+        case 3:
+            variable_parameters = {
+                "property": "gamma1",
+                "min":0+1e-5,
+                "max": 1-1e-5,
+                "reps": 1000,
+                "title": r'Sector 1 emissions intensity, $\gamma_1$'
+            }
+        case 4:
+            variable_parameters = {
+                "property": "gamma2",
+                "min":0+1e-5,
+                "max": 1-1e-5,
+                "reps": 1000,
+                "title": r'Sector 2 emissions intensity, $\gamma_2$'
+            }
+
+    fileName = produce_name_datetime(root)
+    print("fileName: ", fileName)
+
+    variable_parameters, parameters_run = gen_1d_data(variable_parameters, parameters_1)
+    return fileName, variable_parameters, parameters_run, scenario, init_params
 
 def set_up_data(root = "2_sector_model", init_params = 4, scenario = 1):
     """
@@ -1077,11 +1429,179 @@ def set_up_data(root = "2_sector_model", init_params = 4, scenario = 1):
 
     return fileName, variable_parameters, parameters_run, scenario, init_params
 
+def calc_emissions_tax_rebound():
+    """
+    subs_dict = {#BASE PARAMS
+        "A1": 0.5,
+        "A2": 0.5,
+        #"tauC": 1,
+        #"tau1I": 1,
+        "tau2I": 0,
+        "a1": 0.5,
+        "a2": 0.5,
+        "sigma1": 2,
+        "sigma2": 2,
+        #"nu": 2,
+        "PL1": 1,
+        "PL2": 1,
+        "PBH1": 1,
+        "PBH2": 1,
+        "h1": 0,
+        "h2": 0,
+        "B": 1,
+        "gamma1": 1,#0.8,
+        "gamma2": 1,#1.1
+    }
+    """
+
+    subs_dict = {#BASE PARAMS
+        "A1": 0.5,
+        "A2": 0.5,
+        #"tauC": 1,
+        "tau1I": 1,
+        "tau2I": 0,
+        "a1": 0.5,
+        "a2": 0.5,
+        "sigma1": 2,
+        "sigma2": 2,
+        #"nu": 2,
+        "PL1": 1,
+        "PL2": 1,
+        "PBH1": 1,
+        "PBH2": 1,
+        "h1": 1,
+        "h2": 0,
+        "B": 5,
+        "gamma1": 1,#0.8,
+        "gamma2": 2,#1.1
+    }
+
+    tau_C_sym, tau1_I_sym, tau2_I_sym, B_sym, nu_sym, h1_sym, h2_sym, PBH1_sym, PBH2_sym, A1_sym, A2_sym, PL1_sym, PL2_sym, sigma1_sym, sigma2_sym, a1_sym, a2_sym, gamma1_sym, gamma2_sym = symbols('tauC tau1I tau2I B nu h1 h2 PBH1 PBH2 A1 A2 PL1 PL2 sigma1 sigma2 a1 a2 gamma1 gamma2')
+    
+    # Define COMPLETE TAX STUFF
+    BD_C_sym = B_sym - h1_sym * (PBH1_sym + gamma1_sym*tau_C_sym) - h2_sym * (PBH2_sym + gamma2_sym*tau_C_sym)
+    Omega1_C_sym = ((PBH1_sym + gamma1_sym*tau_C_sym) * A1_sym / (PL1_sym * (1 - A1_sym)))**sigma1_sym
+    Omega2_C_sym = ((PBH2_sym + gamma2_sym*tau_C_sym) * A2_sym / (PL2_sym * (1 - A2_sym)))**sigma2_sym
+    chi1_C_sym = (a1_sym / (PBH1_sym + gamma1_sym*tau_C_sym)) * ((A1_sym * Omega1_C_sym**((sigma1_sym - 1) / sigma1_sym)) + (1 - A1_sym))**(((nu_sym - 1) * sigma1_sym) / (nu_sym * (sigma1_sym - 1)))
+    chi2_C_sym = (a2_sym / (PBH2_sym + gamma2_sym*tau_C_sym)) * ((A2_sym * Omega2_C_sym**((sigma2_sym - 1) / sigma2_sym)) + (1 - A2_sym))**(((nu_sym - 1) * sigma2_sym) / (nu_sym * (sigma2_sym - 1)))
+    Z_C_sym = (chi1_C_sym**nu_sym * (Omega1_C_sym * PL1_sym + PBH1_sym + gamma1_sym*tau_C_sym)) + (chi2_C_sym**nu_sym * (Omega2_C_sym* PL2_sym + PBH2_sym + gamma2_sym*tau_C_sym))
+
+    # Define INCOMPLETE TAX STUFF
+    BD_I_sym = B_sym - h1_sym * (PBH1_sym + gamma1_sym*tau1_I_sym) - h2_sym * (PBH2_sym + gamma2_sym*tau2_I_sym)
+    Omega1_I_sym = ((PBH1_sym + gamma1_sym*tau1_I_sym) * A1_sym / (PL1_sym * (1 - A1_sym)))**sigma1_sym
+    Omega2_I_sym = ((PBH2_sym + gamma2_sym*tau2_I_sym) * A2_sym / (PL2_sym * (1 - A2_sym)))**sigma2_sym
+    chi1_I_sym = (a1_sym / (PBH1_sym + gamma1_sym*tau1_I_sym)) * ((A1_sym * Omega1_I_sym**((sigma1_sym - 1) / sigma1_sym)) + (1 - A1_sym))**(((nu_sym - 1) * sigma1_sym) / (nu_sym * (sigma1_sym - 1)))
+    chi2_I_sym = (a2_sym / (PBH2_sym + gamma2_sym*tau2_I_sym)) * ((A2_sym * Omega2_I_sym**((sigma2_sym - 1) / sigma2_sym)) + (1 - A2_sym))**(((nu_sym - 1) * sigma2_sym) / (nu_sym * (sigma2_sym - 1)))
+    Z_I_sym = (chi1_I_sym**nu_sym * (Omega1_I_sym * PL1_sym + PBH1_sym + gamma1_sym*tau1_I_sym)) + (chi2_I_sym**nu_sym * (Omega2_I_sym * PL2_sym + PBH2_sym + gamma2_sym*tau2_I_sym))
+
+    EF_C = (BD_C_sym * (gamma1_sym*chi1_C_sym**nu_sym + gamma2_sym*chi2_C_sym**nu_sym) / Z_C_sym) + gamma1_sym*h1_sym + gamma2_sym*h2_sym
+    EF_I = (BD_I_sym * (gamma1_sym*chi1_I_sym**nu_sym + gamma2_sym*chi2_I_sym**nu_sym) / Z_I_sym) + gamma1_sym*h1_sym + gamma2_sym*h2_sym
+
+    equation = EF_C - EF_I
+
+    equation_simplified = equation.subs(subs_dict)
+    print("SIMPLE EQUATION", equation_simplified)
+
+    tau_C_solution_no_nu_sub = solve(equation_simplified, tau_C_sym, positive=True)
+    print("SOLUTION FOUND")
+    #print("tau_C_solution_no_nu_sub",tau_C_solution_no_nu_sub)
+
+    #tau_C_func_1 = lambdify((nu_sym,tau1_I_sym), tau_C_solution_no_nu_sub[0], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
+    tau_C_func_1 = lambdify(nu_sym, tau_C_solution_no_nu_sub[1], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
+    #tau_C_func_1 = lambdify(nu_sym, tau_C_solution_no_nu_sub, 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
+    
+    """
+    nu_values_log = np.logspace(np.log10(1.01), 3, 1000)
+    tau_C_values_1 = tau_C_func_1(nu_values_log)
+    fig1, ax1 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+    ax1.plot(nu_values_log, tau_C_values_1, label= "Positive solutions")
+    #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
+    ax1.set_xlabel(r"Inter-sector substitutability, $\nu$")
+    ax1.set_ylabel(r"rebound tax multiplier $M_R = \frac{\tau_C}{\tau_I}$")
+    ax1.set_xscale('log')
+    ax1.set_title('log')
+    ax1.grid()
+    """
+    data_tau1_nu = []
+
+    nu_values_lin = np.linspace(1.01, 100, 1000)
+    #tau1_I_values_lin = np.linspace(0.1, 1.5, 5)
+    for nu in nu_values_lin:
+        tau_C_values_1 = tau_C_func_1(nu)
+        data_tau1_nu.append(tau_C_values_1)
+
+    """
+    nu_values_lin = np.linspace(1.01, 100, 1000)
+    tau1_I_values_lin = np.linspace(0.1, 1.5, 5)
+    for tau1_I in tau1_I_values_lin:
+        tau_C_values_1 = tau_C_func_1(nu_values_lin, tau1_I)
+        data_tau1_nu.append(tau_C_values_1/tau1_I)
+    """
+    """
+    nu_values_lin = np.logspace(np.log10(1.01), 2, 5)
+    tau1_I_values_lin = np.linspace(0.1, 1.5, 1000)
+    for nu in nu_values_lin:
+        tau_C_values_1 = tau_C_func_1(nu, tau1_I_values_lin)
+        data_tau1_nu.append(tau_C_values_1/tau1_I_values_lin)
+    """
+    #print(data_tau1_nu)
+    #quit()
+    #tax_ratio = solve(root_to_calc, (tau1_I_sym))
+    #print(tax_ratio)
+    root = "nu_tau_ratio"
+    fileName = produce_name_datetime(root)
+    print("fileName: ", fileName)
+
+    createFolder(fileName)
+
+    save_object(nu_values_lin, fileName + "/Data", "nu_values_lin")
+    save_object(tau_C_values_1, fileName + "/Data", "tau_C_values_1")
+    #save_object(tau_C_func_1, fileName + "/Data", "tau_C_func_1")
+    save_object(subs_dict, fileName + "/Data", "subs_dict")
+
+    #"""
+    fig2, ax2 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+    #for i,tau1_I in enumerate(tau1_I_values_lin):
+    ax2.plot(nu_values_lin, data_tau1_nu)#, label= "$\\tau_I = %s$" % (round(tau1_I,3)))
+    #ax2.plot(nu_values_lin, tau_C_values_1, label= "Positive solutions")
+    #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
+    ax2.set_xlabel(r"Inter-sector substitutability, $\nu$")
+    ax2.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")
+    #ax2.set_title('linear')
+    #ax2.legend()
+    ax2.grid()
+    #"""
+    """
+    fig2, ax2 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+    for i,nu in enumerate(nu_values_lin):
+        ax2.plot(tau1_I_values_lin, data_tau1_nu[i], label= "$\\nu = %s$" % (round(nu,3)))
+    #ax2.plot(nu_values_lin, tau_C_values_1, label= "Positive solutions")
+    #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
+    ax2.set_xlabel(r"Sector 1 incomplete carbon tax,$\tau_I$ ")
+    ax2.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")
+    #ax2.set_title('linear')
+    ax2.legend()
+    ax2.grid()
+    """
+
+
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/incomplete"
+    fig2.savefig(f + ".eps", dpi=600, format="eps")
+    fig2.savefig(f + ".png", dpi=600, format="png")
+    
+    plt.show()
+
+
 def main( type_run):
 
     if type_run == "plots":
         #run_plots(root = "2_sector_model", LOAD = 0, init_params = 4, scenario = 1)
         run_plots(LOAD = 1, LOAD_filename = "results/2_sector_analytic_19_37_47__20_03_2024")
+    elif type_run == "plots_1D":
+        run_plots_1D(root = "2_sector_model", LOAD = 0, init_params = 8, scenario = 4)
     elif type_run == "ineq":
         print("INSIDE")
         inequality_solutions()
@@ -1111,10 +1631,11 @@ def main( type_run):
     elif type_run == "plots_analytic":
         plots_analytic(root = "2_sector_analytic",LOAD = 0, init_params = 2, scenario = 7)
         #plots_analytic(LOAD = 1, LOAD_filename = "results/2_sector_analytic_19_37_47__20_03_2024")
-         
+    elif type_run == "rebound_tax":
+        calc_emissions_tax_rebound()
     else:
         raise ValueError("Wrong TYPE")
 
 if __name__ == '__main__':
-    type_run = "ineq"#"plots"#"ineq", "plots_analytic"#"analytic"#,"calc_analytic"
+    type_run = "rebound_tax"#"plots"#"ineq", "plots_analytic"#"analytic"#,"calc_analytic"
     main(type_run)
