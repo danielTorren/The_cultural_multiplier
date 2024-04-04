@@ -127,6 +127,7 @@ class Individual:
             raise ValueError("Invalid imitaiton_state:common_knowledge, expenditure, consumption")
 
         return outward_social_influence
+    
     def update_consumption(self):
         #calculate consumption
         self.Omega_m = self.calc_Omega_m()

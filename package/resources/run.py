@@ -8,13 +8,13 @@ Created: 10/10/2022
 """
 
 # imports
-from gc import callbacks
 import time
 import numpy as np
 import numpy.typing as npt
 from joblib import Parallel, delayed
 import multiprocessing
-from package.model.network import Network
+#from package.model.network import Network
+from package.model.network_matrix import Network
 #from scipy.optimize import least_squares
 from copy import deepcopy
 from scipy.optimize import minimize, NonlinearConstraint
@@ -22,7 +22,7 @@ from scipy.optimize import minimize, NonlinearConstraint
 
 # modules
 ####SINGLE SHOT RUN
-def generate_data(parameters: dict,print_simu = 0) -> Network:
+def generate_data(parameters: dict,print_simu = 1) -> Network:
     """
     Generate the Network object which itself contains list of Individual objects. Run this forward in time for the desired number of steps
 

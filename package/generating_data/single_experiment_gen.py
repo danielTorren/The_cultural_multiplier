@@ -58,16 +58,16 @@ if __name__ == '__main__':
     "burn_in_duration": 0, 
     "N": 200, 
     "M": 3, 
-    "sector_substitutability": 1.5, 
+    "sector_substitutability": 2, 
     #"low_carbon_substitutability_lower": 1.5, 
-    "low_carbon_substitutability_upper": 1.5, 
+    "low_carbon_substitutability_upper": 2, 
     "a_identity": 2, 
     "b_identity": 2, 
     "clipping_epsilon": 0, 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
     "std_learning_error": 0.02, 
-    "confirmation_bias": 10, 
+    "confirmation_bias": 1, 
     "expenditure": 1,
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     
     fileName = main(base_params=base_params)
 
-    RUN_PLOT = 1
+    RUN_PLOT = 0
 
     if RUN_PLOT:
         single_experiment_plot.main(fileName = fileName)

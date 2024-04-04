@@ -963,10 +963,55 @@ def plot_SBM_network_start_preferences(
     fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
+
+def plot_identity_matrix(fileName, Data, dpi_save,latex_bool = False):
+
+    fig, ax = plt.subplots(figsize=(10,6))
+    y_title = r"Identity, $I_{t,n}$"
+
+    Data_identity_trans = np.asarray(Data.history_identity_vec).T#NOW ITS person then time
+
+    for v in range(Data.N):
+        ax.plot(np.asarray(Data.history_time), Data_identity_trans[v])
+        ax.set_xlabel(r"Time")
+        ax.set_ylabel(r"%s" % y_title)
+        #ax.set_ylim(0, 1)
+
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_identity_timeseries_matrix"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+def plot_emissions_flow_matrix(fileName, Data, dpi_save,latex_bool = False):
+
+    fig, ax = plt.subplots(figsize=(10,6))
+    y_title = r"Emissions individuals, $E_{t,i}$"
+
+    Data_emissions_trans = np.asarray(Data.history_flow_carbon_emissions_vec).T#NOW ITS person then time
+
+    for v in range(Data.N):
+        ax.plot(np.asarray(Data.history_time), Data_emissions_trans[v])
+        ax.set_xlabel(r"Time")
+        ax.set_ylabel(r"%s" % y_title)
+        #ax.set_ylim(0, 1)
+
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_timeseries_matrix"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+
+
+
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     dpi_save = 600,
     ) -> None: 
+    """
     block_markers_list = ["o","s","^", "v","*","H","P","<",">"]#generate_scatter_markers(data.SBM_block_num)
     legend_loc = "upper right"
     lines_alpha = 0.2
@@ -978,13 +1023,19 @@ def main(
         "BrownGreen", ["sienna", "whitesmoke", "olivedrab"], gamma=1
     )
     node_sizes = 100   
-
+    """
     Data = load_object(fileName + "/Data", "social_network")
     print("Data EMissions", Data.total_carbon_emissions_stock)
-    node_shape_list = ["o","s","^","v"]
+    #node_shape_list = ["o","s","^","v"]
 
-    anim_save_bool = False#Need to install the saving thing
+    #anim_save_bool = False#Need to install the saving thing
     ###PLOTS
+
+    plot_identity_matrix(fileName, Data, dpi_save)
+    plot_emissions_flow_matrix(fileName, Data, dpi_save)
+    #plot_emissions_individuals(fileName, Data, dpi_save)
+    #plot_identity_timeseries(fileName, Data, dpi_save)
+
     """
     if Data.burn_in_duration == 0:
         plot_consumption_no_burn_in(fileName, Data, dpi_save)
@@ -997,8 +1048,7 @@ def main(
     #quit()
 
     
-    #plot_emissions_individuals(fileName, Data, dpi_save)
-    #plot_identity_timeseries(fileName, Data, dpi_save)
+
     #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
     #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
     #plot_chi(fileName, Data, dpi_save)
@@ -1008,6 +1058,7 @@ def main(
     #plot_H(fileName, Data, dpi_save)
     #plot_Z_timeseries(fileName, Data, dpi_save)
 
+    """
     if Data.network_type =="SBM":
         plot_SBM_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
         plot_SBM_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one,block_markers_list,legend_loc,lines_alpha)
@@ -1016,6 +1067,7 @@ def main(
         plot_low_carbon_preferences_timeseries(fileName, Data, dpi_save)
         plot_network_start_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
         plot_network_end_preferences(fileName, Data,cmap, dpi_save, node_sizes,norm_zero_one)
+    """
     #threshold_list = [0.0001,0.0002,0.0005,0.001,0.002,0.003,0.004]
     #emissions_threshold_range = np.arange(0,0.005,0.000001)
     #plot_low_carbon_adoption_timeseries(fileName, Data,threshold_list, dpi_save)
