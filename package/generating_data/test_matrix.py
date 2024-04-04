@@ -60,6 +60,7 @@ def main(
     emissions = np.asarray([data.total_carbon_emissions_stock for data in data_parallel])
     emissions_matrix =  np.asarray([data.total_carbon_emissions_stock for data in data_parallel_matrix])
 
+    """
     H = np.asarray([[x.H_m for x in data.agent_list] for data in data_parallel])
     H_matrix = np.asarray([data.H_m_matrix for data in data_parallel_matrix])
 
@@ -77,20 +78,18 @@ def main(
 
     Z = np.asarray([[x.Z for x in data.agent_list] for data in data_parallel])
     Z_matrix = np.asarray([data.Z_vec for data in data_parallel_matrix])
-    #"""
+    
     #print("diff Z", Z - Z_matrix)
 
     preferences = np.asarray([[x.low_carbon_preferences for x in data.agent_list] for data in data_parallel])
     preferences_matrix = np.asarray([data.low_carbon_preference_matrix for data in data_parallel_matrix])
-
+    """
+    
     #print(" emissions", emissions)
     #print("emissions_matrix", emissions_matrix)
-    print("diff emissions", emissions_matrix - emissions)
-    print("diff H", H_matrix - H)
-    print("diff preferences", preferences - preferences_matrix)
-
-
-    
+    print(" percent diff emissions", (emissions_matrix/emissions)*100-100)
+    #print("diff H", H_matrix - H)
+    #print("diff preferences", preferences - preferences_matrix)
 
 def generate_data_alt(parameters: dict):
 
@@ -125,8 +124,8 @@ if __name__ == '__main__':
     
     base_params = {
     "imitation_state": "common_knowledge",
-    "alpha_change_state": "dynamic_identity_determined_weights",
-    "network_type": "SW",
+    "alpha_change_state": "dynamic_identity_determined_weights",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
+    "network_type": "SBM",
     "save_timeseries_data_state": 0,
     "compression_factor_state": 1,
     "heterogenous_intrasector_preferences_state": 1,
@@ -162,8 +161,11 @@ if __name__ == '__main__':
     "homophily_state": 0.9,
     "SW_network_density": 0.1,
     "SW_prob_rewire": 0.1,
-    #"BA_nodes": 11,
-    #"BA_green_or_brown_hegemony": 1,
+    "BA_nodes": 11,
+    "BA_green_or_brown_hegemony": 0,
+    "SBM_block_num": 2,
+    "SBM_network_density_input_intra_block": 0.2,
+    "SBM_network_density_input_inter_block": 0.005,
     "carbon_price_increased_lower": 0.2
     }
     
