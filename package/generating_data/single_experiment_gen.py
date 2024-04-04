@@ -38,7 +38,7 @@ def main(
 if __name__ == '__main__':
     
     base_params = {
-    "imitation_state": "consumption",
+    "imitation_state": "common_knowledge",
     "alpha_change_state": "dynamic_identity_determined_weights",
     "network_type": "SW",
     "save_timeseries_data_state": 1,
@@ -48,12 +48,14 @@ if __name__ == '__main__':
     "heterogenous_sector_substitutabilities_state": 0,
     "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
     "heterogenous_phi_state": 0,
-    "imperfect_learning_state": 0,
-    "vary_seed_state": "init_preferences",
+    "imperfect_learning_state": 1,
+    "vary_seed_state": "preferences",
     "static_internal_preference_state": 0,
     "set_seed": 5,
     "network_structure_seed": 8, 
-    "init_vals_seed": 14, 
+    "preferences_seed": 14,
+    "shuffle_seed":20,
+	"learning_seed":10, 
     "carbon_price_duration": 1000, 
     "burn_in_duration": 0, 
     "N": 200, 
@@ -67,7 +69,7 @@ if __name__ == '__main__':
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
     "std_learning_error": 0.02, 
-    "confirmation_bias": 1, 
+    "confirmation_bias": 10, 
     "expenditure": 1,
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
@@ -84,7 +86,7 @@ if __name__ == '__main__':
     
     fileName = main(base_params=base_params)
 
-    RUN_PLOT = 0
+    RUN_PLOT = 1
 
     if RUN_PLOT:
         single_experiment_plot.main(fileName = fileName)

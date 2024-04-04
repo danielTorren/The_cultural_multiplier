@@ -14,7 +14,7 @@ import numpy.typing as npt
 from joblib import Parallel, delayed
 import multiprocessing
 #from package.model.network import Network
-from package.model.network_matrix import Network
+from package.model.network_matrix import Network_Matrix as Network
 #from scipy.optimize import least_squares
 from copy import deepcopy
 from scipy.optimize import minimize, NonlinearConstraint

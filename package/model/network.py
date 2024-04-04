@@ -45,22 +45,25 @@ class Network:
 
         #seeds
         if self.vary_seed_state =="learning":
-            #if its 1 then very seed imperfect_learning_state
-            self.init_vals_seed = parameters["init_vals_seed"]
+            self.preferences_seed = parameters["preferences_seed"]
             self.network_structure_seed = parameters["network_structure_seed"]
-            self.set_seed = int(round(parameters["set_seed"]))
-        elif self.vary_seed_state =="init_preferences":
-            #if not 1 then do vary seed initial preferences
+            self.shuffle_seed = parameters["shuffle_seed"]
+            self.learning_seed = int(round(parameters["set_seed"]))
+        elif self.vary_seed_state =="preferences":
+            self.preferences_seed = int(round(parameters["set_seed"]))
             self.network_structure_seed = parameters["network_structure_seed"]
-            self.init_vals_seed = int(round(parameters["set_seed"]))
-            self.set_seed = parameters["init_vals_seed"] 
+            self.shuffle_seed = parameters["shuffle_seed"]
+            self.learning_seed = parameters["learning_seed"]
         elif self.vary_seed_state =="network":
-            #vARY network structures
+            self.preferences_seed = parameters["preferences_seed"]
             self.network_structure_seed = int(round(parameters["set_seed"]))
-            self.init_vals_seed = parameters["init_vals_seed"]  
-            self.set_seed = parameters["network_structure_seed"]
-        
-        np.random.seed(self.init_vals_seed)#For inital construction set a seed, this is the same for all runs, then later change it to set_seed
+            self.shuffle_seed = parameters["shuffle_seed"]
+            self.learning_seed = parameters["learning_seed"]
+        elif self.vary_seed_state =="shuffle":
+            self.preferences_seed = parameters["preferences_seed"]
+            self.network_structure_seed = parameters["network_structure_seed"]
+            self.shuffle_seed = int(round(parameters["set_seed"]))
+            self.learning_seed = parameters["learning_seed"]
         
         # network
         self.N = int(round(parameters["N"]))
@@ -85,16 +88,21 @@ class Network:
         self.t = 0
         self.burn_in_duration = parameters["burn_in_duration"]
         self.carbon_price_duration = parameters["carbon_price_duration"]
+        self.time_step_max = self.burn_in_duration + self.carbon_price_duration
 
         #price
         self.prices_low_carbon = np.asarray([1]*self.M)
         self.prices_high_carbon =  np.asarray([1]*self.M)#start them at the same value
         self.carbon_price_m = np.asarray([0]*self.M)
+        
+
         if self.heterogenous_carbon_price_state:
             #RIGHTWAY 
             self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_upper"], num=self.M)
         else:
             self.carbon_price_increased_m = np.linspace(parameters["carbon_price_increased_lower"], parameters["carbon_price_increased_lower"], num=self.M)
+
+        self.update_carbon_price()
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
@@ -106,6 +114,7 @@ class Network:
             self.clipping_epsilon = 0        
         self.clipping_epsilon_init_preference = parameters["clipping_epsilon_init_preference"]
         
+
         if self.heterogenous_phi_state:
             self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_upper"], num=self.M)
         else:
@@ -117,33 +126,7 @@ class Network:
         self.shuffle_reps = int(
             round(self.N*(1 - self.homophily_state))
         )
-
-        ########################################################
-                #UP TO HEAR NUMPY RANDOM USED 1 - CANT HAVE ANYTHING USE NUMPY RANDOM BEFORE THIS
-        ###################################################
-        # set preferences
-        if self.heterogenous_intrasector_preferences_state == 1:
-            self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
-            self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
-            self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
-            (
-                self.low_carbon_preference_matrix_init
-            ) = self.generate_init_data_preferences()
-        else:
-            #this is if you want same preferences for everbody
-            self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
-
-        ################################################################################################
-            #I NEED EVERYTHING TO BE SET WITH A SEED UP UNTIL THIS POINT SO THAT ITS THE SAME
-        ###############################################################################################
-        # create network
-        (
-            self.adjacency_matrix,
-            self.weighting_matrix,
-            self.network,
-        ) = self.create_weighting_matrix()
-
-        #self.expenditure = parameters["expenditure"]
+                #self.expenditure = parameters["expenditure"]
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
 
         if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
@@ -176,22 +159,47 @@ class Network:
             #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
 
         self.sector_substitutability = parameters["sector_substitutability"]
-            
+        
         self.sector_preferences = np.asarray([1/self.M]*self.M)
+
+        ########################################################
+        #CANT HAVE ANYTHING USE NUMPY RANDOM BEFORE THIS
+        ###################################################
+        # set preferences
+        np.random.seed(self.preferences_seed)#For inital construction set a seed
+        if self.heterogenous_intrasector_preferences_state == 1:
+            self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
+            (
+                self.low_carbon_preference_matrix_init
+            ) = self.generate_init_data_preferences()
+        else:
+            #this is if you want same preferences for everbody
+            self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
+
+        # create network
+        np.random.seed(self.network_structure_seed)#This is not necessary but for consistency with other code maybe leave in
+        (
+            self.adjacency_matrix,
+            self.weighting_matrix,
+            self.network,
+        ) = self.create_weighting_matrix()
         
         self.agent_list = self.create_agent_list()
-        
+
         if self.network_type == "SBM":
             self.init_block_id()
 
+        np.random.seed(self.shuffle_seed)#Set seed for shuffle
         self.shuffle_agent_list()#partial shuffle of the list based on identity
 
-        #NOW SET SEED FOR THE IMPERFECT LEARNING
-        ####################################################################################################################################
-        #FROM HERE THIGNS SHOULD BE DIFFERENT IN EVERY SINGEL SEED RUNS
-        #####################################################################################################################################
-        
-        np.random.seed(self.set_seed)
+        np.random.seed(self.learning_seed)#set seed for learning
+        self.error_matrix_list = np.random.normal(loc=0, scale=self.std_learning_error, size=(self.time_step_max+1, self.N, self.M))
+
+        #############################################################################################################################
+        #FROM HERE MODEL IS DETERMINISTIC NOT MORE RANDOMNESS
+        #############################################################################################################################
 
         if self.alpha_change_state == "fixed_preferences":
             self.social_component_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
@@ -209,7 +217,9 @@ class Network:
         if self.network_type == "SBM":
             self.total_carbon_emissions_stock_blocks = np.asarray([0]*self.SBM_block_num)
         
-        self.identity_list = list(map(attrgetter('identity'), self.agent_list))
+        #self.identity_list = list(map(attrgetter('identity'), self.agent_list))
+        self.identity_list = [x.identity for x in self.agent_list]
+
         (
                 self.average_identity,
                 self.std_identity,
@@ -334,7 +344,6 @@ class Network:
         norm_weighting_matrix = self.normlize_matrix(weighting_matrix)
         
         self.network_density = nx.density(G)
-        #print("Network density:", self.network_density)
         
         #quit()
         return (
@@ -342,37 +351,7 @@ class Network:
             norm_weighting_matrix,
             G,
         )
-    
-    
-    def circular_agent_list(self) -> list:
-        """
-        Makes an ordered list circular so that the start and end values are matched in value and value distribution is symmetric
 
-        Parameters
-        ----------
-        list: list
-            an ordered list e.g [1,2,3,4,5]
-        Returns
-        -------
-        circular: list
-            a circular list symmetric about its middle entry e.g [1,3,5,4,2]
-        """
-
-        first_half = self.agent_list[::2]  # take every second element in the list, even indicies
-        second_half = (self.agent_list[1::2])[::-1]  # take every second element , odd indicies
-        self.agent_list = first_half + second_half
-
-    def partial_shuffle_agent_list(self) -> list:
-        """
-        Partially shuffle a list using Fisher Yates shuffle
-        """
-
-        for _ in range(self.shuffle_reps):
-            a, b = np.random.randint(
-                low=0, high=self.N, size=2
-            )  # generate pair of indicies to swap
-            self.agent_list[b], self.agent_list[a] = self.agent_list[a], self.agent_list[b]
-    
     def generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
 
         indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
@@ -404,7 +383,7 @@ class Network:
             "phi_array": self.phi_array,
             "compression_factor_state": self.compression_factor_state,
             "imitation_state": self.imitation_state,
-            "init_carbon_price_m": self.carbon_price_m,
+            "carbon_price_m": self.carbon_price_m,
             "prices_low_carbon_m": self.prices_low_carbon,
             "prices_high_carbon_m":self.prices_high_carbon,
             "clipping_epsilon" :self.clipping_epsilon,
@@ -429,6 +408,48 @@ class Network:
         ]
         return agent_list
     
+    def circular_agent_list(self) -> list:
+        """
+        Makes an ordered list circular so that the start and end values are matched in value and value distribution is symmetric
+
+        Parameters
+        ----------
+        list: list
+            an ordered list e.g [1,2,3,4,5]
+        Returns
+        -------
+        circular: list
+            a circular list symmetric about its middle entry e.g [1,3,5,4,2]
+        """
+
+        first_half = self.agent_list[::2]  # take every second element in the list, even indicies
+        second_half = (self.agent_list[1::2])[::-1]  # take every second element , odd indicies
+        self.agent_list = first_half + second_half
+
+    def partial_shuffle_agent_list(self) -> list:
+        """
+        Partially shuffle a list using Fisher Yates shuffle
+        """
+
+        for _ in range(self.shuffle_reps):
+            a, b = np.random.randint(
+                low=0, high=self.N, size=2
+            )  # generate pair of indicies to swap
+            self.agent_list[b], self.agent_list[a] = self.agent_list[a], self.agent_list[b]
+    
+    def shuffle_agent_list(self): 
+        #make list cirucalr then partial shuffle it
+        self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
+    
+        if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
+            self.agent_list.reverse()
+        elif (self.network_type== "SW"):
+            self.circular_agent_list()#agent list is now circular in terms of identity
+        elif (self.network_type == "SBM"):
+            pass
+
+        self.partial_shuffle_agent_list()#partial shuffle of the list
+
     def init_block_id(self):
         block_ids = []
         block_id = 0
@@ -439,23 +460,18 @@ class Network:
         for i, agent in enumerate(self.agent_list):
             agent.block_id = block_ids[i]
 
-
-    def shuffle_agent_list(self): 
-        #make list cirucalr then partial shuffle it
-        self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
-        if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
-            self.agent_list.reverse()
-        elif (self.network_type== "SW"):
-            self.circular_agent_list()#agent list is now circular in terms of identity
-        elif (self.network_type == "SBM"):
-            pass
-        self.partial_shuffle_agent_list()#partial shuffle of the list
+    ###########################################################################################################################################################
+    #TIME LOOPS
+    ###########################################################################################################################################################
+    def update_carbon_price(self):
+        if self.t == (self.burn_in_duration):
+            self.carbon_price_m = self.carbon_price_increased_m#turn on carbon price
 
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
         #not sure if this stuff is correct tbh.
 
-        attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
-
+        #attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
+        attribute_matrix = np.asarray([x.outward_social_influence for x in self.agent_list])
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
 
@@ -466,9 +482,8 @@ class Network:
     
     def calc_ego_influence_degroot(self) -> npt.NDArray:
 
-        attribute_matrix =np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
-
-
+        #attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
+        attribute_matrix = np.asarray([x.outward_social_influence for x in self.agent_list])
         neighbour_influence = np.matmul(self.weighting_matrix, attribute_matrix)
 
         return neighbour_influence
@@ -491,8 +506,7 @@ class Network:
             ego_influence = self.calc_ego_influence_degroot_independent()
         else:#culturally determined either static or dynamic
             ego_influence = self.calc_ego_influence_degroot()           
-         
-        social_influence = ego_influence + np.random.normal(loc=0, scale=self.std_learning_error, size=(self.N, self.M))
+        social_influence = ego_influence + self.error_matrix_list[self.t]#np.random.normal(loc=0, scale=self.std_learning_error, size=(self.N, self.M))
 
         return social_influence
 
@@ -531,8 +545,8 @@ class Network:
 
         ##THE WEIGHTING FOR THE IDENTITY IS DONE IN INDIVIDUALS
 
-        self.identity_list = list(map(attrgetter('identity'), self.agent_list))
-
+        #self.identity_list = list(map(attrgetter('identity'), self.agent_list))
+        self.identity_list = np.asarray([x.identity for x in self.agent_list])
         norm_weighting_matrix = self.calc_weighting_matrix_attribute(self.identity_list)
 
         return norm_weighting_matrix
@@ -542,7 +556,8 @@ class Network:
         weighting_matrix_list = []
 
         #take the transpose so that you can access through m, this may make it way slower
-        attribute_matrix = (np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list)))).T
+        #attribute_matrix = (np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list)))).T
+        attribute_matrix = (np.asarray([x.outward_social_influence for x in self.agent_list])).T
 
         for m in range(self.M):
             low_carbon_preferences_list = attribute_matrix[m]
@@ -565,8 +580,8 @@ class Network:
             total network emissions from each Individual object
         """
 
-        total_network_emissions = sum(map(attrgetter('flow_carbon_emissions'), self.agent_list))
-        #total_network_emissions = sum([x.flow_carbon_emissions for x in self.agent_list])
+        #total_network_emissions = sum(map(attrgetter('flow_carbon_emissions'), self.agent_list))
+        total_network_emissions = sum([x.flow_carbon_emissions for x in self.agent_list])
         return total_network_emissions
 
     def calc_network_identity(self) -> tuple[float, float, float, float]:
@@ -610,9 +625,14 @@ class Network:
     #    return welfare
     
     def calc_carbon_dividend_array(self):
-        total_quantities_m = sum(map(attrgetter('H_m'), self.agent_list))
-        tax_income_R =  sum(self.carbon_price_m*total_quantities_m)      
+        total_quantities_m = sum(np.asarray([x.H_m for x in self.agent_list]))
+        #print("total_quantities_m",self.t, total_quantities_m)
+        #total_quantities_m = sum(map(attrgetter('H_m'), self.agent_list))
+        #print("self.carbon_price_m",self.carbon_price_m)
+        tax_income_R =  sum(self.carbon_price_m*total_quantities_m)  
+        #print("tax_income_R",tax_income_R)    
         carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
+        #print("carbon_dividend_array",carbon_dividend_array)
         return carbon_dividend_array
     
     def update_individuals(self):
@@ -681,8 +701,7 @@ class Network:
         # advance a time step
         self.t += 1
 
-        if self.t == (self.burn_in_duration + 1):
-            self.carbon_price_m = self.carbon_price_increased_m#turn on carbon price
+        self.update_carbon_price()
         
         # execute step
         self.update_individuals()

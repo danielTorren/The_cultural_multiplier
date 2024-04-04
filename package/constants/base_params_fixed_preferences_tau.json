@@ -1,7 +1,7 @@
 {
     "carbon_tax_implementation": "flat", 
     "carbon_price_duration": 2000,
-    "init_vals_seed": 2,
+    "preferences_seed": 2,
     "seed_reps": 20,
     "N": 20,
     "M": 5,

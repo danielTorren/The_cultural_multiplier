@@ -12,7 +12,7 @@
     "static_internal_preference_state": 0,
     "seed_reps": 25,
     "network_structure_seed": 10, 
-    "init_vals_seed": 77, 
+    "preferences_seed": 77, 
     "set_seed": 4, 
     "carbon_price_duration": 1000, 
     "burn_in_duration": 0, 

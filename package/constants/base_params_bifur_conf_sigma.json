@@ -12,7 +12,7 @@
     "ratio_preference_or_consumption_state_identity": 1.0,
     "ratio_preference_or_consumption_state":0.0,
     "network_structure_seed": 1,
-    "init_vals_seed": 2,
+    "preferences_seed": 2,
     "set_seed": 3,
     "carbon_price_duration": 2000,
     "burn_in_duration": 0,

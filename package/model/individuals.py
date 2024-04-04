@@ -49,7 +49,9 @@ class Individual:
 
         self.sector_substitutability = individual_params["sector_substitutability"]
 
-        self.update_prices(individual_params["init_carbon_price_m"])
+        #print(individual_params["carbon_price_m"])
+        #quit()
+        self.update_prices(individual_params["carbon_price_m"])
         #self.prices_high_carbon_instant = self.prices_high_carbon_m + individual_params["init_carbon_price_m"]
 
         self.id = id
@@ -87,13 +89,15 @@ class Individual:
         term_1 = (self.prices_high_carbon_instant*self.low_carbon_preferences)
         term_2 = (self.prices_low_carbon_m*(1- self.low_carbon_preferences))
         omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
+
+        #print("self.prices_high_carbon_instant", self.prices_high_carbon_instant)
+        #print(self.prices_low_carbon_m)
         return omega_vector
     
     def calc_n_tilde_m(self):
         n_tilde_m = (self.low_carbon_preferences*(self.Omega_m**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array))+(1-self.low_carbon_preferences))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
         return n_tilde_m
         
-    
     def calc_chi_m_nested_CES(self):
         chi_m = (self.sector_preferences*(self.n_tilde_m**((self.sector_substitutability-1)/self.sector_substitutability)))/self.prices_high_carbon_instant
         return chi_m
@@ -106,6 +110,7 @@ class Individual:
         return Z
     
     def calc_consumption_quantities_nested_CES(self):
+        #print(self.instant_expenditure)
         H_m = (self.instant_expenditure*(self.chi_m**self.sector_substitutability))/self.Z
         L_m = H_m*self.Omega_m
         return H_m, L_m
@@ -131,14 +136,17 @@ class Individual:
     def update_consumption(self):
         #calculate consumption
         self.Omega_m = self.calc_Omega_m()
+        #print(self.Omega_m)
         self.n_tilde_m = self.calc_n_tilde_m()
         self.chi_m = self.calc_chi_m_nested_CES()
         self.Z = self.calc_Z()
         self.H_m, self.L_m = self.calc_consumption_quantities_nested_CES()
-
+        #print("self.H_m", self.H_m)
         self.consumption_ratio = self.calc_consumption_ratio()
+        #print("self.consumption_ratio", self.consumption_ratio)
         self.outward_social_influence = self.calc_outward_social_influence()
-
+        #print("self.outward_social_influence",self.outward_social_influence)
+    
     def update_preferences(self, social_component):
         if self.static_internal_preference_state:
             low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preferences_init + self.phi_array*social_component
