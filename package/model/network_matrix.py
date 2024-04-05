@@ -124,35 +124,6 @@ class Network_Matrix:
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
 
-        if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
-            #case 2 (based on the presentation, EXPLAIN THIS BETTER LATER)
-            #YOU NEED TO HAVE UPPER AND LOWER BE DIFFERENT!
-            ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
-            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
-            self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
-        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 0):#fix this solution
-            #case 3
-            block_substitutabilities = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.SBM_block_num)
-            low_carbon_substitutability_matrix = np.tile(block_substitutabilities[:, np.newaxis], (1, self.M))
-            # Repeat each row according to the values in self.SBM_block_sizes
-            self.low_carbon_substitutability_array_list = np.repeat(low_carbon_substitutability_matrix, self.SBM_block_sizes, axis=0)
-        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 1):
-            #case 4 - each block has different substitutabilities and so do the sectors,(base is the same?)
-            self.SBM_sub_add_on = parameters["SBM_sub_add_on"]
-            self.low_carbon_substitutability_array_list = []
-            upper_val = parameters["low_carbon_substitutability_upper"]
-            for i, block_num in enumerate(self.SBM_block_sizes):
-                block_low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], upper_val , num=self.M)
-                block_subs = [block_low_carbon_substitutability_array]*block_num
-                self.low_carbon_substitutability_array_list.extend(block_subs)
-                upper_val += self.SBM_sub_add_on #with each block increase it a bit
-        else:
-            #case 1
-            #NOTE THAT ITS UPPER HERE NOT LOWER AS I USUALLY WANT TO MAKE STUFF MORE SUBSTITUTABLE NOT LESS, AS I ASSUME THAT THE DIRECTION OF TECHNOLOGY IN GENERAL
-            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
-            self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
-            #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
-
         self.sector_substitutability = parameters["sector_substitutability"]
         self.sector_preferences = np.asarray([1/self.M]*self.M)
 
@@ -192,10 +163,49 @@ class Network_Matrix:
         np.random.seed(self.shuffle_seed)#Set seed for shuffle
         self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
         
-    
         if self.network_type == "SBM":
-            self.init_block_id()
+            self.indices_shuffle_vector = self.gen_shuffle_id_vec()
+            self.block_id_list = self.init_block_id(self.block_id_list_unshuffled)
         
+        ###################################################        ###################################################        ###################################################
+        #SECTOR SUB MUST BE DONE AFTER NETWORK CREATION DUE TO THE NUMBER OF BLOCKS, AND SHUFFLE AS NEED THEM IN THE RIGHT ORDER!
+        if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
+            #case 2 (based on the presentation, EXPLAIN THIS BETTER LATER)
+            #YOU NEED TO HAVE UPPER AND LOWER BE DIFFERENT!
+            ## LOW CARBON SUBSTITUTABLILITY - this is what defines the behaviours
+            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.M)
+            self.low_carbon_substitutability_matrix = np.asarray([self.low_carbon_substitutability_array]*self.N)
+        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 0):#fix this solution
+            #case 3
+            block_substitutabilities = np.linspace(parameters["low_carbon_substitutability_lower"], parameters["low_carbon_substitutability_upper"], num=self.SBM_block_num)
+            low_carbon_substitutability_matrix = np.tile(block_substitutabilities[:, np.newaxis], (1, self.M))
+            # Repeat each row according to the values in self.SBM_block_sizes
+            self.low_carbon_substitutability_matrix = np.repeat(low_carbon_substitutability_matrix, self.SBM_block_sizes, axis=0)
+        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 1):
+            #case 4 - each block has different substitutabilities and so do the sectors,(base is the same?)
+            self.SBM_sub_add_on = parameters["SBM_sub_add_on"]
+            low_carbon_substitutability_matrix = []
+            upper_val = parameters["low_carbon_substitutability_upper"]
+            for i, block_num in enumerate(self.SBM_block_sizes):
+                block_low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], upper_val , num=self.M)
+                block_subs = [block_low_carbon_substitutability_array]*block_num
+                low_carbon_substitutability_matrix.extend(block_subs)
+                upper_val += self.SBM_sub_add_on #with each block increase it a bit
+            print(low_carbon_substitutability_matrix)
+            self.low_carbon_substitutability_matrix = self.shuffle_low_carbon_sub_matrix(np.asarray(low_carbon_substitutability_matrix))
+            print("self.low_carbon_substitutability_matrix", self.low_carbon_substitutability_matrix)
+            quit()
+        else:
+            #case 1
+            #NOTE THAT ITS UPPER HERE NOT LOWER AS I USUALLY WANT TO MAKE STUFF MORE SUBSTITUTABLE NOT LESS, AS I ASSUME THAT THE DIRECTION OF TECHNOLOGY IN GENERAL
+            self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
+            self.low_carbon_substitutability_matrix = np.asarray([self.low_carbon_substitutability_array]*self.N)
+            #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
+
+        #print("self.low_carbon_substitutability_array", self.low_carbon_substitutability_array)
+        #print("self.low_carbon_substitutability_matrix", self.low_carbon_substitutability_matrix)
+        #quit()
+
         #################################################################################################################################
         #CAN NOW CALCULATE PROPERTIES OF THE AGENTS AS THEY ARE SHUFFLED CORRECTLY
         #the values if i had done it before would have been correct but the order wrong
@@ -444,8 +454,11 @@ class Network_Matrix:
 
     def calc_social_component_matrix(self) -> npt.NDArray:
 
-        ego_influence = self.calc_ego_influence_degroot()           
-        social_influence = ego_influence + self.error_matrix_list[self.t]
+        if self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
+            ego_influence = self.calc_ego_influence_degroot_independent()
+        else:#culturally determined either static or dynamic
+            ego_influence = self.calc_ego_influence_degroot()           
+        social_influence = ego_influence + self.error_matrix_list[self.t]#np.random.normal(loc=0, scale=self.std_learning_error, size=(self.N, self.M))
 
         return social_influence
 
@@ -480,6 +493,7 @@ class Network_Matrix:
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
         
         neighbour_influence = np.zeros((self.N, self.M))
+        print("self.outward_social_influence_matrix",self.t, self.outward_social_influence_matrix)
 
         for m in range(self.M):
             neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], self.outward_social_influence_matrix[:,m])
@@ -490,9 +504,13 @@ class Network_Matrix:
         weighting_matrix_list = []
         attribute_matrix = (self.outward_social_influence_matrix).T
 
+        #print("MARTRIX attribute_matrix", attribute_matrix)
+
         for m in range(self.M):
             low_carbon_preferences_list = attribute_matrix[m]
+            #print("low_carbon_preferences_list",self.t,  m , low_carbon_preferences_list)
             norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
+            #print("norm_weighting_matrix",self.t, m , norm_weighting_matrix)
             weighting_matrix_list.append(norm_weighting_matrix)
 
         return weighting_matrix_list
@@ -524,13 +542,21 @@ class Network_Matrix:
         group_counts = [base_count + 1] * remainder + [base_count] * (self.SBM_block_num - remainder)
         return group_counts
     
-    def init_block_id(self):
+
+    def gen_shuffle_id_vec(self):
         indices_shuffle_vector = np.zeros(self.N, dtype=int)
         for i, row in enumerate(self.low_carbon_preference_matrix_init):
             #BELOW CHECK WHERE THE ROW INIT PREFERNCES IS EXACTLY THE SAME AS THE SHUFFLED ROW
             indices_shuffle_vector[i] = np.where((self.low_carbon_preference_matrix == row).all(axis=1))[0][0]
-
-        self.block_id_list = [self.block_id_list_unshuffled[i] for i in indices_shuffle_vector]
+        return indices_shuffle_vector
+        
+    def init_block_id(self, block_id_list_unshuffled):
+        block_id_list_shuffled = [block_id_list_unshuffled[i] for i in self.indices_shuffle_vector]
+        return block_id_list_shuffled
+    
+    def shuffle_low_carbon_sub_matrix(self, low_carbon_substitutability_matrix_unshuffled):
+        low_carbon_substitutability_matrix_shuffled = [low_carbon_substitutability_matrix_unshuffled[i] for i in self.indices_shuffle_vector]
+        return low_carbon_substitutability_matrix_shuffled
 
     def calc_block_emissions(self):
         bloc_flows = []

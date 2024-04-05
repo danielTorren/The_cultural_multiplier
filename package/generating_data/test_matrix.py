@@ -43,7 +43,7 @@ def main(
 
     quit()
     """
-
+    data_parallel_matrix = [generate_data_alt_matrix(i) for i in params_list]
     data_parallel_matrix  = Parallel(n_jobs=num_cores, verbose=10)(
         delayed(generate_data_alt_matrix)(i) for i in params_list
     )
@@ -55,7 +55,7 @@ def main(
     )
     print("ORIGINAL DONE!")
 
-    #data_parallel_matrix = [generate_data_alt_matrix(i) for i in params_list]
+    
     #"""
     emissions = np.asarray([data.total_carbon_emissions_stock for data in data_parallel])
     emissions_matrix =  np.asarray([data.total_carbon_emissions_stock for data in data_parallel_matrix])
@@ -130,8 +130,8 @@ if __name__ == '__main__':
     "compression_factor_state": 1,
     "heterogenous_intrasector_preferences_state": 1,
     "heterogenous_carbon_price_state": 0,
-    "heterogenous_sector_substitutabilities_state": 0,
-    "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
+    "heterogenous_sector_substitutabilities_state": 1,
+    "SBM_block_heterogenous_individuals_substitutabilities_state": 1,
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "vary_seed_state": "network",
@@ -141,13 +141,13 @@ if __name__ == '__main__':
     "preferences_seed": 14,
     "shuffle_seed":20,
 	"learning_seed":10, 
-    "carbon_price_duration": 1000, 
+    "carbon_price_duration": 1, 
     "burn_in_duration": 0, 
-    "N": 200, 
-    "M": 3, 
+    "N": 6, 
+    "M": 2, 
     "sector_substitutability": 2, 
-    #"low_carbon_substitutability_lower": 1.5, 
-    "low_carbon_substitutability_upper": 2, 
+    "low_carbon_substitutability_lower": 1.5, 
+    "low_carbon_substitutability_upper": 3, 
     "a_identity": 2, 
     "b_identity": 2, 
     "clipping_epsilon": 0, 
@@ -160,12 +160,13 @@ if __name__ == '__main__':
     "phi_lower": 0.02, 
     "homophily_state": 0.9,
     "SW_network_density": 0.1,
-    "SW_prob_rewire": 0.1,
+    "SW_prob_rewire": 0.5,
     "BA_nodes": 11,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2,
     "SBM_network_density_input_inter_block": 0.005,
+    "SBM_sub_add_on": 0.5,
     "carbon_price_increased_lower": 0.2
     }
     

@@ -472,6 +472,7 @@ class Network:
 
         #attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
         attribute_matrix = np.asarray([x.outward_social_influence for x in self.agent_list])
+        print("attribute_matrix", self.t,attribute_matrix)
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
 
@@ -559,9 +560,13 @@ class Network:
         #attribute_matrix = (np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list)))).T
         attribute_matrix = (np.asarray([x.outward_social_influence for x in self.agent_list])).T
 
+        #print("attribute_matrix", attribute_matrix)
+
         for m in range(self.M):
             low_carbon_preferences_list = attribute_matrix[m]
+            #print("low_carbon_preferences_list",self.t, m , low_carbon_preferences_list)
             norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
+            #print("norm_weighting_matrix",self.t, m , norm_weighting_matrix)
             weighting_matrix_list.append(norm_weighting_matrix)
 
         return weighting_matrix_list
