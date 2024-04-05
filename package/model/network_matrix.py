@@ -191,10 +191,10 @@ class Network_Matrix:
                 block_subs = [block_low_carbon_substitutability_array]*block_num
                 low_carbon_substitutability_matrix.extend(block_subs)
                 upper_val += self.SBM_sub_add_on #with each block increase it a bit
-            print(low_carbon_substitutability_matrix)
-            self.low_carbon_substitutability_matrix = self.shuffle_low_carbon_sub_matrix(np.asarray(low_carbon_substitutability_matrix))
-            print("self.low_carbon_substitutability_matrix", self.low_carbon_substitutability_matrix)
-            quit()
+            #print(low_carbon_substitutability_matrix)
+            self.low_carbon_substitutability_matrix = np.asarray(self.shuffle_low_carbon_sub_matrix(low_carbon_substitutability_matrix))
+            #print("self.low_carbon_substitutability_matrix", self.low_carbon_substitutability_matrix)
+            #quit()
         else:
             #case 1
             #NOTE THAT ITS UPPER HERE NOT LOWER AS I USUALLY WANT TO MAKE STUFF MORE SUBSTITUTABLE NOT LESS, AS I ASSUME THAT THE DIRECTION OF TECHNOLOGY IN GENERAL

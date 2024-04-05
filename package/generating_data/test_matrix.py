@@ -143,11 +143,11 @@ if __name__ == '__main__':
 	"learning_seed":10, 
     "carbon_price_duration": 1, 
     "burn_in_duration": 0, 
-    "N": 6, 
+    "N": 200, 
     "M": 2, 
     "sector_substitutability": 2, 
-    "low_carbon_substitutability_lower": 1.5, 
-    "low_carbon_substitutability_upper": 3, 
+    "low_carbon_substitutability_lower": 2, 
+    "low_carbon_substitutability_upper": 5, 
     "a_identity": 2, 
     "b_identity": 2, 
     "clipping_epsilon": 0, 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2,
     "SBM_network_density_input_inter_block": 0.005,
-    "SBM_sub_add_on": 0.5,
+    "SBM_sub_add_on": 5,
     "carbon_price_increased_lower": 0.2
     }
     
