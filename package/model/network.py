@@ -129,6 +129,37 @@ class Network:
                 #self.expenditure = parameters["expenditure"]
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
 
+        self.sector_substitutability = parameters["sector_substitutability"]
+        
+        self.sector_preferences = np.asarray([1/self.M]*self.M)
+
+        ########################################################
+        #CANT HAVE ANYTHING USE NUMPY RANDOM BEFORE THIS
+        ###################################################
+        # set preferences
+        np.random.seed(self.preferences_seed)#For inital construction set a seed
+        if self.heterogenous_intrasector_preferences_state == 1:
+            self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
+            (
+                self.low_carbon_preference_matrix_init
+            ) = self.generate_init_data_preferences()
+        else:
+            #this is if you want same preferences for everbody
+            self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
+
+        # create network
+        np.random.seed(self.network_structure_seed)#This is not necessary but for consistency with other code maybe leave in
+        (
+            self.adjacency_matrix,
+            self.weighting_matrix,
+            self.network,
+        ) = self.create_weighting_matrix()
+
+        ###################################################        ###################################################        ###################################################
+        #SECTOR SUB MUST BE DONE AFTER NETWORK CREATION DUE TO THE NUMBER OF BLOCKS, AND SHUFFLE AS NEED THEM IN THE RIGHT ORDER!
+
         if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
             #case 2 (based on the presentation, EXPLAIN THIS BETTER LATER)
             #YOU NEED TO HAVE UPPER AND LOWER BE DIFFERENT!
@@ -158,42 +189,29 @@ class Network:
             self.low_carbon_substitutability_array_list = [self.low_carbon_substitutability_array]*self.N
             #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
 
-        self.sector_substitutability = parameters["sector_substitutability"]
-        
-        self.sector_preferences = np.asarray([1/self.M]*self.M)
-
-        ########################################################
-        #CANT HAVE ANYTHING USE NUMPY RANDOM BEFORE THIS
-        ###################################################
-        # set preferences
-        np.random.seed(self.preferences_seed)#For inital construction set a seed
-        if self.heterogenous_intrasector_preferences_state == 1:
-            self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
-            self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
-            self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
-            (
-                self.low_carbon_preference_matrix_init
-            ) = self.generate_init_data_preferences()
-        else:
-            #this is if you want same preferences for everbody
-            self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
-
-        # create network
-        np.random.seed(self.network_structure_seed)#This is not necessary but for consistency with other code maybe leave in
-        (
-            self.adjacency_matrix,
-            self.weighting_matrix,
-            self.network,
-        ) = self.create_weighting_matrix()
+        #print(self.low_carbon_substitutability_array_list)
+        ###################################################################################################################################################################
         
         self.agent_list = self.create_agent_list()
 
         if self.network_type == "SBM":
             self.init_block_id()
+            
+        #bef_low_carbon_preference_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        #print(bef_low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
 
+        #print("self.shuffle_reps", self.shuffle_reps)
         np.random.seed(self.shuffle_seed)#Set seed for shuffle
         self.shuffle_agent_list()#partial shuffle of the list based on identity
-
+        #print("POST SHUFFLE",np.asarray([n.low_carbon_substitutability_array for n in self.agent_list]))
+        #a = self.gen_shuffle_id_vec()
+        #print(a)
+        
+        print("POST SHUFFLE id ",np.asarray([n.block_id for n in self.agent_list]))
+        #self.low_carbon_preference_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        #print(self.low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
+        print("POST SHUFFLE SUB",np.asarray([n.low_carbon_substitutability_array for n in self.agent_list]))
+              
         np.random.seed(self.learning_seed)#set seed for learning
         self.error_matrix_list = np.random.normal(loc=0, scale=self.std_learning_error, size=(self.time_step_max+1, self.N, self.M))
 
@@ -229,6 +247,15 @@ class Network:
         ) = self.calc_network_identity()
 
         #self.welfare_stock = 0
+
+    def gen_shuffle_id_vec(self):
+        indices_shuffle_vector = np.zeros(self.N, dtype=int)
+        low_carbon_preference_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        for i, row in enumerate(self.low_carbon_preference_matrix_init):
+            #BELOW CHECK WHERE THE ROW INIT PREFERNCES IS EXACTLY THE SAME AS THE SHUFFLED ROW
+            indices_shuffle_vector[i] = np.where((low_carbon_preference_matrix == row).all(axis=1))[0][0]
+        
+        return indices_shuffle_vector
 
     def set_up_time_series(self):
         self.history_weighting_matrix = [self.weighting_matrix]
@@ -358,9 +385,14 @@ class Network:
 
         preferences_uncapped = np.asarray([np.random.normal(loc=identity,scale=self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
 
-        low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
+        low_carbon_preference_matrix_unsorted = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
-        return low_carbon_preference_matrix
+        identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)
+        #print("identity_unsorted", identity_unsorted)
+        low_carbon_preference_matrix = [x for _, x in sorted(zip(identity_unsorted, low_carbon_preference_matrix_unsorted))]#low_carbon_preference_matrix_unsorted.sort(key=identity_unsorted) #self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
+        #print("low_carbon_preference_matrix", low_carbon_preference_matrix)
+        #quit()
+        return np.asarray(low_carbon_preference_matrix)
 
     def create_agent_list(self) -> list[Individual]:
         """
@@ -430,22 +462,36 @@ class Network:
         """
         Partially shuffle a list using Fisher Yates shuffle
         """
+        #print("before")
+        #bef_low_carbon_preference_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        #print(bef_low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
 
-        for _ in range(self.shuffle_reps):
+        for rep in range(self.shuffle_reps):
+            #print(rep)
             a, b = np.random.randint(
                 low=0, high=self.N, size=2
             )  # generate pair of indicies to swap
             self.agent_list[b], self.agent_list[a] = self.agent_list[a], self.agent_list[b]
+        #print("done")
+
+        #after_low_carbon_preference_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        #print(after_low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
     
     def shuffle_agent_list(self): 
         #make list cirucalr then partial shuffle it
-        self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
+        
+        #bef_low_carbon_preference_matrix = np.asarray([n.low_carbon_preferences for n in self.agent_list])
+        #print(bef_low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
+        #
+    
+        #self.agent_list.sort(key=lambda x: x.identity)#sorted by identity
     
         if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
             self.agent_list.reverse()
         elif (self.network_type== "SW"):
             self.circular_agent_list()#agent list is now circular in terms of identity
         elif (self.network_type == "SBM"):
+            #print("hello")
             pass
 
         self.partial_shuffle_agent_list()#partial shuffle of the list
@@ -472,7 +518,7 @@ class Network:
 
         #attribute_matrix = np.asarray(list(map(attrgetter('outward_social_influence'), self.agent_list))) 
         attribute_matrix = np.asarray([x.outward_social_influence for x in self.agent_list])
-        print("attribute_matrix", self.t,attribute_matrix)
+        #print("attribute_matrix", self.t,attribute_matrix)
         #behavioural_attitude_matrix = np.asarray([n.attitudes for n in self.agent_list])
         neighbour_influence = np.zeros((self.N, self.M))
 

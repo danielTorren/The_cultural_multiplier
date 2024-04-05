@@ -19,7 +19,7 @@ def main(
 ) -> str: 
 
     num_cores = multiprocessing.cpu_count()
-    seed_reps = 12
+    seed_reps = 1
     params_list = []
     for v in range(seed_reps):
             base_params["set_seed"] = int(v+1)
@@ -44,15 +44,17 @@ def main(
     quit()
     """
     data_parallel_matrix = [generate_data_alt_matrix(i) for i in params_list]
-    data_parallel_matrix  = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_data_alt_matrix)(i) for i in params_list
-    )
+    #quit()
+    #data_parallel_matrix  = Parallel(n_jobs=num_cores, verbose=10)(
+    #    delayed(generate_data_alt_matrix)(i) for i in params_list
+    #)
 
     print("MATRIX DONE!")
 
-    data_parallel = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_data_alt)(i) for i in params_list
-    )
+    data_parallel = [generate_data_alt(i) for i in params_list]
+    #data_parallel = Parallel(n_jobs=num_cores, verbose=10)(
+    #    delayed(generate_data_alt)(i) for i in params_list
+    #)
     print("ORIGINAL DONE!")
 
     
@@ -141,9 +143,9 @@ if __name__ == '__main__':
     "preferences_seed": 14,
     "shuffle_seed":20,
 	"learning_seed":10, 
-    "carbon_price_duration": 1, 
+    "carbon_price_duration": 1000, 
     "burn_in_duration": 0, 
-    "N": 200, 
+    "N": 20, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 
@@ -158,14 +160,14 @@ if __name__ == '__main__':
     "expenditure": 1,
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
-    "homophily_state": 0.9,
+    "homophily_state": 0.1,
     "SW_network_density": 0.1,
     "SW_prob_rewire": 0.5,
     "BA_nodes": 11,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
-    "SBM_network_density_input_intra_block": 0.2,
-    "SBM_network_density_input_inter_block": 0.005,
+    "SBM_network_density_input_intra_block": 0.6,#0.2,
+    "SBM_network_density_input_inter_block": 0.3,#0.005,
     "SBM_sub_add_on": 5,
     "carbon_price_increased_lower": 0.2
     }

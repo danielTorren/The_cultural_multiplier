@@ -8,9 +8,11 @@ Created: 10/10/2022
 """
 
 # imports
+import copy
 import numpy as np
 import networkx as nx
 import numpy.typing as npt
+from copy import deepcopy
 
 # modules
 class Network_Matrix:
@@ -136,15 +138,13 @@ class Network_Matrix:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
-            (
-                self.low_carbon_preference_matrix_init
-            ) = self.generate_init_data_preferences()
+            self.low_carbon_preference_matrix_init = self.generate_init_data_preferences()
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
         
         self.low_carbon_preference_matrix = self.low_carbon_preference_matrix_init#THE IS THE MATRIX OF PREFERENCES, UNMIXED
-
+        #print("PRE SHUFFLE self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
         # create network
         np.random.seed(self.network_structure_seed)#This is not necessary but for consistency with other code maybe leave in
         (
@@ -159,16 +159,24 @@ class Network_Matrix:
         self.update_carbon_price()#check whether its time to update carbon price
         
         #DO THE HOMOPHILY STUFF
-        self.identity_vec = self.calc_identity()
+        #print("self.shuffle_reps", self.shuffle_reps)
+        self.identity_vec = self.calc_identity(self.low_carbon_preference_matrix)
+        #print("pre shuffle self.low_carbon_preference_matrix", self.low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
+        
         np.random.seed(self.shuffle_seed)#Set seed for shuffle
         self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
-        
+        #print("psot shuffle self.low_carbon_preference_matrix", self.low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
+        #quit()
+        #GREAT THEY ARE DIFFERENT HERE THE SHUFFLE WORKS
+
         if self.network_type == "SBM":
-            self.indices_shuffle_vector = self.gen_shuffle_id_vec()
-            self.block_id_list = self.init_block_id(self.block_id_list_unshuffled)
+            self.block_id_list = self.shuffle_matrix_to_match(self.block_id_list_unshuffled)
         
+        print("self.block_id_list", self.block_id_list)
+
         ###################################################        ###################################################        ###################################################
         #SECTOR SUB MUST BE DONE AFTER NETWORK CREATION DUE TO THE NUMBER OF BLOCKS, AND SHUFFLE AS NEED THEM IN THE RIGHT ORDER!
+        #NOTE YOU CANT HAVE BOTH HETEROGENOUS BETWEEN BLOCKS AND SECTORS
         if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
             #case 2 (based on the presentation, EXPLAIN THIS BETTER LATER)
             #YOU NEED TO HAVE UPPER AND LOWER BE DIFFERENT!
@@ -181,30 +189,11 @@ class Network_Matrix:
             low_carbon_substitutability_matrix = np.tile(block_substitutabilities[:, np.newaxis], (1, self.M))
             # Repeat each row according to the values in self.SBM_block_sizes
             self.low_carbon_substitutability_matrix = np.repeat(low_carbon_substitutability_matrix, self.SBM_block_sizes, axis=0)
-        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 1):
-            #case 4 - each block has different substitutabilities and so do the sectors,(base is the same?)
-            self.SBM_sub_add_on = parameters["SBM_sub_add_on"]
-            low_carbon_substitutability_matrix = []
-            upper_val = parameters["low_carbon_substitutability_upper"]
-            for i, block_num in enumerate(self.SBM_block_sizes):
-                block_low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_lower"], upper_val , num=self.M)
-                block_subs = [block_low_carbon_substitutability_array]*block_num
-                low_carbon_substitutability_matrix.extend(block_subs)
-                upper_val += self.SBM_sub_add_on #with each block increase it a bit
-            #print(low_carbon_substitutability_matrix)
-            self.low_carbon_substitutability_matrix = np.asarray(self.shuffle_low_carbon_sub_matrix(low_carbon_substitutability_matrix))
-            #print("self.low_carbon_substitutability_matrix", self.low_carbon_substitutability_matrix)
-            #quit()
         else:
             #case 1
             #NOTE THAT ITS UPPER HERE NOT LOWER AS I USUALLY WANT TO MAKE STUFF MORE SUBSTITUTABLE NOT LESS, AS I ASSUME THAT THE DIRECTION OF TECHNOLOGY IN GENERAL
             self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
             self.low_carbon_substitutability_matrix = np.asarray([self.low_carbon_substitutability_array]*self.N)
-            #self.low_carbon_substitutability_array = np.linspace(parameters["low_carbon_substitutability_upper"], parameters["low_carbon_substitutability_upper"], num=self.M)
-
-        #print("self.low_carbon_substitutability_array", self.low_carbon_substitutability_array)
-        #print("self.low_carbon_substitutability_matrix", self.low_carbon_substitutability_matrix)
-        #quit()
 
         #################################################################################################################################
         #CAN NOW CALCULATE PROPERTIES OF THE AGENTS AS THEY ARE SHUFFLED CORRECTLY
@@ -317,7 +306,7 @@ class Network_Matrix:
             block_probs = np.full((num_blocks,num_blocks), self.SBM_network_density_input_inter_block)
             np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
             G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.network_structure_seed)
-            self.block_id_list_unshuffled = [i+1 for i, size in enumerate(self.SBM_block_sizes) for _ in range(size)]
+            self.block_id_list_unshuffled = np.asarray([i for i, size in enumerate(self.SBM_block_sizes) for _ in range(size)])
         elif self.network_type == "BA":
             G = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes, seed= self.network_structure_seed)
 
@@ -339,9 +328,13 @@ class Network_Matrix:
 
         preferences_uncapped = np.asarray([np.random.normal(loc=identity,scale=self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
 
-        low_carbon_preference_matrix = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
+        low_carbon_preference_matrix_unsorted = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
-        return low_carbon_preference_matrix
+        identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)
+        #print("identity_unsorted", identity_unsorted)
+        low_carbon_preference_matrix = [x for _, x in sorted(zip(identity_unsorted, low_carbon_preference_matrix_unsorted))]
+
+        return np.asarray(low_carbon_preference_matrix)
 
     def circular_list(self, list_to_circle) -> list:
         first_half = list_to_circle[::2]  # take every second element in the list, even indicies
@@ -351,17 +344,23 @@ class Network_Matrix:
         return circular_matrix
 
     def partial_shuffle_matrix(self, matrix_to_shufle) -> list:
+        """ THIS shuffles the matrix in place, doenst make a copy?"""
+        #print("INIT matrix_to_shufle", matrix_to_shufle)
+        self.swaps_list = []
         for _ in range(self.shuffle_reps):
             a, b = np.random.randint(
                 low=0, high=self.N, size=2
             )  # generate pair of indicies to swap
+            self.swaps_list.append((a,b))#use this to mix stuff later
             matrix_to_shufle[[a, b]] = matrix_to_shufle[[b, a]]
+        #print("self.swaps_list", self.swaps_list)
+        #print("END matrix_to_shufle", matrix_to_shufle)
+        #quit()
         return matrix_to_shufle
 
     def shuffle_preferences(self): 
         #make list cirucalr then partial shuffle it
-        sorted_indices = np.argsort(self.identity_vec)
-        sorted_preferences = self.low_carbon_preference_matrix_init[sorted_indices, :]#NOW THEY ARE HOMPHILY
+        sorted_preferences = deepcopy(self.low_carbon_preference_matrix)#[sorted_indices, :]#NOW THEY ARE HOMPHILY
 
         if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
             sorted_preferences = sorted_preferences[::-1]
@@ -371,8 +370,9 @@ class Network_Matrix:
             pass
 
         partial_shuffle_matrix = self.partial_shuffle_matrix(sorted_preferences)#partial shuffle of the list
-
+        
         return partial_shuffle_matrix
+    
     ###########################################################################################################################################################
     #TIME LOOPS
     ###########################################################################################################################################################
@@ -392,11 +392,13 @@ class Network_Matrix:
     def calc_Omega_m(self):
         term_1 = (self.prices_high_carbon_instant*self.low_carbon_preference_matrix)
         term_2 = (self.prices_low_carbon_m*(1- self.low_carbon_preference_matrix))
-        omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
+        #omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
+        omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_matrix)
         return omega_vector
     
     def calc_n_tilde_m(self):
-        n_tilde_m = (self.low_carbon_preference_matrix*(self.Omega_m_matrix**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array))+(1-self.low_carbon_preference_matrix))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+        #n_tilde_m = (self.low_carbon_preference_matrix*(self.Omega_m_matrix**((self.low_carbon_substitutability_array-1)/self.low_carbon_substitutability_array))+(1-self.low_carbon_preference_matrix))**(self.low_carbon_substitutability_array/(self.low_carbon_substitutability_array-1))
+        n_tilde_m = (self.low_carbon_preference_matrix*(self.Omega_m_matrix**((self.low_carbon_substitutability_matrix-1)/self.low_carbon_substitutability_matrix))+(1-self.low_carbon_preference_matrix))**(self.low_carbon_substitutability_matrix/(self.low_carbon_substitutability_matrix-1))
         return n_tilde_m
         
     def calc_chi_m_nested_CES(self):
@@ -478,11 +480,11 @@ class Network_Matrix:
     
         return norm_weighting_matrix
 
-    def calc_identity(self):
-        return np.mean(self.low_carbon_preference_matrix, axis = 1)
+    def calc_identity(self, low_carbon_preference_matrix):
+        return np.mean(low_carbon_preference_matrix, axis = 1)
 
     def update_weightings(self) -> tuple[npt.NDArray, float]:
-        self.identity_vec = self.calc_identity()
+        self.identity_vec = self.calc_identity(self.low_carbon_preference_matrix)
         norm_weighting_matrix = self.calc_weighting_matrix_attribute(self.identity_vec)
 
         return norm_weighting_matrix
@@ -493,7 +495,6 @@ class Network_Matrix:
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
         
         neighbour_influence = np.zeros((self.N, self.M))
-        print("self.outward_social_influence_matrix",self.t, self.outward_social_influence_matrix)
 
         for m in range(self.M):
             neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], self.outward_social_influence_matrix[:,m])
@@ -504,13 +505,9 @@ class Network_Matrix:
         weighting_matrix_list = []
         attribute_matrix = (self.outward_social_influence_matrix).T
 
-        #print("MARTRIX attribute_matrix", attribute_matrix)
-
         for m in range(self.M):
             low_carbon_preferences_list = attribute_matrix[m]
-            #print("low_carbon_preferences_list",self.t,  m , low_carbon_preferences_list)
             norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
-            #print("norm_weighting_matrix",self.t, m , norm_weighting_matrix)
             weighting_matrix_list.append(norm_weighting_matrix)
 
         return weighting_matrix_list
@@ -542,21 +539,18 @@ class Network_Matrix:
         group_counts = [base_count + 1] * remainder + [base_count] * (self.SBM_block_num - remainder)
         return group_counts
     
-
     def gen_shuffle_id_vec(self):
         indices_shuffle_vector = np.zeros(self.N, dtype=int)
         for i, row in enumerate(self.low_carbon_preference_matrix_init):
             #BELOW CHECK WHERE THE ROW INIT PREFERNCES IS EXACTLY THE SAME AS THE SHUFFLED ROW
             indices_shuffle_vector[i] = np.where((self.low_carbon_preference_matrix == row).all(axis=1))[0][0]
         return indices_shuffle_vector
-        
-    def init_block_id(self, block_id_list_unshuffled):
-        block_id_list_shuffled = [block_id_list_unshuffled[i] for i in self.indices_shuffle_vector]
-        return block_id_list_shuffled
-    
-    def shuffle_low_carbon_sub_matrix(self, low_carbon_substitutability_matrix_unshuffled):
-        low_carbon_substitutability_matrix_shuffled = [low_carbon_substitutability_matrix_unshuffled[i] for i in self.indices_shuffle_vector]
-        return low_carbon_substitutability_matrix_shuffled
+
+    def shuffle_matrix_to_match(self,unshuffled_matrix):
+        for i, j in self.swaps_list:
+            unshuffled_matrix[i], unshuffled_matrix[j] = unshuffled_matrix[j], unshuffled_matrix[i]
+
+        return unshuffled_matrix
 
     def calc_block_emissions(self):
         bloc_flows = []
