@@ -171,8 +171,6 @@ class Network_Matrix:
 
         if self.network_type == "SBM":
             self.block_id_list = self.shuffle_matrix_to_match(self.block_id_list_unshuffled)
-        
-        print("self.block_id_list", self.block_id_list)
 
         ###################################################        ###################################################        ###################################################
         #SECTOR SUB MUST BE DONE AFTER NETWORK CREATION DUE TO THE NUMBER OF BLOCKS, AND SHUFFLE AS NEED THEM IN THE RIGHT ORDER!
