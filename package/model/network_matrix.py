@@ -489,32 +489,26 @@ class Network_Matrix:
     
     #####################################################################################################
     #SOCIAL MULTIPLIER SPECFIC FUNCTIONS
-    """
-    Need to vectorise these
-    """
+    #I TRIED TO VECTORISE BUT IT MADE IT SLOWER
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
-        """
+        
         neighbour_influence = np.zeros((self.N, self.M))
 
         for m in range(self.M):
-            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_tensor[m], self.outward_social_influence_matrix[:,m])
-        """
-
-        """
-        I HONESTLY DONT UNDERSTAND HOW THE CODE BELOW WORKS BUT IT DOES SO IM USIGN IT, IVE TESTED IT AGAINS THE ORIIGNAL CODE ABOVE AND ITS THE SAME RESULT
-        """
-        weighting_inlfuence_tensor = np.matmul(self.weighting_matrix_tensor, self.outward_social_influence_matrix) 
-        neighbour_influence = np.diagonal(weighting_inlfuence_tensor, axis1=0, axis2=2)
+            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], self.outward_social_influence_matrix[:,m])
         
         return neighbour_influence
     
     def update_weightings_list(self) -> tuple[npt.NDArray, float]:
-        # IVE TRIED TO MAKE THIS FASTER BUT CANT
+        weighting_matrix_list = []
         attribute_matrix = (self.outward_social_influence_matrix).T
-        weighting_matrix_tensor = np.array([self.calc_weighting_matrix_attribute(x) for x in attribute_matrix])
 
-        return weighting_matrix_tensor
+        for m in range(self.M):
+            low_carbon_preferences_list = attribute_matrix[m]
+            norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
+            weighting_matrix_list.append(norm_weighting_matrix)
 
+        return weighting_matrix_list  
 
     #############################################################################################################
     
