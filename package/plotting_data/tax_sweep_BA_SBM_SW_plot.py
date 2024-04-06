@@ -85,6 +85,7 @@ def plot_means_end_points_emissions(
     plotName = fileName + "/Plots"
     f = plotName + "/network_plot_means_end_points_emissions"
     fig.savefig(f+ ".png", dpi=600, format="png") 
+    fig.savefig(f+ ".eps", dpi=600, format="eps") 
 
 def plot_emissions_ratio_scatter(
     fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
@@ -395,6 +396,7 @@ def plot_emissions_ratio_mean(fileName, emissions_network, scenarios_titles, pro
     plotName = fileName + "/Plots"
     f = plotName + "/plot_emissions_ratio_mean"
     fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
 
 
 #####################################################################################################
@@ -513,7 +515,7 @@ def plot_reduc_mean(fileName, emissions_network, scenarios_titles, property_vals
     fig.savefig(f + ".png", dpi=600, format="png")
     
 def main(
-    fileName = "results/tax_sweep_11_29_20__28_09_2023",
+    fileName ,#= "results/tax_sweep_11_29_20__28_09_2023"
     LOAD_STATIC_FULL = 0
 ) -> None:
     
@@ -533,12 +535,13 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
     print("base params", base_params)
+    quit()
     scenarios = load_object(fileName + "/Data", "scenarios")
     #print(scenarios)
     #"""
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
     #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #EMISSIONS RATIOS ALL TOGETHER, THIS IS THE RATIO OF EMISSIONS TO THE CASE OF NO CARBON PRICE
     #plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
@@ -552,7 +555,7 @@ def main(
 
     #PRICE ELASTICITIES
     #plot_price_elasticies_seeds(fileName, emissions_networks, scenario_labels,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
-    plot_price_elasticies_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_price_elasticies_mean(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #PLOT MULTIPLIER RELATIVE TO THE CASE OF PRICE EFFECT
     #plot_emissions_ratio_seeds(fileName, emissions_networks, scenario_labels ,property_values_list,seed_reps,seeds_to_show,network_titles,colors_scenarios)
@@ -560,9 +563,9 @@ def main(
     
     
     #"""
-    """
+    #"""
     seed_reps = base_params["seed_reps"]
-    seeds_to_show = 3
+    #seeds_to_show = 3
 
     if LOAD_STATIC_FULL:
         tau_matrix = load_object(fileName + "/Data", "tau_matrix")
@@ -576,7 +579,7 @@ def main(
         save_object(emissions_matrix,fileName + "/Data", "emissions_matrix")
 
     #plot_emissions_fixed(tau_matrix, emissions_matrix)
-    plot_reduc_seeds(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,seeds_to_show,network_titles,colors_scenarios)
+    #plot_reduc_seeds(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,seeds_to_show,network_titles,colors_scenarios)
     plot_reduc_mean(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,network_titles,colors_scenarios)
     #"""
 
@@ -584,6 +587,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_12_33_21__13_03_2024",
+        fileName= "results/tax_sweep_networks_20_26_58__05_04_2024",
         LOAD_STATIC_FULL = 0
     )

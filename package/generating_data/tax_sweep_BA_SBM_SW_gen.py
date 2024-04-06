@@ -102,7 +102,7 @@ def main(
 
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
-
+    print("params", params)
     root = "tax_sweep_networks"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
