@@ -14,6 +14,7 @@ from package.resources.utility import (
     createFolder,
     save_object,
     produce_name_datetime,
+    produce_param_list_stochastic
 )
 from package.resources.run import parallel_run_sa
 from package.plotting_data import sensitivity_analysis_plot
@@ -133,17 +134,6 @@ def stochastic_produce_param_list_SA(
                 base_params_copy.copy()
             )  
         #params_list.append(base_params_copy)
-    return params_list
-
-def produce_param_list_stochastic(params: dict, property_list: list, property: str) -> list[dict]:
-    params_list = []
-    for i in property_list:
-        params[property] = i
-        for v in range(params["seed_reps"]):
-            params["set_seed"] = int(v+1)
-            params_list.append(
-                params.copy()
-            )  
     return params_list
 
 def main(

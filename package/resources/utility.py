@@ -167,3 +167,14 @@ def calc_bounds(data, confidence_level):
     upper_bound = ys_mean + margin_of_error
 
     return ys_mean,lower_bound, upper_bound
+
+def produce_param_list_stochastic(params: dict, property_list: list, property: str) -> list[dict]:
+    params_list = []
+    for i in property_list:
+        params[property] = i
+        for v in range(params["seed_reps"]):
+            params["set_seed"] = int(v+1)
+            params_list.append(
+                params.copy()
+            )  
+    return params_list

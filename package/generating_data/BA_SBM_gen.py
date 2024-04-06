@@ -159,6 +159,8 @@ def main(
     save_object(params_SBM, fileName + "/Data", "base_params_SBM")
 
     print("RUNS DONE")
+
+    """
 ########################################################################################################################
     t_max = params_SBM["carbon_price_duration"] + params_SBM["burn_in_duration"]
 
@@ -202,7 +204,7 @@ def main(
     save_object(emissions_array_static, fileName + "/Data", "emissions_array_static")
     save_object(emissions_array_static_full, fileName + "/Data", "emissions_array_static_full")
     print("STATIC DONE")
-
+    """
 ###############################################################################################################
     save_object(var_params,fileName + "/Data" , "var_params")
     save_object(property_values_list,fileName + "/Data", "property_values_list")
