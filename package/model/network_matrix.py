@@ -215,7 +215,7 @@ class Network_Matrix:
             if self.alpha_change_state in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_identity_determined_weights", "common_knowledge_dynamic_identity_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
-                self.weighting_matrix_list = self.update_weightings_list()
+                self.weighting_matrix_tensor = self.update_weightings_list()
             self.social_component_matrix = self.calc_social_component_matrix()
 
         self.carbon_dividend_array = self.calc_carbon_dividend_array()
@@ -465,7 +465,7 @@ class Network_Matrix:
     def calc_weighting_matrix_attribute(self,attribute_array):
 
         difference_matrix = np.subtract.outer(attribute_array, attribute_array) #euclidean_distances(attribute_array,attribute_array)# i think this actually not doing anything? just squared at the moment
-
+        #print("1 vec difference_matrix", difference_matrix.shape)
         alpha_numerator = np.exp(-np.multiply(self.confirmation_bias, np.abs(difference_matrix)))
 
         non_diagonal_weighting_matrix = (
@@ -489,26 +489,32 @@ class Network_Matrix:
     
     #####################################################################################################
     #SOCIAL MULTIPLIER SPECFIC FUNCTIONS
-
+    """
+    Need to vectorise these
+    """
     def calc_ego_influence_degroot_independent(self) -> npt.NDArray:
-        
+        """
         neighbour_influence = np.zeros((self.N, self.M))
 
         for m in range(self.M):
-            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], self.outward_social_influence_matrix[:,m])
+            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_tensor[m], self.outward_social_influence_matrix[:,m])
+        """
+
+        """
+        I HONESTLY DONT UNDERSTAND HOW THE CODE BELOW WORKS BUT IT DOES SO IM USIGN IT, IVE TESTED IT AGAINS THE ORIIGNAL CODE ABOVE AND ITS THE SAME RESULT
+        """
+        weighting_inlfuence_tensor = np.matmul(self.weighting_matrix_tensor, self.outward_social_influence_matrix) 
+        neighbour_influence = np.diagonal(weighting_inlfuence_tensor, axis1=0, axis2=2)
         
         return neighbour_influence
     
     def update_weightings_list(self) -> tuple[npt.NDArray, float]:
-        weighting_matrix_list = []
+        # IVE TRIED TO MAKE THIS FASTER BUT CANT
         attribute_matrix = (self.outward_social_influence_matrix).T
+        weighting_matrix_tensor = np.array([self.calc_weighting_matrix_attribute(x) for x in attribute_matrix])
 
-        for m in range(self.M):
-            low_carbon_preferences_list = attribute_matrix[m]
-            norm_weighting_matrix = self.calc_weighting_matrix_attribute(low_carbon_preferences_list)
-            weighting_matrix_list.append(norm_weighting_matrix)
+        return weighting_matrix_tensor
 
-        return weighting_matrix_list
 
     #############################################################################################################
     
@@ -623,7 +629,7 @@ class Network_Matrix:
             if self.alpha_change_state in ("dynamic_identity_determined_weights", "common_knowledge_dynamic_identity_determined_weights"):
                 self.weighting_matrix = self.update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":#independent behaviours
-                self.weighting_matrix_list = self.update_weightings_list()
+                self.weighting_matrix_tensor = self.update_weightings_list()
             else:
                 pass #this is for "uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights"
             #This still updates for the case of the static weightings

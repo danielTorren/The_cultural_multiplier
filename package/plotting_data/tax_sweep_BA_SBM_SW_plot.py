@@ -535,13 +535,13 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
     print("base params", base_params)
-    quit()
+
     scenarios = load_object(fileName + "/Data", "scenarios")
     #print(scenarios)
     #"""
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
     #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #EMISSIONS RATIOS ALL TOGETHER, THIS IS THE RATIO OF EMISSIONS TO THE CASE OF NO CARBON PRICE
     #plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
@@ -563,7 +563,7 @@ def main(
     
     
     #"""
-    #"""
+    """
     seed_reps = base_params["seed_reps"]
     #seeds_to_show = 3
 
@@ -581,12 +581,12 @@ def main(
     #plot_emissions_fixed(tau_matrix, emissions_matrix)
     #plot_reduc_seeds(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,seeds_to_show,network_titles,colors_scenarios)
     plot_reduc_mean(fileName, emissions_networks, scenario_labels,property_values_list, tau_matrix, emissions_matrix,seed_reps,network_titles,colors_scenarios)
-    #"""
+    """
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_20_26_58__05_04_2024",
+        fileName= "results/tax_sweep_networks_10_49_39__06_04_2024",
         LOAD_STATIC_FULL = 0
     )
