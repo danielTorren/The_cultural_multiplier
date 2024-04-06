@@ -12,7 +12,6 @@ import datetime
 import matplotlib.pyplot as plt
 from scipy import stats
 
-
 # modules
 def produce_name_datetime(root):
     fileName = "results/" + root +  "_" + datetime.datetime.now().strftime("%H_%M_%S__%d_%m_%Y")

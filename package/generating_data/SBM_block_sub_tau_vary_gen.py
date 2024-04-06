@@ -1,11 +1,18 @@
 # imports
 import json
-import numpy as np
-from package.resources.utility import createFolder,produce_name_datetime,save_object
-from package.resources.run import multi_emissions_stock, multi_emissions_stock_ineq,parallel_run,emissions_parallel_run_BLOCKS
-from package.resources.utility import produce_param_list_stochastic,produce_param_list
-from package.generating_data.twoD_param_sweep_gen import generate_vals_variable_parameters_and_norms
-from package.resources.utility import generate_vals
+from package.resources.utility import createFolder,produce_name_datetime,save_object, generate_vals # produce_param_list_stochastic,
+from package.resources.run import emissions_parallel_run_BLOCKS
+
+def produce_param_list_stochastic(params: dict, property_list: list, property: str) -> list[dict]:
+    params_list = []
+    for i in property_list:
+        params[property] = i
+        for v in range(params["seed_reps"]):
+            params["set_seed"] = int(v+1)
+            params_list.append(
+                params.copy()
+            )  
+    return params_list
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",

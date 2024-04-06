@@ -5,10 +5,22 @@ import json
 import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
 from package.resources.run import multi_emissions_stock,generate_data
-from package.resources.utility import produce_param_list_stochastic
 from package.generating_data.static_preferences_emissions_gen import calculate_emissions
 from package.plotting_data import BA_SBM_plot
 from package.resources.utility import generate_vals
+
+
+def produce_param_list_stochastic(params: dict, property_list: list, property: str) -> list[dict]:
+    params_list = []
+    for i in property_list:
+        params[property] = i
+        for v in range(params["seed_reps"]):
+            params["set_seed"] = int(v+1)
+            params_list.append(
+                params.copy()
+            )  
+    return params_list
+
 ##################################################################################################
 #REVERSE Engineer the carbon price based on the final emissions
 
