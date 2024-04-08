@@ -9,7 +9,6 @@ from package.generating_data.static_preferences_emissions_gen import calculate_e
 from package.plotting_data import BA_SBM_plot
 from package.resources.utility import generate_vals
 
-
 def produce_param_list_stochastic(params: dict, property_list: list, property: str) -> list[dict]:
     params_list = []
     for i in property_list:

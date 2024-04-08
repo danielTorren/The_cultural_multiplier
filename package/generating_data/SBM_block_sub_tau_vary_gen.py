@@ -108,7 +108,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_SBM_block_tau.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_SBM_block_tau_alt.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_SBM_block_tau.json",
 )
 

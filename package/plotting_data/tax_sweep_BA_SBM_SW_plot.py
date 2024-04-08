@@ -4,7 +4,6 @@ Created: 10/10/2022
 
 # imports
 
-from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 from package.resources.utility import (

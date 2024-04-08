@@ -365,14 +365,14 @@ def main(
     col_label = col_dict["title"]#r'Confirmation bias, $\theta$'
     y_label = "Cumulative emissions, $E$"#col_dict["title"]#r"Identity variance, $\sigma^2$"
         
-    #multi_line_matrix_plot_stoch_bands_23(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label, scenario_labels,network_titles)
-    #multi_line_matrix_plot_stoch_bands_23(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, col_label, row_label, y_label, scenario_labels,network_titles)
+    multi_line_matrix_plot_stoch_bands_23(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 0, col_label, row_label, y_label, scenario_labels,network_titles)
+    multi_line_matrix_plot_stoch_bands_23(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, col_label, row_label, y_label, scenario_labels,network_titles)
     #multi_line_matrix_plot_stoch_bands_23_95_confidence(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, col_label, row_label, y_label, scenario_labels,network_titles,confidence_level)
-    multi_line_matrix_plot_stoch_bands_23_95_confidence_inset(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, "Carbon price Sector 2, $\\tau_2$","Inter-sector substitutability, $\\nu$", "Cumulative carbon emissions, $E$", scenario_labels,network_titles,confidence_level,min_val_inset)
+    #multi_line_matrix_plot_stoch_bands_23_95_confidence_inset(fileName, emissions_networks, col_dict["vals"], row_dict["vals"],"emissions", get_cmap("plasma"), dpi_save, 1, "Carbon price Sector 2, $\\tau_2$","Inter-sector substitutability, $\\nu$", "Cumulative carbon emissions, $E$", scenario_labels,network_titles,confidence_level,min_val_inset)
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/asym_network_inter_sub_tau_18_45_12__03_03_2024"
+        fileName= "results/asym_network_inter_sub_tau_22_31_21__06_04_2024"
     )

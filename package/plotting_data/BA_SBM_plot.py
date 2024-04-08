@@ -4,12 +4,14 @@ Created: 10/10/2022
 """
 
 # imports
+from cProfile import label
 import matplotlib.pyplot as plt
-from package.resources.utility import load_object
+from package.resources.utility import load_object, calc_bounds
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize
 from package.generating_data.static_preferences_emissions_gen import calculate_emissions
+from matplotlib.cm import get_cmap
 
 def calculate_price_elasticity(price, emissions):
     # Calculate the percentage change in quantity demanded (emissions)
@@ -155,8 +157,6 @@ def calc_M_vector(tau_social_vec ,tau_static_vec, emissions_social, emissions_st
 
     return M_vals
 
-
-
 def plot_reduc_2_3(
         fileName: str,  emissions_array_static_full, total_tau_range_static, Data_arr_BA, property_title, property_save, property_vals, labels_BA, Data_arr_SBM, labels_SBM, seed_reps
     ):
@@ -193,12 +193,79 @@ def plot_reduc_2_3(
     fig.savefig(f + ".png", dpi=600, format="png") 
 
 
+def plot_BA_SBM_2_3(
+    fileName: str, Data_arr_BA, property_title, property_save, property_vals, labels_BA, Data_arr_SBM, labels_SBM, seed_reps
+):
+    #nrows=seed_reps
+    fig, axes = plt.subplots(nrows=2, ncols=Data_arr_BA.shape[0], figsize=(10, 6), constrained_layout=True)
+    
+    for j, Data_list in enumerate(Data_arr_BA):
+        data_BA = Data_arr_BA[j].T
+        data_SBM = Data_arr_SBM[j].T
+        for i in range(seed_reps):#loop through seeds
+
+            #for i, ax in enumerate(axes.flat):
+            axes[0][j].plot(property_vals, data_BA[i])
+            axes[1][j].plot(property_vals, data_SBM[i], linestyle="dashed")
+
+        axes[0][j].set_title(labels_BA[j])
+        axes[1][j].set_title(labels_SBM[j])
+        axes[0][j].grid()
+        axes[1][j].grid()
+        axes[0][j].legend()
+        axes[1][j].legend()
+    
+    fig.supxlabel(property_title)
+    fig.supylabel(r"Cumulative emissions, E")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_BA_SBM_seeds_2_3" + property_save
+    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+
+def plot_BA_SBM_2(
+    fileName: str, Data_arr_BA, property_title, property_save, property_vals, labels_BA, Data_arr_SBM, labels_SBM, seed_reps, colors_scenarios
+):
+    #nrows=seed_reps
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 6), constrained_layout=True,sharey=True)
+    
+    for j, Data_list in enumerate(Data_arr_BA):
+        data_BA = Data_arr_BA[j].T
+        data_SBM = Data_arr_SBM[j].T
+        for i in range(seed_reps):#loop through seeds
+            axes[0].plot(property_vals, data_BA[i], alpha = 0.2,color = colors_scenarios[j])
+            axes[1].plot(property_vals, data_SBM[i], alpha = 0.2, color = colors_scenarios[j])
+
+
+        mu_emissions_BA, _, _ = calc_bounds(data_BA.T, 0.95)
+        mu_emissions_SBM, _, _ = calc_bounds(data_SBM.T, 0.95)
+
+        axes[0].plot(property_vals, mu_emissions_BA, label= labels_BA[j], color = colors_scenarios[j])
+        axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color = colors_scenarios[j])
+
+        axes[0].grid()
+        axes[1].grid()
+        axes[0].legend()
+        axes[1].legend()
+    
+    fig.supxlabel(property_title)
+    fig.supylabel(r"Cumulative emissions, E")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_BA_SBM_seeds_2" + property_save
+    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+
 
 
 
 def main(
     fileName
     ) -> None: 
+
+    name = "Set2"
+    cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
+    colors_scenarios = cmap.colors  # type: list
 
     ############################
     #BA
@@ -219,17 +286,19 @@ def main(
     seed_reps = base_params_BA["seed_reps"]
 
     #reference_run = load_object(fileName + "/Data", "reference_run")
-    emissions_array_static = load_object(fileName + "/Data", "emissions_array_static")
-    emissions_array_static_full = load_object(fileName + "/Data", "emissions_array_static_full")
-    total_tau_range_static = load_object(fileName + "/Data", "total_tau_range_static")
+    #emissions_array_static = load_object(fileName + "/Data", "emissions_array_static")
+    #emissions_array_static_full = load_object(fileName + "/Data", "emissions_array_static_full")
+    #total_tau_range_static = load_object(fileName + "/Data", "total_tau_range_static")
 
     #plot_end_points_emissions_multi_BA_SBM_2_3(fileName, emissions_array_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps)
     #plot_price_elasticies_BA_SBM_seeds_2_3(fileName, emissions_array_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
-    plot_reduc_2_3(fileName, emissions_array_static_full, total_tau_range_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
+    #plot_reduc_2_3(fileName, emissions_array_static_full, total_tau_range_static, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps)
     
+    #plot_BA_SBM_2_3(fileName, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps)
+    plot_BA_SBM_2(fileName, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_tau_vary_14_36_26__25_01_2024",
+        fileName= "results/BA_SBM_tau_vary_22_39_24__06_04_2024",
     )
