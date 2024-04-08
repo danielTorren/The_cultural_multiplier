@@ -240,8 +240,8 @@ def plot_BA_SBM_2(
         mu_emissions_BA, _, _ = calc_bounds(data_BA.T, 0.95)
         mu_emissions_SBM, _, _ = calc_bounds(data_SBM.T, 0.95)
 
-        axes[0].plot(property_vals, mu_emissions_BA, label= labels_BA[j], color = colors_scenarios[j])
-        axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color = colors_scenarios[j])
+        axes[0].plot(property_vals, mu_emissions_BA, label= labels_BA[j], color = colors_scenarios[j], alpha = 1)
+        axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
 
         axes[0].grid()
         axes[1].grid()

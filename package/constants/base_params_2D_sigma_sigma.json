@@ -31,7 +31,7 @@
     "std_low_carbon_preference": 0.01, 
     "std_learning_error": 0.02, 
     "confirmation_bias": 1, 
-    "expenditure": 1,
+    
     "init_carbon_price": 0, 
     "homophily_state": 0,
     "SW_network_density": 0.1,

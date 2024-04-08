@@ -120,6 +120,24 @@ def emissions_parallel_run(
     return np.asarray(emissions_list)
 ###################################################################################################
 
+def generate_emissions_stock_res_sectors(params):
+    data = generate_data(params)
+    return data.total_carbon_emissions_stock, data.total_carbon_emissions_stock_sectors
+
+def emissions_parallel_run_sectors(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_emissions_stock_res_sectors)(i) for i in params_dict
+    )
+    emissions_list, emissions_list_sectors = zip(
+        *res
+    )
+    return np.asarray(emissions_list), np.asarray(emissions_list_sectors)
+
+###################################################################################################
 
 def generate_emissions_stock_res_BLOCK(params):
     data = generate_data(params)

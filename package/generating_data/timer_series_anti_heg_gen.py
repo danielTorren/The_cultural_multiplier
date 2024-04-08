@@ -69,7 +69,7 @@ if __name__ == '__main__':
     "std_low_carbon_preference": 0.01, 
     "std_learning_error": 0.02, 
     "confirmation_bias": 10, 
-    "expenditure": 1,
+    
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
     "BA_nodes": 11
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     "std_low_carbon_preference": 0.01, 
     "std_learning_error": 0.02, 
     "confirmation_bias": 1, 
-    "expenditure": 1,
+    
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
     "BA_nodes": 11

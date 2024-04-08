@@ -122,7 +122,6 @@ class Network_Matrix:
             round(self.N*(1 - self.homophily_state))
         )
 
-        #self.expenditure = parameters["expenditure"]
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
 
@@ -221,6 +220,7 @@ class Network_Matrix:
         self.carbon_dividend_array = self.calc_carbon_dividend_array()
 
         self.total_carbon_emissions_stock = 0
+        self.total_carbon_emissions_stock_sectors = np.zeros(self.M)
         if self.network_type == "SBM":
             self.total_carbon_emissions_stock_blocks = np.asarray([0]*self.SBM_block_num)
        
@@ -634,7 +634,9 @@ class Network_Matrix:
         #check the exact timings on these
         if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
             self.total_carbon_emissions_flow = self.H_m_matrix.sum()
+            self.total_carbon_emissions_flow_sectors = self.H_m_matrix.sum(axis = 0)
             self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
+            self.total_carbon_emissions_stock_sectors = self.total_carbon_emissions_stock_sectors + self.total_carbon_emissions_flow_sectors
             if self.network_type == "SBM":
                 block_flows = self.calc_block_emissions()
                 self.total_carbon_emissions_stock_blocks = self.total_carbon_emissions_stock_blocks + block_flows# [self.total_carbon_emissions_stock_blocks[x]+ block_flows[x] for x in range(self.SBM_block_num)]
