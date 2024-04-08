@@ -495,7 +495,7 @@ class Network_Matrix:
         neighbour_influence = np.zeros((self.N, self.M))
 
         for m in range(self.M):
-            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_list[m], self.outward_social_influence_matrix[:,m])
+            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_tensor[m], self.outward_social_influence_matrix[:,m])
         
         return neighbour_influence
     
