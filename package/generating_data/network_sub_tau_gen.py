@@ -33,15 +33,6 @@ def main(
         start_time = time.time()
     
     #Gen params lists
-    #ENVIRONMENTAL IDENTITY
-    params["imitation_state"] = "expenditure"
-    params["network_type"] = "SW"
-    params_list_tax_SW_identity,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
-    params["network_type"] = "SBM"
-    params_list_tax_SBM_identity,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
-    params["network_type"] = "BA"
-    params_list_tax_BA_identity,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
-    params_list_identity = params_list_tax_SW_identity + params_list_tax_SBM_identity + params_list_tax_BA_identity
     #SOCIAL
     params["imitation_state"] = "consumption"
     params["network_type"] = "SW"
@@ -52,13 +43,12 @@ def main(
     params_list_tax_BA_social,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
     params_list_social = params_list_tax_SW_social + params_list_tax_SBM_social + params_list_tax_BA_social
     
-    params_list = params_list_identity + params_list_social
+    params_list = params_list_social
     print("Total runs: ",len(params_list))
-    #print(variable_parameters_dict["row"]["reps"])
-    #quit()
+
     Data_serial = emissions_parallel_run(params_list)
 
-    data_array = Data_serial.reshape(2,3,variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], params["seed_reps"])
+    data_array = Data_serial.reshape(3,variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], params["seed_reps"])
     #3 is for the networks, 2 is for the scenario
 
     if print_simu:
@@ -72,7 +62,7 @@ def main(
 
     createFolder(fileName)
 
-    save_object(data_array, fileName + "/Data", "emissions_data_2_3")
+    save_object(data_array, fileName + "/Data", "emissions_data_3")
     save_object(params, fileName + "/Data", "base_params")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
 
@@ -80,7 +70,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_networks_imitation_tau.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_networks_imitation_tau.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_networks_sub_tau.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_2D_networks_sub_tau.json",
     )
 
