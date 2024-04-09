@@ -8,7 +8,6 @@ Created: 10/10/2022
 """
 
 # imports
-import copy
 import numpy as np
 import networkx as nx
 import numpy.typing as npt
@@ -28,6 +27,7 @@ class Network_Matrix:
 
         """
         self.parameters = parameters
+        #print(" self.parameters ",  self.parameters )
 
         #INITAL STATE OF THE SYSTEMS, WHAT ARE THE RUN CONDITIONS
         self.save_timeseries_data_state = parameters["save_timeseries_data_state"]
@@ -328,12 +328,20 @@ class Network_Matrix:
         preferences_uncapped = np.asarray([np.random.normal(loc=identity,scale=self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
 
         low_carbon_preference_matrix_unsorted = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
-
         identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)
-        #print("identity_unsorted", identity_unsorted)
-        low_carbon_preference_matrix = [x for _, x in sorted(zip(identity_unsorted, low_carbon_preference_matrix_unsorted))]
+        
+        ##########################################
+        #NEED TO ACCOUTN FOR THE FACT THAT VERY VERY OCCASIONALLY THE IDENTIES WILL BE THE SAME I ASSUME DUE TO THE CLIPPING
+        #unique = len(identity_unsorted) == len(set(identity_unsorted))
+        #print("IS IDENTITY UNIQUE?", unique)
+        # Zip the lists together
+        zipped_lists = zip(identity_unsorted, low_carbon_preference_matrix_unsorted)
+        # Sort the zipped lists based on the first element (identity_unsorted)
+        sorted_lists = sorted(zipped_lists, key=lambda x: x[0])
+        # Unzip the sorted lists
+        sorted_identity, sorted_low_carbon_preference_matrix = zip(*sorted_lists)
 
-        return np.asarray(low_carbon_preference_matrix)
+        return np.asarray(sorted_low_carbon_preference_matrix)
 
     def circular_list(self, list_to_circle) -> list:
         first_half = list_to_circle[::2]  # take every second element in the list, even indicies
@@ -406,6 +414,8 @@ class Network_Matrix:
     
     def calc_Z(self):
         common_vector = self.Omega_m_matrix*self.prices_low_carbon_m + self.prices_high_carbon_instant
+        #print(self.chi_m_tensor,self.sector_substitutability)
+        #quit()
         chi_pow = self.chi_m_tensor**self.sector_substitutability
         no_sum_Z_terms = chi_pow*common_vector
         Z = no_sum_Z_terms.sum(axis = 1)

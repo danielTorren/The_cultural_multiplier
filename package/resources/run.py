@@ -18,8 +18,23 @@ from package.model.network_matrix import Network_Matrix as Network
 #from scipy.optimize import least_squares
 from copy import deepcopy
 from scipy.optimize import minimize, NonlinearConstraint
+"""
+import warnings
 
+def handle_overflow_warning(message, category, filename, lineno, instance, file=None, line=None):
+    if "overflow encountered in power" in str(message):
+        print("Overflow encountered in power at line", lineno)
+        #print("parameters:", instance.parameters)
+        #print("STUFF", instance.chi_m_tensor, instance.sector_substitutability)
+        print("instance", vars(instance))
+        quit()
+        # You can print additional properties or perform other actions here
 
+# Register the warning handler
+warnings.showwarning = lambda message, category, filename, lineno, file=None, line=None: handle_overflow_warning(
+    message, category, filename, lineno, Network, file=file, line=line
+)
+"""
 # modules
 ####SINGLE SHOT RUN
 def generate_data(parameters: dict,print_simu = 0) -> Network:
@@ -97,7 +112,7 @@ def generate_sensitivity_output_flat(params: dict):
 def parallel_run_sa(
     params_dict: list[dict],
 ):
-    print("params_dict len", len(params_dict))
+
     num_cores = multiprocessing.cpu_count()
     #results_emissions_stock =[generate_sensitivity_output_flat(i) for i in params_dict]
     results_emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_sensitivity_output_flat)(i) for i in params_dict)

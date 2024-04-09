@@ -1,7 +1,15 @@
 {
-    "sector_substitutability":{"property":"sector_substitutability","min":1,"max": 50, "round":0},
-    "b_low_carbon_preference":{"property":"b_low_carbon_preference","min":0.05, "max": 8, "round":0},
-    "b_sector_preference":{"property":"b_sector_preference","min":0.05, "max": 8, "round":0},
-    "b_low_carbon_substitutability":{"property":"b_low_carbon_substitutability","min":0.05, "max": 8, "round":0},
-    "b_prices_high_carbon":{"property":"b_prices_high_carbon","min":0.05, "max": 8, "round":0}
+    "phi_lower": {"property":"phi_lower","min":0.01,"max": 1.0, "round":0},
+    "carbon_price_increased_lower": {"property":"carbon_price_increased_lower","min":0,"max": 5, "round":0},
+    "carbon_price_increased_upper": {"property":"carbon_price_increased_upper","min":0,"max": 5, "round":0},
+    "N": {"property":"N","min":100,"max": 1000, "round":1},
+    "sector_substitutability":{"property":"sector_substitutability","min":1.1,"max": 5, "round":0},
+    "low_carbon_substitutability_lower": {"property":"low_carbon_substitutability_lower","min":1.1,"max":5, "round":0},
+    "low_carbon_substitutability_upper": {"property":"low_carbon_substitutability_upper","min":1.1,"max":5, "round":0},
+    "std_learning_error": {"property":"std_learning_error","min":0.0,"max": 0.5, "round":0},
+    "confirmation_bias": {"property":"confirmation_bias","min":0,"max": 50, "round":0},
+    "homophily_state":{"property":"homophily_state","min":0,"max": 1, "round":0},
+    "a_identity": {"property":"a_identity","min":0.1,"max": 8, "round":0},
+    "b_identity": {"property":"b_identity","min":0.1,"max": 8, "round":0},
+    "std_low_carbon_preference": {"property":"std_low_carbon_preference","min":0,"max": 0.3, "round":0}
 }

@@ -79,6 +79,7 @@ def generate_problem(
     ########################################
 
     # GENERATE PARAMETER VALUES
+    # FOR SOME REASON SOBOL DOESNT WORK IT SAYS SKIP VALUES MUST BE POSTIVE SO IGNORE THE WARNING.
     param_values = saltelli.sample(
         problem, N_samples, calc_second_order=calc_second_order
     )  # NumPy matrix. #N(2D +2) samples where N is 1024 and D is the number of parameters
@@ -160,30 +161,49 @@ def main(
         variable_parameters_dict, N_samples, AV_reps, calc_second_order
     )   
 
-    params_list_sa = stochastic_produce_param_list_SA(
+    #SW
+    base_params["network_type"] = "SW"
+    params_list_sa_SW = stochastic_produce_param_list_SA(
         param_values, base_params, variable_parameters_dict
     )
+    
+    #SBM
+    base_params["network_type"] = "SBM"
+    params_list_sa_SBM = stochastic_produce_param_list_SA(
+        param_values, base_params, variable_parameters_dict
+    )
+
+    #BA
+    base_params["network_type"] = "BA"
+    params_list_sa_BA = stochastic_produce_param_list_SA(
+        param_values, base_params, variable_parameters_dict
+    )
+
+    params_list_sa = params_list_sa_SW + params_list_sa_SBM + params_list_sa_BA
+
     print("Total runs: ", len(params_list_sa))
 
     root = "sensitivity_analysis_" + base_params["network_type"]
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
-    createFolder(fileName)
-
     Y_emissions_stock_stochastic = parallel_run_sa(
         params_list_sa
     )
 
-    len_y = int(len(Y_emissions_stock_stochastic)/AV_reps)
-    Y_emissions_stock_reshape = Y_emissions_stock_stochastic.reshape(len_y,AV_reps)
-    Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=1)
-
+    len_y = int(len(Y_emissions_stock_stochastic[0])/AV_reps)
+    Y_emissions_stock_reshape = Y_emissions_stock_stochastic.reshape(3,len_y,AV_reps)
+    Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=2)
+    
+    createFolder(fileName)
+    
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(params_list_sa, fileName + "/Data", "params_list_sa")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
     save_object(problem, fileName + "/Data", "problem")
-    save_object(Y_emissions_stock, fileName + "/Data", "Y_emissions_stock")
+    save_object(Y_emissions_stock[0], fileName + "/Data", "Y_emissions_stock_SW")
+    save_object(Y_emissions_stock[1], fileName + "/Data", "Y_emissions_stock_SBM")
+    save_object(Y_emissions_stock[2], fileName + "/Data", "Y_emissions_stock_BA")
     save_object(N_samples , fileName + "/Data","N_samples")
     save_object(calc_second_order, fileName + "/Data","calc_second_order")
 
@@ -192,10 +212,11 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_6 = main(
     N_samples = 128,
-    BASE_PARAMS_LOAD = "package/constants/base_params_BA_sensitivity.json",
-    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA_BA.json",
+    BASE_PARAMS_LOAD = "package/constants/base_params_sensitivity.json",
+    VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
     calc_second_order = True
     )
+
     RUN_PLOT = 0
 
     if RUN_PLOT:

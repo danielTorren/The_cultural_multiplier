@@ -173,7 +173,7 @@ def bifurcation_plot_identity_or_not(fileName,cluster_pos_matrix_identity,cluste
     fig.savefig(f + ".png", dpi=600, format="png")
 
 def multi_scatter_seperate_total_sensitivity_analysis_plot(
-    fileName, data_dict, dict_list, names, N_samples, order,latex_bool = False
+    fileName, data_dict, dict_list, names, N_samples, order, netowrk_type,  latex_bool = False
 ):
     """
     Create scatter chart of results.
@@ -241,14 +241,14 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot(
     f = (
         plotName
         + "/"
-        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot.eps"
-        % (len(names), N_samples, order)
+        + "%s_%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot.eps"
+        % (len(names), N_samples, order, netowrk_type)
     )
     f_png = (
         plotName
         + "/"
-        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot.png"
-        % (len(names), N_samples, order)
+        + "%s_%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot.png"
+        % (len(names), N_samples, order, netowrk_type)
     )
     fig.savefig(f, dpi=600, format="eps")
     fig.savefig(f_png, dpi=600, format="png")
