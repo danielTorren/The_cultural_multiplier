@@ -126,5 +126,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/network_sub_tau_11_27_56__19_02_2024"
+        fileName= "results/network_sub_tau_16_06_37__08_04_2024"
     )
