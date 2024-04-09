@@ -86,6 +86,97 @@ def plot_means_end_points_emissions(
     fig.savefig(f+ ".png", dpi=600, format="png") 
     fig.savefig(f+ ".eps", dpi=600, format="eps") 
 
+def plot_means_end_points_emissions_lines(
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,6), constrained_layout = True)
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = emissions_networks[k]
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            #mu_emissions =  Data.mean(axis=1)
+            #min_emissions =  Data.min(axis=1)
+            #max_emissions=  Data.max(axis=1)
+
+            #print("mu_emissions",mu_emissions)
+            #ax.plot(property_vals, mu_emissions, c= color, label=scenarios_titles[i])
+            #ax.fill_between(property_vals, min_emissions, max_emissions, facecolor=color , alpha=0.4)
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
+            #ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.4, facecolor = colors_scenarios[i])
+            #print("DATA", Data.shape)
+            data_trans = Data.T
+            #quit()
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i], alpha = 0.1)
+
+
+        #ax.legend()
+        ax.set_xlabel(r"Carbon price, $\tau$")
+        
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E")
+    axes[2].legend( fontsize="8")
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_plot_means_end_points_emissions_lines"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    fig.savefig(f+ ".eps", dpi=600, format="eps") 
+    
+def plot_means_end_points_emissions_lines_inset(
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8))#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = emissions_networks[k]
+
+        max_val_inset = 0.1
+        inset_ax = axes[k].inset_axes([0.55, 0.53, 0.4, 0.45])
+        index_min = np.where(property_vals > max_val_inset)[0][0]#get index where its more than 0.8 carbon tax, this way independent of number of reps as longas more than 3       
+
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
+            inset_ax.plot(property_vals[:index_min], mu_emissions[:index_min], c = colors_scenarios[i])
+
+            data_trans = Data.T
+            #quit()
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i], alpha = 0.1)
+                inset_ax.plot(property_vals[:index_min], data_trans[v][:index_min], c = colors_scenarios[i], alpha = 0.1)
+
+
+        #ax.legend()
+        ax.set_xlabel(r"Carbon price, $\tau$")
+        
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_plot_means_end_points_emissions_lines_inset"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    fig.savefig(f+ ".eps", dpi=600, format="eps")    
+
+
 def plot_emissions_ratio_scatter(
     fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
 ):
@@ -166,6 +257,7 @@ def plot_emissions_ratio_line(
     plotName = fileName + "/Plots"
     f = plotName + "/plot_emissions_ratio_line"
     fig.savefig(f+ ".png", dpi=600, format="png") 
+
 
 def plot_seeds_scatter_emissions(
     fileName, emissions_network, scenarios_titles, property_vals, seed_reps, seeds_to_show, network_titles, colors_scenarios
@@ -540,7 +632,10 @@ def main(
     #"""
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
     #plot_scatter_end_points_emissions_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    
+    #plot_means_end_points_emissions_lines(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     #EMISSIONS RATIOS ALL TOGETHER, THIS IS THE RATIO OF EMISSIONS TO THE CASE OF NO CARBON PRICE
     #plot_emissions_ratio_scatter(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
@@ -586,6 +681,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_15_39_06__08_04_2024",
+        fileName= "results/tax_sweep_networks_15_36_34__09_04_2024",
         LOAD_STATIC_FULL = 0
     )

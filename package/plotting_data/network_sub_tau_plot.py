@@ -13,15 +13,14 @@ from matplotlib.cm import get_cmap
 import matplotlib.pyplot as plt
 
 def plot_means_end_points_emissions(
-    fileName, emissions_networks, scenarios_titles, property_values_list_col, property_values_list_row, network_titles, row_titles, colors
+    fileName, emissions_networks, property_values_list_col, property_values_list_row, network_titles, row_titles, colors
 ):
 
     ncols = 3 
     nrows = 1
     #print(c,emissions_final)
-    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, figsize=(15,6), constrained_layout = True, sharey="col")# 
+    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, figsize=(15,6), constrained_layout = True)# 
 
-    axes[0].set_ylabel(scenarios_titles[i])
     for j in range(ncols):
         axes[j].set_title(network_titles[j])
         for k in range(len(property_values_list_row)):
@@ -55,7 +54,7 @@ def main(
     #print(colors)
 
     #quit()
-    emissions_networks = load_object(fileName + "/Data","emissions_data_2_3")
+    emissions_networks = load_object(fileName + "/Data","emissions_data_3")
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     base_params = load_object(fileName + "/Data", "base_params") 
@@ -69,7 +68,6 @@ def main(
     property_values_list_row = row_dict["vals"]
 
     row_titles = ["Elasticity of substitution, $\sigma_m$ = %s" % (round(i,3)) for i in property_values_list_row]
-
     plot_means_end_points_emissions(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)
 
     plt.show()
