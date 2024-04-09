@@ -133,6 +133,22 @@ def main(
 
     params_list_SW= params_list_no_tau_SW + params_list_low_tau_SW + params_list_high_tau_SW
 
+##########################################################################################################
+    
+    #NO "homophily_state"
+    params_SBM["homophily_state"] = 0    
+    params_list_no_tau_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
+
+    #Low "homophily_state"
+    params_SBM["homophily_state"] = 0.5   
+    params_list_low_tau_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
+
+    #High "homophily_state"
+    params_SBM["homophily_state"] = 1  
+    params_list_high_tau_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
+
+    params_list_SBM = params_list_no_tau_SBM + params_list_low_tau_SBM + params_list_high_tau_SBM
+
 #########################################################################################################
     #NO HEGEMONOY AND COMPLETE MIXING
     params_BA["BA_green_or_brown_hegemony"] = 0    
@@ -150,25 +166,6 @@ def main(
     params_list_brown_heg_BA = produce_param_list_stochastic(params_BA, property_values_list, property_varied)
 
     params_list_BA = params_list_no_heg_BA + params_list_green_heg_BA + params_list_brown_heg_BA
-    
-
-##########################################################################################################
-    
-    #NO "homophily_state"
-    params_SBM["homophily_state"] = 0    
-    params_list_no_tau_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
-
-    #Low "homophily_state"
-    params_SBM["homophily_state"] = 0.5   
-    params_list_low_tau_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
-
-    #High "homophily_state"
-    params_SBM["homophily_state"] = 1  
-    params_list_high_tau_SBM = produce_param_list_stochastic(params_SBM, property_values_list, property_varied)
-
-    params_list_SBM = params_list_no_tau_SBM + params_list_low_tau_SBM + params_list_high_tau_SBM
-    
-    
 
 ############################################################################################################################
     #RUN THE STUFF

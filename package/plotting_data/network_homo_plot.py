@@ -274,28 +274,36 @@ def plot_price_elasticies_BA_SBM_seeds_3(
     
     for j, Data_list in enumerate(Data_arr_BA):
         #calculate_price_elasticity
+        data_SW =  (Data_arr_BA[j]).T
         data_BA =  (Data_arr_BA[j]).T
         data_SBM = (Data_arr_SBM[j]).T
 
+        stochastic_array_price_elasticities_SW = np.asarray([calculate_price_elasticity(property_vals,x) for x in data_SW])
         stochastic_array_price_elasticities_BA = np.asarray([calculate_price_elasticity(property_vals,x) for x in data_BA])
         stochastic_array_price_elasticities_SBM = np.asarray([calculate_price_elasticity(property_vals,x) for x in  data_SBM])#calc_price_elasticities_2D((Data_arr_SBM[j]).T, property_vals_SBM)
 
+        mean_SW = stochastic_array_price_elasticities_SW.mean(axis=0)
         mean_BA = stochastic_array_price_elasticities_BA.mean(axis=0)
         mean_SBM = stochastic_array_price_elasticities_SBM.mean(axis=0)
 
         axes[0].plot(property_vals[1:], mean_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
-        axes[1].plot(property_vals[1:], mean_BA, label= labels_BA[j], color = colors_scenarios[j], alpha = 1)
+        axes[1].plot(property_vals[1:], mean_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
+        axes[2].plot(property_vals[1:], mean_BA, label= labels_BA[j], color = colors_scenarios[j], alpha = 1)
 
         for i in range(seed_reps):
-            axes[0].plot(property_vals[1:], stochastic_array_price_elasticities_SBM[i], color = colors_scenarios[j], alpha = 0.1)
-            axes[1].plot(property_vals[1:], stochastic_array_price_elasticities_BA[i], color = colors_scenarios[j], alpha = 0.1)
+            axes[0].plot(property_vals[1:], stochastic_array_price_elasticities_SW[i], color = colors_scenarios[j], alpha = 0.1)
+            axes[1].plot(property_vals[1:], stochastic_array_price_elasticities_SBM[i], color = colors_scenarios[j], alpha = 0.1)
+            axes[2].plot(property_vals[1:], stochastic_array_price_elasticities_BA[i], color = colors_scenarios[j], alpha = 0.1)
 
         axes[0].grid()
         axes[1].grid()
+        axes[2].grid()
         axes[0].legend()
         axes[1].legend()
-        axes[0].set_title("Stochastic Block Model")
-        axes[1].set_title("Barabasi-Albert Scale-Free")
+        axes[2].legend()
+        axes[0].set_title("Watt-Strogatz Small-World")
+        axes[1].set_title("Stochastic Block Model")
+        axes[2].set_title("Barabasi-Albert Scale-Free")
     
     fig.supxlabel(property_title)
     fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
@@ -328,7 +336,7 @@ def main(
     labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = 0.5$", r"High homophily, $h = 1$"]
 
 
-    emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SBM")
+    emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
     labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = 0.5$", r"High homophily, $h = 1$"]
 
     seed_reps = base_params_BA["seed_reps"]
@@ -350,5 +358,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_tau_vary_12_12_47__09_04_2024",
+        fileName= "results/networks_homo_tau_15_14_05__09_04_2024",
     )
