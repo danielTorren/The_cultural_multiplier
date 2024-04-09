@@ -80,6 +80,8 @@ def main(
     data_array_1 = load_object(fileName + "/Data", "data_array_1")
     data_array_2 = load_object(fileName + "/Data", "data_array_2")
     data_sectors_2 = load_object(fileName + "/Data", "data_sectors_2")
+
+    
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
     scenario_labels = ["One sector, $M = 1$", "Two sectors, $M = 2$"]
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
