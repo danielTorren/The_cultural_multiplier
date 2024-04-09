@@ -147,8 +147,8 @@ def emissions_parallel_run_BLOCKS(
         params_dict: list[dict]
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
-    res = [generate_emissions_stock_res_BLOCK(i) for i in params_dict]
-    #res = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res_BLOCK)(i) for i in params_dict)
+    #res = [generate_emissions_stock_res_BLOCK(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res_BLOCK)(i) for i in params_dict)
     emissions_list, emissions_list_blocks = zip(
         *res
     )
