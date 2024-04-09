@@ -33,23 +33,19 @@ def main(
         start_time = time.time()
     
     #Gen params lists
-    #SOCIAL
-    params["imitation_state"] = "consumption"
     params["network_type"] = "SW"
-    params_list_tax_SW_social,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
+    params_list_tax_SW,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
     params["network_type"] = "SBM"
-    params_list_tax_SBM_social,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
+    params_list_tax_SBM,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
     params["network_type"] = "BA"
-    params_list_tax_BA_social,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
-    params_list_social = params_list_tax_SW_social + params_list_tax_SBM_social + params_list_tax_BA_social
-    
-    params_list = params_list_social
+    params_list_tax_BA,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
+    params_list = params_list_tax_SW + params_list_tax_SBM + params_list_tax_BA
+
     print("Total runs: ",len(params_list))
 
     Data_serial = emissions_parallel_run(params_list)
 
     data_array = Data_serial.reshape(3,variable_parameters_dict["row"]["reps"], variable_parameters_dict["col"]["reps"], params["seed_reps"])
-    #3 is for the networks, 2 is for the scenario
 
     if print_simu:
         print(
