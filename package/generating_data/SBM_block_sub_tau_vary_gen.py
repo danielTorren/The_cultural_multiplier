@@ -36,8 +36,6 @@ def main(
     root = "SBM_BLOCK_sub_tau_vary"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
-    
-    createFolder(fileName)
 
     ##########################################
     # BOTH BLOCKS LOW SUB
@@ -69,7 +67,7 @@ def main(
 
     ##########################################
     #one block high the other low
-    params["low_carbon_substitutability_upper"] = 1.5
+    params["low_carbon_substitutability_upper"] = 1.1
     params["low_carbon_substitutability_lower"] = 8  
     #NO "homophily_state"
     params["homophily_state"] = 0    
@@ -78,12 +76,12 @@ def main(
     #High "homophily_state" with block 1 being the high one(THIS IS SO THAT THE GREEN HAS HIGH SUB)
     params["homophily_state"] = 1  
     params["low_carbon_substitutability_upper"] = 8 
-    params["low_carbon_substitutability_lower"] = 1.5  
+    params["low_carbon_substitutability_lower"] = 1.1  
     params_list_green_high_sub_high_homo = produce_param_list_stochastic(params, property_values_list, property_varied)
 
     #High "homophily_state" with block 2 being the high one(THIS IS SO THAT THE BROWN HAS HIGH SUB)
     params["homophily_state"] = 1  
-    params["low_carbon_substitutability_upper"] = 1.5 
+    params["low_carbon_substitutability_upper"] = 1.1 
     params["low_carbon_substitutability_lower"] = 8  
     params_list_brown_high_sub_high_homo = produce_param_list_stochastic(params, property_values_list, property_varied)
 
@@ -98,6 +96,8 @@ def main(
     emissions_array = emissions_stock_serial.reshape(7, property_reps, params["seed_reps"])#7 for the 7 different scenarios
     emissions_array_blocks = emissions_blocks_serial.reshape(7, property_reps, params["seed_reps"], params["SBM_block_num"])#7 for the 7 different scenarios
 
+    createFolder(fileName)
+    
     save_object(emissions_array, fileName + "/Data", "emissions_array")
     save_object(emissions_array_blocks, fileName + "/Data", "emissions_array_blocks")
     save_object(params, fileName + "/Data", "base_params")

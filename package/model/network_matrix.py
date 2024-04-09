@@ -119,8 +119,9 @@ class Network_Matrix:
         # network homophily
         self.homophily_state = parameters["homophily_state"]  # 0-1, if 1 then no mixing, if 0 then complete mixing
         self.shuffle_reps = int(
-            round(self.N*(1 - self.homophily_state))
+            round(self.N*(1 - self.homophily_state)**2)
         )
+        print("self.shuffle_reps", self.shuffle_reps)
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
@@ -151,7 +152,7 @@ class Network_Matrix:
             self.weighting_matrix,
             self.network,
         ) = self.create_weighting_matrix()
-
+        #print(" self.adjacency_matrix",  self.adjacency_matrix)
         ########################################################################################################################
         # THIS STEP TAKES PLACE IN THE INDIVIDUAL USUALLY
         #########################################################################################################################
@@ -164,13 +165,11 @@ class Network_Matrix:
         
         np.random.seed(self.shuffle_seed)#Set seed for shuffle
         self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
-        #print("psot shuffle self.low_carbon_preference_matrix", self.low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
+        #print("psot shuffle self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
         #quit()
         #GREAT THEY ARE DIFFERENT HERE THE SHUFFLE WORKS
-
-        if self.network_type == "SBM":
-            self.block_id_list = self.shuffle_matrix_to_match(self.block_id_list_unshuffled)
-
+        
+        #quit()
         ###################################################        ###################################################        ###################################################
         #SECTOR SUB MUST BE DONE AFTER NETWORK CREATION DUE TO THE NUMBER OF BLOCKS, AND SHUFFLE AS NEED THEM IN THE RIGHT ORDER!
         #NOTE YOU CANT HAVE BOTH HETEROGENOUS BETWEEN BLOCKS AND SECTORS
@@ -222,6 +221,8 @@ class Network_Matrix:
         self.total_carbon_emissions_stock = 0
         self.total_carbon_emissions_stock_sectors = np.zeros(self.M)
         if self.network_type == "SBM":
+            self.group_indices_list = self.calc_group_ids()
+            print("self.group_indices_list", self.group_indices_list)
             self.total_carbon_emissions_stock_blocks = np.asarray([0]*self.SBM_block_num)
        
     ############################################################################################################################
@@ -304,7 +305,7 @@ class Network_Matrix:
             block_probs = np.full((num_blocks,num_blocks), self.SBM_network_density_input_inter_block)
             np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
             G = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.network_structure_seed)
-            self.block_id_list_unshuffled = np.asarray([i for i, size in enumerate(self.SBM_block_sizes) for _ in range(size)])
+            self.block_id_list = np.asarray([i for i, size in enumerate(self.SBM_block_sizes) for _ in range(size)])
         elif self.network_type == "BA":
             G = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes, seed= self.network_structure_seed)
 
@@ -536,27 +537,18 @@ class Network_Matrix:
         # Distribute the remainder among the first few groups
         group_counts = [base_count + 1] * remainder + [base_count] * (self.SBM_block_num - remainder)
         return group_counts
-    
-    def gen_shuffle_id_vec(self):
-        indices_shuffle_vector = np.zeros(self.N, dtype=int)
-        for i, row in enumerate(self.low_carbon_preference_matrix_init):
-            #BELOW CHECK WHERE THE ROW INIT PREFERNCES IS EXACTLY THE SAME AS THE SHUFFLED ROW
-            indices_shuffle_vector[i] = np.where((self.low_carbon_preference_matrix == row).all(axis=1))[0][0]
-        return indices_shuffle_vector
 
-    def shuffle_matrix_to_match(self,unshuffled_matrix):
-        for i, j in self.swaps_list:
-            unshuffled_matrix[i], unshuffled_matrix[j] = unshuffled_matrix[j], unshuffled_matrix[i]
-
-        return unshuffled_matrix
+    def calc_group_ids(self):
+        group_indices_list = []
+        for group_id in np.unique(self.block_id_list):
+            group_indices_list.append(np.where(self.block_id_list == group_id)[0])
+        return group_indices_list
 
     def calc_block_emissions(self):
-        bloc_flows = []
-        for group_id in np.unique(self.block_id_list):
-            group_indices = np.where(self.block_id_list == group_id)[0]
-            bloc_flows.append(np.sum(self.H_m_matrix[group_indices]))
-        
-        return np.asarray(bloc_flows)
+
+        # chek the prefereces of the respective blocsk?
+        block_flows = np.asarray([np.sum(self.H_m_matrix[group_indices]) for group_indices in self.group_indices_list])
+        return  block_flows
     
 ##############################################################################################################################
     
