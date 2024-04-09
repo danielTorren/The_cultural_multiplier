@@ -71,7 +71,7 @@ def plot_end_points_emissions_multi_blocks_lines(
 ):
 
     #print(c,emissions_final)
-    fig, axes = plt.subplots(nrows = 1, ncols = 3,figsize=(10,6),constrained_layout = True, sharey = True )
+    fig, axes = plt.subplots(nrows = 1, ncols = 3,figsize=(20,8),constrained_layout = True)
     
     data_blocks = np.transpose(emissions_array_blocks, (3, 0,1,2))
     data_block_1 = data_blocks[0]
@@ -132,8 +132,8 @@ def main(
         r"$\sigma_1 = 1.1,\sigma_2 = 1.1$, $h = 1$(Block 1 Green, Block 2 Brown)",
         r"$\sigma_1 = 8,\sigma_2 = 8$, $h = 0$",
         r"$\sigma_1 = 8,\sigma_2 = 8$, $h = 1$(Block 1 Green, Block 2 Brown)",
-        r"$\sigma_1 = 8,\sigma_2 = 1.5$, $h = 0$",
-        r"$\sigma_1 = 8,\sigma_2 = 1.5$, $h = 1$(Block 1 Green, Block 2 Brown)",
+        r"$\sigma_1 = 8,\sigma_2 = 1.1$, $h = 0$",
+        r"$\sigma_1 = 8,\sigma_2 = 1.1$, $h = 1$(Block 1 Green, Block 2 Brown)",
         r"$\sigma_1 = 1.5,\sigma_2 = 8$, $h = 1$(Block 1 Green, Block 2 Brown)"
         ]
 
@@ -153,6 +153,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/SBM_BLOCK_sub_tau_vary_10_12_27__09_04_2024",
+        fileName= "results/SBM_BLOCK_sub_tau_vary_12_04_34__09_04_2024",
     )
 
