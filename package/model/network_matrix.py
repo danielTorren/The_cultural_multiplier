@@ -121,7 +121,7 @@ class Network_Matrix:
         self.shuffle_reps = int(
             round(self.N*(1 - self.homophily_state)**2)
         )
-        print("self.shuffle_reps", self.shuffle_reps)
+        #print("self.shuffle_reps", self.shuffle_reps)
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
@@ -222,7 +222,7 @@ class Network_Matrix:
         self.total_carbon_emissions_stock_sectors = np.zeros(self.M)
         if self.network_type == "SBM":
             self.group_indices_list = self.calc_group_ids()
-            print("self.group_indices_list", self.group_indices_list)
+            #print("self.group_indices_list", self.group_indices_list)
             self.total_carbon_emissions_stock_blocks = np.asarray([0]*self.SBM_block_num)
        
     ############################################################################################################################
