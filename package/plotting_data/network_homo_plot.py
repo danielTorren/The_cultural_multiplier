@@ -286,7 +286,7 @@ def plot_price_elasticies_BA_SBM_seeds_3(
         mean_BA = stochastic_array_price_elasticities_BA.mean(axis=0)
         mean_SBM = stochastic_array_price_elasticities_SBM.mean(axis=0)
 
-        axes[0].plot(property_vals[1:], mean_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
+        axes[0].plot(property_vals[1:], mean_SW, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
         axes[1].plot(property_vals[1:], mean_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
         axes[2].plot(property_vals[1:], mean_BA, label= labels_BA[j], color = colors_scenarios[j], alpha = 1)
 

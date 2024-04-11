@@ -1430,18 +1430,21 @@ def set_up_data(root = "2_sector_model", init_params = 4, scenario = 1):
     return fileName, variable_parameters, parameters_run, scenario, init_params
 
 def calc_emissions_tax_rebound():
-    """
+
+    #a = load_object("results/nu_tau_ratio_20_34_10__25_03_2024" + "/Data", "subs_dict")
+    #print("a", a)
+
+    #quit()
+
+    #THE ONE USE IN GRAPHS
     subs_dict = {#BASE PARAMS
         "A1": 0.5,
         "A2": 0.5,
-        #"tauC": 1,
-        #"tau1I": 1,
         "tau2I": 0,
         "a1": 0.5,
         "a2": 0.5,
         "sigma1": 2,
         "sigma2": 2,
-        #"nu": 2,
         "PL1": 1,
         "PL2": 1,
         "PBH1": 1,
@@ -1452,29 +1455,27 @@ def calc_emissions_tax_rebound():
         "gamma1": 1,#0.8,
         "gamma2": 1,#1.1
     }
-    """
 
+    #MESS AROUND WITH THE CASE OF FOOD AND TRAVEL? 
     subs_dict = {#BASE PARAMS
         "A1": 0.5,
         "A2": 0.5,
-        #"tauC": 1,
-        "tau1I": 1,
         "tau2I": 0,
         "a1": 0.5,
         "a2": 0.5,
         "sigma1": 2,
         "sigma2": 2,
-        #"nu": 2,
         "PL1": 1,
         "PL2": 1,
         "PBH1": 1,
         "PBH2": 1,
-        "h1": 1,
+        "h1": 0,
         "h2": 0,
-        "B": 5,
+        "B": 1,
         "gamma1": 1,#0.8,
-        "gamma2": 2,#1.1
+        "gamma2": 1,#1.1
     }
+    #NOTE THAT YOU CANT SET PARAMETERS LATER, SO IF THEY ARE INCLUDED IN THIS LIST IT SFIXE D
 
     tau_C_sym, tau1_I_sym, tau2_I_sym, B_sym, nu_sym, h1_sym, h2_sym, PBH1_sym, PBH2_sym, A1_sym, A2_sym, PL1_sym, PL2_sym, sigma1_sym, sigma2_sym, a1_sym, a2_sym, gamma1_sym, gamma2_sym = symbols('tauC tau1I tau2I B nu h1 h2 PBH1 PBH2 A1 A2 PL1 PL2 sigma1 sigma2 a1 a2 gamma1 gamma2')
     
@@ -1504,93 +1505,188 @@ def calc_emissions_tax_rebound():
 
     tau_C_solution_no_nu_sub = solve(equation_simplified, tau_C_sym, positive=True)
     print("SOLUTION FOUND")
-    #print("tau_C_solution_no_nu_sub",tau_C_solution_no_nu_sub)
-
-    #tau_C_func_1 = lambdify((nu_sym,tau1_I_sym), tau_C_solution_no_nu_sub[0], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
-    tau_C_func_1 = lambdify(nu_sym, tau_C_solution_no_nu_sub[1], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
-    #tau_C_func_1 = lambdify(nu_sym, tau_C_solution_no_nu_sub, 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
     
-    """
-    nu_values_log = np.logspace(np.log10(1.01), 3, 1000)
-    tau_C_values_1 = tau_C_func_1(nu_values_log)
-    fig1, ax1 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
-    ax1.plot(nu_values_log, tau_C_values_1, label= "Positive solutions")
-    #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
-    ax1.set_xlabel(r"Inter-sector substitutability, $\nu$")
-    ax1.set_ylabel(r"rebound tax multiplier $M_R = \frac{\tau_C}{\tau_I}$")
-    ax1.set_xscale('log')
-    ax1.set_title('log')
-    ax1.grid()
-    """
-    data_tau1_nu = []
-
-    nu_values_lin = np.linspace(1.01, 100, 1000)
-    #tau1_I_values_lin = np.linspace(0.1, 1.5, 5)
-    for nu in nu_values_lin:
-        tau_C_values_1 = tau_C_func_1(nu)
-        data_tau1_nu.append(tau_C_values_1)
-
-    """
-    nu_values_lin = np.linspace(1.01, 100, 1000)
-    tau1_I_values_lin = np.linspace(0.1, 1.5, 5)
-    for tau1_I in tau1_I_values_lin:
-        tau_C_values_1 = tau_C_func_1(nu_values_lin, tau1_I)
-        data_tau1_nu.append(tau_C_values_1/tau1_I)
-    """
-    """
-    nu_values_lin = np.logspace(np.log10(1.01), 2, 5)
-    tau1_I_values_lin = np.linspace(0.1, 1.5, 1000)
-    for nu in nu_values_lin:
-        tau_C_values_1 = tau_C_func_1(nu, tau1_I_values_lin)
-        data_tau1_nu.append(tau_C_values_1/tau1_I_values_lin)
-    """
-    #print(data_tau1_nu)
-    #quit()
-    #tax_ratio = solve(root_to_calc, (tau1_I_sym))
-    #print(tax_ratio)
+    
+    #######################################################################################################################################################
     root = "nu_tau_ratio"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
     createFolder(fileName)
 
-    save_object(nu_values_lin, fileName + "/Data", "nu_values_lin")
-    save_object(tau_C_values_1, fileName + "/Data", "tau_C_values_1")
+
     #save_object(tau_C_func_1, fileName + "/Data", "tau_C_func_1")
     save_object(subs_dict, fileName + "/Data", "subs_dict")
 
-    #"""
-    fig2, ax2 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
-    #for i,tau1_I in enumerate(tau1_I_values_lin):
-    ax2.plot(nu_values_lin, data_tau1_nu)#, label= "$\\tau_I = %s$" % (round(tau1_I,3)))
-    #ax2.plot(nu_values_lin, tau_C_values_1, label= "Positive solutions")
-    #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
-    ax2.set_xlabel(r"Inter-sector substitutability, $\nu$")
-    ax2.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")
-    #ax2.set_title('linear')
-    #ax2.legend()
-    ax2.grid()
-    #"""
-    """
-    fig2, ax2 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
-    for i,nu in enumerate(nu_values_lin):
-        ax2.plot(tau1_I_values_lin, data_tau1_nu[i], label= "$\\nu = %s$" % (round(nu,3)))
-    #ax2.plot(nu_values_lin, tau_C_values_1, label= "Positive solutions")
-    #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
-    ax2.set_xlabel(r"Sector 1 incomplete carbon tax,$\tau_I$ ")
-    ax2.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")
-    #ax2.set_title('linear')
-    ax2.legend()
-    ax2.grid()
-    """
+    nu_plot = 0
+    tau_plot = 0
+    nu_tau_plot = 0
+    together_plot = 1
+    #######################################################################################################################################################
+    # RUN THE Nu vs rebound plot
+    if nu_plot:
+        tau_C_func_1 = lambdify(nu_sym, tau_C_solution_no_nu_sub[1], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
+        
+        data_tau1_nu = []
 
+        nu_values_lin = np.linspace(1.01, 10, 1000)
+        #tau1_I_values_lin = np.linspace(0.1, 1.5, 5)
+        for nu in nu_values_lin:
+            tau_C_values_1 = tau_C_func_1(nu)
+            data_tau1_nu.append(tau_C_values_1)
 
-    plt.tight_layout()
+        save_object(nu_values_lin, fileName + "/Data", "nu_values_lin")
+        save_object(data_tau1_nu, fileName + "/Data", "data_tau1_nu")
+        
+        fig1, ax1 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+        ax1.plot(nu_values_lin, data_tau1_nu)
+        ax1.set_xlabel(r"Inter-sector substitutability, $\nu$")
+        ax1.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")
+        ax1.grid()
 
-    plotName = fileName + "/Plots"
-    f = plotName + "/incomplete"
-    fig2.savefig(f + ".eps", dpi=600, format="eps")
-    fig2.savefig(f + ".png", dpi=600, format="png")
+        plt.tight_layout()
+
+        plotName = fileName + "/Plots"
+        f = plotName + "/incomplete"
+        fig1.savefig(f + ".eps", dpi=600, format="eps")
+        fig1.savefig(f + ".png", dpi=600, format="png")
+
+    #######################################################################################################################################################
+    # RUN THE TAU vs Rebound for differnet nu
+    #print("tau_C_solution_no_nu_sub",tau_C_solution_no_nu_sub)
+    if tau_plot:
+        tau_C_func_1 = lambdify((nu_sym,tau1_I_sym), tau_C_solution_no_nu_sub[0], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
+        data_tau1_tau = []
+
+        nu_values_lin_tau = np.logspace(np.log10(1.01), 1, 5)
+        tau1_I_values_lin = np.linspace(0.1, 1, 1000)
+        for nu in nu_values_lin_tau:
+            tau_C_values_1 = tau_C_func_1(nu, tau1_I_values_lin)
+            data_tau1_tau.append(tau_C_values_1/tau1_I_values_lin)
+
+        save_object(nu_values_lin_tau , fileName + "/Data", "nu_values_lin_tau")
+        save_object(tau1_I_values_lin , fileName + "/Data", "tau1_I_values_lin ")
+        save_object(data_tau1_tau, fileName + "/Data", "data_tau1_tau")
+
+        fig2, ax2 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+        
+        for i,nu in enumerate(nu_values_lin_tau):
+            ax2.plot(tau1_I_values_lin, data_tau1_tau[i], label= "$\\nu = %s$" % (round(nu,3)))
+        #ax2.plot(nu_values_lin, tau_C_values_1, label= "Positive solutions")
+        #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
+        ax2.set_xlabel(r"Sector 1 incomplete carbon tax,$\tau_I$ ")
+        ax2.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")
+        #ax2.set_title('linear')
+        ax2.legend()
+        ax2.grid()
+
+        plt.tight_layout()
+
+        plotName = fileName + "/Plots"
+        f = plotName + "/tau_plot_incomplete"
+        fig1.savefig(f + ".eps", dpi=600, format="eps")
+        fig1.savefig(f + ".png", dpi=600, format="png")
+    #######################################################################################################################################################
+    # RUN THE TAU vs Rebound for differnet nu
+    #print("tau_C_solution_no_nu_sub",tau_C_solution_no_nu_sub)
+    if nu_tau_plot:
+        tau_C_func_1 = lambdify((nu_sym,tau1_I_sym), tau_C_solution_no_nu_sub[0], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
+        data_tau1_nu_tau = []
+
+        nu_values_lin_nu_tau = np.linspace(1.01, 10, 1000)
+        tau1_I_values_lin_nu_tau = np.linspace(0.01, 1, 5)
+        for tau in tau1_I_values_lin_nu_tau:
+            tau_C_values_1 = tau_C_func_1(nu_values_lin_nu_tau, tau)
+            data_tau1_nu_tau.append(tau_C_values_1/tau)
+
+        save_object(nu_values_lin_nu_tau , fileName + "/Data", "nu_values_lin_nu_tau")
+        save_object(tau1_I_values_lin_nu_tau , fileName + "/Data", "tau1_I_values_lin_nu_tau")
+        save_object(data_tau1_nu_tau, fileName + "/Data", "data_tau1_nu_tau")
+
+        fig3, ax3 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+        
+        for i,tau in enumerate(tau1_I_values_lin_nu_tau):
+            ax3.plot(nu_values_lin_nu_tau , data_tau1_nu_tau[i], label= "$\\tau_I = %s$" % (round(tau,3)))
+        ax3.set_xlabel(r"Inter-sector substitutability, $\nu$")
+        ax3.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")
+        ax3.legend()
+        ax3.grid()
+
+        plt.tight_layout()
+
+        plotName = fileName + "/Plots"
+        f = plotName + "/nu_plot_incomplete"
+        fig1.savefig(f + ".eps", dpi=600, format="eps")
+        fig1.savefig(f + ".png", dpi=600, format="png")
+    
+    #######################################################################################################################################################
+    
+    if together_plot:
+
+        fig_together, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 6), constrained_layout=True)
+
+        ax2 = axes[0]
+        ax3 = axes[1]
+        #I CANT BE BOTHERED TO RE-WRITE THIS ATM
+
+        tau_C_func_1 = lambdify((nu_sym,tau1_I_sym), tau_C_solution_no_nu_sub[0], 'numpy')#FOR SOME REASON YOU HAVE TO GET THE SECOND ONE???
+
+        #NU VARS
+
+        data_tau1_tau = []
+
+        nu_values_lin_tau = np.logspace(np.log10(1.01), 2, 5)
+        tau1_I_values_lin = np.linspace(0.1, 1, 1000)
+        for nu in nu_values_lin_tau:
+            tau_C_values_1 = tau_C_func_1(nu, tau1_I_values_lin)
+            data_tau1_tau.append( tau1_I_values_lin/tau_C_values_1)#1 -
+
+        save_object(nu_values_lin_tau , fileName + "/Data", "nu_values_lin_tau")
+        save_object(tau1_I_values_lin , fileName + "/Data", "tau1_I_values_lin ")
+        save_object(data_tau1_tau, fileName + "/Data", "data_tau1_tau")
+
+        #fig2, ax2 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+        
+        for i,nu in enumerate(nu_values_lin_tau):
+            ax2.plot(tau1_I_values_lin, data_tau1_tau[i], label= "$\\nu = %s$" % (round(nu,3)))
+        #ax2.plot(nu_values_lin, tau_C_values_1, label= "Positive solutions")
+        #ax.plot(nu_values, tau_C_values_0, label= "Negative solutions")
+        ax2.set_xlabel(r"Sector 1 incomplete carbon tax,$\tau_I$ ")
+        ax2.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_I}{\tau_C}$")#1 - 
+        #ax2.set_title('linear')
+        ax2.legend()
+        ax2.grid()
+
+        # TAU VARS
+
+        data_tau1_nu_tau = []
+
+        nu_values_lin_nu_tau = np.linspace(1.01, 100, 1000)
+        tau1_I_values_lin_nu_tau = np.linspace(0.01, 1, 5)
+        for tau in tau1_I_values_lin_nu_tau:
+            tau_C_values_1 = tau_C_func_1(nu_values_lin_nu_tau, tau)
+            data_tau1_nu_tau.append(tau/tau_C_values_1)#1 -
+
+        save_object(nu_values_lin_nu_tau , fileName + "/Data", "nu_values_lin_nu_tau")
+        save_object(tau1_I_values_lin_nu_tau , fileName + "/Data", "tau1_I_values_lin_nu_tau")
+        save_object(data_tau1_nu_tau, fileName + "/Data", "data_tau1_nu_tau")
+
+        #fig3, ax3 = plt.subplots(1, 1, figsize=(5, 5),constrained_layout = True)
+        
+        for i,tau in enumerate(tau1_I_values_lin_nu_tau):
+            ax3.plot(nu_values_lin_nu_tau , data_tau1_nu_tau[i], label= "$\\tau_I = %s$" % (round(tau,3)))
+        ax3.set_xlabel(r"Inter-sector substitutability, $\nu$")
+        ax3.set_ylabel(r"Rebound tax multiplier, $M_R = \frac{\tau_C}{\tau_I}$")#1 - 
+        ax3.legend()
+        ax3.grid()
+        
+        plt.tight_layout()
+
+        plotName = fileName + "/Plots"
+        f = plotName + "/together_incomplete"
+        fig_together.savefig(f + ".eps", dpi=600, format="eps")
+        fig_together.savefig(f + ".png", dpi=600, format="png")
+    #######################################################################################################################################################
     
     plt.show()
 

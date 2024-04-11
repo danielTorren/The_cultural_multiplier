@@ -27,19 +27,20 @@ def plot_sector_rebound_simulations_identity(
         inset_ax_socially = axes[1][k].inset_axes([0.4, 0.4, 0.55, 0.55])
         index_min = np.where(property_vals > max_val_inset)[0][0]#get index where its more than 0.8 carbon tax, this way independent of number of reps as longas more than 3       
 
+        #CALC IDENTITY
         emissions_1_identity  = total_emissions_1_identity[k].T
         emissions_2_identity  = total_emissions_2_identity[k].T
         emissiosn_sector_2_identity = np.transpose(emissions_networks_2_identity[k],(2,1,0))
-
-        emissions_1_socially  = total_emissions_1_socially[k].T
-        emissions_2_socially  = total_emissions_2_socially[k].T
-        emissiosn_sector_2_socially = np.transpose(emissions_networks_2_socially[k],(2,1,0))
-
         
         emissions_1_mean_identity = (emissions_1_identity).mean(axis=0)
         emissions_2_mean_identity = (emissions_2_identity).mean(axis=0)
         emissiosn_sector_2_1_mean_identity = (emissiosn_sector_2_identity[0]).mean(axis=0)
         emissiosn_sector_2_2_mean_identity = (emissiosn_sector_2_identity[1]).mean(axis=0)
+
+        #CALC SOCIALLY
+        emissions_1_socially  = total_emissions_1_socially[k].T
+        emissions_2_socially  = total_emissions_2_socially[k].T
+        emissiosn_sector_2_socially = np.transpose(emissions_networks_2_socially[k],(2,1,0))
 
         emissions_1_mean_socially = (emissions_1_socially).mean(axis=0)
         emissions_2_mean_socially = (emissions_2_socially).mean(axis=0)
@@ -47,7 +48,7 @@ def plot_sector_rebound_simulations_identity(
         emissiosn_sector_2_2_mean_socially = (emissiosn_sector_2_socially[1]).mean(axis=0)
 
 
-        #PLOT MEANS
+        #PLOT IDENTITIY
         axes[0][k].plot(property_vals, emissions_2_mean_identity, alpha = 1, color = "Blue", label = r'Emissions both sectors, $E_F$')#BLUE emisisons both sectors 2 sector
         axes[0][k].plot(property_vals, emissions_1_mean_identity, alpha = 1, color = "Red", label = r'Emissions no sector 2, $E^{*}_{F}$', ls="--")#RED Dashed emisisons both sectors 2 sector
         

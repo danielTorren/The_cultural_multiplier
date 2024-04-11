@@ -191,10 +191,12 @@ def main(
         params_list_sa
     )
 
-    len_y = int(len(Y_emissions_stock_stochastic[0])/AV_reps)
+    len_y = int(len(params_list_sa_SW)/AV_reps)
+
     Y_emissions_stock_reshape = Y_emissions_stock_stochastic.reshape(3,len_y,AV_reps)
     Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=2)
-    
+
+
     createFolder(fileName)
     
     save_object(base_params, fileName + "/Data", "base_params")
