@@ -407,6 +407,7 @@ def plot_sector_emissions_rebound_line(fileName,variable_parameters, data_E_F, d
     #CALCULATE WHAT THE EMISSIONS WOULD BE IF SECTOR 2 DIDNT EXIST
     parameters["a1"] = 1#NEED TO CHANGE THIS ONE
     data_E_F_1sector = calc_emissions_1_sector(parameters)
+    print("HELLO")
     
     # Plot E_F
     ax.plot(var1_values, data_E_F, label = r'Emissions both sectors, $E_F$')
@@ -504,8 +505,8 @@ def run_plots_1D(root,LOAD, init_params, scenario, LOAD_filename = "filename"):
     #plot_line_with_colorbar(fileName,variable_parameters, data_E_F, data_derv_E_F, 0, scenario)
     #plot_line_with_colorbar(fileName, variable_parameters, data_E_F, data_derv_E_F, 1, scenario)
 
-    plot_sector_emissions(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario)
-    #plot_sector_emissions_rebound_line(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario, parameters_run)
+    #plot_sector_emissions(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario)
+    plot_sector_emissions_rebound_line(fileName,variable_parameters, data_E_F, data_E_F_1, data_E_F_2, scenario, parameters_run)
     #plot_contours(fileName, "Scenario 1",B_values, tau_values, data_E_F_1, data_derv_E_F_1, axis_val)
     #plot_contours(fileName, "Scenario 2",B_values, tau_values, data_E_F_2, data_derv_E_F_2, axis_val)
     #plot_contours_2_scen(fileName, B_values, tau_values, data_E_F_1, data_derv_E_F_1, data_E_F_2, data_derv_E_F_2, axis_val)
@@ -548,14 +549,14 @@ def analytic_derivatives():
 #########################################################################################################
     #H1
     #DERIVE IT SUING SYMPY
-    #H_1 = (BD_sym*chi1_sym**nu_sym/Z_sym) + h1_sym
-    #partial_H1_tau1_sympy = diff(H_1, tau1_sym)
+    H_1 = (BD_sym*chi1_sym**nu_sym/Z_sym) + h1_sym
+    partial_H1_tau1_sympy = diff(H_1, tau1_sym)
 
 #########################################################################################################
     #H2
     #DERIVE IT SUING SYMPY
-    #H_2 = (BD_sym*chi2_sym**nu_sym/Z_sym) + h2_sym
-    #partial_H2_tau1_sympy = diff(H_2, tau1_sym)
+    H_2 = (BD_sym*chi2_sym**nu_sym/Z_sym) + h2_sym
+    partial_H2_tau1_sympy = diff(H_2, tau1_sym)
 
 ##########################################################################################################
 
@@ -578,29 +579,7 @@ def analytic_derivatives_alt():
     subs_dict = {#BASE PARAMS
                 "A1": 0.5,
                 "A2": 0.5,
-                "tau1": 1.2,#1,
-                "tau2": 0.4,
-                "a1": 0.5,
-                "a2": 0.5,
-                "sigma1": 2,
-                "sigma2": 2,
-                "nu": 2,
-                "PL1": 1,
-                "PL2": 1,
-                "PBH1": 1,
-                "PBH2": 1,
-                "h1": 0.7,
-                "h2": 0.3,
-                "B": 5,
-                "gamma1": 0.9,#0.8,
-                "gamma2": 2.5,#1.1
-    }
-
-    """
-    subs_dict = {#BASE PARAMS
-                "A1": 0.5,
-                "A2": 0.5,
-                "tau1": 1,#1,
+                #"tau1": 1.2,#1,
                 "tau2": 0,
                 "a1": 0.5,
                 "a2": 0.5,
@@ -613,11 +592,11 @@ def analytic_derivatives_alt():
                 "PBH2": 1,
                 "h1": 0,
                 "h2": 0,
-                "B": 5,
+                "B": 1,
                 "gamma1": 1,#0.8,
                 "gamma2": 1,#1.1
     }
-    """
+
         
     # Define symbols
     tau1_sym, tau2_sym, B_sym, nu_sym, h1_sym, h2_sym, PBH1_sym, PBH2_sym, A1_sym, A2_sym, PL1_sym, PL2_sym, sigma1_sym, sigma2_sym, a1_sym, a2_sym, gamma1_sym, gamma2_sym = symbols('tau1 tau2 B nu h1 h2 PBH1 PBH2 A1 A2 PL1 PL2 sigma1 sigma2 a1 a2 gamma1 gamma2')
@@ -697,57 +676,34 @@ def analytic_derivatives_alt():
     #print("Vlaues of Z", Z_sym.subs(subs_dict))#,Z_sym_alt.subs(subs_dict)
     #print("Vlaues of derv Z", derv_Z_sym.subs(subs_dict), manual_derv_Z_sym.subs(subs_dict))#, derv_Z_sym_alt.subs(subs_dict), manual_derv_Z_sym_alt.subs(subs_dict)
     #quit()
+    ##########################################################################################################
+    #SECTOR EMISSIONS
+    EF1 = (BD_sym * (gamma1_sym*chi1_sym**nu_sym) / Z_sym) + gamma1_sym*h1_sym
+    EF2 = (BD_sym * (gamma2_sym*chi2_sym**nu_sym) / Z_sym) + gamma2_sym*h2_sym
 
-##########################################################################################################
+    derv_EF1 = diff(EF1, tau1_sym)
+    derv_EF1_sub = derv_EF1.subs(subs_dict)
+
+    derv_EF2 = diff(EF2, tau1_sym)
+    
+
+    ##########################################################################################################
 
     # Define EF equation with BD substituted
     EF = (BD_sym * (gamma1_sym*chi1_sym**nu_sym + gamma2_sym*chi2_sym**nu_sym) / Z_sym) + gamma1_sym*h1_sym + gamma2_sym*h2_sym
-    #derv_EF = diff(EF, tau1_sym)
+    derv_EF = diff(EF, tau1_sym)
+
     #manual_derv_EF = 
     #manual_derv_87  = gamma1_sym * BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * diff(chi1_sym, tau1_sym) - Z_sym**(-1) * gamma1_sym * h1_sym * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) * diff(Z_sym, tau1_sym)
     #manual_derv_87_subbed  = gamma1_sym * BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym - Z_sym**(-1) * gamma1_sym * h1_sym * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) * manual_derv_Z_sym
     
     manual_derv_EF_tau1 = gamma1_sym * BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * ((gamma1_sym*chi1_sym / (PBH1_sym + gamma1_sym*tau1_sym)) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1)) - Z_sym**(-1) * gamma1_sym * h1_sym * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) * (((Omega1_sym * PL1_sym + PBH1_sym + gamma1_sym*tau1_sym) * gamma1_sym * nu_sym * chi1_sym**nu_sym) / (PBH1_sym + gamma1_sym*tau1_sym) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym))/(nu_sym * (A1_sym * Omega1_sym**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1) + gamma1_sym*chi1_sym**nu_sym * (PL1_sym * (sigma1_sym * Omega1_sym) / (PBH1_sym + gamma1_sym*tau1_sym) + 1))
 
-    #EF_alt = (BD_sym_alt * (chi1_sym_alt**nu_sym + chi2_sym_alt**nu_sym) / Z_sym_alt) + h1_sym + h2_sym
-    #derv_EF_alt = diff(EF_alt, tau1_sym)
-    #manual_derv_EF_alt = BD_sym_alt * Z_sym_alt**(-1) * nu_sym * chi1_sym_alt**(nu_sym - 1) * ((chi1_sym_alt / (PBH1_sym + tau1_sym)) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym_alt**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym_alt**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1)) - Z_sym_alt**(-1) * h1_sym * (chi1_sym_alt**nu_sym + chi2_sym_alt**nu_sym) - BD_sym_alt * Z_sym_alt**(-2) * (chi1_sym_alt**nu_sym + chi2_sym_alt**nu_sym) * ((Omega1_sym_alt * PL1_sym + PBH1_sym + tau1_sym) * nu_sym * chi1_sym_alt**nu_sym / (PBH1_sym + tau1_sym) * ((sigma1_sym * (nu_sym - 1) * A1_sym * Omega1_sym_alt**((sigma1_sym - 1) / sigma1_sym)) / (nu_sym * (A1_sym * Omega1_sym_alt**((sigma1_sym - 1) / sigma1_sym) + (1 - A1_sym))) - 1) + chi1_sym_alt**nu_sym * (PL1_sym * sigma1_sym * Omega1_sym_alt / (PBH1_sym + tau1_sym) + 1))
-    #print("Vlaues of EF", EF.subs(subs_dict))#,EF_alt.subs(subs_dict)
-    #print("Vlaues of derv E", derv_EF.subs(subs_dict) , manual_derv_87.subs(subs_dict), manual_derv_87_subbed.subs(subs_dict), manual_derv_EF.subs(subs_dict))#, derv_EF_alt.subs(subs_dict), manual_derv_EF.subs(subs_dict)
-    #quit()
-    #TEST 107
-    #manual_derv_87  = gamma1_sym * BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * diff(chi1_sym, tau1_sym) - Z_sym**(-1) * gamma1_sym * h1_sym * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) * diff(Z_sym, tau1_sym)
+    ##########################################################################################################
 
-    #manual_derv_88_alt = gamma1_sym * BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym - Z_sym**(-1) * gamma1_sym * h1_sym * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (gamma1_sym * chi1_sym**nu_sym + gamma2_sym * chi2_sym**nu_sym) * manual_derv_Z_sym
+    print_latex(derv_EF1_sub)
 
-    #manual_derv_EF_sym_107 = BD_sym * Z_sym**(-1) * nu_sym * chi1_sym**(nu_sym - 1) * manual_derv_chi1_sym - Z_sym**(-1) * h1_sym * (chi1_sym**nu_sym + chi2_sym**nu_sym) - BD_sym * Z_sym**(-2) * (chi1_sym**nu_sym + chi2_sym**nu_sym) * manual_derv_Z_sym
-
-    # Combine terms
-
-    #derv_EF_sym_value = partial_derivative_EF_tau1.subs(subs_dict)
-    #manual_derv_87_value = manual_derv_87.subs(subs_dict)
-    #manual_derv_88_alt_value = manual_derv_88_alt.subs(subs_dict)
-    #manual_derv_EF_sym_107_value = manual_derv_EF_sym_107.subs(subs_dict)
-
-    #print("Vlaues of derv E", derv_EF_sym_value,manual_derv_87_value,manual_derv_88_alt_value,manual_derv_EF_sym_107_value)
-    #print("Manually derived expression:", manual_derivative_sym)
-
-    #quit()
-    """
-    simplified_manual = simplify(manual_derivative_sym)
-    print("DONE simplified_manual")
-    simplified_sympy = simplify(partial_derivative_EF_tau1)
-    print("DONE simplified_sympy")
-
-    if simplified_manual == simplified_sympy:
-        print("Expressions match after simplification.")
-    else:
-        print("Expressions do not match after simplification.")
-
-    print("partial_derivative_EF_tau1",partial_derivative_EF_tau1)
     quit()
-    """
-
     return EF, manual_derv_EF_tau1
 
 def inequality_solutions():
@@ -860,7 +816,7 @@ def calc_emissions_1_sector(parameters):
 
     return EF1
 
-def calc_emissions_and_derivative(parameters):
+def calc_emissions_and_derivative(parameters):#THIS IS THE ONE I USE FOR RUNS!!!! FIGURE 1?
     A1 = parameters["A1"]
     A2 = parameters["A2"]
     a1 = parameters["a1"]
@@ -920,13 +876,25 @@ def plots_analytic(root = "2_sector_analytic",LOAD = 0, init_params = 4, scenari
         EF_tau1_tau2_value = load_object(fileName + "/Data","data_EF_tau1_tau2")
         scenario = load_object(fileName + "/Data","scenario")
     else:
+        
+        #print("init_params, scenario",init_params, scenario)
+
         fileName, variable_parameters, parameters_run, scenario, init_params = set_up_data(root = root, init_params = init_params, scenario = scenario)
 
+
+
         EF, partial_derivative_EF_tau1, partial_derivative_EF_tau2, EF_tau1_tau2 = analytic_derivatives()
+
+
+        #print(" EF",  EF)
+        #print("partial_derivative_EF_tau1", partial_derivative_EF_tau1)
+        #print("partial_derivative_EF_tau2",partial_derivative_EF_tau2) 
+
 
         # Determine which parameters are varied
         varied_params = [str(sym) for sym in EF.free_symbols]
 
+        
         #create lambdify functions
         EF_func = lambdify(varied_params,EF, 'numpy')
         partial_derivative_tau1_func = lambdify(varied_params,partial_derivative_EF_tau1, 'numpy')
@@ -1134,7 +1102,7 @@ def set_up_data_1D(root = "2_sector_model", init_params = 4, scenario = 1):
             parameters_1 = {
                 "A1": 0.5,
                 "A2": 0.5,
-                "tau1": 0.1,
+                #"tau1": 0.1,
                 "tau2": 0,
                 "a1": 0.5,
                 "a2": 0.5,
@@ -1457,6 +1425,7 @@ def calc_emissions_tax_rebound():
     }
 
     #MESS AROUND WITH THE CASE OF FOOD AND TRAVEL? 
+    """
     subs_dict = {#BASE PARAMS
         "A1": 0.5,
         "A2": 0.5,
@@ -1475,6 +1444,7 @@ def calc_emissions_tax_rebound():
         "gamma1": 1,#0.8,
         "gamma2": 1,#1.1
     }
+    """
     #NOTE THAT YOU CANT SET PARAMETERS LATER, SO IF THEY ARE INCLUDED IN THIS LIST IT SFIXE D
 
     tau_C_sym, tau1_I_sym, tau2_I_sym, B_sym, nu_sym, h1_sym, h2_sym, PBH1_sym, PBH2_sym, A1_sym, A2_sym, PL1_sym, PL2_sym, sigma1_sym, sigma2_sym, a1_sym, a2_sym, gamma1_sym, gamma2_sym = symbols('tauC tau1I tau2I B nu h1 h2 PBH1 PBH2 A1 A2 PL1 PL2 sigma1 sigma2 a1 a2 gamma1 gamma2')
@@ -1697,7 +1667,7 @@ def main( type_run):
         #run_plots(root = "2_sector_model", LOAD = 0, init_params = 4, scenario = 1)
         run_plots(LOAD = 1, LOAD_filename = "results/2_sector_analytic_19_37_47__20_03_2024")
     elif type_run == "plots_1D":
-        run_plots_1D(root = "2_sector_model", LOAD = 0, init_params = 8, scenario = 4)
+        run_plots_1D(root = "2_sector_model", LOAD = 0, init_params = 4, scenario = 1)#init_params = 8, scenario = 4
     elif type_run == "ineq":
         print("INSIDE")
         inequality_solutions()
@@ -1733,5 +1703,5 @@ def main( type_run):
         raise ValueError("Wrong TYPE")
 
 if __name__ == '__main__':
-    type_run = "rebound_tax"#"plots"#"ineq", "plots_analytic"#"analytic"#,"calc_analytic"
+    type_run = "analytic"#"rebound_tax"#"plots"#"ineq", "plots_analytic"#"analytic"#,"calc_analytic"
     main(type_run)
