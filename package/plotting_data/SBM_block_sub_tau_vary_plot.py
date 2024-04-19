@@ -112,6 +112,58 @@ def plot_end_points_emissions_multi_blocks_lines(
     f = plotName + "/multi_blocks_lines_" + property_save + "_emissions"
     fig.savefig(f+ ".png", dpi=600, format="png")  
 
+def plot_end_points_emissions_multi_blocks_lines_rows(
+    fileName: str, Data_arr,emissions_array_blocks, property_title, property_save, property_vals, labels, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(nrows = 2, ncols = 3,figsize=(20,8),constrained_layout = True, sharex="col")
+    
+    data_blocks = np.transpose(emissions_array_blocks, (3, 0,1,2))
+    data_block_1 = data_blocks[0]
+    data_block_2 = data_blocks[1]
+
+    row_index = [0,1,0,1,0,1,1]
+
+    for i, Data_list in enumerate(Data_arr):
+        mu_emissions =  Data_list.mean(axis=1)
+        data_run_1 = data_block_1[i].mean(axis=1)
+        data_run_2 = data_block_2[i].mean(axis=1)
+        #min_emissions =  Data_list.min(axis=1)
+        #max_emissions=  Data_list.max(axis=1)
+
+        axes[row_index[i]][0].plot(property_vals, mu_emissions, label = labels[i], color = colors_scenarios[i])
+        axes[row_index[i]][1].plot(property_vals, data_run_1, label = labels[i], color = colors_scenarios[i])
+        axes[row_index[i]][2].plot(property_vals, data_run_2, label = labels[i], color = colors_scenarios[i])
+        #ax.fill_between(property_vals, min_emissions, max_emissions, alpha=0.5)
+
+        Data_list_trans = Data_list.T
+        data1_trans = data_block_1[i].T
+        data2_trans = data_block_2[i].T
+        for v in range(len(Data_list_trans)):#loop through seeds
+            axes[row_index[i]][0].plot(property_vals, Data_list_trans[v], alpha = 0.2, color = colors_scenarios[i])
+            axes[row_index[i]][1].plot(property_vals, data1_trans[v], alpha = 0.2, color = colors_scenarios[i])
+            axes[row_index[i]][2].plot(property_vals, data2_trans[v], alpha = 0.2, color = colors_scenarios[i])
+    axes[0][2].legend()
+    axes[1][2].legend()
+
+    axes[1][0].set_xlabel(property_title)
+    axes[1][1].set_xlabel(property_title)
+    axes[1][2].set_xlabel(property_title)
+
+    axes[0][0].set_title("All individuals")
+    axes[0][1].set_title("Block 1")
+    axes[0][2].set_title("Block 2")
+
+    fig.supylabel(r"Cumulative carbon emissions, E")
+    axes[0][0].set_ylabel(r"No homophily, h = 0")
+    axes[1][0].set_ylabel(r"Complete homophily, h = 1")
+
+    #print("what worong")
+    plotName = fileName + "/Plots"
+    f = plotName + "/multi_blocks_lines_rows_" + property_save + "_emissions"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+
 def main(
     fileName = "results/one_param_sweep_single_17_43_28__31_01_2023",
     dpi_save = 600,
@@ -129,14 +181,24 @@ def main(
     
     labels = [
         r"$\sigma_1 = 1.1,\sigma_2 = 1.1$, $h = 0$",
-        r"$\sigma_1 = 1.1,\sigma_2 = 1.1$, $h = 1$(Block 1 Green, Block 2 Brown)",
+        r"$\sigma_1 = 1.1,\sigma_2 = 1.1$, $h = 1$(Block 1 Brown, Block 2 Green)",
         r"$\sigma_1 = 8,\sigma_2 = 8$, $h = 0$",
-        r"$\sigma_1 = 8,\sigma_2 = 8$, $h = 1$(Block 1 Green, Block 2 Brown)",
+        r"$\sigma_1 = 8,\sigma_2 = 8$, $h = 1$(Block 1 Brown, Block 2 Green)",
         r"$\sigma_1 = 8,\sigma_2 = 1.1$, $h = 0$",
-        r"$\sigma_1 = 8,\sigma_2 = 1.1$, $h = 1$(Block 1 Green, Block 2 Brown)",
-        r"$\sigma_1 = 1.5,\sigma_2 = 8$, $h = 1$(Block 1 Green, Block 2 Brown)"
+        r"$\sigma_1 = 8,\sigma_2 = 1.1$, $h = 1$(Block 1 Brown, Block 2 Green)",
+        r"$\sigma_1 = 1.1,\sigma_2 = 8$, $h = 1$(Block 1 Brown, Block 2 Green)"
         ]
 
+    labels_no_homo = [
+        r"$\sigma_1 = 1.1,\sigma_2 = 1.1$",
+        r"$\sigma_1 = 1.1,\sigma_2 = 1.1$",
+        r"$\sigma_1 = 8,\sigma_2 = 8$",
+        r"$\sigma_1 = 8,\sigma_2 = 8$",
+        r"$\sigma_1 = 8,\sigma_2 = 1.1$",
+        r"$\sigma_1 = 8,\sigma_2 = 1.1$",
+        r"$\sigma_1 = 1.1,\sigma_2 = 8$"
+        ]
+    
     property_varied = var_params["property_varied"]
 
     emissions_array = load_object(fileName + "/Data", "emissions_array")
@@ -149,6 +211,8 @@ def main(
     #plot_end_points_emissions_multi_lines(fileName, emissions_array, r"Carbon price, $\tau$", property_varied, property_values_list, labels,colors_scenarios)
     plot_end_points_emissions_multi_blocks_lines(fileName, emissions_array, emissions_array_blocks, r"Carbon price, $\tau$", property_varied, property_values_list, labels,colors_scenarios)
 
+    plot_end_points_emissions_multi_blocks_lines_rows(fileName, emissions_array, emissions_array_blocks, r"Carbon price, $\tau$", property_varied, property_values_list, labels_no_homo,colors_scenarios)
+    
     plt.show()
 
 if __name__ == '__main__':

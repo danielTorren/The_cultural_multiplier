@@ -200,7 +200,7 @@ def main(
     createFolder(fileName)
     
     save_object(base_params, fileName + "/Data", "base_params")
-    save_object(params_list_sa, fileName + "/Data", "params_list_sa")
+    #save_object(params_list_sa, fileName + "/Data", "params_list_sa")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
     save_object(problem, fileName + "/Data", "problem")
     save_object(Y_emissions_stock[0], fileName + "/Data", "Y_emissions_stock_SW")

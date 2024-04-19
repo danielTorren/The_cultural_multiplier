@@ -1703,5 +1703,5 @@ def main( type_run):
         raise ValueError("Wrong TYPE")
 
 if __name__ == '__main__':
-    type_run = "analytic"#"rebound_tax"#"plots"#"ineq", "plots_analytic"#"analytic"#,"calc_analytic"
+    type_run = "rebound_tax"#"rebound_tax"#"plots"#"ineq", "plots_analytic"#"analytic"#,"calc_analytic"
     main(type_run)

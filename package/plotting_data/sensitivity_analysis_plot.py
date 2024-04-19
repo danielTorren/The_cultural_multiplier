@@ -176,7 +176,7 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
 
     fig, axes = plt.subplots(ncols=3, nrows=1, constrained_layout=True , sharey=True,figsize=(12, 6))#,#sharex=True# figsize=(14, 7) # len(list(data_dict.keys())))
     
-    plt.rc('ytick', labelsize=4) 
+    #plt.rc('ytick', labelsize=4) 
     for i, ax in enumerate(axes.flat):
         data_dict = data_list[i]
         if order == "First":
@@ -341,9 +341,10 @@ def main(
     data_list_first = [data_sa_dict_first_SW,  data_sa_dict_first_SBM, data_sa_dict_first_BA]
     data_list_total = [data_sa_dict_total_SW,  data_sa_dict_total_SBM, data_sa_dict_total_BA]
 
-    #multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_first, plot_outputs, titles, N_samples, "First", network_titles ,latex_bool = latex_bool)
-    #multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_total, plot_outputs, titles, N_samples, "Total", network_titles ,latex_bool = latex_bool)
+    multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_first, plot_outputs, titles, N_samples, "First", network_titles ,latex_bool = latex_bool)
+    multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_total, plot_outputs, titles, N_samples, "Total", network_titles ,latex_bool = latex_bool)
     #print(titles)
+    #quit()
     if calc_second_order:
         #print("variable_parameters_dict", variable_parameters_dict)
 
@@ -375,7 +376,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_BA_11_40_09__11_04_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
+        fileName="results/sensitivity_analysis_BA_15_03_02__15_04_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},
