@@ -71,26 +71,6 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
         )
     return social_network
 
-def generate_sensitivity_output(params: dict):
-    """
-    Generate data from a set of parameter contained in a dictionary. Average results over multiple stochastic seeds 
-
-    """
-    #print("params", params)
-
-    emissions_stock_list = []
-
-    for v in range(params["seed_reps"]):
-        params["set_seed"] = int(v+1)#plus one is because seed 0 and 1 are the same, so want to avoid them 
-        data = generate_data(params)
-        emissions_stock_list.append(data.total_carbon_emissions_stock)
-
-    stochastic_norm_emissions_stock = np.mean(emissions_stock_list)
-
-    return (
-        stochastic_norm_emissions_stock
-    )
-
 def parallel_run(params_dict: dict[dict]) -> list[Network]:
     """
     Generate data from a list of parameter dictionaries, parallelize the execution of each single shot simulation

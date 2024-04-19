@@ -361,11 +361,13 @@ class Network_Matrix:
     
     def update_preferences(self):
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preference_matrix + self.phi_array*self.social_component_matrix
+        low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)#this stops the guassian error from causing A to be too large or small thereby producing nans
         return low_carbon_preferences
     
     def calc_Omega_m(self):
         term_1 = (self.prices_high_carbon_instant*self.low_carbon_preference_matrix)
         term_2 = (self.prices_low_carbon_m*(1- self.low_carbon_preference_matrix))
+
         #omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_array)
         omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_matrix)
         return omega_vector
@@ -534,7 +536,7 @@ class Network_Matrix:
         self.history_stock_carbon_emissions = [self.total_carbon_emissions_stock]
         self.history_low_carbon_preference_matrix = [self.low_carbon_preference_matrix]
         self.history_identity_vec = [self.identity_vec]
-        self.history_flow_carbon_emissions_vec = [self.total_carbon_emissions_flow_vec]
+        #self.history_flow_carbon_emissions_vec = [self.total_carbon_emissions_flow_vec]
 
     def save_timeseries_data_state_network(self):
         """
@@ -551,7 +553,7 @@ class Network_Matrix:
         self.history_time.append(self.t)
         self.history_stock_carbon_emissions.append(self.total_carbon_emissions_stock)
         self.history_flow_carbon_emissions.append(self.total_carbon_emissions_flow)
-        self.history_flow_carbon_emissions_vec.append(self.total_carbon_emissions_flow_vec)
+        #self.history_flow_carbon_emissions_vec.append(self.total_carbon_emissions_flow_vec)
         self.history_low_carbon_preference_matrix.append(self.low_carbon_preference_matrix)
         self.history_identity_vec.append(self.identity_vec)
 

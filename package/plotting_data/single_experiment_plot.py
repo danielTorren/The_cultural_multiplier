@@ -1011,21 +1011,11 @@ def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     dpi_save = 600,
     ) -> None: 
-    """
-    block_markers_list = ["o","s","^", "v","*","H","P","<",">"]#generate_scatter_markers(data.SBM_block_num)
-    legend_loc = "upper right"
-    lines_alpha = 0.2
-    cmap_multi = get_cmap("plasma")
-    cmap_weighting = get_cmap("Reds")
 
-    norm_zero_one = Normalize(vmin=0, vmax=1)
-    cmap = LinearSegmentedColormap.from_list(
-        "BrownGreen", ["sienna", "whitesmoke", "olivedrab"], gamma=1
-    )
-    node_sizes = 100   
-    """
     Data = load_object(fileName + "/Data", "social_network")
+
     print("Data EMissions", Data.total_carbon_emissions_stock)
+
     #node_shape_list = ["o","s","^","v"]
 
     #anim_save_bool = False#Need to install the saving thing
@@ -1033,7 +1023,7 @@ def main(
 
     
     plot_identity_matrix(fileName, Data, dpi_save)
-    plot_emissions_flow_matrix(fileName, Data, dpi_save)
+    #plot_emissions_flow_matrix(fileName, Data, dpi_save)
     #plot_emissions_individuals(fileName, Data, dpi_save)
     #plot_identity_timeseries(fileName, Data, dpi_save)
 
