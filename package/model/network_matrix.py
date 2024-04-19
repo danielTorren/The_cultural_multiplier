@@ -105,7 +105,6 @@ class Network_Matrix:
         self.shuffle_reps = int(
             round(self.N*(1 - self.homophily_state)**2)
         )
-        #print("self.shuffle_reps", self.shuffle_reps)
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
@@ -141,7 +140,6 @@ class Network_Matrix:
         # THIS STEP TAKES PLACE IN THE INDIVIDUAL USUALLY
         #########################################################################################################################
         self.update_carbon_price()#check whether its time to update carbon price
-
 
         self.identity_vec = self.calc_identity(self.low_carbon_preference_matrix)
 
@@ -363,7 +361,6 @@ class Network_Matrix:
     
     def update_preferences(self):
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preference_matrix + self.phi_array*self.social_component_matrix
-    
         return low_carbon_preferences
     
     def calc_Omega_m(self):
@@ -384,8 +381,6 @@ class Network_Matrix:
     
     def calc_Z(self):
         common_vector = self.Omega_m_matrix*self.prices_low_carbon_m + self.prices_high_carbon_instant
-        #print(self.chi_m_tensor,self.sector_substitutability)
-        #quit()
         chi_pow = self.chi_m_tensor**self.sector_substitutability
         no_sum_Z_terms = chi_pow*common_vector
         Z = no_sum_Z_terms.sum(axis = 1)
@@ -428,7 +423,6 @@ class Network_Matrix:
     ################################################################################################################################################
     
     def calc_ego_influence_degroot(self) -> npt.NDArray:
-        #print(", self.outward_social_influence_matrix", self.outward_social_influence_matrix)
         neighbour_influence = np.matmul(self.weighting_matrix, self.outward_social_influence_matrix)
 
         return neighbour_influence
