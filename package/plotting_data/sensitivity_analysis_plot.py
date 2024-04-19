@@ -384,12 +384,11 @@ if __name__ == '__main__':
         titles = [    
             "Social suseptability, $\\phi$",
             "Sector min carbon price, $\\tau_{m,min}$",
-            "Sectro max carbon price, $\\tau_{m,max}$",
+            "Sector max carbon price, $\\tau_{m,max}$",
             "Number of individuals, $N$",
             "Sector substitutability, $\\nu$",
             "Sector min low carbon substitutability, $\\sigma_{m, min}$",
             "Sector max low carbon substitutability, $\\sigma_{m, max}$",
-            "Social learning error standard deviation, $\\sigma_{\\epsilon}$",
             "Confirmation bias, $\\theta$",
             "Homophily state, $h$",
             "Initial environmental identity Beta, $a$ ",

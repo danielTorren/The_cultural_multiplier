@@ -36,34 +36,24 @@ class Network_Matrix:
         self.heterogenous_carbon_price_state = parameters["heterogenous_carbon_price_state"]
         self.heterogenous_sector_substitutabilities_state = parameters["heterogenous_sector_substitutabilities_state"]
         self.heterogenous_phi_state = parameters["heterogenous_phi_state"]
-        self.imperfect_learning_state = parameters["imperfect_learning_state"]
         self.imitation_state = parameters["imitation_state"]
         self.alpha_change_state = parameters["alpha_change_state"]
         self.vary_seed_state = parameters["vary_seed_state"]
-        self.static_internal_preference_state = parameters["static_internal_preference_state"]
         self.network_type = parameters["network_type"]
 
         #seeds
-        if self.vary_seed_state =="learning":
-            self.preferences_seed = parameters["preferences_seed"]
-            self.network_structure_seed = parameters["network_structure_seed"]
-            self.shuffle_seed = parameters["shuffle_seed"]
-            self.learning_seed = int(round(parameters["set_seed"]))
-        elif self.vary_seed_state =="preferences":
+        if self.vary_seed_state =="preferences":
             self.preferences_seed = int(round(parameters["set_seed"]))
             self.network_structure_seed = parameters["network_structure_seed"]
             self.shuffle_seed = parameters["shuffle_seed"]
-            self.learning_seed = parameters["learning_seed"]
         elif self.vary_seed_state =="network":
             self.preferences_seed = parameters["preferences_seed"]
             self.network_structure_seed = int(round(parameters["set_seed"]))
             self.shuffle_seed = parameters["shuffle_seed"]
-            self.learning_seed = parameters["learning_seed"]
         elif self.vary_seed_state =="shuffle":
             self.preferences_seed = parameters["preferences_seed"]
             self.network_structure_seed = parameters["network_structure_seed"]
             self.shuffle_seed = int(round(parameters["set_seed"]))
-            self.learning_seed = parameters["learning_seed"]
         
         # network
         self.N = int(round(parameters["N"]))
@@ -103,14 +93,8 @@ class Network_Matrix:
 
         # social learning and bias
         self.confirmation_bias = parameters["confirmation_bias"]
-        if self.imperfect_learning_state:
-            self.std_learning_error = parameters["std_learning_error"]
-            self.clipping_epsilon = parameters["clipping_epsilon"]
-        else:
-            self.std_learning_error = 0
-            self.clipping_epsilon = 0        
         self.clipping_epsilon_init_preference = parameters["clipping_epsilon_init_preference"]
-        
+
         if self.heterogenous_phi_state:
             self.phi_array = np.linspace(parameters["phi_lower"], parameters["phi_upper"], num=self.M)
         else:
@@ -152,22 +136,17 @@ class Network_Matrix:
             self.weighting_matrix,
             self.network,
         ) = self.create_weighting_matrix()
-        #print(" self.adjacency_matrix",  self.adjacency_matrix)
+
         ########################################################################################################################
         # THIS STEP TAKES PLACE IN THE INDIVIDUAL USUALLY
         #########################################################################################################################
         self.update_carbon_price()#check whether its time to update carbon price
-        
-        #DO THE HOMOPHILY STUFF
-        #print("self.shuffle_reps", self.shuffle_reps)
+
+
         self.identity_vec = self.calc_identity(self.low_carbon_preference_matrix)
-        #print("pre shuffle self.low_carbon_preference_matrix", self.low_carbon_preference_matrix - self.low_carbon_preference_matrix_init)
-        
+
         np.random.seed(self.shuffle_seed)#Set seed for shuffle
         self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
-        #print("psot shuffle self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
-        #quit()
-        #GREAT THEY ARE DIFFERENT HERE THE SHUFFLE WORKS
         
         #quit()
         ###################################################        ###################################################        ###################################################
@@ -198,8 +177,6 @@ class Network_Matrix:
     
         self.calc_consumption()#UNLIKE IN THE OTHER MODEL I CAN CALCULATE STUFF NOW
 
-        np.random.seed(self.learning_seed)#set seed for learning
-        self.error_matrix_list = np.random.normal(loc=0, scale=self.std_learning_error, size=(self.time_step_max+1, self.N, self.M))
 
         #############################################################################################################################
         #FROM HERE MODEL IS DETERMINISTIC NOT MORE RANDOMNESS
@@ -332,9 +309,6 @@ class Network_Matrix:
         
         ##########################################
         #NEED TO ACCOUTN FOR THE FACT THAT VERY VERY OCCASIONALLY THE IDENTIES WILL BE THE SAME I ASSUME DUE TO THE CLIPPING
-        #unique = len(identity_unsorted) == len(set(identity_unsorted))
-        #print("IS IDENTITY UNIQUE?", unique)
-        # Zip the lists together
         zipped_lists = zip(identity_unsorted, low_carbon_preference_matrix_unsorted)
         # Sort the zipped lists based on the first element (identity_unsorted)
         sorted_lists = sorted(zipped_lists, key=lambda x: x[0])
@@ -352,7 +326,6 @@ class Network_Matrix:
 
     def partial_shuffle_matrix(self, matrix_to_shufle) -> list:
         """ THIS shuffles the matrix in place, doenst make a copy?"""
-        #print("INIT matrix_to_shufle", matrix_to_shufle)
         self.swaps_list = []
         for _ in range(self.shuffle_reps):
             a, b = np.random.randint(
@@ -360,9 +333,6 @@ class Network_Matrix:
             )  # generate pair of indicies to swap
             self.swaps_list.append((a,b))#use this to mix stuff later
             matrix_to_shufle[[a, b]] = matrix_to_shufle[[b, a]]
-        #print("self.swaps_list", self.swaps_list)
-        #print("END matrix_to_shufle", matrix_to_shufle)
-        #quit()
         return matrix_to_shufle
 
     def shuffle_preferences(self): 
@@ -393,7 +363,7 @@ class Network_Matrix:
     
     def update_preferences(self):
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preference_matrix + self.phi_array*self.social_component_matrix
-        low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon, 1- self.clipping_epsilon)#this stops the guassian error from causing A to be too large or small thereby producing nans
+    
         return low_carbon_preferences
     
     def calc_Omega_m(self):
@@ -466,10 +436,9 @@ class Network_Matrix:
     def calc_social_component_matrix(self) -> npt.NDArray:
 
         if self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
-            ego_influence = self.calc_ego_influence_degroot_independent()
+            social_influence = self.calc_ego_influence_degroot_independent()
         else:#culturally determined either static or dynamic
-            ego_influence = self.calc_ego_influence_degroot()           
-        social_influence = ego_influence + self.error_matrix_list[self.t]#np.random.normal(loc=0, scale=self.std_learning_error, size=(self.N, self.M))
+            social_influence = self.calc_ego_influence_degroot()           
 
         return social_influence
 
