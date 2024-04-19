@@ -8,7 +8,6 @@ for a given initial set seed.
 Created: 10/10/2022
 """
 # imports
-from package.model.network import Network 
 from package.model.network_matrix import Network_Matrix
 from joblib import Parallel, delayed
 import multiprocessing
@@ -137,7 +136,7 @@ if __name__ == '__main__':
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "vary_seed_state": "network",
-    "static_internal_preference_state": 0,
+
     "set_seed": 5,
     "network_structure_seed": 8, 
     "preferences_seed": 14,
@@ -155,7 +154,7 @@ if __name__ == '__main__':
     "clipping_epsilon": 0, 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
-    "std_learning_error": 0.02, 
+
     "confirmation_bias": 1, 
     
     "init_carbon_price": 0, 

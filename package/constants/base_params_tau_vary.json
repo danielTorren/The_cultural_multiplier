@@ -24,7 +24,7 @@
     "low_carbon_substitutability_upper":5,
     "a_identity": 2,
     "b_identity": 2,
-    "clipping_epsilon": 1e-5,
+
     "std_low_carbon_preference":0.01,
     "confirmation_bias":5,
     "expenditure":1

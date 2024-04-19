@@ -10,7 +10,7 @@
     "imitation_state": "consumption",
     "alpha_change_state": "dynamic_identity_determined_weights",
     "vary_seed_state": "preferences",
-    "static_internal_preference_state": 0,
+
     "homophily_state": 1.0, 
     "network_structure_seed": 8, 
     "preferences_seed": 14,
@@ -32,7 +32,7 @@
     "clipping_epsilon": 1e-3, 
     "clipping_epsilon_init_preference": 1e-3,
     "std_low_carbon_preference": 0.01, 
-    "std_learning_error": 0.02, 
+
     "confirmation_bias": 0, 
     "expenditure": 10,
     "init_carbon_price": 0, 

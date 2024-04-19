@@ -50,7 +50,7 @@ if __name__ == '__main__':
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "vary_seed_state": "preferences",
-    "static_internal_preference_state": 0,
+
     "set_seed": 5,
     "network_structure_seed": 8, 
     "preferences_seed": 14,
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     "clipping_epsilon": 0, 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
-    "std_learning_error": 0.02, 
+
     "confirmation_bias": 10, 
     
     "init_carbon_price": 0, 

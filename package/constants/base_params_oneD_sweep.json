@@ -23,7 +23,7 @@
     "sector_substitutability": 5,
     "a_identity": 2,
     "b_identity": 2,
-    "clipping_epsilon": 1e-5,
+
     "std_low_carbon_preference":0.01,
     "carbon_price_increased_lower": 0.5,
     "carbon_price_increased_upper": 0.5,

@@ -30,7 +30,7 @@
     "low_carbon_substitutability_upper":1.001,
     "a_identity": 2,
     "b_identity": 2,
-    "clipping_epsilon": 1e-5,
+
     "lambda_m_lower": 1.1,
     "lambda_m_upper": 10,
     "std_low_carbon_preference":0.001,

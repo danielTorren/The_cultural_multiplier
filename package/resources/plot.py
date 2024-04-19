@@ -16,10 +16,10 @@ from matplotlib.colors import Normalize, LinearSegmentedColormap, SymLogNorm, Bo
 from matplotlib.cm import get_cmap, rainbow
 from matplotlib.collections import LineCollection
 from typing import Union
-from package.model.network import Network
 from scipy.stats import beta
 import numpy.typing as npt
 from pydlc import dense_lines
+from package.model.network_matrix import Network_Matrix as Network
 
 ###########################################################
 #Setting fonts and font sizes

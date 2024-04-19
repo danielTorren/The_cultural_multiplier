@@ -49,7 +49,7 @@ if __name__ == '__main__':
     "imperfect_learning_state": 0,
     "imitation_state": "consumption",
     "vary_seed_state": "preferences",
-    "static_internal_preference_state": 0,
+
     "set_seed": 5,
     "network_structure_seed": 8, 
     "preferences_seed": 14,
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     "clipping_epsilon": 0, 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
-    "std_learning_error": 0.02, 
+
     "confirmation_bias": 10, 
     
     "init_carbon_price": 0, 
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     "imitation_state": "consumption",
     "alpha_change_state": "dynamic_identity_determined_weights",
     "vary_seed_state": "learning",
-    "static_internal_preference_state": 0,
+
     "seed_reps": 5,
     "network_structure_seed": 8, 
     "preferences_seed": 14,
@@ -107,10 +107,10 @@ if __name__ == '__main__':
     "low_carbon_substitutability_upper": 1.5, 
     "a_identity": 2, 
     "b_identity": 2, 
-    "clipping_epsilon": 1e-5, 
+ 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
-    "std_learning_error": 0.02, 
+
     "confirmation_bias": 1, 
     
     "init_carbon_price": 0, 

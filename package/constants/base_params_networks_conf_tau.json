@@ -9,7 +9,7 @@
     "imperfect_learning_state": 1,
     "imitation_state": "consumption",
     "vary_seed_state": "learning",
-    "static_internal_preference_state": 0,
+
     "seed_reps": 5,
     "network_structure_seed": 8, 
     "preferences_seed": 14,
@@ -25,10 +25,10 @@
     "low_carbon_substitutability_upper": 1.5, 
     "a_identity": 2, 
     "b_identity": 2, 
-    "clipping_epsilon": 1e-5, 
+ 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
-    "std_learning_error": 0.02, 
+
     "confirmation_bias": 20, 
     
     "init_carbon_price": 0, 
