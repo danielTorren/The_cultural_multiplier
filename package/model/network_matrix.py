@@ -360,6 +360,8 @@ class Network_Matrix:
         if self.t == (self.burn_in_duration): #THIS IS REPETATIVE
             self.carbon_price_m = self.carbon_price_increased_m#turn on carbon price
             self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m# UPDATE IT ONCE
+            #print("self.prices_high_carbon_instant", self.prices_high_carbon_instant)
+            #quit()
 
     #CALCULATIONS FROM INDIVIDUAL
     ################################################################################################################################################
@@ -498,6 +500,8 @@ class Network_Matrix:
         tax_income_R =  np.sum(self.carbon_price_m*total_quantities_m) 
         #carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
         carbon_dividend_array = tax_income_R/self.N
+        print("carbon_dividend_array stop",carbon_dividend_array)
+        #quit()
         return carbon_dividend_array
 
     def calc_instant_expediture(self):
