@@ -376,7 +376,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_BA_15_03_02__15_04_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
+        fileName="results/sensitivity_analysis_BA_15_44_04__19_04_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},

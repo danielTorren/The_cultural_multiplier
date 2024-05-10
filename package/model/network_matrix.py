@@ -102,9 +102,11 @@ class Network_Matrix:
 
         # network homophily
         self.homophily_state = parameters["homophily_state"]  # 0-1, if 1 then no mixing, if 0 then complete mixing
+        self.shuffle_intensity = 1.5# THIS SETS HOW QUICKLY THE HOMOPHILY DROPS OFF, the larger the value the more shuffles there are for a given homophily state value
         self.shuffle_reps = int(
-            round(self.N*(1 - self.homophily_state)**2)
+            round((self.N*(1 - self.homophily_state))**self.shuffle_intensity)
         )
+        #print("self.shuffle_reps ", self.shuffle_reps )
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
@@ -145,7 +147,9 @@ class Network_Matrix:
 
         np.random.seed(self.shuffle_seed)#Set seed for shuffle
         self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
-        
+        #print("POST SHUFFLE self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
+        #quit()
+
         #quit()
         ###################################################        ###################################################        ###################################################
         #SECTOR SUB MUST BE DONE AFTER NETWORK CREATION DUE TO THE NUMBER OF BLOCKS, AND SHUFFLE AS NEED THEM IN THE RIGHT ORDER!
@@ -192,6 +196,7 @@ class Network_Matrix:
             self.social_component_matrix = self.calc_social_component_matrix()
 
         self.carbon_dividend_array = self.calc_carbon_dividend_array()
+        #print("self.carbon_dividend_array",self.carbon_dividend_array)
 
         self.total_carbon_emissions_stock = 0
         self.total_carbon_emissions_stock_sectors = np.zeros(self.M)
@@ -490,8 +495,9 @@ class Network_Matrix:
     
     def calc_carbon_dividend_array(self):
         total_quantities_m = self.H_m_matrix.sum(axis = 0)
-        tax_income_R =  sum(self.carbon_price_m*total_quantities_m) 
-        carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
+        tax_income_R =  np.sum(self.carbon_price_m*total_quantities_m) 
+        #carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
+        carbon_dividend_array = tax_income_R/self.N
         return carbon_dividend_array
 
     def calc_instant_expediture(self):
@@ -597,7 +603,7 @@ class Network_Matrix:
             self.social_component_matrix = self.calc_social_component_matrix()
 
         self.carbon_dividend_array = self.calc_carbon_dividend_array()
-        
+
         #check the exact timings on these
         if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
             self.total_carbon_emissions_flow = self.H_m_matrix.sum()

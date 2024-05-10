@@ -145,12 +145,14 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, s
         base_params["N"],
         base_params["M"],
         reference_run.sector_preferences,
-        reference_run.prices_low_carbon,
+        reference_run.prices_low_carbon_m,
         reference_run.low_carbon_preference_matrix_init,
-        np.asarray(reference_run.low_carbon_substitutability_array_list),
+        np.asarray(reference_run.low_carbon_substitutability_matrix),
         reference_run.sector_substitutability,
-        reference_run.prices_high_carbon
+        reference_run.prices_high_carbon_m
         )
+    
+    print("RAN REFERENCE CASE FOR GIVEN SEED")
     
     ###################################################################
 
@@ -170,7 +172,7 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, s
 
 def calc_required_static_carbon_tax_seeds(base_params, property_values_list, emissions_networks,lower_bound, upper_bound, total_range_runs):
 
-    emissions_seeds = np.transpose(emissions_networks,(3,0,1,2))# shape : from netowrk, scenario, reps , seeds to SHAPE : seeds, netowrk, scenario, reps
+    emissions_seeds = np.transpose(emissions_networks,(3,0,1,2))# shape : from netowrk, scenario, reps , seeds to SHAPE : seeds, network, scenario, reps
 
     tau_matrix = []
     emissions_matrix = []
@@ -183,21 +185,17 @@ def calc_required_static_carbon_tax_seeds(base_params, property_values_list, emi
         emissions_seed_runs = emissions_seeds[v]
 
         emissions_min, emissions_max = np.amin(emissions_seed_runs), np.amax(emissions_seed_runs)
-        #print("emissions_min, emissions_max ",emissions_min, emissions_max )
-        #pass
+
         base_params_copy = deepcopy(base_params)
 
-        tau_list, emissions_list = calc_required_static_carbon_tax(base_params_copy, emissions_min, emissions_max, set_seed, lower_bound, upper_bound,  initial_guess_min_tau, initial_guess_max_tau, total_range_runs)
+        tau_list, emissions_list = calc_required_static_carbon_tax(base_params_copy, emissions_min, emissions_max, set_seed, lower_bound, upper_bound, initial_guess_min_tau, initial_guess_max_tau, total_range_runs)
         
         initial_guess_min_tau = min(tau_list)#UPDATE THE STARTING VALUES
         initial_guess_max_tau = max(tau_list)
 
-        #print("min max",initial_guess_min_tau, initial_guess_max_tau)
-
         tau_matrix.append(tau_list)
         emissions_matrix.append(emissions_list)
 
-    
     data_tau_full = np.asarray(tau_matrix)
     data_tau = np.squeeze(data_tau_full)
     data_emissions_full = np.asarray(emissions_matrix)
