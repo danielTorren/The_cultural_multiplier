@@ -55,6 +55,8 @@ class Network_Matrix:
             self.network_structure_seed = parameters["network_structure_seed"]
             self.shuffle_seed = int(round(parameters["set_seed"]))
         
+        #print("SEEDS Identity, Structure, Shuffle: ", self.preferences_seed, self.network_structure_seed, self.shuffle_seed )
+        
         # network
         self.N = int(round(parameters["N"]))
         if self.network_type == "SW":
@@ -106,7 +108,6 @@ class Network_Matrix:
         self.shuffle_reps = int(
             round((self.N*(1 - self.homophily_state))**self.shuffle_intensity)
         )
-        #print("self.shuffle_reps ", self.shuffle_reps )
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
@@ -123,7 +124,9 @@ class Network_Matrix:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
-            self.low_carbon_preference_matrix_init = self.generate_init_data_preferences()
+            
+            self.low_carbon_preference_matrix_init = self.generate_init_data_preferences_no_homo()
+            #self.low_carbon_preference_matrix_init = self.generate_init_data_preferences()
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
@@ -131,7 +134,7 @@ class Network_Matrix:
         self.low_carbon_preference_matrix = self.low_carbon_preference_matrix_init#THE IS THE MATRIX OF PREFERENCES, UNMIXED
         #print("PRE SHUFFLE self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
         # create network
-        np.random.seed(self.network_structure_seed)#This is not necessary but for consistency with other code maybe leave in
+        #np.random.seed(self.network_structure_seed)#This is not necessary but for consistency with other code maybe leave in
         (
             self.adjacency_matrix,
             self.weighting_matrix,
@@ -146,11 +149,16 @@ class Network_Matrix:
         self.identity_vec = self.calc_identity(self.low_carbon_preference_matrix)
 
         np.random.seed(self.shuffle_seed)#Set seed for shuffle
-        self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
+        #self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
+        if self.homophily_state != 0:
+            #print("YO!")
+            self.low_carbon_preference_matrix = self.shuffle_preferences_start_mixed()
         #print("POST SHUFFLE self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
         #quit()
+        ########################################################################################################################
+        #NO MORE STOCHASTIC
+        #########################################################################################################################
 
-        #quit()
         ###################################################        ###################################################        ###################################################
         #SECTOR SUB MUST BE DONE AFTER NETWORK CREATION DUE TO THE NUMBER OF BLOCKS, AND SHUFFLE AS NEED THEM IN THE RIGHT ORDER!
         #NOTE YOU CANT HAVE BOTH HETEROGENOUS BETWEEN BLOCKS AND SECTORS
@@ -300,6 +308,16 @@ class Network_Matrix:
             norm_weighting_matrix,
             G,
         )
+
+    def generate_init_data_preferences_no_homo(self) -> tuple[npt.NDArray, npt.NDArray]:
+
+        indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
+
+        preferences_uncapped = np.asarray([np.random.normal(loc=identity,scale=self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
+
+        low_carbon_preference_matrix_unsorted = np.clip(preferences_uncapped, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
+
+        return np.asarray(low_carbon_preference_matrix_unsorted)
     
     def generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
 
@@ -341,6 +359,30 @@ class Network_Matrix:
     def shuffle_preferences(self): 
         #make list cirucalr then partial shuffle it
         sorted_preferences = deepcopy(self.low_carbon_preference_matrix)#[sorted_indices, :]#NOW THEY ARE HOMPHILY
+
+        if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
+            sorted_preferences = sorted_preferences[::-1]
+        elif (self.network_type== "SW"):
+            sorted_preferences = self.circular_list(sorted_preferences)#agent list is now circular in terms of identity
+        elif (self.network_type == "SBM"):
+            pass
+
+        partial_shuffle_matrix = self.partial_shuffle_matrix(sorted_preferences)#partial shuffle of the list
+        
+        return partial_shuffle_matrix
+    
+    def shuffle_preferences_start_mixed(self): 
+
+        low_carbon_preference_matrix_unsorted =  deepcopy(self.low_carbon_preference_matrix)
+        identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)
+        
+        ##########################################
+        #NEED TO ACCOUTN FOR THE FACT THAT VERY VERY OCCASIONALLY THE IDENTIES WILL BE THE SAME I ASSUME DUE TO THE CLIPPING
+        zipped_lists = zip(identity_unsorted, low_carbon_preference_matrix_unsorted)
+        # Sort the zipped lists based on the first element (identity_unsorted)
+        sorted_lists = sorted(zipped_lists, key=lambda x: x[0])
+        # Unzip the sorted lists
+        sorted_identity, sorted_preferences = zip(*sorted_lists)
 
         if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
             sorted_preferences = sorted_preferences[::-1]
@@ -500,7 +542,7 @@ class Network_Matrix:
         tax_income_R =  np.sum(self.carbon_price_m*total_quantities_m) 
         #carbon_dividend_array =  np.asarray([tax_income_R/self.N]*self.N)
         carbon_dividend_array = tax_income_R/self.N
-        print("carbon_dividend_array stop",carbon_dividend_array)
+        #print("carbon_dividend_array stop",carbon_dividend_array)
         #quit()
         return carbon_dividend_array
 
