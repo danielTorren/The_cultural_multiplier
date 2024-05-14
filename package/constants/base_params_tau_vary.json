@@ -5,7 +5,7 @@
     "ratio_preference_or_consumption_state":0.0,
     "network_structure_seed": 8,
     "preferences_seed": 14,
-    "shuffle_seed":20,
+    "shuffle_homophily_seed":20,
 	"learning_seed":10,
     "set_seed": 4,
     "seed_reps": 10,

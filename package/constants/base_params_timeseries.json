@@ -14,7 +14,7 @@
 
     "network_structure_seed": 10, 
     "preferences_seed": 77, 
-    "shuffle_seed": 2,
+    "shuffle_homophily_seed": 2,
     
     "set_seed": 4, 
     "carbon_price_duration": 1000, 

@@ -84,6 +84,6 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_networks_init_seed.json",
-        scenarios_seed = ["preferences", "network"]
+        scenarios_seed = ["preferences", "network","shuffle_homophily", "shuffle_coherance"]
     )
 

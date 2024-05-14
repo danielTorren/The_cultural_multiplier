@@ -60,8 +60,8 @@ def main(
     emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_BA])
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"] 
     base_params = load_object(fileName + "/Data", "base_params") 
-    #scenarios_seed = ["Environmental identity", "Network links", "Neighbour shuffling"]#load_object(fileName + "/Data", "scenarios_seed")
-    scenarios_seed = ["Environmental identity", "Network links"]
+    scenarios_seed = ["Environmental identity", "Network links", "Neighbour shuffling", "Preference shuffling"]#load_object(fileName + "/Data", "scenarios_seed")
+    #scenarios_seed = ["Environmental identity", "Network links"]
     plot_distributions(fileName, emissions_networks, scenarios_seed, network_titles, colors_scenarios, fixed_emissions)
 
     plt.show()

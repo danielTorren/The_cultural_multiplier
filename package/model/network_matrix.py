@@ -45,17 +45,24 @@ class Network_Matrix:
         if self.vary_seed_state =="preferences":
             self.preferences_seed = int(round(parameters["set_seed"]))
             self.network_structure_seed = parameters["network_structure_seed"]
-            self.shuffle_seed = parameters["shuffle_seed"]
+            self.shuffle_homophily_seed = parameters["shuffle_homophily_seed"]
+            self.shuffle_coherance_seed = parameters["shuffle_coherance_seed"]
         elif self.vary_seed_state =="network":
             self.preferences_seed = parameters["preferences_seed"]
             self.network_structure_seed = int(round(parameters["set_seed"]))
-            self.shuffle_seed = parameters["shuffle_seed"]
-        elif self.vary_seed_state =="shuffle":
+            self.shuffle_homophily_seed = parameters["shuffle_homophily_seed"]
+            self.shuffle_coherance_seed = parameters["shuffle_coherance_seed"]
+        elif self.vary_seed_state =="shuffle_homophily":
             self.preferences_seed = parameters["preferences_seed"]
             self.network_structure_seed = parameters["network_structure_seed"]
-            self.shuffle_seed = int(round(parameters["set_seed"]))
-        
-        #print("SEEDS Identity, Structure, Shuffle: ", self.preferences_seed, self.network_structure_seed, self.shuffle_seed )
+            self.shuffle_homophily_seed = int(round(parameters["set_seed"]))
+            self.shuffle_coherance_seed = parameters["shuffle_coherance_seed"]
+        elif self.vary_seed_state =="shuffle_coherance":
+            self.preferences_seed = parameters["preferences_seed"]
+            self.network_structure_seed = parameters["network_structure_seed"]
+            self.shuffle_homophily_seed = parameters["shuffle_homophily_seed"]
+            self.shuffle_coherance_seed = int(round(parameters["set_seed"]))
+        #print("SEEDS Identity, Structure, Shuffle: ", self.preferences_seed, self.network_structure_seed, self.shuffle_homophily_seed )
         
         # network
         self.N = int(round(parameters["N"]))
@@ -104,9 +111,13 @@ class Network_Matrix:
 
         # network homophily
         self.homophily_state = parameters["homophily_state"]  # 0-1, if 1 then no mixing, if 0 then complete mixing
+        self.coherance_state = parameters["coherance_state"]
         self.shuffle_intensity = 1.5# THIS SETS HOW QUICKLY THE HOMOPHILY DROPS OFF, the larger the value the more shuffles there are for a given homophily state value
         self.shuffle_reps = int(
             round((self.N*(1 - self.homophily_state))**self.shuffle_intensity)
+        )
+        self.shuffle_reps_coherance = int(
+            round((self.N*(1 - self.coherance_state))**self.shuffle_intensity)
         )
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
@@ -119,13 +130,13 @@ class Network_Matrix:
         # CANT HAVE ANYTHING USE NUMPY RANDOM BEFORE THIS
         ###################################################
         # set preferences
-        np.random.seed(self.preferences_seed)#For inital construction set a seed
         if self.heterogenous_intrasector_preferences_state == 1:
             self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
-            
-            self.low_carbon_preference_matrix_init = self.generate_init_data_preferences_no_homo()
+
+            self.low_carbon_preference_matrix_init = self.generate_init_data_preferences_coherance()
+            #self.low_carbon_preference_matrix_init = self.generate_init_data_preferences_no_homo()
             #self.low_carbon_preference_matrix_init = self.generate_init_data_preferences()
         else:
             #this is if you want same preferences for everbody
@@ -148,7 +159,7 @@ class Network_Matrix:
 
         self.identity_vec = self.calc_identity(self.low_carbon_preference_matrix)
 
-        np.random.seed(self.shuffle_seed)#Set seed for shuffle
+        
         #self.low_carbon_preference_matrix = self.shuffle_preferences()#partial shuffle of the list based on identity
         if self.homophily_state != 0:
             #print("YO!")
@@ -309,6 +320,22 @@ class Network_Matrix:
             G,
         )
 
+    def generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
+
+        np.random.seed(self.preferences_seed)#For inital construction set a seed
+        preferences_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
+        preferences_capped_uncoherant = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
+        preferences_sorted = sorted(preferences_capped_uncoherant)#LIST IS NOW SORTED
+        #NOW ACCORDING TO THE DEGREE OF INTERNAL COHERANCE, WE SHUFFLE
+        preferences_coherance = self.partial_shuffle_vector(np.asarray(preferences_sorted), self.shuffle_reps_coherance)
+        low_carbon_preference_matrix = preferences_coherance.reshape(self.N,self.M)
+        #FINALLY MIX UP THE LIST SUCH THAT THE POSITIONING OF THE ROWS WITHIN THE MATRIX IS RANDOM
+
+        np.random.seed(self.shuffle_coherance_seed)#For inital construction set a seed
+        np.random.shuffle(low_carbon_preference_matrix)
+
+        return low_carbon_preference_matrix
+    
     def generate_init_data_preferences_no_homo(self) -> tuple[npt.NDArray, npt.NDArray]:
 
         indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
@@ -345,16 +372,35 @@ class Network_Matrix:
         circular_matrix = np.concatenate((first_half, second_half), axis=0)
         return circular_matrix
 
-    def partial_shuffle_matrix(self, matrix_to_shufle) -> list:
+    def partial_shuffle_matrix(self, matrix_to_shufle, shuffle_reps) -> list:
         """ THIS shuffles the matrix in place, doenst make a copy?"""
         self.swaps_list = []
-        for _ in range(self.shuffle_reps):
+        for _ in range(shuffle_reps):
             a, b = np.random.randint(
                 low=0, high=self.N, size=2
             )  # generate pair of indicies to swap
             self.swaps_list.append((a,b))#use this to mix stuff later
             matrix_to_shufle[[a, b]] = matrix_to_shufle[[b, a]]
         return matrix_to_shufle
+
+    def partial_shuffle_vector(self, vector_to_shuffle, shuffle_reps) -> list:
+        """ THIS shuffles the list in place, doenst make a copy?"""
+        #self.swaps_list = []
+        #vector_to_shuffle_init = deepcopy(vector_to_shuffle)
+        #print("before", vector_to_shuffle, type(vector_to_shuffle))
+        #print("shuffle_reps",shuffle_reps)
+        for _ in range(shuffle_reps):
+            a, b = np.random.randint(
+                low=0, high=len(vector_to_shuffle), size=2
+            )  # generate pair of indicies to swap
+            #self.swaps_list.append((a,b))#use this to mix stuff later
+            vector_to_shuffle[a], vector_to_shuffle[b] = vector_to_shuffle[b], vector_to_shuffle[a]
+        #print("after",vector_to_shuffle )
+        #print(vector_to_shuffle_init-vector_to_shuffle)
+        #quit()
+        
+        return vector_to_shuffle
+
 
     def shuffle_preferences(self): 
         #make list cirucalr then partial shuffle it
@@ -367,12 +413,12 @@ class Network_Matrix:
         elif (self.network_type == "SBM"):
             pass
 
-        partial_shuffle_matrix = self.partial_shuffle_matrix(sorted_preferences)#partial shuffle of the list
+        partial_shuffle_matrix = self.partial_shuffle_matrix(sorted_preferences, self.shuffle_reps)#partial shuffle of the list
         
         return partial_shuffle_matrix
     
     def shuffle_preferences_start_mixed(self): 
-
+        np.random.seed(self.shuffle_homophily_seed)#Set seed for shuffle
         low_carbon_preference_matrix_unsorted =  deepcopy(self.low_carbon_preference_matrix)
         identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)
         
@@ -391,7 +437,7 @@ class Network_Matrix:
         elif (self.network_type == "SBM"):
             pass
 
-        partial_shuffle_matrix = self.partial_shuffle_matrix(sorted_preferences)#partial shuffle of the list
+        partial_shuffle_matrix = self.partial_shuffle_matrix(sorted_preferences, self.shuffle_reps)#partial shuffle of the list
         
         return partial_shuffle_matrix
     

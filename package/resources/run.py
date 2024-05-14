@@ -79,9 +79,7 @@ def parallel_run(params_dict: dict[dict]) -> list[Network]:
 
     num_cores = multiprocessing.cpu_count()
     #data_parallel = [generate_data(i) for i in params_dict]
-    data_parallel = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_data)(i) for i in params_dict
-    )
+    data_parallel = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_data)(i) for i in params_dict)
     return data_parallel
 
 def generate_sensitivity_output_flat(params: dict):
@@ -108,9 +106,7 @@ def emissions_parallel_run(
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
     #emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
-    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(generate_emissions_stock_res)(i) for i in params_dict
-    )
+    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(    delayed(generate_emissions_stock_res)(i) for i in params_dict)
     return np.asarray(emissions_list)
 ###################################################################################################
 
