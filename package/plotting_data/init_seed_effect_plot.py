@@ -60,9 +60,9 @@ def plot_distributions_rows(fileName, M_networks, scenarios_seeds_titles, networ
             a = ax.hist(emissions[i], bins=30, alpha=0.5, label=network_titles[j], color=colors_scenarios[i])
             ax.vlines(x=fixed_emissions, ymin=0, ymax=y_max, label="Fixed preferences", linestyles="--", color="black")
 
-            if i == 2:
-                print(a)
-                quit()
+            #if i == 2:
+            #    print(a)
+            #   quit()
 
             ax.set_ylim(0, y_max)
 
@@ -74,7 +74,7 @@ def plot_distributions_rows(fileName, M_networks, scenarios_seeds_titles, networ
                 #ax.legend(loc='upper right', fontsize="10")
     fig.supxlabel(r"Cumulative Emissions, E")
     fig.supylabel(r"Frequency")
-    fig.suptitle("Social susceptability, $\phi$ = " +  str(base_params["phi_lower"]))
+    fig.suptitle("Social susceptability, $\phi$ = " +  str(base_params["phi_lower"]) + ", Preference cohesion, $c$ = " +  str(base_params["coherance_state"]) )
     #fig.text(0.5, 0.04, 'Frequency', ha='center')
     #fig.text(0.04, 0.5, 'Frequency', va='center', rotation='vertical')
     
@@ -111,5 +111,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/init_seed_effect_gen_11_15_41__15_05_2024",
+        fileName= "results/init_seed_effect_gen_11_19_40__15_05_2024",
     )
