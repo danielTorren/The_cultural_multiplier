@@ -93,19 +93,12 @@ def main(
 
     emissions_stock_serial = multi_emissions_stock(params_list)
     emissions_array = emissions_stock_serial.reshape(3, 3, property_reps, params["seed_reps"])#2 is for BA and SBM,3 is for the 3 differents states
-    
-    emissions_array_SW = emissions_array[0]
-    emissions_array_SBM = emissions_array[1]
-    emissions_array_BA = emissions_array[2]
+
 
     #SAVE STUFF
     createFolder(fileName)
     
-    save_object(emissions_array_BA , fileName + "/Data", "emissions_array_BA")
-    save_object(emissions_array_SBM, fileName + "/Data", "emissions_array_SBM")
-    save_object(emissions_array_SW, fileName + "/Data", "emissions_array_SW")
-    save_object(params, fileName + "/Data", "base_params")
-    save_object(params, fileName + "/Data", "base_params")
+    save_object(emissions_array , fileName + "/Data", "emissions_array")
     save_object(params, fileName + "/Data", "base_params")
 
     print("RUNS DONE")

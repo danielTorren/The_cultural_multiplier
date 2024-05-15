@@ -40,6 +40,37 @@ def plot_end_points_emissions_multi_BA_SBM_SW(
     f = plotName + "/plot_emissions_BA_SBM_SW_seeds_" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
 
+def plot_emisisons_simple(
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8), sharey=True)#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = emissions_networks[k]
+
+        mu_emissions = emissions.mean(axis=1)
+        ax.plot(property_vals, mu_emissions)
+        data_trans = mu_emissions.T
+        for v in range(len(data_trans)):
+            ax.plot(property_vals, data_trans[v], alpha = 0.1)
+        #ax.legend()
+        ax.set_xlabel(r"Social susceptibility, $\phi$")
+        
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_emissions_simple_phi"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    #fig.savefig(f+ ".eps", dpi=600, format="eps")  
+
 def main(
     fileName
     ) -> None: 
