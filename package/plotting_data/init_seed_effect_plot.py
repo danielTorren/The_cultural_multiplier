@@ -50,17 +50,20 @@ def plot_distributions_rows(fileName, M_networks, scenarios_seeds_titles, networ
     
     fig, axes = plt.subplots(ncols=num_networks, nrows=num_scenarios, figsize=(20, 10), sharex=True, sharey=True,constrained_layout = True)
     
-    y_max=120
+    y_max=400
 
     for i in range(num_scenarios):
         for j in range(num_networks):
             emissions = M_networks[j]
             ax = axes[i, j]
 
-            ax.hist(emissions[i], bins=30, alpha=0.5, label=network_titles[j], color=colors_scenarios[i])
+            a = ax.hist(emissions[i], bins=30, alpha=0.5, label=network_titles[j], color=colors_scenarios[i])
             ax.vlines(x=fixed_emissions, ymin=0, ymax=y_max, label="Fixed preferences", linestyles="--", color="black")
 
-            
+            if i == 2:
+                print(a)
+                quit()
+
             ax.set_ylim(0, y_max)
 
             if j == 0:
@@ -108,5 +111,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/init_seed_effect_gen_10_54_27__15_05_2024",
+        fileName= "results/init_seed_effect_gen_11_15_41__15_05_2024",
     )
