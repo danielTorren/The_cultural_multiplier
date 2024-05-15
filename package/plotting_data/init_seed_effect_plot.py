@@ -31,7 +31,7 @@ def plot_distributions(
         ax.vlines(x = fixed_emissions, ymin = 0, ymax= 10, label= "Fixed preferences", linestyles="--", color= "black", )
         ax.set_xlabel(r"Cumulative Emisisons, E")
         ax.set_title (network_titles[k])
-        ax.set_ylim(0,60)
+        ax.set_ylim(0,120)
 
     axes[0].set_ylabel(r"Frequency")
     handles, labels = axes[0].get_legend_handles_labels()
@@ -43,6 +43,45 @@ def plot_distributions(
     f = plotName + "/network_hist_init_seed"
     fig1.savefig(f+ ".png", dpi=600, format="png") 
     fig1.savefig(f+ ".eps", dpi=600, format="eps") 
+
+def plot_distributions_rows(fileName, M_networks, scenarios_seeds_titles, network_titles, colors_scenarios, fixed_emissions, base_params):
+    num_networks = len(M_networks)
+    num_scenarios = len(scenarios_seeds_titles)
+    
+    fig, axes = plt.subplots(ncols=num_networks, nrows=num_scenarios, figsize=(20, 10), sharex=True, sharey=True,constrained_layout = True)
+    
+    y_max=120
+
+    for i in range(num_scenarios):
+        for j in range(num_networks):
+            emissions = M_networks[j]
+            ax = axes[i, j]
+
+            ax.hist(emissions[i], bins=30, alpha=0.5, label=network_titles[j], color=colors_scenarios[i])
+            ax.vlines(x=fixed_emissions, ymin=0, ymax=y_max, label="Fixed preferences", linestyles="--", color="black")
+
+            
+            ax.set_ylim(0, y_max)
+
+            if j == 0:
+                ax.set_ylabel(scenarios_seeds_titles[i])
+                
+            if i == 0:
+                axes[0][j].set_title (network_titles[j])
+                #ax.legend(loc='upper right', fontsize="10")
+    fig.supxlabel(r"Cumulative Emissions, E")
+    fig.supylabel(r"Frequency")
+    fig.suptitle("Social susceptability, $\phi$ = " +  str(base_params["phi_lower"]))
+    #fig.text(0.5, 0.04, 'Frequency', ha='center')
+    #fig.text(0.04, 0.5, 'Frequency', va='center', rotation='vertical')
+    
+    
+    #fig.tight_layout()
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_hist_init_seed_rows"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+
 
 def main(
     fileName
@@ -63,11 +102,11 @@ def main(
     base_params = load_object(fileName + "/Data", "base_params") 
     scenarios_seed = ["Preferences", "Network links", "Neighbour shuffling", "Preference shuffling"]#load_object(fileName + "/Data", "scenarios_seed")
     #scenarios_seed = ["Environmental identity", "Network links"]
-    plot_distributions(fileName, emissions_networks, scenarios_seed, network_titles, colors_scenarios, fixed_emissions)
-
+    #plot_distributions(fileName, emissions_networks, scenarios_seed, network_titles, colors_scenarios, fixed_emissions)
+    plot_distributions_rows(fileName, emissions_networks, scenarios_seed, network_titles, colors_scenarios, fixed_emissions, base_params)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/init_seed_effect_gen_17_28_41__14_05_2024",
+        fileName= "results/init_seed_effect_gen_10_54_27__15_05_2024",
     )

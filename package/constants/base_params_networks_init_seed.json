@@ -26,7 +26,7 @@
     "std_low_carbon_preference": 0.01, 
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
-    "phi_lower": 0.001, 
+    "phi_lower": 0.01, 
     "homophily_state": 0,
     "coherance_state": 0,
     "BA_nodes": 11,
