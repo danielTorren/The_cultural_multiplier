@@ -443,7 +443,7 @@ class Network_Matrix:
             sorted_preferences = self.circular_list(sorted_preferences)#agent list is now circular in terms of identity
         elif (self.network_type == "SBM"):
             pass
-
+        
         partial_shuffle_matrix = self.partial_shuffle_matrix(sorted_preferences, self.shuffle_reps)#partial shuffle of the list
         
         return partial_shuffle_matrix

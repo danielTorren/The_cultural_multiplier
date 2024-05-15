@@ -37,7 +37,7 @@ def plot_means_end_points_emissions_lines_inset(
             #color = next(colors)#set color for whole scenario?
             Data = emissions[i]
             #print("Data", Data.shape)
-            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
 
             ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
             inset_ax.plot(property_vals[:index_min], mu_emissions[:index_min], c = colors_scenarios[i])
@@ -61,9 +61,176 @@ def plot_means_end_points_emissions_lines_inset(
     plotName = fileName + "/Plots"
     f = plotName + "/network_plot_means_end_points_emissions_lines_inset"
     fig.savefig(f+ ".png", dpi=600, format="png") 
-    fig.savefig(f+ ".eps", dpi=600, format="eps")    
+    fig.savefig(f+ ".eps", dpi=600, format="eps")   
+
+def plot_emisisons_simple(
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8), sharey=True)#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = emissions_networks[k]
+
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
+            data_trans = Data.T
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i], alpha = 0.1)
+
+
+        #ax.legend()
+        ax.set_xlabel(r"Carbon price, $\tau$")
+        
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_emissions_simple"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    #fig.savefig(f+ ".eps", dpi=600, format="eps")  
+
+def plot_emisisons_simple_short(
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios, value_min
+):
+
+    #print(c,emissions_final)
+    index_min = np.where(property_vals> value_min)[0][0]
+
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8), sharey=True)#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+    
+    for k, ax in enumerate(axes.flat):
+        emissions  = emissions_networks[k]
+
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+            ax.plot(property_vals[index_min:], mu_emissions[index_min:], label=scenarios_titles[i], c = colors_scenarios[i])
+            data_trans = Data.T
+            for v in range(len(data_trans)):
+                ax.plot(property_vals[index_min:], data_trans[v][index_min:], color = colors_scenarios[i], alpha = 0.1)
+
+
+        #ax.legend()
+        ax.set_xlabel(r"Carbon price, $\tau$")
+        #ax.set_xlim(0.0,1)
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_emissions_simple_short"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    #fig.savefig(f+ ".eps", dpi=600, format="eps")  
+
 
 #####################################################################################################
+def plot_M_simple(
+    fileName, M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig1, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8), sharey=True)#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = M_networks[k]
+        scen_mu_min = []
+        scen_mu_max = []
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+            scen_mu_min.append(min(mu_emissions))
+            scen_mu_max.append(max(mu_emissions))
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i+1])
+
+            data_trans = Data.T
+            #quit()
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i+1], alpha = 0.1)
+
+        #ax.legend()
+        ax.set_xlabel(r"Carbon price, $\tau$")
+        ax.set_title (network_titles[k])
+        ax.set_ylim(min(scen_mu_min)*1.1, max(scen_mu_max)*1.1)
+
+    axes[0].set_ylabel(r"Carbon tax multiplier, M")
+    handles, labels = axes[0].get_legend_handles_labels()
+
+    fig1.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_M_simple"
+    fig1.savefig(f+ ".png", dpi=600, format="png") 
+    fig1.savefig(f+ ".eps", dpi=600, format="eps") 
+
+def plot_M_simple_short(
+    fileName, M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios, value_min
+):
+
+    index_min = np.where(property_vals> value_min)[0][0]
+
+    #print(c,emissions_final)
+    fig1, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8), sharey=True)#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = M_networks[k]
+        scen_mu_min = []
+        scen_mu_max = []
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+            scen_mu_min.append(min(mu_emissions[index_min:]))
+            scen_mu_max.append(max(mu_emissions[index_min:]))
+            ax.plot(property_vals[index_min:], mu_emissions[index_min:], label=scenarios_titles[i], c = colors_scenarios[i+1])
+
+            data_trans = Data.T
+            #quit()
+            for v in range(len(data_trans)):
+                ax.plot(property_vals[index_min:], data_trans[v][index_min:], color = colors_scenarios[i+1], alpha = 0.1)
+
+        #ax.set_xlim(0.1,1)
+        #ax.legend()
+        ax.set_xlabel(r"Carbon price, $\tau$")
+        ax.set_title (network_titles[k])
+        #ax.set_ylim(min(scen_mu_min)*1.1, max(scen_mu_max)*1.1)
+
+    axes[0].set_ylabel(r"Carbon tax multiplier, M")
+    handles, labels = axes[0].get_legend_handles_labels()
+
+    fig1.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_M_simple_short"
+    fig1.savefig(f+ ".png", dpi=600, format="png") 
+    fig1.savefig(f+ ".eps", dpi=600, format="eps") 
+
+
 def plot_M_lines(
     fileName, M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
 ):
@@ -81,7 +248,7 @@ def plot_M_lines(
             #color = next(colors)#set color for whole scenario?
             Data = emissions[i]
             #print("Data", Data.shape)
-            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
 
             scen_mu_min.append(min(mu_emissions))
             scen_mu_max.append(max(mu_emissions))
@@ -131,7 +298,7 @@ def plot_M_lines_inset(
             #color = next(colors)#set color for whole scenario?
             Data = emissions[i]
             #print("Data", Data.shape)
-            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
 
             scen_mu_min.append(min(mu_emissions))
             scen_mu_max.append(max(mu_emissions))
@@ -183,7 +350,7 @@ def plot_M_lines_short_inset(
             #color = next(colors)#set color for whole scenario?
             Data = emissions[i]
             #print("Data", Data.shape)
-            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
 
             scen_mu_min.append(min(mu_emissions))
             scen_mu_max.append(max(mu_emissions))
@@ -233,7 +400,7 @@ def plot_M_lines_short(
             #color = next(colors)#set color for whole scenario?
             Data = emissions[i]
             #print("Data", Data.shape)
-            mu_emissions, min_emissions, max_emissions = calc_bounds(Data, 0.95)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
 
             #ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
             ax.plot(property_vals[50:], mu_emissions[50:], label=scenarios_titles[i], c = colors_scenarios[i+1])
@@ -284,19 +451,30 @@ def main(
 
     scenarios = load_object(fileName + "/Data", "scenarios")
 
+    index_list_simple = [0,4,5]#GET THE INTERESTING STUFF!!
+    emissions_networks_simple = np.asarray([[network[x] for x in index_list_simple] for network in  emissions_networks])     
+    scenario_labels_simple = [scenario_labels[x] for x in index_list_simple]
 
-    plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_emisisons_simple(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios)
     
+    value_min = 0.1
+    plot_emisisons_simple_short(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios, value_min)
     M_vals_networks = load_object(fileName + "/Data", "M_vals_networks")
     #print(scenarios)
     #"""
     #EMISSIONS PLOTS ALL TOGETHER SEEDS
+    index_list_simple_M = [3,4]
+    M_vals_networks_simple = np.asarray([[network[x] for x in index_list_simple_M] for network in M_vals_networks]) 
     
-    plot_M_lines(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
+    #plot_M_simple(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios)
+    plot_M_simple_short(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios, value_min)
+    
+    #plot_M_lines(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
     
     #plot_M_lines_inset(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
     #plot_M_lines_short(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
-    plot_M_lines_short_inset(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
+    #plot_M_lines_short_inset(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
     plt.show()
 
 if __name__ == '__main__':
