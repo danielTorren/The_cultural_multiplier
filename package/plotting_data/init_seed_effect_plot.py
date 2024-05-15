@@ -31,6 +31,7 @@ def plot_distributions(
         ax.vlines(x = fixed_emissions, ymin = 0, ymax= 10, label= "Fixed preferences", linestyles="--", color= "black", )
         ax.set_xlabel(r"Cumulative Emisisons, E")
         ax.set_title (network_titles[k])
+        ax.set_ylim(0,60)
 
     axes[0].set_ylabel(r"Frequency")
     handles, labels = axes[0].get_legend_handles_labels()
@@ -60,7 +61,7 @@ def main(
     emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_BA])
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"] 
     base_params = load_object(fileName + "/Data", "base_params") 
-    scenarios_seed = ["Environmental identity", "Network links", "Neighbour shuffling", "Preference shuffling"]#load_object(fileName + "/Data", "scenarios_seed")
+    scenarios_seed = ["Preferences", "Network links", "Neighbour shuffling", "Preference shuffling"]#load_object(fileName + "/Data", "scenarios_seed")
     #scenarios_seed = ["Environmental identity", "Network links"]
     plot_distributions(fileName, emissions_networks, scenarios_seed, network_titles, colors_scenarios, fixed_emissions)
 
@@ -68,5 +69,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/init_seed_effect_gen_14_18_23__14_05_2024",
+        fileName= "results/init_seed_effect_gen_17_28_41__14_05_2024",
     )

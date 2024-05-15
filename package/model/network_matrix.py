@@ -164,7 +164,7 @@ class Network_Matrix:
         if self.homophily_state != 0:
             #print("YO!")
             self.low_carbon_preference_matrix = self.shuffle_preferences_start_mixed()
-        #print("POST SHUFFLE self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
+        #print("POST SHUFFLE self.low_carbon_preference_matrix", self.low_carbon_preference_matrix, np.mean(self.low_carbon_preference_matrix))
         #quit()
         ########################################################################################################################
         #NO MORE STOCHASTIC
@@ -325,15 +325,22 @@ class Network_Matrix:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
         preferences_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
         preferences_capped_uncoherant = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
-        preferences_sorted = sorted(preferences_capped_uncoherant)#LIST IS NOW SORTED
-        #NOW ACCORDING TO THE DEGREE OF INTERNAL COHERANCE, WE SHUFFLE
-        preferences_coherance = self.partial_shuffle_vector(np.asarray(preferences_sorted), self.shuffle_reps_coherance)
-        low_carbon_preference_matrix = preferences_coherance.reshape(self.N,self.M)
-        #FINALLY MIX UP THE LIST SUCH THAT THE POSITIONING OF THE ROWS WITHIN THE MATRIX IS RANDOM
 
+        if self.coherance_state != 0:
+            preferences_sorted = sorted(preferences_capped_uncoherant)#LIST IS NOW SORTED
+            #NOW ACCORDING TO THE DEGREE OF INTERNAL COHERANCE, WE SHUFFLE
+            preferences_coherance = self.partial_shuffle_vector(np.asarray(preferences_sorted), self.shuffle_reps_coherance)
+            low_carbon_preference_matrix = preferences_coherance.reshape(self.N,self.M)
+        else:
+            low_carbon_preference_matrix = preferences_capped_uncoherant.reshape(self.N,self.M)
+        
+        #print("BEFORE low_carbon_preference_matrix",low_carbon_preference_matrix)
+        #FINALLY MIX UP THE LIST SUCH THAT THE POSITIONING OF THE ROWS WITHIN THE MATRIX IS RANDOM
         np.random.seed(self.shuffle_coherance_seed)#For inital construction set a seed
         np.random.shuffle(low_carbon_preference_matrix)
 
+        #print("AFTER low_carbon_preference_matrix",low_carbon_preference_matrix)
+        #quit()
         return low_carbon_preference_matrix
     
     def generate_init_data_preferences_no_homo(self) -> tuple[npt.NDArray, npt.NDArray]:
