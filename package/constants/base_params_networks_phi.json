@@ -30,7 +30,7 @@
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
     "homophily_state": 0,
-    "coherance_state": 0,
+    "coherance_state": 0.95,
     "BA_nodes": 11,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,

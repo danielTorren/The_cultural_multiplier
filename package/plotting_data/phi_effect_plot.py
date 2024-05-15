@@ -41,6 +41,39 @@ def plot_emisisons_simple(
     fig.savefig(f+ ".png", dpi=600, format="png") 
     #fig.savefig(f+ ".eps", dpi=600, format="eps")  
 
+def plot_car_emisisons_simple(
+    fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8), sharey=True)#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = emissions_networks[k]
+
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            var_emissions = Data.var(axis=1)
+            ax.plot(property_vals, var_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
+
+        #ax.legend()
+        ax.set_xlabel(r"Social susceptability, $\phi$")
+        
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Variance cumulative carbon emissions, Var(E)")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_emissions_simple_phi_var"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    #fig.savefig(f+ ".eps", dpi=600, format="eps")  
+
 def main(
     fileName
     ) -> None: 
@@ -58,9 +91,10 @@ def main(
     scenarios_titles = labels_SW = [r"No carbon price, $\tau = 0$", r"Low carbon price, $\tau = 0.1$", r"High carbon price, $\tau = 1$"]
 
     plot_emisisons_simple(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    plot_car_emisisons_simple(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_vary_17_11_30__15_05_2024",
+        fileName= "results/phi_vary_17_17_36__15_05_2024",
     )
