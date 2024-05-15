@@ -2,46 +2,10 @@
 # imports
 import matplotlib.pyplot as plt
 from package.resources.utility import load_object
-import numpy as np
-
-def plot_end_points_emissions_multi_BA_SBM_SW(
-    fileName: str, Data_arr_BA, Data_arr_SBM, Data_arr_SW, property_title, property_save, property_vals, labels_BA, labels_SBM, labels_SW,seed_reps
-):
-    #nrows=seed_reps
-    fig, axes = plt.subplots(nrows=3, ncols=Data_arr_BA.shape[0], figsize=(10, 6), constrained_layout=True)
-    
-    for j, Data_list in enumerate(Data_arr_BA):
-        data_BA = Data_arr_BA[j].T
-        data_SBM = Data_arr_SBM[j].T
-        data_SW = Data_arr_SW[j].T
-        for i in range(seed_reps):#loop through seeds
-
-            #for i, ax in enumerate(axes.flat):
-            axes[0][j].plot(property_vals, data_BA[i])
-            axes[1][j].plot(property_vals, data_SBM[i], linestyle="dashed")
-            axes[2][j].plot(property_vals, data_SW[i], linestyle="dotted")
-
-        axes[0][j].set_title(labels_BA[j])
-        axes[1][j].set_title(labels_SBM[j])
-        axes[2][j].set_title(labels_SW[j])
-
-        axes[0][j].grid()
-        axes[1][j].grid()
-        axes[2][j].grid()
-
-        #axes[0][j].legend()
-        #axes[1][j].legend()
-        #axes[2][j].legend()
-    
-    fig.supxlabel(property_title)
-    fig.supylabel(r"Cumulative emissions, E")
-
-    plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_BA_SBM_SW_seeds_" + property_save
-    fig.savefig(f + ".png", dpi=600, format="png")
+from matplotlib.cm import  get_cmap
 
 def plot_emisisons_simple(
-    fileName, emissions_networks, scenarios_titles, property_vals, network_titles
+    fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
 ):
 
     #print(c,emissions_final)
@@ -52,13 +16,19 @@ def plot_emisisons_simple(
     for k, ax in enumerate(axes.flat):
         emissions  = emissions_networks[k]
 
-        mu_emissions = emissions.mean(axis=1)
-        ax.plot(property_vals, mu_emissions)
-        data_trans = mu_emissions.T
-        for v in range(len(data_trans)):
-            ax.plot(property_vals, data_trans[v], alpha = 0.1)
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions = Data.mean(axis=1)
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
+            data_trans = Data.T
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i], alpha = 0.1)
+
+
         #ax.legend()
-        ax.set_xlabel(r"Social susceptibility, $\phi$")
+        ax.set_xlabel(r"Social susceptability, $\phi$")
         
         ax.set_title (network_titles[k])
     axes[0].set_ylabel(r"Cumulative carbon emissions, E")
@@ -74,33 +44,23 @@ def plot_emisisons_simple(
 def main(
     fileName
     ) -> None: 
-
+    name = "Set2"
+    cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
+    colors_scenarios = cmap.colors  # type: list
     ############################
     #BA
-    base_params_BA = load_object(fileName + "/Data", "base_params_BA")
+    base_params = load_object(fileName + "/Data", "base_params")
     var_params = load_object(fileName + "/Data" , "var_params")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     property_varied = var_params["property_varied"]
+    network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
+    emissions_array = load_object(fileName + "/Data", "emissions_array")
+    scenarios_titles = labels_SW = [r"No carbon price, $\tau = 0$", r"Low carbon price, $\tau = 0.1$", r"High carbon price, $\tau = 1$"]
 
-    emissions_array_BA = load_object(fileName + "/Data", "emissions_array_BA")
-    labels_BA = [r"BA, No carbon price, $\tau = 0$", r"BA, Low carbon price, $\tau = 0.1$", r"BA, High carbon price, $\tau = 1$"]
-    
-    #base_params_SBM = load_object(fileName + "/Data", "base_params_SBM")
-
-    emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
-    labels_SBM = [r"SBM, No carbon price, $\tau = 0$", r"SBM, Low carbon price, $\tau = 0.1$", r"SBM, High carbon price, $\tau = 1$"]
-
-    #base_params_SW = load_object(fileName + "/Data", "base_params_SW")
-
-    emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
-    labels_SW = [r"SW, No carbon price, $\tau = 0$", r"SW, Low carbon price, $\tau = 0.1$", r"SW, High carbon price, $\tau = 1$"]
-
-    seed_reps = base_params_BA["seed_reps"]
-
-    plot_end_points_emissions_multi_BA_SBM_SW(fileName, emissions_array_BA, emissions_array_SBM, emissions_array_SW, r"Social susceptability, $\phi$", property_varied, property_values_list, labels_BA, labels_SBM, labels_SW,seed_reps)
+    plot_emisisons_simple(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/BA_SBM_SW_phi_vary_10_40_18__26_01_2024",
+        fileName= "results/phi_vary_17_11_30__15_05_2024",
     )

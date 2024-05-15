@@ -2,7 +2,7 @@
     "property_varied" : "phi_lower",
     "property_min" : 0,
     "property_max" :1,
-    "property_reps": 10,
+    "property_reps": 100,
     "property_varied_title" : "Phi",
     "property_divisions": "linear"
 }

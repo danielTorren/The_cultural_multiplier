@@ -114,7 +114,4 @@ if __name__ == '__main__':
         BASE_PARAMS_LOAD = "package/constants/base_params_networks_phi.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_phi.json",
     )
-    RUN_PLOT = 1
 
-    if RUN_PLOT:
-        phi_effect_plot.main(fileName = fileName_Figure_1)

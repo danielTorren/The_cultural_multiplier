@@ -13,7 +13,7 @@ from package.resources.utility import (
 )
 from package.generating_data.static_preferences_emissions_gen import calc_required_static_carbon_tax_seeds
 from package.plotting_data.price_elasticity_plot import calculate_price_elasticity,calc_price_elasticities_2D
-from matplotlib.cm import rainbow,  get_cmap
+from matplotlib.cm import get_cmap
 import matplotlib.pyplot as plt
 
 
