@@ -8,7 +8,7 @@
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "imitation_state": "consumption",
-    "vary_seed_state": "network",
+    "vary_seed_state": "preferences",
     "alpha_change_state": "dynamic_identity_determined_weights",
     "seed_reps": 25,
     "network_structure_seed": 10, 
