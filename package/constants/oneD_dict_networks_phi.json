@@ -1,6 +1,6 @@
 {
     "property_varied" : "phi_lower",
-    "property_min" : 1e-4,
+    "property_min" : 1e-3,
     "property_max" :1,
     "property_reps": 1000,
     "property_varied_title" : "Phi",
