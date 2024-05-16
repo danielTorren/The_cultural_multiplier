@@ -26,6 +26,8 @@ def main(
     property_values_list = generate_vals(
         var_params
     )
+    #print("property_values_list", property_values_list)
+    #quit()
     #property_values_list = np.linspace(property_min, property_max, property_reps)
 
     f = open(BASE_PARAMS_LOAD)
@@ -43,6 +45,7 @@ def main(
     params["network_type"]  = "SW"
     params["carbon_price_increased_lower"] = 0    
     params_list_no_tau_SW = produce_param_list_stochastic(params, property_values_list, property_varied)
+
 
     params["carbon_price_increased_lower"] = 0.1   
     params_list_low_tau_SW = produce_param_list_stochastic(params, property_values_list, property_varied)
