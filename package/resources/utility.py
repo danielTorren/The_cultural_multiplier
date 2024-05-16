@@ -177,3 +177,12 @@ def produce_param_list_stochastic(params: dict, property_list: list, property: s
                 params.copy()
             )  
     return params_list
+
+def produce_param_list_only_stochastic(params: dict) -> list[dict]:
+    params_list = []
+    for v in range(params["seed_reps"]):
+        params["set_seed"] = int(v+1)
+        params_list.append(
+            params.copy()
+        )  
+    return params_list
