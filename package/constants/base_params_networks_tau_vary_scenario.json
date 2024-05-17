@@ -8,13 +8,12 @@
     "heterogenous_phi_state": 0,
     "imperfect_learning_state": 1,
     "imitation_state": "consumption",
-    "vary_seed_state": "network",
-
-    "seed_reps": 25,
+    "vary_seed_state": "preferences",
+    "seed_reps": 100,
     "network_structure_seed": 10, 
     "preferences_seed": 77, 
+    "shuffle_coherance_seed": 5,
     "shuffle_homophily_seed": 2,
-    
     "set_seed": 4, 
     "carbon_price_duration": 1000, 
     "burn_in_duration": 0, 
@@ -25,14 +24,13 @@
     "low_carbon_substitutability_upper": 2, 
     "a_identity": 2, 
     "b_identity": 2, 
- 
     "clipping_epsilon_init_preference": 1e-5,
     "std_low_carbon_preference": 0.01, 
-
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
     "phi_lower": 0.02, 
     "homophily_state": 0,
+    "coherance_state": 0.9,
     "BA_nodes": 11,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
