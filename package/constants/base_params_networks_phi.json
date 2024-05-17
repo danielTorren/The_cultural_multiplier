@@ -10,7 +10,7 @@
     "imitation_state": "consumption",
     "vary_seed_state": "preferences",
     "alpha_change_state": "dynamic_identity_determined_weights",
-    "seed_reps": 50,
+    "seed_reps": 100,
     "network_structure_seed": 10, 
     "preferences_seed": 77, 
     "shuffle_homophily_seed": 2,

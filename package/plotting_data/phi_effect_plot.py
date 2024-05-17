@@ -189,6 +189,7 @@ def main(
     #BA
     base_params = load_object(fileName + "/Data", "base_params")
     var_params = load_object(fileName + "/Data" , "var_params")
+    print("base_params", base_params)
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     property_varied = var_params["property_varied"]
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
@@ -205,5 +206,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_vary_12_00_50__16_05_2024",
+        fileName= "results/phi_vary_13_04_38__16_05_2024",
     )
