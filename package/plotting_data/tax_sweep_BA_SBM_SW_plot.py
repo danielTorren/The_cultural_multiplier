@@ -429,7 +429,6 @@ def plot_M_lines_short(
 
 def main(
     fileName ,#= "results/tax_sweep_11_29_20__28_09_2023"
-    LOAD_STATIC_FULL = 1
 ) -> None:
     
     name = "Set2"
@@ -479,7 +478,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        #fileName= "results/tax_sweep_networks_13_18_41__19_04_2024",#COMPLETE
-        fileName= "results/asym_tax_sweep_networks_17_31_30__10_05_2024",#ASYM
-        LOAD_STATIC_FULL = 1
+        fileName= "results/tax_sweep_networks_14_58_29__17_05_2024",#COMPLETE
+        #fileName= "results/asym_tax_sweep_networks_17_31_30__10_05_2024",#ASYM
     )
