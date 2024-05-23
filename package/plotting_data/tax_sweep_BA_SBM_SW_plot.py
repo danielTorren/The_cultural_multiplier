@@ -16,6 +16,45 @@ from package.plotting_data.price_elasticity_plot import calculate_price_elastici
 from matplotlib.cm import get_cmap
 import matplotlib.pyplot as plt
 
+def plot_means_end_points_emissions(
+    fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8))#
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = emissions_networks[k]
+
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i])
+
+            data_trans = Data.T
+            #quit()
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i], alpha = 0.1)
+
+
+        #ax.legend()
+        ax.set_xlabel(r"Carbon price, $\tau$")
+        
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_plot_means_end_points_emissions_lines"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    fig.savefig(f+ ".eps", dpi=600, format="eps")   
 
 def plot_means_end_points_emissions_lines_inset(
     fileName, emissions_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
@@ -454,11 +493,13 @@ def main(
     emissions_networks_simple = np.asarray([[network[x] for x in index_list_simple] for network in  emissions_networks])     
     scenario_labels_simple = [scenario_labels[x] for x in index_list_simple]
 
-    #plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
     #plot_emisisons_simple(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios)
     
+    #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+
     value_min = 0.1
-    plot_emisisons_simple_short(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios, value_min)
+    #plot_emisisons_simple_short(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios, value_min)
     M_vals_networks = load_object(fileName + "/Data", "M_vals_networks")
     #print(scenarios)
     #"""
@@ -466,7 +507,7 @@ def main(
     index_list_simple_M = [3,4]
     M_vals_networks_simple = np.asarray([[network[x] for x in index_list_simple_M] for network in M_vals_networks]) 
     
-    #plot_M_simple(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios)
+    plot_M_simple(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios)
     plot_M_simple_short(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios, value_min)
     
     #plot_M_lines(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
@@ -478,6 +519,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_14_58_29__17_05_2024",#COMPLETE
+        fileName= "results/tax_sweep_networks_14_58_29__17_05_2024"#"results/tax_sweep_networks_14_58_29__17_05_2024",#COMPLETE
         #fileName= "results/asym_tax_sweep_networks_17_31_30__10_05_2024",#ASYM
     )

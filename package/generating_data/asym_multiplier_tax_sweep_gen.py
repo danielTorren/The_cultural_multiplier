@@ -14,14 +14,9 @@ import multiprocessing
 
 def calc_dividend(H_m, tau_m, N):
     total_quantities_m = H_m.sum(axis = 0)
-    #print(" H_m",  H_m)
-    #print("H_m.sum(axis = 0)",H_m.sum(axis = 0))
     
     tax_income_R =  np.sum(tau_m*total_quantities_m) 
-    #print("tau_m",tau_m,tax_income_R)
-    #quit()
-    #total_quantities_system = np.sum(H_m)
-    #tax_income_R =  tau*total_quantities_system    
+
     carbon_dividend =  tax_income_R/N
     return carbon_dividend
 
@@ -236,7 +231,7 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
 
-    """
+    #"""
 
     print("STARTING CALC")
     tau_matrix, emissions_matrix = calc_required_static_carbon_tax_seeds(base_params,property_values_list, emissions_networks,tau_lower_bound, tau_upper_bound, total_range_runs)#EMISSIONS CAN BE ANY OF THEM
@@ -244,16 +239,16 @@ def main(
     print("CALCULATED DATA")
     save_object(tau_matrix,fileName + "/Data", "tau_matrix")
     save_object(emissions_matrix,fileName + "/Data", "emissions_matrix")
-    """
+    #"""
     ##############
 
-    tau_matrix = load_object(fileName + "/Data", "tau_matrix")
-    emissions_matrix = load_object(fileName + "/Data", "emissions_matrix")
+    #tau_matrix = load_object(fileName + "/Data", "tau_matrix")
+    #emissions_matrix = load_object(fileName + "/Data", "emissions_matrix")
 
     M_vals_networks = calc_M_vector(property_values_list , tau_matrix,emissions_networks, emissions_matrix)
     save_object(M_vals_networks,fileName + "/Data", "M_vals_networks")
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/asym_tax_sweep_networks_17_31_30__10_05_2024"
+        fileName= "results/asym_tax_sweep_networks_13_09_20__20_05_2024"#asym_tax_sweep_networks_17_31_30__10_05_2024"
     )
