@@ -40,8 +40,8 @@ def main(
     params["network_type"] = "SBM"
     params_list_tax_SBM_identity,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
     params["network_type"] = "BA"
-    params_list_tax_BA_identity,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
-    params_list_identity = params_list_tax_SW_identity + params_list_tax_SBM_identity + params_list_tax_BA_identity
+    params_list_tax_Ba_preferences,__ = produce_param_list_stochastic_n_double(params, variable_parameters_dict)
+    params_list_identity = params_list_tax_SW_identity + params_list_tax_SBM_identity + params_list_tax_Ba_preferences
     #SOCIAL
     params["low_carbon_substitutability_upper"] = 5
     params["network_type"] = "SW"

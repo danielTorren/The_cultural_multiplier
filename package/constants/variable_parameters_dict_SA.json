@@ -8,7 +8,7 @@
     "low_carbon_substitutability_upper": {"property":"low_carbon_substitutability_upper","min":1.1,"max":5, "round":0},
     "confirmation_bias": {"property":"confirmation_bias","min":0,"max": 50, "round":0},
     "homophily_state":{"property":"homophily_state","min":0,"max": 1, "round":0},
-    "a_identity": {"property":"a_identity","min":0.1,"max": 8, "round":0},
-    "b_identity": {"property":"b_identity","min":0.1,"max": 8, "round":0},
+    "a_preferences": {"property":"a_preferences","min":0.1,"max": 8, "round":0},
+    "b_preferences": {"property":"b_preferences","min":0.1,"max": 8, "round":0},
     "std_low_carbon_preference": {"property":"std_low_carbon_preference","min":0,"max": 0.3, "round":0}
 }

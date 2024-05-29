@@ -1,0 +1,8 @@
+{
+    "property_varied" : "carbon_price_increased_lower",
+    "property_min" : 0,
+    "property_max" :1,
+    "property_reps": 200,
+    "property_varied_title" : "Carbon tax",
+    "property_divisions": "linear"
+}

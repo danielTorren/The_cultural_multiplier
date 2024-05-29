@@ -19,8 +19,8 @@
 	"learning_seed":10, 
     "carbon_price_duration": 1000, 
     "burn_in_duration": 0, 
-    "a_identity": 2, 
-    "b_identity": 2, 
+    "a_preferences": 2, 
+    "b_preferences": 2, 
  
     "clipping_epsilon_init_preference": 1e-5,
     "init_carbon_price": 0

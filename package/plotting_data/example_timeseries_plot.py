@@ -14,12 +14,12 @@ def plot_identity_matrix_2(fileName, Data_1, Data_2):
 
     fig, axes = plt.subplots(nrows=1,ncols=2,figsize=(10,6), sharey=True)
 
-    Data_identity_trans_1 = np.asarray(Data_1.history_identity_vec).T#NOW ITS person then time
-    Data_identity_trans_2 = np.asarray(Data_2.history_identity_vec).T#NOW ITS person then time
+    Data_preferences_trans_1 = np.asarray(Data_1.history_identity_vec).T#NOW ITS person then time
+    Data_preferences_trans_2 = np.asarray(Data_2.history_identity_vec).T#NOW ITS person then time
 
     for v in range(Data_1.N):
-        axes[0].plot(np.asarray(Data_1.history_time), Data_identity_trans_1[v])
-        axes[1].plot(np.asarray(Data_2.history_time), Data_identity_trans_2[v])
+        axes[0].plot(np.asarray(Data_1.history_time), Data_preferences_trans_1[v])
+        axes[1].plot(np.asarray(Data_2.history_time), Data_preferences_trans_2[v])
         
     axes[0].set_xlabel(r"Timestep")
     axes[1].set_xlabel(r"Timestep")

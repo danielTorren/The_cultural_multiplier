@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 from package.resources.utility import produce_name_datetime, save_object, createFolder, load_object
 from sympy import symbols, diff, simplify, lambdify, print_latex, And, solve
-
+from scipy.optimize import brentq
 #####################################
 #PLOT 1D stuff for 1st figure 
 
@@ -393,15 +393,113 @@ def calc_emissions_tax_rebound():
 
     plt.show()
 
+def root_emmissions_function(tau_C, *args):
+
+    tau_I, v = args
+
+    numerator_I = 4**(1-v) * (tau_I+2)**(2*(v-1)) + (1+tau_I)**v
+    denominator_I = 4**(1-v) * (tau_I+2)**(2*v-1) * (1+tau_I) + 2*(1+tau_I)**v
+    E_I = numerator_I / denominator_I
+    E_C =  1 / ((1 + tau_C) * (2 + tau_C))
+    convergence_val = E_I - E_C
+    return convergence_val
+
+def calc_emissions(tau_C, tau_I, v):
+    numerator_I = 4**(1-v) * (tau_I+2)**(2*(v-1)) + (1+tau_I)**v
+    denominator_I = 4**(1-v) * (tau_I+2)**(2*v-1) * (1+tau_I) + 2*(1+tau_I)**v
+    E_I = numerator_I / denominator_I
+    E_C =  1 / ((1 + tau_C) * (2 + tau_C))
+    return E_I, E_C
+
+
+def calc_ratio_complete_incomplete():
+    
+    tau_I_list = np.linspace(0,2,1000)
+    v_list = [1.01,5,30]
+
+    tau_C_data = []
+    E_I_data = []
+    for v in v_list:
+        tau_C_list = []
+        E_I_list = []
+        E_C_list = []
+        for tau_I in tau_I_list:
+            E_I, E_C = calc_emissions(tau_I,tau_I, v)
+            E_I_list.append(E_I)
+            E_C_list.append(E_C)
+            root = brentq(f = root_emmissions_function, a = 0, b = 10000, args=(tau_I,v), maxiter= 100)
+            tau_C_list.append(root)
+        tau_C_data.append(tau_C_list)
+        E_I_data.append(E_I_list)
+
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), constrained_layout=True)
+
+    for i, tau_C_v in enumerate(tau_C_data):
+        ax.plot(tau_I_list, tau_C_v, label= "$\\nu = %s$" % (v_list[i]))
+
+    ax.set_xlabel(r"Sector 1 incomplete carbon tax, $\tau_I$ ")
+    ax.set_ylabel(r"Complete carbon tax,  $\tau_C$")#1 - 
+    #ax2.set_title('linear')
+    ax.legend()
+    ax.grid()
+
+    fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), constrained_layout=True)
+
+    for i, E_I in enumerate(E_I_data):
+        ax2.plot(tau_I_list, E_I, label= "Incomplete coverage, $\\nu = %s$" % (v_list[i]))
+
+    ax2.plot(tau_I_list, E_C_list, label= "Complete coverage")
+
+    ax2.set_xlabel(r"Carbon tax in complete and incomplete coverage, $\tau$")
+    ax2.set_ylabel(r"Emmisions flow, $E_F$")#1 - 
+    #ax2.set_title('linear')
+    ax2.legend()
+    ax2.grid()
+
+    fig3, ax3 = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), constrained_layout=True)
+
+    for i, E_I in enumerate(E_I_data):
+        ax3.plot(E_I, tau_I_list, label= "Incomplete coverage, $\\nu = %s$" % (v_list[i]))
+
+    ax3.plot(E_C_list,tau_I_list, label= "Complete coverage")
+
+    ax3.set_ylabel(r"Carbon tax in complete and incomplete coverage, $\tau$")
+    ax3.set_xlabel(r"Emmisions flow, $E_F$")#1 - 
+    #ax2.set_title('linear')
+    ax3.legend()
+    ax3.grid()
+
+
+    root = "E_root_nu_tau_ratio"
+    fileName = produce_name_datetime(root)
+    print("fileName: ", fileName)
+
+    createFolder(fileName)
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/Emissions"
+    fig2.savefig(f + ".eps", dpi=600, format="eps")
+    fig2.savefig(f + ".png", dpi=600, format="png")
+
+    f = plotName + "/ratio"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+    plt.show()
+
+    return tau_C_list
+
 def main( type_run):
 
     if type_run == "plots_1D":
         run_plots_1D(root = "2_sector_model", LOAD = 0, init_params = 4, scenario = 1)#init_params = 8, scenario = 4
     elif type_run == "rebound_tax":
         calc_emissions_tax_rebound()
+    elif type_run =="ratio":
+        calc_ratio_complete_incomplete()
     else:
         raise ValueError("Wrong TYPE")
 
 if __name__ == '__main__':
-    type_run = "rebound_tax"# "plots_1D"
+    type_run = "rebound_tax"#"rebound_tax"# "plots_1D"
     main(type_run)

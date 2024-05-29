@@ -121,6 +121,17 @@ class Network_Matrix:
         )
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        #self.individual_expenditure_array =  np.asarray([1]*self.N)#sums to 1, constant total system expenditure 
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
 
         self.sector_substitutability = parameters["sector_substitutability"]
@@ -131,13 +142,17 @@ class Network_Matrix:
         ###################################################
         # set preferences
         if self.heterogenous_intrasector_preferences_state == 1:
-            self.a_identity = parameters["a_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
-            self.b_identity = parameters["b_identity"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.a_preferences = parameters["a_preferences"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
+            self.b_preferences = parameters["b_preferences"]#A #IN THIS BRANCH CONSISTEN BEHAVIOURS USE THIS FOR THE IDENTITY DISTRIBUTION
             self.std_low_carbon_preference = parameters["std_low_carbon_preference"]
 
             self.low_carbon_preference_matrix_init = self.generate_init_data_preferences_coherance()
             #self.low_carbon_preference_matrix_init = self.generate_init_data_preferences_no_homo()
             #self.low_carbon_preference_matrix_init = self.generate_init_data_preferences()
+        elif self.heterogenous_intrasector_preferences_state == 0:#EQUAL PREFENCES
+            self.low_carbon_preference_matrix_init = np.asarray([[1/self.M]*self.M]*self.N)
+            #print("self.low_carbon_preference_matrix_init", self.low_carbon_preference_matrix_init)
+            #quit()
         else:
             #this is if you want same preferences for everbody
             self.low_carbon_preference_matrix_init = np.asarray([np.random.uniform(size=self.M)]*self.N)
@@ -166,6 +181,7 @@ class Network_Matrix:
             self.low_carbon_preference_matrix = self.shuffle_preferences_start_mixed()
         #print("POST SHUFFLE self.low_carbon_preference_matrix", self.low_carbon_preference_matrix, np.mean(self.low_carbon_preference_matrix))
         #quit()
+
         ########################################################################################################################
         #NO MORE STOCHASTIC
         #########################################################################################################################
@@ -198,6 +214,15 @@ class Network_Matrix:
     
         self.calc_consumption()#UNLIKE IN THE OTHER MODEL I CAN CALCULATE STUFF NOW
 
+        if (self.preferences_seed == 2) and (self.parameters["carbon_price_increased_lower"] == 0):
+            print(np.mean(self.low_carbon_preference_matrix))
+            print(self.carbon_price_increased_m)
+            print("self.sector_substitutability",self.sector_substitutability)
+            print("self.Omega_m_matrix",self.Omega_m_matrix[0])
+            print("self.chi_m_tensor", self.chi_m_tensor[0])
+            print("self.Z_vec", self.Z_vec[0])
+            print("self.H_m_matrix", self.H_m_matrix[0])
+            #quit()
 
         #############################################################################################################################
         #FROM HERE MODEL IS DETERMINISTIC NOT MORE RANDOMNESS
@@ -323,7 +348,7 @@ class Network_Matrix:
     def generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
 
         np.random.seed(self.preferences_seed)#For inital construction set a seed
-        preferences_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
+        preferences_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
         preferences_capped_uncoherant = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
         if self.coherance_state != 0:
@@ -345,7 +370,7 @@ class Network_Matrix:
     
     def generate_init_data_preferences_no_homo(self) -> tuple[npt.NDArray, npt.NDArray]:
 
-        indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
+        indentities_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N)
 
         preferences_uncapped = np.asarray([np.random.normal(loc=identity,scale=self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
 
@@ -355,7 +380,7 @@ class Network_Matrix:
     
     def generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
 
-        indentities_beta = np.random.beta( self.a_identity, self.b_identity, size=self.N)
+        indentities_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N)
 
         preferences_uncapped = np.asarray([np.random.normal(loc=identity,scale=self.std_low_carbon_preference, size=self.M) for identity in  indentities_beta])
 
@@ -681,7 +706,15 @@ class Network_Matrix:
 
         self.update_carbon_price()#check whether its time to update carbon price
         
-        self.instant_expenditure_vec = self.calc_instant_expediture()#update expenditures with previous steps gains
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        #self.instant_expenditure_vec = self.calc_instant_expediture()#update expenditures with previous steps gains
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
 
         #update preferences 
         if self.alpha_change_state != "fixed_preferences":

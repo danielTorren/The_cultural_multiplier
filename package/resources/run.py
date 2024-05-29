@@ -297,7 +297,7 @@ def multi_emissions_stock(
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
     #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
-    emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(
+    emissions_stock = Parallel(n_jobs=num_cores, verbose=0)(
         delayed(generate_emissions_stock)(i) for i in params_dict
     )
 

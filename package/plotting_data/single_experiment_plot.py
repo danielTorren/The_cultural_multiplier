@@ -969,10 +969,10 @@ def plot_identity_matrix(fileName, Data, dpi_save,latex_bool = False):
     fig, ax = plt.subplots(figsize=(10,6))
     y_title = r"Identity, $I_{t,n}$"
 
-    Data_identity_trans = np.asarray(Data.history_identity_vec).T#NOW ITS person then time
+    Data_preferences_trans = np.asarray(Data.history_identity_vec).T#NOW ITS person then time
 
     for v in range(Data.N):
-        ax.plot(np.asarray(Data.history_time), Data_identity_trans[v])
+        ax.plot(np.asarray(Data.history_time), Data_preferences_trans[v])
         ax.set_xlabel(r"Time")
         ax.set_ylabel(r"%s" % y_title)
         #ax.set_ylim(0, 1)

@@ -22,8 +22,8 @@
     "sector_substitutability": 5,
     "low_carbon_substitutability_lower":5,
     "low_carbon_substitutability_upper":5,
-    "a_identity": 2,
-    "b_identity": 2,
+    "a_preferences": 2,
+    "b_preferences": 2,
 
     "std_low_carbon_preference":0.01,
     "confirmation_bias":5,

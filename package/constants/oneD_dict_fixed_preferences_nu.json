@@ -1,0 +1,8 @@
+{
+    "property_varied" : "sector_substitutability",
+    "property_min" : 1.01,
+    "property_max" :10,
+    "property_reps": 200,
+    "property_varied_title" : "sector substitutability",
+    "property_divisions": "linear"
+}

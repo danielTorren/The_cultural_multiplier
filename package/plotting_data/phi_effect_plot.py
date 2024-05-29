@@ -1,7 +1,8 @@
 
 # imports
 import matplotlib.pyplot as plt
-from package.resources.utility import load_object
+from pyrsistent import v
+from package.resources.utility import load_object, calc_bounds
 from matplotlib.cm import  get_cmap
 
 def plot_emisisons_simple(
@@ -178,6 +179,77 @@ def plot_var_emisisons_simple_xlog(
     fig.savefig(f+ ".png", dpi=600, format="png") 
     #fig.savefig(f+ ".eps", dpi=600, format="eps") 
 
+def plot_M(
+    fileName, M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8))#
+
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = M_networks[k]
+        
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i+1])
+            data_trans = Data.T
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i+1], alpha = 0.1)
+        ax.set_xlabel(r"Social susceptability, $\phi$")
+        ax.set_title (network_titles[k])
+        ax.set_ylim(-1,2)
+    axes[0].set_ylabel(r"Carbon tax reduction, M")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_plot_m_phi"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    fig.savefig(f+ ".eps", dpi=600, format="eps")    
+
+def plot_M_xlog(
+    fileName, M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
+):
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols = 3, nrows = 1,figsize=(15,8))#
+
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = M_networks[k]
+        
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios[i+1])
+
+            data_trans = Data.T
+            for v in range(len(data_trans)):
+                ax.plot(property_vals, data_trans[v], color = colors_scenarios[i+1], alpha = 0.1)
+        ax.set_ylim(-1,2)
+        ax.set_xscale('log')
+        ax.set_xlabel(r"Social susceptability, $\phi$")
+        
+        ax.set_title (network_titles[k])
+    axes[0].set_ylabel(r"Carbon tax reduction, M")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=len(scenarios_titles), fontsize="10")
+
+    # plt.tight_layout()
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_plot_m_phi_xlog"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    fig.savefig(f+ ".eps", dpi=600, format="eps")    
+
 
 def main(
     fileName
@@ -189,19 +261,48 @@ def main(
     #BA
     base_params = load_object(fileName + "/Data", "base_params")
     var_params = load_object(fileName + "/Data" , "var_params")
-    print("base_params", base_params)
+    #print("base_params", base_params)
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     property_varied = var_params["property_varied"]
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
     emissions_array = load_object(fileName + "/Data", "emissions_array")
     scenarios_titles = labels_SW = [r"No carbon price, $\tau = 0$", r"Low carbon price, $\tau = 0.1$", r"High carbon price, $\tau = 1$"]
 
-    #plot_emisisons_simple(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    plot_emisisons_simple(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     plot_emisisons_simple_xlog(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_var_emisisons_simple(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_var_emisisons_simple_log(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
-    plot_var_emisisons_simple_xlog(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    #plot_var_emisisons_simple_xlog(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     
+    #######################################
+    static_tau_matrix = load_object(fileName + "/Data" , "tau_matrix")
+    static_emissions_matrix = load_object(fileName + "/Data" , "emissions_matrix")
+
+    print(static_tau_matrix.shape, static_emissions_matrix.shape)
+    print(static_tau_matrix[0])
+    print(static_emissions_matrix[0])
+
+    quit()
+
+    matrix1 = static_tau_matrix
+    matrix2 = static_emissions_matrix
+    # Create a figure and axis for the plots
+    fig, ax = plt.subplots()
+
+    # Plot each row where matrix1 is x and matrix2 is y
+    for i in range(matrix1.shape[0]):
+        ax.plot(matrix1[i], matrix2[i], alpha=0.5)
+
+    # Adding labels and title
+    ax.set_xlabel('tau')
+    ax.set_ylabel('E')
+    plt.show()
+    quit()
+
+    M_networks = load_object(fileName + "/Data" , "M_vals_networks")
+    plot_M(fileName, M_networks, scenarios_titles, property_values_list, network_titles, colors_scenarios)
+    plot_M_xlog(fileName, M_networks, scenarios_titles, property_values_list, network_titles, colors_scenarios)
+
     plt.show()
 
 if __name__ == '__main__':
