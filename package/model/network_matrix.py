@@ -121,16 +121,6 @@ class Network_Matrix:
         )
 
         self.individual_expenditure_array =  np.asarray([1/(self.N)]*self.N)#sums to 1, constant total system expenditure 
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
-        #self.individual_expenditure_array =  np.asarray([1]*self.N)#sums to 1, constant total system expenditure 
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
 
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
 
@@ -213,16 +203,6 @@ class Network_Matrix:
         #I dont think i want to shuffle the adjacency matrix
     
         self.calc_consumption()#UNLIKE IN THE OTHER MODEL I CAN CALCULATE STUFF NOW
-
-        if (self.preferences_seed == 2) and (self.parameters["carbon_price_increased_lower"] == 0):
-            print(np.mean(self.low_carbon_preference_matrix))
-            print(self.carbon_price_increased_m)
-            print("self.sector_substitutability",self.sector_substitutability)
-            print("self.Omega_m_matrix",self.Omega_m_matrix[0])
-            print("self.chi_m_tensor", self.chi_m_tensor[0])
-            print("self.Z_vec", self.Z_vec[0])
-            print("self.H_m_matrix", self.H_m_matrix[0])
-            #quit()
 
         #############################################################################################################################
         #FROM HERE MODEL IS DETERMINISTIC NOT MORE RANDOMNESS
@@ -505,20 +485,20 @@ class Network_Matrix:
         return n_tilde_m
         
     def calc_chi_m_nested_CES(self):
-        chi_m = (self.sector_preferences*(self.n_tilde_m_matrix**((self.sector_substitutability-1)/self.sector_substitutability)))/self.prices_high_carbon_instant
+        #chi_m = (self.sector_preferences*(self.n_tilde_m_matrix**((self.sector_substitutability-1)/self.sector_substitutability)))/self.prices_high_carbon_instant
+        chi_m = ((self.sector_preferences*(self.n_tilde_m_matrix**((self.sector_substitutability-1)/self.sector_substitutability)))/self.prices_high_carbon_instant)**self.sector_substitutability
         return chi_m
     
     def calc_Z(self):
         common_vector = self.Omega_m_matrix*self.prices_low_carbon_m + self.prices_high_carbon_instant
-        chi_pow = self.chi_m_tensor**self.sector_substitutability
-        no_sum_Z_terms = chi_pow*common_vector
+        no_sum_Z_terms = self.chi_m_tensor*common_vector
         Z = no_sum_Z_terms.sum(axis = 1)
         return Z
     
     def calc_consumption_quantities_nested_CES(self):
         term_1 = self.instant_expenditure_vec/self.Z_vec
         term_1_matrix = np.tile(term_1, (self.M,1)).T
-        H_m_matrix = term_1_matrix*(self.chi_m_tensor**self.sector_substitutability)
+        H_m_matrix = term_1_matrix*self.chi_m_tensor
         L_m_matrix = H_m_matrix*self.Omega_m_matrix
 
         return H_m_matrix, L_m_matrix
@@ -705,16 +685,8 @@ class Network_Matrix:
         self.t += 1
 
         self.update_carbon_price()#check whether its time to update carbon price
-        
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
-        #self.instant_expenditure_vec = self.calc_instant_expediture()#update expenditures with previous steps gains
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
-        ######################################################################################################
+
+        self.instant_expenditure_vec = self.calc_instant_expediture()#update expenditures with previous steps gains
 
         #update preferences 
         if self.alpha_change_state != "fixed_preferences":

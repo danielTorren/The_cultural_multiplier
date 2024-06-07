@@ -4,6 +4,7 @@ from matplotlib.colors import Normalize
 from package.resources.utility import produce_name_datetime, save_object, createFolder, load_object
 from sympy import symbols, diff, simplify, lambdify, print_latex, And, solve
 from scipy.optimize import brentq
+from matplotlib.cm import get_cmap
 #####################################
 #PLOT 1D stuff for 1st figure 
 
@@ -91,21 +92,30 @@ def calc_emissions_and_derivative(parameters):#THIS IS THE ONE I USE FOR RUNS!!!
     Omega2 = ((PBH2 + tau2) * A2 / (PL2 * (1 - A2)))**sigma2
 
     # Define chi1 equation
-    chi1 = (a1 / (PBH1 + gamma1*tau1)) * ((A1 * Omega1**((sigma1 - 1) / sigma1)) + (1 - A1))**(((nu - 1) * sigma1) / (nu * (sigma1 - 1)))
+    chi1 = ((a1 / (PBH1 + gamma1*tau1)) * ((A1 * Omega1**((sigma1 - 1) / sigma1)) + (1 - A1))**(((nu - 1) * sigma1) / (nu * (sigma1 - 1))))**nu
 
     # Define chi2 equation
-    chi2 = (a2 / (PBH2 + gamma2*tau2)) * ((A2 * Omega2**((sigma2 - 1) / sigma2)) + (1 - A2))**(((nu - 1) * sigma2) / (nu * (sigma2 - 1)))
+    chi2 = ((a2 / (PBH2 + gamma2*tau2)) * ((A2 * Omega2**((sigma2 - 1) / sigma2)) + (1 - A2))**(((nu - 1) * sigma2) / (nu * (sigma2 - 1))))**nu
 
     # Define Z equation
-    Z = (chi1**nu * (Omega1 * PL1 + PBH1 + gamma1*tau1)) + (chi2**nu * (Omega2 * PL2 + PBH2 + gamma2*tau2))
+    Z = (chi1 * (Omega1 * PL1 + PBH1 + gamma1*tau1)) + (chi2* (Omega2 * PL2 + PBH2 + gamma2*tau2))
+
+    H1 = (BD*chi1) / Z + h1
+    H2 = (BD*chi2) / Z + h2
+    L1 = Omega1*H1
+    L2 = Omega2*H2
+
+    T = H1+ L1 + H2 + L2
+    prop_sector_1 = (H1+L1)/T
+    prop_H1 = H1/(H1+ L1)
+
 
     # Define EF equation with BD substituted
-    EF1 = (BD * gamma1*chi1**nu) / Z + gamma1*h1
-    EF2 = (BD * gamma2*chi2**nu) / Z + gamma2*h2
-    EF = (BD * (gamma1*chi1**nu + gamma2*chi2**nu) / Z) + gamma1*h1 + gamma2*h2
-    manual_derv_EF_tau1 = gamma1 * BD * Z**(-1) * nu * chi1**(nu - 1) * ((gamma1*chi1 / (PBH1 + gamma1*tau1)) * ((sigma1 * (nu - 1) * A1 * Omega1**((sigma1 - 1) / sigma1)) / (nu * (A1 * Omega1**((sigma1 - 1) / sigma1) + (1 - A1))) - 1)) - Z**(-1) * gamma1 * h1 * (gamma1 * chi1**nu + gamma2 * chi2**nu) - BD * Z**(-2) * (gamma1 * chi1**nu + gamma2 * chi2**nu) * (((Omega1 * PL1 + PBH1 + gamma1*tau1) * gamma1 * nu * chi1**nu) / (PBH1 + gamma1*tau1) * ((sigma1 * (nu - 1) * A1 * Omega1**((sigma1 - 1) / sigma1))/(nu * (A1 * Omega1**((sigma1 - 1) / sigma1) + (1 - A1))) - 1) + gamma1*chi1**nu * (PL1 * (sigma1 * Omega1) / (PBH1 + gamma1*tau1) + 1))
+    EF1 = (BD * gamma1*chi1) / Z + gamma1*h1
+    EF2 = (BD * gamma2*chi2) / Z + gamma2*h2
+    EF = (BD * (gamma1*chi1 + gamma2*chi2) / Z) + gamma1*h1 + gamma2*h2
 
-    return EF, manual_derv_EF_tau1, EF1, EF2
+    return EF, EF1, EF2,  prop_sector_1, prop_H1, T
 
 def calc_emissions_1_sector(parameters):
     A1 = parameters["A1"]
@@ -182,7 +192,7 @@ def run_plots_1D(root,LOAD, init_params, scenario, LOAD_filename = "filename"):
         fileName, variable_parameters, parameters_run, scenario, init_params = set_up_data_1D(root, init_params, scenario)
         
         #data_E_F_1, data_derv_E_F_1 = calculate_data_alt(parameters_run)
-        data_E_F, data_derv_E_F, data_E_F_1, data_E_F_2  = calc_emissions_and_derivative(parameters_run)
+        data_E_F, data_E_F_1, data_E_F_2, prop_sec1 ,prop_H1  = calc_emissions_and_derivative(parameters_run)
 
         createFolder(fileName)
 
@@ -414,7 +424,7 @@ def calc_emissions(tau_C, tau_I, v):
 
 def calc_ratio_complete_incomplete():
     
-    tau_I_list = np.linspace(0,2,1000)
+    tau_I_list = np.linspace(0,1,1000)
     v_list = [1.01,5,30]
 
     tau_C_data = []
@@ -469,6 +479,31 @@ def calc_ratio_complete_incomplete():
     ax3.legend()
     ax3.grid()
 
+    #######################################################################################
+    # Values of tau
+    tau_values_5 = np.linspace(0, 1, 1000)
+
+    # Values of x (nu)
+    nu_values_5 = [1.01,5,30]  # Adjust range and number of points as needed
+
+    def new_sector1_consumption_proportion(tau1, nu):
+        numerator = (1 + tau1)**(-nu) * (2 + tau1)**(2*(nu - 1)) * (1 + (1 + tau1)**2)
+        denominator = numerator + 2**(2*nu - 1)
+        return numerator / denominator
+
+    # Plotting
+    fig5, ax5 = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), constrained_layout=True)
+
+    for nu in nu_values_5:
+        sector1_prop = [new_sector1_consumption_proportion(tau,nu) for tau in tau_values_5]
+        ax5.plot(tau_values_5, sector1_prop, label="Sector 1 consumption propotion, $\\nu$ = %s" % (nu))
+
+    Omega_prop = [1/(1+(1+tau**2)) for tau in tau_values_5]
+    ax5.plot(tau_values_5, Omega_prop, label="Sector 1 High consumption propotion",linestyle="--" )
+
+    ax5.set_xlabel('Carbon tax, $\\tau$')
+    ax5.set_ylabel('Proportion')
+    ax5.legend()
 
     root = "E_root_nu_tau_ratio"
     fileName = produce_name_datetime(root)
@@ -485,9 +520,397 @@ def calc_ratio_complete_incomplete():
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png")
 
+    f = plotName + "/ratio_sector_1_consumption_low_carb"
+    fig5.savefig(f + ".eps", dpi=600, format="eps")
+    fig5.savefig(f + ".png", dpi=600, format="png")
+
     plt.show()
 
     return tau_C_list
+
+def A_nu_tau_effect():
+    # Values of tau
+    tau_values = np.linspace(0, 1, 1000)
+    nu_values = [1.01,5,30]  # Adjust range and number of points as needed
+    A_1_values = [0.4,0.5,0.6]
+
+    #def calc_emissions
+    parameters_dict = {#BASE PARAMS
+        "A2": 0.5,
+        "tau2": 0,
+        "a1": 0.5,
+        "a2": 0.5,
+        "sigma1": 2,
+        "sigma2": 2,
+        "PL1": 1,
+        "PL2": 1,
+        "PBH1": 1,
+        "PBH2": 1,
+        "h1": 0,
+        "h2": 0,
+        "B": 1,
+        "gamma1": 1,
+        "gamma2": 1,
+    }
+
+    data = np.zeros(shape = (len(A_1_values),len(nu_values), len(tau_values) ))
+    data_sec1 = np.zeros(shape = (len(A_1_values),len(nu_values), len(tau_values) ))
+    data_H1 = np.zeros(shape = (len(A_1_values),len(nu_values), len(tau_values) ))
+    for i, A_1 in enumerate(A_1_values):
+        parameters_dict["A1"] = A_1
+        for j, nu in enumerate(nu_values):
+            parameters_dict["nu"] = nu
+            for k, tau in enumerate(tau_values):
+                parameters_dict["tau1"] = tau
+                #EF, manual_derv_EF_tau1, EF1, EF2
+                data[i,j,k], _ , _ , data_sec1[i,j,k] ,data_H1[i,j,k] = calc_emissions_and_derivative(parameters_dict)
+
+    fig, axes = plt.subplots(nrows=1, ncols=len(A_1_values), figsize=(10, 6), constrained_layout=True, sharey=True)
+
+    for i, A_1 in enumerate(A_1_values):
+        axes[i].set_title("Sector 1 low carbon preference, $A_1$ = %s" % (A_1))
+        axes[i].set_xlabel('Carbon tax, $\\tau$')
+        for j, nu in enumerate(nu_values):
+            axes[i].plot(tau_values, data[i][j], label="$\\nu$ = %s" % (nu))
+            
+
+    axes[0].set_ylabel('Emissions flow, $E_F$')
+    axes[-1].legend()
+
+    fig1, axes1 = plt.subplots(nrows=1, ncols=len(A_1_values), figsize=(10, 6), constrained_layout=True, sharey=True)
+
+    for i, A_1 in enumerate(A_1_values):
+        axes1[i].set_title("Sector 1 low carbon preference, $A_1$ = %s" % (A_1))
+        axes1[i].set_xlabel('Carbon tax, $\\tau$')
+        for j, nu in enumerate(nu_values):
+            axes1[i].plot(tau_values, data_sec1[i][j], label="$\\nu$ = %s" % (nu))
+            
+    axes1[0].set_ylabel('Proportion of total consumption sector 1')
+    axes1[-1].legend()
+
+    fig2, axes2 = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), constrained_layout=True, sharey=True)
+
+    for i, A_1 in enumerate(A_1_values):
+        axes2.plot(tau_values, data_sec1[i][0], label="Sector 1 low carbon preference, $A_1$ = %s" % (A_1))
+    axes2.set_xlabel('Carbon tax, $\\tau$')   
+    axes2.set_ylabel("Proportion of sector 1 consumption low carbon")
+    axes2.legend()
+
+    ###############################################################################
+
+    parameters_dict_a = {#BASE PARAMS
+        "A1": 0.5,
+        "A2": 0.5,
+        "tau2": 0,
+        "sigma1": 2,
+        "sigma2": 2,
+        "PL1": 1,
+        "PL2": 1,
+        "PBH1": 1,
+        "PBH2": 1,
+        "h1": 0,
+        "h2": 0,
+        "B": 1,
+        "gamma1": 1,
+        "gamma2": 1,
+    }
+
+    a_values = [0.4,0.5,0.6]
+    data_a = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    for i, a in enumerate(a_values):
+        parameters_dict_a["a1"] = a
+        parameters_dict_a["a2"] = 1-a
+        for j, nu in enumerate(nu_values):
+            parameters_dict_a["nu"] = nu
+            for k, tau in enumerate(tau_values):
+                parameters_dict_a["tau1"] = tau
+                #EF, manual_derv_EF_tau1, EF1, EF2
+                data_a[i,j,k], _ , _ , _, _ = calc_emissions_and_derivative(parameters_dict_a)
+
+    fig3, axes3 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(10, 6), constrained_layout=True, sharey=True)
+
+    for i, a in enumerate(a_values):
+        axes3[i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes3[i].set_xlabel('Carbon tax, $\\tau$')
+        for j, nu in enumerate(nu_values):
+            axes3[i].plot(tau_values, data_a[i][j], label="$\\nu$ = %s" % (nu))
+            
+    axes3[0].set_ylabel('Emissions flow, $E_F$')
+    axes3[-1].legend()
+
+    ###############################################################################
+    
+    root = "A_nu_tau"
+    fileName = produce_name_datetime(root)
+    print("fileName: ", fileName)
+
+    createFolder(fileName)
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/Emissions"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop_sec1"
+    fig1.savefig(f + ".eps", dpi=600, format="eps")
+    fig1.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop_h1"
+    fig2.savefig(f + ".eps", dpi=600, format="eps")
+    fig2.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop_sec1_a"
+    fig3.savefig(f + ".eps", dpi=600, format="eps")
+    fig3.savefig(f + ".png", dpi=600, format="png")
+
+    plt.show()
+
+def a_nu_tau_effect():
+        # Values of tau
+    tau_values = np.linspace(0, 1, 1000)
+    nu_values = [1.01,5,30]  # Adjust range and number of points as needed
+    a_values = [0.4,0.5,0.6]
+
+    ######################################
+    #Colours
+    name = "Set2"
+    cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
+    colors_scenarios = cmap.colors  # type: list
+    ####################################
+
+
+    parameters_dict_a = {#BASE PARAMS
+        "A1": 0.5,
+        "A2": 0.5,
+        "tau2": 0,
+        "sigma1": 2,
+        "sigma2": 2,
+        "PL1": 1,
+        "PL2": 1,
+        "PBH1": 1,
+        "PBH2": 1,
+        "h1": 0,
+        "h2": 0,
+        "B": 1,
+        "gamma1": 1,
+        "gamma2": 1,
+    }
+    line_width = 1.5
+    
+    data = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    data_1 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    data_2 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    data_sec1 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    data_H1 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    data_total = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    for i, a in enumerate(a_values):
+        parameters_dict_a["a1"] = a
+        parameters_dict_a["a2"] = 1-a
+        for j, nu in enumerate(nu_values):
+            parameters_dict_a["nu"] = nu
+            for k, tau in enumerate(tau_values):
+                parameters_dict_a["tau1"] = tau
+                #EF, manual_derv_EF_tau1, EF1, EF2
+                data[i,j,k], data_1[i,j,k] , data_2[i,j,k] , data_sec1[i,j,k] ,data_H1[i,j,k] , data_total[i,j,k]= calc_emissions_and_derivative(parameters_dict_a)
+
+    ###############################################################################
+    """
+    fig3, axes3 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(15, 6), constrained_layout=True, sharey=True)
+
+    for i, a in enumerate(a_values):
+        axes3[i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes3[i].set_xlabel('Carbon tax, $\\tau$')
+        for j, nu in enumerate(nu_values):
+            axes3[i].plot(tau_values, data[i][j], label="$\\nu$ = %s" % (nu), color = colors_scenarios[j], linewidth= line_width)
+    axes3[0].set_ylabel('Emissions flow, $E_F$')
+    axes3[-1].legend()
+
+    
+
+    fig1, axes1 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(15, 6), constrained_layout=True, sharey=True)
+
+    for i, a in enumerate(a_values):
+        axes1[i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes1[i].set_xlabel('Carbon tax, $\\tau$')
+        for j, nu in enumerate(nu_values):
+            axes1[i].plot(tau_values, data_sec1[i][j], label="$\\nu$ = %s" % (nu))
+            
+    axes1[0].set_ylabel('Proportion of total consumption sector 1')
+    axes1[-1].legend()
+
+    fig2, axes2 = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), constrained_layout=True, sharey=True)
+
+    for i, a in enumerate(a_values):
+        axes2.plot(tau_values, data_sec1[i][0], label="Preference for Sector 1 goods, $a$ = %s" % (a))
+    axes2.set_xlabel('Carbon tax, $\\tau$')   
+    axes2.set_ylabel("Proportion of sector 1 consumption low carbon")
+    axes2.legend()
+    
+    ##################################################################################################
+    
+    fig4, axes4 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(15, 6), constrained_layout=True, sharey=True)
+
+    colour_list = [ "red", "blue", "green", "yellow", "purple", "orange", "white", "black" ]
+
+
+    for i, a in enumerate(a_values):
+        axes4[i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes4[i].set_xlabel('Carbon tax, $\\tau$')
+        for j, nu in enumerate(nu_values):
+            axes4[i].plot(tau_values, data_1[i][j], label="Sector 1, $\\nu$ = %s" % (nu), linestyle = "-.", color = colors_scenarios[j], linewidth= line_width)
+            axes4[i].plot(tau_values, data_2[i][j], label="Sector 2, $\\nu$ = %s" % (nu), linestyle = "--", color = colors_scenarios[j], linewidth= line_width)
+            
+    axes4[0].set_ylabel('Sectoral emissions flow, $E_{1,2}$')
+    axes4[-1].legend()
+    """
+    ################################################################################################
+
+    # ADD IN SOLID LINE OF THE COMPLETE COVERAGE CASE
+    complete_data = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    complete_data_1 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    complete_data_2 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    complete_data_sec1 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    complete_data_H1 = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+    complete_data_total = np.zeros(shape = (len(a_values),len(nu_values), len(tau_values) ))
+
+    for i, a in enumerate(a_values):
+        parameters_dict_a["a1"] = a
+        parameters_dict_a["a2"] = 1-a
+        for j, nu in enumerate(nu_values):
+            parameters_dict_a["nu"] = nu
+            for k, tau in enumerate(tau_values):
+                parameters_dict_a["tau1"] = tau
+                parameters_dict_a["tau2"] = tau
+                #EF, manual_derv_EF_tau1, EF1, EF2
+                complete_data[i,j,k], complete_data_1[i,j,k] , complete_data_2[i,j,k] , complete_data_sec1[i,j,k] ,complete_data_H1[i,j,k], complete_data_total[i,j,k] = calc_emissions_and_derivative(parameters_dict_a)
+    """
+    fig5, axes5 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(15, 6), constrained_layout=True, sharey=True)
+
+    colour_list = [ "red", "blue", "green", "yellow", "purple", "orange", "white", "black" ]
+
+    for i, a in enumerate(a_values):
+        axes5[i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes5[i].set_xlabel('Carbon tax, $\\tau$')
+        for j, nu in enumerate(nu_values):
+            axes5[i].plot(tau_values, complete_data_1[i][j], label="Sector 1, $\\nu$ = %s" % (nu), linestyle = "-.", color = colors_scenarios[j], linewidth= line_width)
+            axes5[i].plot(tau_values, complete_data_2[i][j], label="Sector 2, $\\nu$ = %s" % (nu), linestyle = "--", color = colors_scenarios[j], linewidth= line_width)
+            
+    axes5[0].set_ylabel('Sectoral emissions flow, $E_{1,2}$')
+    axes5[-1].legend()
+
+
+    #NOW DO THE SECTORAL AND INTRA SECTORAL ON THE SAME PLOT
+
+    fig6, axes6 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(15, 6), constrained_layout=True, sharey=True)
+
+    for i, a in enumerate(a_values):
+        axes6[i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes6[i].set_xlabel('Carbon tax, $\\tau$')
+        
+        axes6[i].plot(tau_values, complete_data_H1[i][0], label="Sector 1 High carbon", linestyle = "solid", color = "black", linewidth= line_width)
+        axes6[i].plot(tau_values, complete_data_sec1[i][j], label="Complete Sector 1 Total, $\\nu$ = %s" % (nu), linestyle = "solid", color = "orange", linewidth= line_width)
+        for j, nu in enumerate(nu_values):
+            axes6[i].plot(tau_values, data_sec1[i][j], label="Incomplete Sector 1 Total, $\\nu$ = %s" % (nu), linestyle = "--", color = colors_scenarios[j], linewidth= line_width)
+
+    axes6[0].set_ylabel('Proportion')
+    axes6[-1].legend()
+    """
+
+    #JOINT PLOT
+    fig7, axes7 = plt.subplots(nrows=3, ncols=len(a_values), figsize=(12, 12), constrained_layout=True, sharey="row", sharex=True)
+
+    for i, a in enumerate(a_values):
+        
+        axes7[0][i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes7[2][i].set_xlabel('Carbon tax, $\\tau$')
+        
+        axes7[2][i].plot(tau_values, complete_data_H1[i][0], label="Sector 1 High carbon", linestyle = "solid", color = "black", linewidth= line_width)
+        #axes7[2][i].plot(tau_values, complete_data_sec1[i][j], label="Complete Sector 1 Total, $\\nu$ = %s" % (nu), linestyle = "solid", color = "orange", linewidth= line_width)
+        for j, nu in enumerate(nu_values):
+            axes7[0][i].plot(tau_values, data[i][j], label="$\\nu$ = %s" % (nu), color = colors_scenarios[j], linewidth= line_width)
+            axes7[1][i].plot(tau_values, data_1[i][j], label="Sector 1, $\\nu$ = %s" % (nu), linestyle = "-.", color = colors_scenarios[j], linewidth= line_width)
+            axes7[1][i].plot(tau_values, data_2[i][j], label="Sector 2, $\\nu$ = %s" % (nu), linestyle = "--", color = colors_scenarios[j], linewidth= line_width)
+            axes7[2][i].plot(tau_values, data_sec1[i][j], label="Incomplete Sector 1 Total, $\\nu$ = %s" % (nu), linestyle = "--", color = colors_scenarios[j], linewidth= line_width)
+        
+    axes7[0][-1].legend()
+    axes7[1][-1].legend()
+    axes7[2][-1].legend()
+    axes7[0][0].set_ylabel('Emissions flow, $E_F$')
+    axes7[1][0].set_ylabel('Sectoral emissions flow, $E_{1,2}$')
+    axes7[2][0].set_ylabel('Proportion')
+    
+    fig8, axes8 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(15, 6), constrained_layout=True, sharey=True)
+
+    for i, a in enumerate(a_values):
+        axes8[i].set_title("Preference for Sector 1 goods, $a$ = %s" % (a))
+        axes8[i].set_xlabel('Carbon tax, $\\tau$')
+    
+        for j, nu in enumerate(nu_values):
+            axes8[i].plot(tau_values, data_total[i][j], label="$\\nu$ = %s" % (nu),  color = colors_scenarios[j], linewidth= line_width)
+
+    axes8[0].set_ylabel('Total consumption')
+    axes8[-1].legend()
+
+
+    ###############################################################################
+    
+    root = "a_nu_tau"
+    fileName = produce_name_datetime(root)
+    print("fileName: ", fileName)
+
+    createFolder(fileName)
+
+    """
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop_sec1"
+    fig1.savefig(f + ".eps", dpi=600, format="eps")
+    fig1.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop_h1"
+    fig2.savefig(f + ".eps", dpi=600, format="eps")
+    fig2.savefig(f + ".png", dpi=600, format="png")
+    
+    
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/Emissions"
+    fig3.savefig(f + ".eps", dpi=600, format="eps")
+    fig3.savefig(f + ".png", dpi=600, format="png")
+    
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/sec_Emissions"
+    fig4.savefig(f + ".eps", dpi=600, format="eps")
+    fig4.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/COMPLETEsec_Emissions"
+    fig5.savefig(f + ".eps", dpi=600, format="eps")
+    fig5.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop_consum"
+    fig6.savefig(f + ".eps", dpi=600, format="eps")
+    fig6.savefig(f + ".png", dpi=600, format="png")
+    plt.show()
+    """
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/joint_plot"
+    fig7.savefig(f + ".eps", dpi=600, format="eps")
+    fig7.savefig(f + ".png", dpi=600, format="png")
+
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/total"
+    fig7.savefig(f + ".eps", dpi=600, format="eps")
+    fig7.savefig(f + ".png", dpi=600, format="png")
+
+    plt.show()
 
 def main( type_run):
 
@@ -497,9 +920,13 @@ def main( type_run):
         calc_emissions_tax_rebound()
     elif type_run =="ratio":
         calc_ratio_complete_incomplete()
+    elif type_run == "A_nu_tau":
+        A_nu_tau_effect()
+    elif type_run == "a_nu_tau":
+        a_nu_tau_effect()
     else:
         raise ValueError("Wrong TYPE")
 
 if __name__ == '__main__':
-    type_run = "rebound_tax"#"rebound_tax"# "plots_1D"
+    type_run = "a_nu_tau"#"rebound_tax"# "plots_1D"
     main(type_run)
