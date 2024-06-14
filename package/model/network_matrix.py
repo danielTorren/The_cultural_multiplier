@@ -125,7 +125,8 @@ class Network_Matrix:
         self.instant_expenditure_vec = self.individual_expenditure_array #SET AS THE SAME INITIALLY 
 
         self.sector_substitutability = parameters["sector_substitutability"]
-        self.sector_preferences = np.asarray([1/self.M]*self.M)
+        #self.sector_preferences = np.asarray([1/self.M]*self.M)
+        self.sector_preferences = np.asarray([0.4,0.6])
 
         ########################################################
         # CANT HAVE ANYTHING USE NUMPY RANDOM BEFORE THIS

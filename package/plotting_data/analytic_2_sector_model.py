@@ -688,9 +688,9 @@ def a_nu_tau_effect():
         "tau2": 0,
         "sigma1": 2,
         "sigma2": 2,
-        "PL1": 1,
+        "PL1": 2,
         "PL2": 1,
-        "PBH1": 1,
+        "PBH1": 2,
         "PBH2": 1,
         "h1": 0,
         "h2": 0,
@@ -820,7 +820,7 @@ def a_nu_tau_effect():
     """
 
     #JOINT PLOT
-    fig7, axes7 = plt.subplots(nrows=3, ncols=len(a_values), figsize=(12, 12), constrained_layout=True, sharey="row", sharex=True)
+    fig7, axes7 = plt.subplots(nrows=3, ncols=len(a_values), figsize=(16, 12), constrained_layout=True, sharey="row", sharex=True)
 
     for i, a in enumerate(a_values):
         
@@ -841,6 +841,11 @@ def a_nu_tau_effect():
     axes7[0][0].set_ylabel('Emissions flow, $E_F$')
     axes7[1][0].set_ylabel('Sectoral emissions flow, $E_{1,2}$')
     axes7[2][0].set_ylabel('Proportion')
+    # Add letters to each subplot
+    labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']  # Adjust the number of labels according to your subplot count
+    for ax, label in zip(axes7.flatten(), labels):
+        ax.annotate(label, xy=(0.01, 0.98), xycoords='axes fraction', fontsize=14,
+                    ha='left', va='top', fontweight='bold')
     
     fig8, axes8 = plt.subplots(nrows=1, ncols=len(a_values), figsize=(15, 6), constrained_layout=True, sharey=True)
 
@@ -912,6 +917,139 @@ def a_nu_tau_effect():
 
     plt.show()
 
+def q_plots():
+    # Define the parameters
+
+    K_values = [0.5, 1, 2]
+    nu_values = [1.01, 5, 30]
+    #P_L1 = 1
+    Q1_values = np.linspace(1, 2, 1000)
+    #Q2 = 1
+    # Define the function
+    def E_F(Q1, K12, nu):
+        numerator = Q1**(-nu) * (Q1 + 1)**(2 * (nu - 1)) + K12**(nu) * 2**(2 * (nu - 1))
+        denominator = Q1**(1 - nu) * (Q1 + 1)**(2 * nu - 1) + K12**(nu - 1) * 2**(2 * nu - 1)
+        return numerator / denominator
+
+    #ratio
+    def H_L_ratio(Q1, K12, nu):
+        numerator = Q1**(-nu) * (Q1 + 1)**(2 * (nu - 1)) * (1 + Q1**2)
+        denominator = numerator + K12**(nu) * 2**(2 * nu - 1)
+        return numerator / denominator
+    
+
+
+    """
+    ########################################################################################################################################
+    # Create the 3x3 subplot
+    fig, axes = plt.subplots(1, 3, figsize=(10, 5), sharex=True, sharey=True, constrained_layout = True)
+
+    for j, K in enumerate(K_values):
+        ax = axes[j]
+        for nu in nu_values:
+            E_F_values = [E_F(Q1, Q2, K, nu) for Q1 in Q1_values]
+            ax.plot(Q1_values, E_F_values, label=f'$\\nu$={nu}')
+        ax.set_title("$K$=%s ($P_{L,1}$ = 1, $P_{L,2}$ = %s, $P_{H,2}$ = %s )" %(K, 1/K, 1/K))
+        ax.grid(True)
+    axes[-1].legend()
+
+    # Set common labels
+    fig.supxlabel('Price ratio sector 1, $Q_1$')
+    fig.supylabel('Emissions Flow, $E_F$')
+
+    #################################################################################################################################################
+
+
+    # Create the 3x3 subplot
+    fig1, axes1 = plt.subplots(1, 3, figsize=(10, 5), sharex=True, sharey=True, constrained_layout = True)
+
+    for j, K in enumerate(K_values):
+        ax = axes1[j]
+        for nu in nu_values:
+            E_F_values = [ratio(Q1, K, nu) for Q1 in Q1_values]
+            ax.plot(Q1_values, E_F_values, label=f'$\\nu$={nu}')
+        ax.set_title("$K$=%s ($P_{L,1}$ = 1, $P_{L,2}$ = %s, $P_{H,2}$ = %s )" %(K, 1/K, 1/K))
+        ax.grid(True)
+    axes1[-1].legend()
+
+    # Set common labels
+    fig1.supxlabel('Price ratio sector 1, $Q_1$')
+    fig1.supylabel('Sector 1 consumption proportion')
+
+    """
+    #################################################################################
+    # Create the 3x3 subplot
+    fig2, axes2 = plt.subplots(2, 3, figsize=(15, 8), sharex=True, sharey="row", constrained_layout = True)
+
+    for j, K in enumerate(K_values):
+        ax = axes2[0][j]
+        for nu in nu_values:
+            E_F_values = [E_F(Q1, K, nu) for Q1 in Q1_values]
+            ax.plot(Q1_values, E_F_values, label=f'$\\nu$={nu}')
+        ax.set_title("$K$=%s ($P_{H,1} = Q_1$, $P_{L,1}$ = 1, $P_{H,2}$ = %s, $P_{L,2}$ = %s)" %(K, 1/K, 1/K))
+        ax.grid(True)
+    axes2[1][-1].legend()
+
+    for j, K in enumerate(K_values):
+        ax = axes2[1][j]
+        for nu in nu_values:
+            E_F_values = [H_L_ratio(Q1, K, nu) for Q1 in Q1_values]
+            ax.plot(Q1_values, E_F_values, label=f'$\\nu$={nu}')
+        #ax.set_title("$K$=%s ($P_{L,1}$ = 1, $P_{L,2}$ = %s, $P_{H,2}$ = %s )" %(K, 1/K, 1/K))
+        ax.grid(True)
+
+    for j, K in enumerate(K_values):
+        ax = axes2[1][j]
+        prop_L = Q1_values**2/(1+ Q1_values**2)
+        ax.plot(Q1_values,  prop_L, label=f'Sector 1 Low carbon', linestyle = "--",color = "black" )
+        #ax.set_title("$K$=%s ($P_{L,1}$ = 1, $P_{L,2}$ = %s, $P_{H,2}$ = %s )" %(K, 1/K, 1/K))
+        ax.grid(True)
+    #axes2[-1].legend()
+
+    """"
+    for j, K in enumerate(K_values):
+        ax = axes2[2][j]
+        for nu in nu_values:
+            E_F_values = [H_L_P_ratio(Q1, K, nu) for Q1 in Q1_values]
+            ax.plot(Q1_values, E_F_values, label=f'$\\nu$={nu}')
+        #ax.set_title("$K$=%s ($P_{L,1}$ = 1, $P_{L,2}$ = %s, $P_{H,2}$ = %s )" %(K, 1/K, 1/K))
+        ax.grid(True)
+    """
+    
+    labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']  # Adjust the number of labels according to your subplot count
+    for ax, label in zip(axes2.flatten(), labels):
+        ax.annotate(label, xy=(0.01, 0.98), xycoords='axes fraction', fontsize=14,
+                    ha='left', va='top', fontweight='bold')
+
+    # Set common labels
+    axes2[0][0].set_ylabel('Emissions Flow, $E_F$')
+    axes2[1][0].set_ylabel('Sector 1 consumption proportion')
+    #axes2[2][0].set_ylabel('Sector 1 expenditure proportion')
+    fig2.supxlabel('Price ratio sector 1, $Q_1$')
+
+    root = "q_plots"
+    fileName = produce_name_datetime(root)
+    print("fileName: ", fileName)
+
+    createFolder(fileName)
+
+    """
+    plotName = fileName + "/Plots"
+    f = plotName + "/em_total"
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop_q"
+    fig1.savefig(f + ".eps", dpi=600, format="eps")
+    fig1.savefig(f + ".png", dpi=600, format="png")
+    """
+    plotName = fileName + "/Plots"
+    f = plotName + "/joimtem_prop_q"
+    fig2.savefig(f + ".eps", dpi=600, format="eps")
+    fig2.savefig(f + ".png", dpi=600, format="png")
+
+    plt.show()
 def main( type_run):
 
     if type_run == "plots_1D":
@@ -924,9 +1062,11 @@ def main( type_run):
         A_nu_tau_effect()
     elif type_run == "a_nu_tau":
         a_nu_tau_effect()
+    elif type_run == "q_plot":
+        q_plots()
     else:
         raise ValueError("Wrong TYPE")
 
 if __name__ == '__main__':
-    type_run = "a_nu_tau"#"rebound_tax"# "plots_1D"
+    type_run = "q_plot"#"rebound_tax"# "plots_1D"
     main(type_run)

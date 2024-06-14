@@ -944,7 +944,7 @@ def main(
     fileName_asym
 ) -> None:
 
-    colors_scenarios_asym = get_cmap("tab10").colors
+    colors_scenarios_asym = get_cmap("tab20").colors
     #print(colors)
 
     #FULL
@@ -993,7 +993,7 @@ def main(
 
 
     #SEPERATING OUT THE COLOURS
-    name = "Set2"#"tab20"#"Set2"
+    name = "tab20"#"tab20"#"Set2"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
     colors_scenarios = cmap.colors  # type: list
 
@@ -1003,7 +1003,7 @@ def main(
     plot_joint_M_simple_short_manual_colours(fileName_full, fileName_asym, M_vals_networks_simple_full, M_vals_networks_simple_asym,  scenario_labels_simple_total[1:], scenario_labels_simple_asym[1:], property_values_list,network_titles,colors_scenarios, value_min)
     
     ##############FULLL
-    name = "Set3"#"tab20"#"Set2"
+    name = "tab20"#"tab20"#"Set2"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
     colors_scenarios = cmap.colors  # type: list
     scenario_labels_complete = ["Complete coverage fixed preferences","Complete coverage uniform weighting","Complete coverage static social multiplier","Complete coverage static environmental identity multiplier","Complete coverage social multiplier", "Complete coverage environmental identity multiplier"]

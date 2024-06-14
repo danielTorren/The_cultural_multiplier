@@ -470,7 +470,7 @@ def main(
     fileName ,#= "results/tax_sweep_11_29_20__28_09_2023"
 ) -> None:
     
-    name = "Set2"
+    name = "tab20"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
     colors_scenarios = cmap.colors  # type: list
     #print(colors)
@@ -494,12 +494,12 @@ def main(
     scenario_labels_simple = [scenario_labels[x] for x in index_list_simple]
 
     plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    #plot_emisisons_simple(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios)
+    plot_emisisons_simple(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios)
     
     #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     value_min = 0.1
-    #plot_emisisons_simple_short(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios, value_min)
+    plot_emisisons_simple_short(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios, value_min)
     M_vals_networks = load_object(fileName + "/Data", "M_vals_networks")
     #print(scenarios)
     #"""
