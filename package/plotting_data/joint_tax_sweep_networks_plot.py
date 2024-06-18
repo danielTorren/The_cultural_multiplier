@@ -952,14 +952,14 @@ def main(
     emissions_SBM_full = load_object(fileName_full + "/Data","emissions_SBM")
     emissions_BA_full = load_object(fileName_full + "/Data","emissions_BA")
     emissions_networks_full = np.asarray([emissions_SW_full,emissions_SBM_full,emissions_BA_full])
-    M_vals_networks_full = load_object(fileName_full + "/Data", "M_vals_networks")
+    #M_vals_networks_full = load_object(fileName_full + "/Data", "M_vals_networks")
     
     #ASYM
     emissions_SW_asym = load_object(fileName_asym + "/Data","emissions_SW")
     emissions_SBM_asym = load_object(fileName_asym + "/Data","emissions_SBM")
     emissions_BA_asym = load_object(fileName_asym + "/Data","emissions_BA")
     emissions_networks_asym = np.asarray([emissions_SW_asym,emissions_SBM_asym,emissions_BA_asym])
-    M_vals_networks_asym = load_object(fileName_asym + "/Data", "M_vals_networks")
+    #M_vals_networks_asym = load_object(fileName_asym + "/Data", "M_vals_networks")
 
     #####################################################################################################
 
@@ -977,9 +977,9 @@ def main(
     emissions_networks_simple_asym = np.asarray([[network[x] for x in index_list_simple] for network in  emissions_networks_asym]) 
     scenario_labels_simple = [scenario_labels[x] for x in index_list_simple]
 
-    index_list_simple_M = [3,4]
-    M_vals_networks_simple_full = np.asarray([[network[x] for x in index_list_simple_M] for network in M_vals_networks_full]) 
-    M_vals_networks_simple_asym = np.asarray([[network[x] for x in index_list_simple_M] for network in M_vals_networks_asym]) 
+    #index_list_simple_M = [3,4]
+    #M_vals_networks_simple_full = np.asarray([[network[x] for x in index_list_simple_M] for network in M_vals_networks_full]) 
+    #M_vals_networks_simple_asym = np.asarray([[network[x] for x in index_list_simple_M] for network in M_vals_networks_asym]) 
     value_min = 0.1
 
     #####################################################################################################
@@ -1000,7 +1000,7 @@ def main(
     scenario_labels_simple_total = ["Complete coverage fixed preferences", "Complete coverage social multiplier", "Complete coverage environmental identity multiplier"]
     scenario_labels_simple_asym = ["Incomplete coverage fixed preferences", "Incomplete coverage social multiplier", "Incomplete coverage environmental identity multiplier"]
     plot_joint_emisisons_simple_short_colours(fileName_full, fileName_asym, emissions_networks_simple_full, emissions_networks_simple_asym, scenario_labels_simple_total, scenario_labels_simple_asym ,property_values_list,network_titles,colors_scenarios,colors_scenarios_asym, value_min)
-    plot_joint_M_simple_short_manual_colours(fileName_full, fileName_asym, M_vals_networks_simple_full, M_vals_networks_simple_asym,  scenario_labels_simple_total[1:], scenario_labels_simple_asym[1:], property_values_list,network_titles,colors_scenarios, value_min)
+    #plot_joint_M_simple_short_manual_colours(fileName_full, fileName_asym, M_vals_networks_simple_full, M_vals_networks_simple_asym,  scenario_labels_simple_total[1:], scenario_labels_simple_asym[1:], property_values_list,network_titles,colors_scenarios, value_min)
     
     ##############FULLL
     name = "tab20"#"tab20"#"Set2"
@@ -1010,12 +1010,12 @@ def main(
     scenario_labels_incomplete = ["Incomplete coverage fixed preferences","Incomplete coverage uniform weighting","Incomplete coverage static social multiplier","Incomplete coverage static environmental identity multiplier","Incomplete coverage social multiplier", "Incomplete coverage environmental identity multiplier"]
 
     plot_joint_emisisons_colours(fileName_full, fileName_asym, emissions_networks_full, emissions_networks_asym, scenario_labels_complete, scenario_labels_incomplete ,property_values_list,network_titles,colors_scenarios,colors_scenarios_asym, value_min)
-    plot_joint_M_colours(fileName_full, fileName_asym, M_vals_networks_full, M_vals_networks_asym,  scenario_labels_complete[1:], scenario_labels_incomplete[1:] , property_values_list,network_titles,colors_scenarios, value_min)
+    #plot_joint_M_colours(fileName_full, fileName_asym, M_vals_networks_full, M_vals_networks_asym,  scenario_labels_complete[1:], scenario_labels_incomplete[1:] , property_values_list,network_titles,colors_scenarios, value_min)
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName_full = "results/tax_sweep_networks_14_58_29__17_05_2024",#tax_sweep_networks_13_18_41__19_04_2024",#FULL
-        fileName_asym = "results/asym_tax_sweep_networks_13_09_20__20_05_2024"#asym_tax_sweep_networks_17_31_30__10_05_2024,#ASYM
+        fileName_full = "results/tax_sweep_networks_11_10_59__14_06_2024",#tax_sweep_networks_13_18_41__19_04_2024",#FULL
+        fileName_asym = "results/asym_tax_sweep_networks_11_11_23__14_06_2024"#asym_tax_sweep_networks_17_31_30__10_05_2024,#ASYM
     )

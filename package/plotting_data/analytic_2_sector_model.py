@@ -1050,6 +1050,73 @@ def q_plots():
     fig2.savefig(f + ".png", dpi=600, format="png")
 
     plt.show()
+
+def A_tau_plot():
+
+    def prop_expression(tau_1, A_1):
+        term1 = (0.5 / (1 + tau_1)) ** 2
+        term2 = (A_1 * ((1 + tau_1) * A_1 / (1 - A_1)) ** 2 + (1 - A_1)) ** 2
+        term3 = 1 + ((1 + tau_1) * A_1 / (1 - A_1)) ** 2
+        numerator = term1 * term2 * term3
+        denominator = numerator + 0.5
+        return numerator / denominator
+    
+
+    def emissions_expression(tau_1, A_1):
+        term1 = (0.5 / (1 + tau_1)) ** 2
+        term2 = A_1 * ((1 + tau_1) * A_1 / (1 - A_1)) ** 2 + (1 - A_1)
+        term2_squared = term2 ** 2
+        numerator = term1 * term2_squared + 0.25
+        term3 = ((1 + tau_1) * A_1 / (1 - A_1)) ** 2 + (1 + tau_1)
+        denominator = term1 * term2_squared * term3 + 0.5
+        return numerator / denominator
+
+    #################################################################################
+
+    # Create a grid of tau_1 and A_1 values
+    tau_1_values = np.linspace(0, 1, 100)
+    A_1_values = np.linspace(0.1, 0.9, 100)
+
+    # Create a meshgrid for plotting
+    tau_1_grid, A_1_grid = np.meshgrid(tau_1_values, A_1_values)
+    Z_prop = prop_expression(tau_1_grid, A_1_grid)
+    Z_em = emissions_expression(tau_1_grid, A_1_grid)
+
+    fig, ax = plt.subplots(1, 1, figsize=(5, 5), constrained_layout = True)
+    #Emissions
+    cp = ax.contourf(tau_1_grid, A_1_grid, Z_em, levels=50, cmap='viridis')
+    cbar1 = fig.colorbar(cp)
+    cbar1.set_label(r"Emissions Flow")
+    ax.set_xlabel(r'Carbon tax sector 1, $\tau_1$')
+    ax.set_ylabel(r'Low carbon preference sector 1, $A_1$')
+
+    fig2, ax2 = plt.subplots(1, 1, figsize=(5, 5), constrained_layout = True)
+    #Emissions
+    cp = ax2.contourf(tau_1_grid, A_1_grid, Z_prop, levels=50, cmap='viridis')
+    cbar2 = fig2.colorbar(cp)
+    cbar2.set_label(r"Sector 1 consumption proportion")
+    ax2.set_xlabel(r'Carbon tax sector 1, $\tau_1$')
+    ax2.set_ylabel(r'Low carbon preference sector 1, $A_1$')
+
+    root = "A_tau_plot"
+    fileName = produce_name_datetime(root)
+    print("fileName: ", fileName)
+
+    createFolder(fileName)
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/em"
+    #fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/prop"
+    #fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig2.savefig(f + ".png", dpi=600, format="png")
+
+    plt.show()
+
+
 def main( type_run):
 
     if type_run == "plots_1D":
@@ -1064,9 +1131,11 @@ def main( type_run):
         a_nu_tau_effect()
     elif type_run == "q_plot":
         q_plots()
+    elif type_run == "A_tau_plot":
+        A_tau_plot()
     else:
         raise ValueError("Wrong TYPE")
 
 if __name__ == '__main__':
-    type_run = "q_plot"#"rebound_tax"# "plots_1D"
+    type_run = "A_tau_plot"#"q_plot"#"rebound_tax"# "plots_1D"
     main(type_run)
