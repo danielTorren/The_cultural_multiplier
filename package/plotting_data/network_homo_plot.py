@@ -227,7 +227,7 @@ def plot_BA_SBM_3(
     fileName: str, Data_arr_SW, Data_arr_BA, property_title, property_save, property_vals, labels_BA, Data_arr_SBM, labels_SBM, seed_reps, colors_scenarios
 ):
     #nrows=seed_reps
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(10, 6), constrained_layout=True)
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(11, 5), constrained_layout=True)
     
     for j, Data_list in enumerate(Data_arr_BA):
         data_SW = Data_arr_SW[j].T
@@ -253,12 +253,12 @@ def plot_BA_SBM_3(
         axes[0].legend( fontsize = "8")
         axes[1].legend( fontsize = "8")
         axes[2].legend(loc= "upper right", fontsize = "8" )
-        axes[0].set_title("Watt-Strogatz Small-World")
-        axes[1].set_title("Stochastic Block Model")
-        axes[2].set_title("Barabasi-Albert Scale-Free")
+        axes[0].set_title("Watt-Strogatz Small-World", fontsize = "12" )
+        axes[1].set_title("Stochastic Block Model", fontsize = "12" )
+        axes[2].set_title("Barabasi-Albert Scale-Free", fontsize = "12" )
     
-    fig.supxlabel(property_title)
-    fig.supylabel(r"Cumulative emissions, E")
+    fig.supxlabel(property_title, fontsize = "12" )
+    fig.supylabel(r"Cumulative emissions, E", fontsize = "12" )
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_emissions_BA_SBM_seeds_3" + property_save
@@ -352,7 +352,7 @@ def main(
     
     #plot_BA_SBM_2_3(fileName, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps)
     plot_BA_SBM_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
-    plot_price_elasticies_BA_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
+    #plot_price_elasticies_BA_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
     
     plt.show()
 

@@ -466,6 +466,103 @@ def plot_M_lines_short(
     fig.savefig(f+ ".png", dpi=600, format="png") 
     fig.savefig(f+ ".eps", dpi=600, format="eps")    
 
+
+def ALT_plot_M_simple_short_manual_colours(
+    fileName_full,  M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios, value_min
+):
+
+    index_min = np.where(property_vals> value_min)[0][0]
+
+    #print(c,emissions_final)
+    fig, axes = plt.subplots(ncols=3, nrows=1, figsize=(11, 5), sharey=True)
+
+    #colors = iter(rainbow(np.linspace(0, 1,len(emissions_networks[0]))))
+
+    for k, ax in enumerate(axes.flat):
+        emissions  = M_networks[k]
+        scen_mu_min = []
+        scen_mu_max = []
+
+        colours_list = colors_scenarios[:(len(emissions)+1)*2]
+
+        colors_scenarios_complete = colours_list[0::2]
+
+        for i in range(len(emissions)):
+            #color = next(colors)#set color for whole scenario?
+            Data = emissions[i]
+
+            #print("Data", Data.shape)
+            mu_emissions, __, __ = calc_bounds(Data, 0.95)
+
+            scen_mu_min.append(min(mu_emissions[index_min:]))
+            scen_mu_max.append(max(mu_emissions[index_min:]))
+            ax.plot(property_vals[index_min:], mu_emissions[index_min:], label=scenarios_titles[i], c = colors_scenarios_complete[i+1])
+
+            data_trans = Data.T
+
+            #quit()
+            for v in range(len(data_trans)):
+                ax.plot(property_vals[index_min:], data_trans[v][index_min:], color = colors_scenarios_complete[i+1], alpha = 0.1)
+                
+        ax.set_ylim(0.8, 1.005)
+
+        ax.set_title(network_titles[k], fontsize="12")
+
+    axes[0].set_ylabel(r"Carbon price reduction, M", fontsize="12")
+    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
+    fig.subplots_adjust(bottom=0.2)  # Adjust bottom margin to make space for legend
+    #plt.tight_layout()  # Adjust layout to make space for the legend
+
+    # plt.tight_layout()
+    plotName = fileName_full + "/Plots"
+    f = plotName + "/ALT_network_joint_M_simple_short_manual_colours"
+    fig.savefig(f+ ".png", dpi=600, format="png") 
+    fig.savefig(f+ ".eps", dpi=600, format="eps") 
+
+
+def ALT_plot_emissions_simple_short_colours(
+    fileName, emissions_networks,
+    scenarios_titles, property_vals, network_titles,
+    colors_scenarios, value_min
+):
+    index_min = np.where(property_vals > value_min)[0][0]
+
+    fig, axes = plt.subplots(ncols=3, nrows=1, figsize=(11, 5), sharey=True)
+
+    for k, ax in enumerate(axes.flat):
+        emissions = emissions_networks[k]
+
+        colours_list = colors_scenarios[:len(emissions) * 2]
+        colors_scenarios_complete = colours_list[0::2]
+
+        for i in range(len(emissions)):
+            Data = emissions[i]
+            mu_emissions, _, _ = calc_bounds(Data, 0.95)
+
+            ax.plot(property_vals[index_min:], mu_emissions[index_min:], label=scenarios_titles[i], c=colors_scenarios_complete[i])
+            data_trans = Data.T
+
+            for v in range(len(data_trans)):
+                ax.plot(property_vals[index_min:], data_trans[v][index_min:], color=colors_scenarios_complete[i], alpha=0.1)
+
+        ax.set_title(network_titles[k], fontsize="12")
+    
+    axes[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
+    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=3, fontsize="9")
+    fig.subplots_adjust(bottom=0.2)  # Adjust bottom margin to make space for legend
+    #plt.tight_layout()  # Adjust layout to make space for the legend
+    
+    plotName = fileName + "/Plots"
+    f = plotName + "/ALT_network_emissions_simple_short_joint_colours"
+    fig.savefig(f + ".png", dpi=600, format="png")
+
+
 def main(
     fileName ,#= "results/tax_sweep_11_29_20__28_09_2023"
 ) -> None:
@@ -493,13 +590,13 @@ def main(
     emissions_networks_simple = np.asarray([[network[x] for x in index_list_simple] for network in  emissions_networks])     
     scenario_labels_simple = [scenario_labels[x] for x in index_list_simple]
 
-    plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
-    plot_emisisons_simple(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios)
+    #plot_means_end_points_emissions_lines_inset(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
+    #plot_emisisons_simple(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios)
     
     #plot_means_end_points_emissions(fileName, emissions_networks, scenario_labels ,property_values_list,network_titles,colors_scenarios)
 
     value_min = 0.1
-    plot_emisisons_simple_short(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios, value_min)
+    #plot_emisisons_simple_short(fileName, emissions_networks_simple, scenario_labels_simple ,property_values_list,network_titles,colors_scenarios, value_min)
     M_vals_networks = load_object(fileName + "/Data", "M_vals_networks")
     #print(scenarios)
     #"""
@@ -507,18 +604,23 @@ def main(
     index_list_simple_M = [3,4]
     M_vals_networks_simple = np.asarray([[network[x] for x in index_list_simple_M] for network in M_vals_networks]) 
     
-    plot_M_simple(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios)
-    plot_M_simple_short(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios, value_min)
+    #plot_M_simple(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios)
+    #plot_M_simple_short(fileName,M_vals_networks_simple, scenario_labels_simple[1:], property_values_list,network_titles,colors_scenarios, value_min)
     
     #plot_M_lines(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
     
     #plot_M_lines_inset(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
     #plot_M_lines_short(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
     #plot_M_lines_short_inset(fileName, M_vals_networks, scenario_labels[1:] ,property_values_list,network_titles,colors_scenarios)
+
+
+    ALT_plot_emissions_simple_short_colours(fileName,emissions_networks_simple, scenario_labels_simple,property_values_list,network_titles,colors_scenarios, value_min)
+    ALT_plot_M_simple_short_manual_colours(fileName,  M_vals_networks_simple, scenario_labels_simple, property_values_list, network_titles, colors_scenarios, value_min)
+    
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_14_58_29__17_05_2024"#"results/tax_sweep_networks_14_58_29__17_05_2024",#COMPLETE
+        fileName= "results/tax_sweep_networks_14_58_29__17_05_2024"#"results/tax_sweep_networks_14_58_29__17_05_2024"#"results/tax_sweep_networks_14_58_29__17_05_2024",#COMPLETE
         #fileName= "results/asym_tax_sweep_networks_17_31_30__10_05_2024",#ASYM
     )
