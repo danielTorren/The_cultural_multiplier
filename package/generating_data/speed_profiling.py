@@ -2,12 +2,15 @@
 from package.resources.run import generate_data
 import cProfile
 import pstats
+import numpy as np
 
 def main(base_params): 
     Data = generate_data(base_params)  # run the simulation
 
 if __name__ == '__main__':
 
+    #np.show_config()  # This will display the BLAS/LAPACK linkage information
+    #quit()
     #cProfile.run('main()')
 
     ###################################################################
@@ -34,7 +37,7 @@ if __name__ == '__main__':
     "set_seed": 4, 
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
-    "N": 2000, 
+    "N": 4000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 
@@ -56,6 +59,7 @@ if __name__ == '__main__':
     "SW_prob_rewire": 0.1
     }
 
+    
     # Create a profiler object
     pr = cProfile.Profile()
 

@@ -2,6 +2,8 @@ import numpy as np
 import networkx as nx
 import numpy.typing as npt
 from copy import deepcopy
+import dask.array as da
+from sklearn.preprocessing import normalize
 
 # modules
 class Network_Matrix:
@@ -172,16 +174,10 @@ class Network_Matrix:
             self.network = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes, seed=self.network_structure_seed)
 
         self.adjacency_matrix = nx.to_numpy_array(self.network)
+        #SCIPY ALT
+        #self.weighting_matrix = normalize(self.adjacency_matrix, axis=1, norm='l1')
         self.weighting_matrix = self._normlize_matrix(self.adjacency_matrix)
         self.network_density = nx.density(self.network)
-
-    #SLOW!!
-    def _normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
-        row_sums = matrix.sum(axis=1)
-        # Handle rows with zero sum by setting to one to avoid division by zero
-        row_sums[row_sums == 0] = 1
-        norm_matrix = matrix / row_sums[:, np.newaxis]
-        return norm_matrix
     
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
@@ -343,6 +339,15 @@ class Network_Matrix:
             social_influence = self._calc_ego_influence_degroot()           
         return social_influence
 
+    #"""
+    #SLOW!!
+    def _normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
+        row_sums = matrix.sum(axis=1)
+        # Handle rows with zero sum by setting to one to avoid division by zero
+        row_sums[row_sums == 0] = 1
+        norm_matrix = matrix / row_sums[:, np.newaxis]
+        return norm_matrix
+
     def _calc_weighting_matrix_attribute(self, attribute_array):
         # Use broadcasting for the difference matrix
         difference_matrix = attribute_array[:, np.newaxis] - attribute_array[np.newaxis, :]
@@ -354,9 +359,29 @@ class Network_Matrix:
         non_diagonal_weighting_matrix = self.adjacency_matrix * alpha_numerator
         
         # Normalize the matrix row-wise
+        #SCIPY ALT
+        #norm_weighting_matrix = normalize(non_diagonal_weighting_matrix, axis=1, norm='l1')
         norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
         
         return norm_weighting_matrix
+    #"""
+    """
+    def _calc_weighting_matrix_attribute(self, attribute_array):
+        attribute_array = da.from_array(attribute_array, chunks=(1000,))  # Chunk size can be tuned
+        difference_matrix = attribute_array[:, None] - attribute_array[None, :]
+        
+        alpha_numerator = da.exp(-self.confirmation_bias * da.absolute(difference_matrix))
+        non_diagonal_weighting_matrix = self.adjacency_matrix * alpha_numerator
+        
+        norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
+        return norm_weighting_matrix.compute()
+
+    def _normlize_matrix(self, matrix: da.Array) -> da.Array:
+        row_sums = matrix.sum(axis=1)
+        row_sums = da.where(row_sums == 0, 1, row_sums)  # Avoid division by zero
+        norm_matrix = matrix / row_sums[:, None]
+        return norm_matrix
+    """
 
 
     def _calc_identity(self, low_carbon_preference_matrix):
