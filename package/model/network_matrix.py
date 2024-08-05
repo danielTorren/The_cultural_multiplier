@@ -41,7 +41,12 @@ class Network_Matrix:
     def _set_seeds(self):
         #seeds
         self.vary_seed_state = self.parameters["vary_seed_state"]
-        if self.vary_seed_state =="preferences":
+        if self.vary_seed_state =="multi":
+            self.preferences_seed = self.parameters["preferences_seed"]
+            self.network_structure_seed = self.parameters["network_structure_seed"]
+            self.shuffle_homophily_seed = self.parameters["shuffle_homophily_seed"]
+            self.shuffle_coherance_seed = self.parameters["shuffle_coherance_seed"]
+        elif self.vary_seed_state =="preferences":
             self.preferences_seed = int(round(self.parameters["set_seed"]))
             self.network_structure_seed = self.parameters["network_structure_seed"]
             self.shuffle_homophily_seed = self.parameters["shuffle_homophily_seed"]
@@ -366,13 +371,12 @@ class Network_Matrix:
         return norm_weighting_matrix
     """
     #"""
+
     def _calc_weighting_matrix_attribute(self, attribute_array):
-        attribute_array = da.from_array(attribute_array, chunks=(1000,))  # Chunk size can be tuned
+        attribute_array = da.from_array(attribute_array, chunks=('auto',))  # Chunk size can be tuned
         difference_matrix = attribute_array[:, None] - attribute_array[None, :]
-        
         alpha_numerator = da.exp(-self.confirmation_bias * da.absolute(difference_matrix))
         non_diagonal_weighting_matrix = self.adjacency_matrix * alpha_numerator
-        
         norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
         return norm_weighting_matrix.compute()
 
@@ -381,9 +385,9 @@ class Network_Matrix:
         row_sums = da.where(row_sums == 0, 1, row_sums)  # Avoid division by zero
         norm_matrix = matrix / row_sums[:, None]
         return norm_matrix
+    
     #"""
-
-
+    
     def _calc_identity(self, low_carbon_preference_matrix):
         return np.mean(low_carbon_preference_matrix, axis = 1)
 

@@ -37,7 +37,7 @@ if __name__ == '__main__':
     "set_seed": 4, 
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
-    "N": 4000, 
+    "N": 5000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 

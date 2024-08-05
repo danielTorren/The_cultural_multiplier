@@ -16,6 +16,9 @@ import multiprocessing
 from package.model.network_matrix import Network_Matrix as Network
 from copy import deepcopy
 from scipy.optimize import minimize, NonlinearConstraint
+import dask
+from dask import delayed
+from distributed import Client
 
 # modules
 ####SINGLE SHOT RUN
