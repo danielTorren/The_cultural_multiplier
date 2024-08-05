@@ -2,8 +2,6 @@ import numpy as np
 import networkx as nx
 import numpy.typing as npt
 from copy import deepcopy
-import dask.array as da
-from sklearn.preprocessing import normalize
 import scipy.sparse as sp
 
 # modules
@@ -345,7 +343,6 @@ class Network_Matrix:
         # Convert the result to a dense NumPy array if necessary
         return neighbour_influence
         
-
     def _calc_social_component_matrix(self) -> npt.NDArray:
         if self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
             social_influence = self._calc_ego_influence_degroot_independent()

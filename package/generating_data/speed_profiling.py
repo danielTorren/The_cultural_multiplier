@@ -2,17 +2,12 @@
 from package.resources.run import generate_data
 import cProfile
 import pstats
-import numpy as np
 
 def main(base_params): 
     Data = generate_data(base_params)  # run the simulation
     print("Em", Data.total_carbon_emissions_stock)
 
 if __name__ == '__main__':
-
-    #np.show_config()  # This will display the BLAS/LAPACK linkage information
-    #quit()
-    #cProfile.run('main()')
 
     ###################################################################
     base_params = {
@@ -38,7 +33,7 @@ if __name__ == '__main__':
     "set_seed": 4, 
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
-    "N": 5000, 
+    "N": 10000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 
