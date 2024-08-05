@@ -24,7 +24,7 @@ def produce_param_list_multi_seed(params: dict, property_list: list, property: s
 
     return params_list
 
-def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
+def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios,seeds_labels):
     base_params_tax_copy = deepcopy(base_params_tax)
 
     base_params_tax_copy["ratio_preference_or_consumption_state"] = 0 #WE ASSUME Consumption BASE LEARNING
@@ -35,21 +35,21 @@ def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
     if "fixed_preferences" in scenarios:
         base_params_copy_1 = deepcopy(base_params_tax_copy)
         base_params_copy_1["alpha_change_state"] = "fixed_preferences"
-        params_sub_list_1 = produce_param_list_multi_seed(base_params_copy_1, carbon_tax_vals,"carbon_price_increased_lower")
+        params_sub_list_1 = produce_param_list_multi_seed(base_params_copy_1, carbon_tax_vals,"carbon_price_increased_lower",seeds_labels)
         params_list.extend(params_sub_list_1)
 
     # 5. Run with social learning, Emissions: [S_n]
     if "dynamic_socially_determined_weights" in scenarios:
         base_params_copy_5 = deepcopy(base_params_tax_copy)
         base_params_copy_5["alpha_change_state"] = "dynamic_socially_determined_weights"
-        params_sub_list_5 = produce_param_list_multi_seed(base_params_copy_5, carbon_tax_vals,"carbon_price_increased_lower")
+        params_sub_list_5 = produce_param_list_multi_seed(base_params_copy_5, carbon_tax_vals,"carbon_price_increased_lower",seeds_labels)
         params_list.extend(params_sub_list_5)
 
     # 6.  Run with cultural learning, Emissions: [S_n]
     if "dynamic_identity_determined_weights" in scenarios:
         base_params_copy_6 = deepcopy(base_params_tax_copy)
         base_params_copy_6["alpha_change_state"] = "dynamic_identity_determined_weights"
-        params_sub_list_6 = produce_param_list_multi_seed(base_params_copy_6, carbon_tax_vals,"carbon_price_increased_lower")
+        params_sub_list_6 = produce_param_list_multi_seed(base_params_copy_6, carbon_tax_vals,"carbon_price_increased_lower",seeds_labels)
         params_list.extend(params_sub_list_6)
 
     return params_list

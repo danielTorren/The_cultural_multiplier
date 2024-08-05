@@ -15,7 +15,7 @@
     "preferences_seed": 14,
     "shuffle_homophily_seed":20,
 	"learning_seed":10, 
-    "carbon_price_duration": 1000, 
+    "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
     "M": 2,
     "clipping_epsilon_init_preference": 1e-5,

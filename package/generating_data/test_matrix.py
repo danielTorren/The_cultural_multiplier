@@ -142,7 +142,7 @@ if __name__ == '__main__':
     "preferences_seed": 14,
     "shuffle_homophily_seed":20,
 	"learning_seed":10, 
-    "carbon_price_duration": 1000, 
+    "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
     "N": 20, 
     "M": 2, 

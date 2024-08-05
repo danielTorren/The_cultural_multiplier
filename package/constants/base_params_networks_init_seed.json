@@ -13,7 +13,7 @@
     "network_structure_seed": 10, 
     "shuffle_homophily_seed": 2,
     "shuffle_coherance_seed": 5,
-    "carbon_price_duration": 1000, 
+    "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
     "N": 200, 
     "M": 2, 
