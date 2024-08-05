@@ -6,6 +6,7 @@ import numpy as np
 
 def main(base_params): 
     Data = generate_data(base_params)  # run the simulation
+    print("Em", Data.total_carbon_emissions_stock)
 
 if __name__ == '__main__':
 
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     "imperfect_learning_state": 1,
     "imitation_state": "consumption",
     "vary_seed_state": "network",
-    "alpha_change_state": "dynamic_identity_determined_weights",
+    "alpha_change_state": "dynamic_identity_determined_weights",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
     "seed_reps": 25,
     "network_structure_seed": 10, 
     "preferences_seed": 77, 

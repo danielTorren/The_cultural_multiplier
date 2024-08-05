@@ -4,6 +4,7 @@ import numpy.typing as npt
 from copy import deepcopy
 import dask.array as da
 from sklearn.preprocessing import normalize
+import scipy.sparse as sp
 
 # modules
 class Network_Matrix:
@@ -179,9 +180,13 @@ class Network_Matrix:
             self.network = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes, seed=self.network_structure_seed)
 
         self.adjacency_matrix = nx.to_numpy_array(self.network)
+        self.sparse_adjacency_matrix = sp.csr_matrix(self.adjacency_matrix)
+        # Get the non-zero indices of the adjacency matrix
+        self.row_indices_sparse, self.col_indices_sparse = self.sparse_adjacency_matrix.nonzero()
+
         #SCIPY ALT
         #self.weighting_matrix = normalize(self.adjacency_matrix, axis=1, norm='l1')
-        self.weighting_matrix = self._normlize_matrix(self.adjacency_matrix)
+        self.weighting_matrix = self._normlize_matrix(self.sparse_adjacency_matrix)
         self.network_density = nx.density(self.network)
     
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
@@ -264,20 +269,20 @@ class Network_Matrix:
 
     def _initialize_social_component(self):
         if self.alpha_change_state == "fixed_preferences":
-            self.social_component_matrix = self.low_carbon_preference_matrix#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
+            self.social_component_vector = self.low_carbon_preference_matrix#DUMBY FEED IT ITSELF? DO I EVEN NEED TO DEFINE IT
         else:
             if self.alpha_change_state in ("uniform_network_weighting","static_culturally_determined_weights","dynamic_identity_determined_weights", "common_knowledge_dynamic_identity_determined_weights"):
                 self.weighting_matrix = self._update_weightings()
             elif self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):#independent behaviours
                 self.weighting_matrix_tensor = self._update_weightings_list()
-            self.social_component_matrix = self.calc_social_component_matrix()
+            self.social_component_vector = self._calc_social_component_matrix()
 
     ##################################################################################
     #Below this the updating code
     ##################################################################################
 
     def _update_preferences(self):
-        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preference_matrix + self.phi_array*self.social_component_matrix
+        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preference_matrix + self.phi_array*self.social_component_vector
         low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)#this stops the guassian error from causing A to be too large or small thereby producing nans
         return low_carbon_preferences
     
@@ -334,59 +339,46 @@ class Network_Matrix:
         self.outward_social_influence_matrix = self._calc_outward_social_influence()
 
     def _calc_ego_influence_degroot(self) -> npt.NDArray:
-        neighbour_influence = np.matmul(self.weighting_matrix, self.outward_social_influence_matrix)
+       
+        # Perform the matrix multiplication using the dot method for sparse matrices
+        neighbour_influence = self.weighting_matrix.dot(self.outward_social_influence_matrix)
+        # Convert the result to a dense NumPy array if necessary
         return neighbour_influence
+        
 
-    def calc_social_component_matrix(self) -> npt.NDArray:
+    def _calc_social_component_matrix(self) -> npt.NDArray:
         if self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
             social_influence = self._calc_ego_influence_degroot_independent()
         else:#culturally determined either static or dynamic
             social_influence = self._calc_ego_influence_degroot()           
         return social_influence
 
-    #"""
-    #SLOW!!
-    def _normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
-        row_sums = matrix.sum(axis=1)
-        # Handle rows with zero sum by setting to one to avoid division by zero
-        row_sums[row_sums == 0] = 1
-        norm_matrix = matrix / row_sums[:, np.newaxis]
-        return norm_matrix
-
     def _calc_weighting_matrix_attribute(self, attribute_array):
-        # Use broadcasting for the difference matrix
-        difference_matrix = attribute_array[:, np.newaxis] - attribute_array[np.newaxis, :]
-        
-        # Combine operations to avoid creating intermediate arrays
-        alpha_numerator = np.exp(-self.confirmation_bias * np.abs(difference_matrix))
-        
-        # Element-wise multiplication
-        non_diagonal_weighting_matrix = self.adjacency_matrix * alpha_numerator
-        
+        # Compute the differences only for the non-zero entries
+        differences = attribute_array[self.row_indices_sparse] - attribute_array[self.col_indices_sparse]
+        # Compute the weighting values only for the non-zero entries
+        weights = np.exp(-self.confirmation_bias * np.abs(differences))
+        # Create a sparse matrix with the same structure as the adjacency matrix
+        non_diagonal_weighting_matrix = sp.csr_matrix(
+            (weights, (self.row_indices_sparse, self.col_indices_sparse)),
+            shape=self.adjacency_matrix.shape
+        )
         # Normalize the matrix row-wise
-        #SCIPY ALT
-        #norm_weighting_matrix = normalize(non_diagonal_weighting_matrix, axis=1, norm='l1')
         norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
-        
+
         return norm_weighting_matrix
-    #"""
-    """
 
-    def _calc_weighting_matrix_attribute(self, attribute_array):
-        attribute_array = da.from_array(attribute_array, chunks=('auto',))  # Chunk size can be tuned
-        difference_matrix = attribute_array[:, None] - attribute_array[None, :]
-        alpha_numerator = da.exp(-self.confirmation_bias * da.absolute(difference_matrix))
-        non_diagonal_weighting_matrix = self.adjacency_matrix * alpha_numerator
-        norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
-        return norm_weighting_matrix.compute()
+    def _normlize_matrix(self, matrix: sp.csr_matrix) -> sp.csr_matrix:
+        # Normalize the matrix row-wise
+        row_sums = np.array(matrix.sum(axis=1)).flatten()
+        row_sums[row_sums == 0] = 1  # Avoid division by zero
+        inv_row_sums = 1.0 / row_sums
+        # Create a diagonal matrix for normalization
+        diagonal_matrix = sp.diags(inv_row_sums)
+        # Multiply to normalize
+        norm_matrix = diagonal_matrix.dot(matrix)
 
-    def _normlize_matrix(self, matrix: da.Array) -> da.Array:
-        row_sums = matrix.sum(axis=1)
-        row_sums = da.where(row_sums == 0, 1, row_sums)  # Avoid division by zero
-        norm_matrix = matrix / row_sums[:, None]
         return norm_matrix
-    
-    """
 
     def _calc_identity(self, low_carbon_preference_matrix):
         return np.mean(low_carbon_preference_matrix, axis = 1)
@@ -399,7 +391,8 @@ class Network_Matrix:
     def _calc_ego_influence_degroot_independent(self) -> npt.NDArray:
         neighbour_influence = np.zeros((self.N, self.M))
         for m in range(self.M):
-            neighbour_influence[:, m] = np.matmul(self.weighting_matrix_tensor[m], self.outward_social_influence_matrix[:,m])
+            neighbour_influence[:, m] = self.weighting_matrix_tensor[m].dot(self.outward_social_influence_matrix[:, m])
+            #neighbour_influence[:, m] = np.matmul(self.weighting_matrix_tensor[m], self.outward_social_influence_matrix[:,m])
         return neighbour_influence
     
     def _update_weightings_list(self) -> tuple[npt.NDArray, float]:
@@ -473,7 +466,7 @@ class Network_Matrix:
                 self.weighting_matrix_tensor = self._update_weightings_list()
             else:
                 pass #this is for "uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights"
-            self.social_component_matrix = self.calc_social_component_matrix()
+            self.social_component_vector = self._calc_social_component_matrix()
 
         self.carbon_dividend_array = self._calc_carbon_dividend_array()
         
