@@ -344,7 +344,7 @@ class Network_Matrix:
             social_influence = self._calc_ego_influence_degroot()           
         return social_influence
 
-    """
+    #"""
     #SLOW!!
     def _normlize_matrix(self, matrix: npt.NDArray) -> npt.NDArray:
         row_sums = matrix.sum(axis=1)
@@ -369,8 +369,8 @@ class Network_Matrix:
         norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
         
         return norm_weighting_matrix
-    """
     #"""
+    """
 
     def _calc_weighting_matrix_attribute(self, attribute_array):
         attribute_array = da.from_array(attribute_array, chunks=('auto',))  # Chunk size can be tuned
@@ -386,8 +386,8 @@ class Network_Matrix:
         norm_matrix = matrix / row_sums[:, None]
         return norm_matrix
     
-    #"""
-    
+    """
+
     def _calc_identity(self, low_carbon_preference_matrix):
         return np.mean(low_carbon_preference_matrix, axis = 1)
 
