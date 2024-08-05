@@ -13,7 +13,7 @@ import numpy as np
 import numpy.typing as npt
 from joblib import Parallel, delayed
 import multiprocessing
-from package.model.network_matrix_short_edited import Network_Matrix as Network
+from package.model.network_matrix import Network_Matrix as Network
 from copy import deepcopy
 from scipy.optimize import minimize, NonlinearConstraint
 
