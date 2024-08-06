@@ -14,23 +14,39 @@ from package.resources.utility import (
     save_object, 
     produce_name_datetime
 )
-from package.plotting_data import single_experiment_plot
+from package.plotting_data import four_homo_plot
 import pyperclip
 
 def main(
     base_params
 ) -> str: 
 
-    root = "single_experiment"
+    root = "homo_four"
     fileName = produce_name_datetime(root)
     pyperclip.copy(fileName)
     print("fileName:", fileName)
 
-    Data = generate_data(base_params)  # run the simulation
-    print("EM:", Data.total_carbon_emissions_stock)
+    #case1
+    base_params["homophily_state"] = 0
+    base_params["coherance_state"] = 0
+    Data1 = generate_data(base_params)  # run the simulation
+    #case2
+    base_params["homophily_state"] = 1
+    base_params["coherance_state"] = 0
+    Data2 = generate_data(base_params)  # run the simulation
+    #case3
+    base_params["homophily_state"] = 0
+    base_params["coherance_state"] = 1
+    Data3 = generate_data(base_params)  # run the simulation
+    #case4
+    base_params["homophily_state"] = 1
+    base_params["coherance_state"] = 1
+    Data4 = generate_data(base_params)  # run the simulation
 
+    Data_list = [Data1, Data2, Data3, Data4]
     createFolder(fileName)
-    save_object(Data, fileName + "/Data", "social_network")
+    save_object(Data_list, fileName + "/Data", "Data_list")
+    
     save_object(base_params, fileName + "/Data", "base_params")
 
     return fileName
@@ -69,8 +85,6 @@ if __name__ == '__main__':
     "clipping_epsilon_init_preference": 1e-5, 
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
-    "homophily_state": 0,
-    "coherance_state": 1,#0.95,
     "BA_nodes": 160,
     #"BA_density":0.1,
     "BA_green_or_brown_hegemony": 0,
@@ -86,4 +100,4 @@ if __name__ == '__main__':
     RUN_PLOT = 1
 
     if RUN_PLOT:
-        single_experiment_plot.main(fileName = fileName)
+        four_homo_plot.main(fileName = fileName)
