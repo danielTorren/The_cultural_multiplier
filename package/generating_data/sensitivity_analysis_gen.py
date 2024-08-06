@@ -118,6 +118,7 @@ def stochastic_produce_param_list_SA(
     """
 
     params_list = []
+    seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed"]
     for i, X in enumerate(param_values):
         base_params_copy = (
             base_params.copy()
@@ -129,8 +130,10 @@ def stochastic_produce_param_list_SA(
             base_params_copy[variable_parameters_dict_toList[v]["property"]] = X[
                 v
             ]  # replace the base variable value with the new value for that experiment
-        for v in range(base_params_copy["seed_reps"]):#copy with stochastic seeds
-            base_params_copy["set_seed"] = int(v+1)
+        for j in range(base_params_copy["seed_reps"]):#copy with stochastic seeds
+            for k, label in enumerate(seeds_labels):
+                base_params_copy[label] = int(10*k + j + 1)
+            #base_params_copy["set_seed"] = int(v+1)
             params_list.append(
                 base_params_copy.copy()
             )  
@@ -194,7 +197,7 @@ def main(
     len_y = int(len(params_list_sa_SW)/AV_reps)
 
     Y_emissions_stock_reshape = Y_emissions_stock_stochastic.reshape(3,len_y,AV_reps)
-    Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=2)
+    Y_emissions_stock = np.mean(Y_emissions_stock_reshape, axis=2)#AVERAGE OVER THE SEED VARIATIONS
 
 
     createFolder(fileName)
@@ -213,7 +216,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_6 = main(
-    N_samples = 2048,
+    N_samples = 8,
     BASE_PARAMS_LOAD = "package/constants/base_params_sensitivity.json",
     VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
     calc_second_order = True

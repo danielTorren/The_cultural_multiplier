@@ -41,7 +41,6 @@ if __name__ == '__main__':
     "a_preferences": 2, 
     "b_preferences": 2, 
     "clipping_epsilon_init_preference": 1e-5,
-    "std_low_carbon_preference": 0.01, 
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
     "homophily_state": 0,

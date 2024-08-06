@@ -76,9 +76,7 @@ def parallel_run_sa(
     num_cores = multiprocessing.cpu_count()
     #results_emissions_stock =[generate_sensitivity_output_flat(i) for i in params_dict]
     results_emissions_stock = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_sensitivity_output_flat)(i) for i in params_dict)
-
     return np.asarray(results_emissions_stock)
-
 
 def generate_emissions_stock_res(params):
     data = generate_data(params)

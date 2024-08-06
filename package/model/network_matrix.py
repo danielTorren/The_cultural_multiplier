@@ -109,9 +109,30 @@ class Network_Matrix:
 
         elif self.network_type == "BA":
             self.BA_green_or_brown_hegemony = self.parameters["BA_green_or_brown_hegemony"]
+            #self.BA_density = int(self.parameters["BA_density"])
             self.BA_nodes = int(self.parameters["BA_nodes"])
+            #self.BA_nodes = self._calculate_m_BA(self.BA_density, self.N)
+            #print("self.BA_nodes",self.BA_nodes)
             self.SBM_block_heterogenous_individuals_substitutabilities_state = 0
-
+    """
+    def _calculate_m_BA(self,rho, n):
+        term1 = n
+        term2 = (n**2 * (1 - 2 * rho) + 2 * rho * n)**(0.5)
+        
+        m1 = (term1 + term2) / 2
+        m2 = (term1 - term2) / 2
+        print(m1,m2)
+        quit()
+        # Ensure m is non-negative
+        if m1 >= 0 and m2 >= 0:
+            return m1, m2  # Return both valid solutions
+        elif m1 >= 0:
+            return m1
+        elif m2 >= 0:
+            return m2
+        else:
+            raise ValueError("No valid solution for m.")
+    """
     def _initialize_time_params(self):
         self.t = 0
         self.burn_in_duration = self.parameters["burn_in_duration"]
@@ -156,7 +177,6 @@ class Network_Matrix:
         if self.heterogenous_intrasector_preferences_state == 1:
             self.a_preferences = self.parameters["a_preferences"]
             self.b_preferences = self.parameters["b_preferences"]
-            self.std_low_carbon_preference = self.parameters["std_low_carbon_preference"]
             self.low_carbon_preference_matrix_init = self._generate_init_data_preferences_coherance()
         elif self.heterogenous_intrasector_preferences_state == 0:
             self.low_carbon_preference_matrix_init = np.full((self.N, self.M), 1 / self.M)
