@@ -73,13 +73,13 @@ def main(
     scenario_labels = ["Fixed preferences","Dynamic social weighting", "Dynamic identity weighting"]
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
 
-    value_min = -0.1
+    value_min = -0.7
     plot_emissions_lines(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios, value_min)
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_10_13_58__06_08_2024",
+        fileName = "results/tax_sweep_networks_18_34_59__06_08_2024",
        
     )
