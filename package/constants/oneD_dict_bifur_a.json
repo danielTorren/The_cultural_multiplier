@@ -1,8 +1,0 @@
-{
-    "property_varied": "a_preferences",
-    "property_min" : 0.5,
-    "property_max" : 2,
-    "property_reps": 4,
-    "property_varied_title" :"a identity",
-    "property_divisions": "linear"
-}

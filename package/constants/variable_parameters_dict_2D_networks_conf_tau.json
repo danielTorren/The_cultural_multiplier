@@ -1,4 +1,0 @@
-{
-    "row":{"property":"confirmation_bias","min":0, "max": 40, "title": "Confirmation bias","divisions": "linear", "reps": 5}, 
-    "col":{"property":"carbon_price_increased_lower","min":0, "max": 1, "title": "Carbon price","divisions": "linear", "reps": 200} 
-}

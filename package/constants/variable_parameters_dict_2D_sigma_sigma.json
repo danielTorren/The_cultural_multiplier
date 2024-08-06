@@ -1,4 +1,0 @@
-{
-    "row":{"property":"low_carbon_substitutability_lower","min":1.05, "max": 8, "title": "sigma lower","divisions": "geo", "reps": 64}, 
-    "col":{"property":"low_carbon_substitutability_upper","min":1.05, "max": 8, "title": "sigma upper","divisions": "geo", "reps": 64} 
-}

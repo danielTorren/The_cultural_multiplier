@@ -1,8 +1,0 @@
-{
-    "property_varied" : "std_low_carbon_preference",
-    "property_min" : 0,
-    "property_max" : 0.15,
-    "property_reps": 5,
-    "property_varied_title" : "$\\sigma_A$",
-    "property_divisions": "linear"
-}

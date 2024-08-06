@@ -1,4 +1,0 @@
-{
-    "row":{"property":"confirmation_bias","min":0, "max": 40, "title": "Confirmation bias","divisions": "linear", "reps": 124}, 
-    "col":{"property":"low_carbon_substitutability_upper","min":1.1, "max": 10, "title": "Confirmation bias","divisions": "geo", "reps": 124}
-}

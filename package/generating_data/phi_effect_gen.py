@@ -1,11 +1,9 @@
 
 # imports
-from ast import arg
 import json
-import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object
 from package.resources.run import multi_emissions_stock
-from package.resources.utility import produce_param_list_stochastic, produce_param_list_only_stochastic, generate_vals
+from package.resources.utility import produce_param_list_stochastic_multi, produce_param_list_only_stochastic_multi, generate_vals
 ##################################################################################################
 #REVERSE Engineer the carbon price based on the final emissions
 
@@ -24,9 +22,6 @@ def main(
     property_values_list = generate_vals(
         var_params
     )
-    #print("property_values_list", property_values_list)
-    #quit()
-    #property_values_list = np.linspace(property_min, property_max, property_reps)
 
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
@@ -44,7 +39,7 @@ def main(
         params["network_type"] = network_type
         for carbon_price in carbon_price_list:
             params["carbon_price_increased_lower"] = carbon_price
-            params_list += produce_param_list_stochastic(params, property_values_list, property_varied)
+            params_list += produce_param_list_stochastic_multi(params, property_values_list, property_varied)
 
     print("TOTAL RUNS", len(params_list))
     emissions_stock_serial = multi_emissions_stock(params_list)
@@ -57,7 +52,7 @@ def main(
     params_list_fixed = []
     for carbon_price in carbon_price_list:
         params["carbon_price_increased_lower"] = carbon_price
-        params_list_fixed += produce_param_list_only_stochastic(params)
+        params_list_fixed += produce_param_list_only_stochastic_multi(params)
 
     print("TOTAL RUNS FIXED", len(params_list_fixed))
 

@@ -1,8 +1,0 @@
-{
-    "property_varied" : "burn_in_duration",
-    "property_min" : 0,
-    "property_max" : 2000,
-    "property_reps": 25,
-    "property_varied_title" : "Burn-in duration",
-    "property_divisions": "linear"
-}

@@ -1,8 +1,0 @@
-{
-    "property_varied" : "N",
-    "property_min" : 20,
-    "property_max" :100,
-    "property_reps": 30,
-    "property_varied_title" : "N",
-    "property_divisions": "linear"
-}

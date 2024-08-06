@@ -1,8 +1,0 @@
-{
-    "property_varied": "sector_substitutability",
-    "property_min" : 1.1,
-    "property_max" :10,
-    "property_reps": 5,
-    "property_varied_title" :"\\nu",
-    "property_divisions": "linear"
-}

@@ -1,4 +1,0 @@
-{
-    "row":{"property":"a_low_carbon_substitutability","min":0.1, "max": 10, "title": "low carbon substitutability $\\sigma_m$, Beta $a_{\\sigma_m}$","divisions": "linear", "reps": 32}, 
-    "col":{"property":"b_low_carbon_substitutability","min":0.1, "max": 10, "title": "low carbon substitutability $\\sigma_m$ ,Beta $b_{\\sigma_m}$","divisions": "linear", "reps": 32} 
-}

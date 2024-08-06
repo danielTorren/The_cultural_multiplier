@@ -1,8 +1,0 @@
-{
-    "property_varied" : "dividend_progressiveness",
-    "property_min" : -1,
-    "property_max" :1,
-    "property_reps": 20,
-    "property_varied_title" : "Carbon tax progressiveness",
-    "property_divisions": "linear"
-}
