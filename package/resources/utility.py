@@ -195,9 +195,9 @@ def produce_param_list_stochastic_multi(params: dict, property_list: list, prope
         for j in range(params["seed_reps"]):
             for k, label in enumerate(seeds_labels):
                 params[label] = int(10*k + j + 1)
-                params_list.append(
-                    params.copy()
-                )  
+            params_list.append(
+                params.copy()
+            )  
     return params_list
 
 def produce_param_list_only_stochastic_multi(params: dict) -> list[dict]:
@@ -206,7 +206,7 @@ def produce_param_list_only_stochastic_multi(params: dict) -> list[dict]:
     for j in range(params["seed_reps"]):
         for k, label in enumerate(seeds_labels):
             params[label] = int(10*k + j + 1)
-            params_list.append(
-                params.copy()
-            )  
+        params_list.append(
+            params.copy()
+        )  
     return params_list

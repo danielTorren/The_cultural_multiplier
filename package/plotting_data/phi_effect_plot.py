@@ -273,39 +273,10 @@ def main(
     #plot_var_emisisons_simple_log(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_var_emisisons_simple_xlog(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     
-    """
-    #######################################
-    static_tau_matrix = load_object(fileName + "/Data" , "tau_matrix")
-    static_emissions_matrix = load_object(fileName + "/Data" , "emissions_matrix")
 
-    print(static_tau_matrix.shape, static_emissions_matrix.shape)
-    print(static_tau_matrix[0])
-    print(static_emissions_matrix[0])
-
-    quit()
-
-    matrix1 = static_tau_matrix
-    matrix2 = static_emissions_matrix
-    # Create a figure and axis for the plots
-    fig, ax = plt.subplots()
-
-    # Plot each row where matrix1 is x and matrix2 is y
-    for i in range(matrix1.shape[0]):
-        ax.plot(matrix1[i], matrix2[i], alpha=0.5)
-
-    # Adding labels and title
-    ax.set_xlabel('tau')
-    ax.set_ylabel('E')
-    plt.show()
-    quit()
-
-    M_networks = load_object(fileName + "/Data" , "M_vals_networks")
-    plot_M(fileName, M_networks, scenarios_titles, property_values_list, network_titles, colors_scenarios)
-    plot_M_xlog(fileName, M_networks, scenarios_titles, property_values_list, network_titles, colors_scenarios)
-    """
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_vary_09_14_29__17_05_2024",
+        fileName= "results/phi_vary_11_06_19__06_08_2024",
     )
