@@ -151,7 +151,7 @@ class Network_Matrix:
         self.homophily_state = self.parameters["homophily_state"]
         self.coherance_state = self.parameters["coherance_state"]
         self.shuffle_intensity = 1.5
-        self.shuffle_reps = int(round((self.N * (1 - self.homophily_state)) ** self.shuffle_intensity))
+        self.shuffle_reps_homophily = int(round((self.N * (1 - self.homophily_state)) ** self.shuffle_intensity))
         self.shuffle_reps_coherance = int(round((self.N * (1 - self.coherance_state)) ** self.shuffle_intensity))
 
     def _initialize_expenditure(self):
@@ -192,12 +192,11 @@ class Network_Matrix:
         self.row_indices_sparse, self.col_indices_sparse = self.sparse_adjacency_matrix.nonzero()
 
         #SCIPY ALT
-        #self.weighting_matrix = normalize(self.adjacency_matrix, axis=1, norm='l1')
         self.weighting_matrix = self._normlize_matrix(self.sparse_adjacency_matrix)
         self.network_density = nx.density(self.network)
-        #print("self.network_density", self.network_density)
-        #quit()
-    
+
+    ########################################################################################################
+
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
         preferences_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
@@ -220,16 +219,12 @@ class Network_Matrix:
         second_half = every_second_element[::-1] #reverse it
         circular_matrix = np.concatenate((first_half, second_half), axis=0)
         return circular_matrix
-
-    def _partial_shuffle_matrix(self, matrix_to_shufle, shuffle_reps) -> list:
-        self.swaps_list = []
+    
+    def _partial_shuffle_matrix(self, matrix_to_shuffle, shuffle_reps) -> np.ndarray:
         for _ in range(shuffle_reps):
-            a, b = np.random.randint(
-                low=0, high=self.N, size=2
-            )  # generate pair of indicies to swap
-            self.swaps_list.append((a,b))#use this to mix stuff later
-            matrix_to_shufle[[a, b]] = matrix_to_shufle[[b, a]]
-        return matrix_to_shufle
+            a, b = np.random.randint(low=0, high=self.N, size=2)  # generate pair of indices to swap rows
+            matrix_to_shuffle[[a, b], :] = matrix_to_shuffle[[b, a], :]
+        return matrix_to_shuffle
 
     def _partial_shuffle_vector(self, vector_to_shuffle, shuffle_reps) -> list:
         for _ in range(shuffle_reps):
@@ -241,11 +236,13 @@ class Network_Matrix:
     
     def _shuffle_preferences_start_mixed(self): 
         np.random.seed(self.shuffle_homophily_seed)#Set seed for shuffle
+
         low_carbon_preference_matrix_unsorted =  deepcopy(self.low_carbon_preference_matrix)
         identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)
         zipped_lists = zip(identity_unsorted, low_carbon_preference_matrix_unsorted)
-        sorted_lists = sorted(zipped_lists, key=lambda x: x[0])
-        _ , sorted_preferences = zip(*sorted_lists)
+        sorted_lists = sorted(zipped_lists, key=lambda x: x[0])#order by the identity 
+        _ , sorted_preferences_tuple = zip(*sorted_lists)
+        sorted_preferences = np.asarray(sorted_preferences_tuple)
 
         if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
             sorted_preferences = sorted_preferences[::-1]
@@ -254,9 +251,11 @@ class Network_Matrix:
         elif (self.network_type == "SBM"):
             pass
         
-        partial_shuffle_matrix = self._partial_shuffle_matrix(sorted_preferences, self.shuffle_reps)#partial shuffle of the list
-        
+        partial_shuffle_matrix = self._partial_shuffle_matrix(sorted_preferences, self.shuffle_reps_homophily)#partial shuffle of the list
+
         return partial_shuffle_matrix
+    
+    #################################################################################################
     
     def _update_carbon_price(self):
         if self.t == self.burn_in_duration:

@@ -38,33 +38,6 @@ def main(
     fileName = produce_name_datetime(root)
     #pyperclip.copy(fileName)
     print("fileName:", fileName)
-    """
-    params_list = []
-    #case1
-    base_params["homophily_state"] = 0
-    base_params["coherance_state"] = 0
-    #params_list.append(deepcopy(base_params))
-    params_seeds = produce_param_list_only_stochastic_homo(base_params)
-    params_list.extend(params_seeds)
-    #case2
-    base_params["homophily_state"] = 1
-    base_params["coherance_state"] = 0
-    #params_list.append(deepcopy(base_params))
-    params_seeds = produce_param_list_only_stochastic_homo(base_params)
-    params_list.extend(params_seeds)
-    #case3
-    base_params["homophily_state"] = 0
-    base_params["coherance_state"] = 1
-    #params_list.append(deepcopy(base_params))
-    params_seeds = produce_param_list_only_stochastic_homo(base_params)
-    params_list.extend(params_seeds)
-    #case4
-    base_params["homophily_state"] = 1
-    base_params["coherance_state"] = 1
-    #params_list.append(deepcopy(base_params))
-    params_seeds = produce_param_list_only_stochastic_homo(base_params)
-    params_list.extend(params_seeds)
-    """
 
     homophily_values = [0, 0.9, 1]
     coherance_values = [0, 0.9, 1]
