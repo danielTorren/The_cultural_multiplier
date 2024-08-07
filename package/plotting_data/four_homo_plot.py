@@ -96,22 +96,63 @@ def plot_identity_matrix_density_four_array_seed(fileName, data_array, dpi_save,
     f = plotName + "/plot_identity_timeseries_matrix_density_four_array_seed"
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
+def plot_identity_matrix_density_four_histograms_direct(fileName, h_list, dpi_save, latex_bool=False):
+    fig, axs = plt.subplots(2, 2, figsize=(12, 12))
+    y_title = r"Identity, $I_{t,n}$"
+    
+    colors = [(1, 1, 1), (0, 0, 1)]  # White to blue
+    n_bins = 100  # Discretize the interpolation into bins
+    cmap_name = 'white_to_blue'
+    custom_cmap = LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bins)
+
+    titles = [
+        "Homophily 0, Coherence 0",
+        "Homophily 0, Coherence 1",
+        "Homophily 1, Coherence 0",
+        "Homophily 1, Coherence 1"
+    ]
+    
+    for i in range(4):
+        ax = axs[i // 2, i % 2]
+        
+        # Extract the precomputed histogram
+        h = h_list[i]
+        
+        # Plot the histogram
+        X, Y = np.meshgrid(h[1], h[2])
+        ax.pcolormesh(X, Y, h[0].T, cmap=custom_cmap, shading='auto')
+        
+        # Set the labels
+        ax.set_xlabel(r"Time")
+        ax.set_ylabel(r"%s" % y_title)
+        ax.set_title(titles[i])
+        
+        # Add color bar to indicate the density
+        plt.colorbar(ax.pcolormesh(X, Y, h[0].T, cmap=custom_cmap, shading='auto'), ax=ax, label='Density')
+    
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_identity_timeseries_matrix_density_four_direct"
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     dpi_save = 600,
     ) -> None: 
 
-    data_array = load_object(fileName + "/Data", "data_array")
+    #data_array = load_object(fileName + "/Data", "data_array")
+    h_list = load_object(fileName + "/Data", "h_list")
 
-    bin_num= 50
+    #bin_num= 50
     #plot_identity_matrix_density_four_array(fileName, data_array, dpi_save, bin_num)
-    plot_identity_matrix_density_four_array_seed(fileName, data_array, dpi_save, bin_num)
+    #plot_identity_matrix_density_four_array_seed(fileName, data_array, dpi_save, bin_num)
+    plot_identity_matrix_density_four_histograms_direct(fileName, h_list, dpi_save)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/homo_four_11_49_11__07_08_2024",
+        fileName = "results/homo_four_12_28_42__07_08_2024",
     )
 
 

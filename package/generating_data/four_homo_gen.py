@@ -5,6 +5,7 @@ from package.resources.utility import (
     save_object, 
     produce_name_datetime
 )
+import numpy as np
 
 def produce_param_list_only_stochastic_homo(params: dict) -> list[dict]:
     seeds_labels = ["shuffle_homophily_seed", "shuffle_coherance_seed"]
@@ -58,9 +59,30 @@ def main(
 
     Data_array = Data_array_flat.reshape(4, base_params["seed_reps"],time_steps, base_params["N"] )
 
+    seeds, time_steps, N = Data_array.shape[1], Data_array.shape[2], Data_array.shape[3]
+    history_time = np.arange(time_steps)  # Assuming the same time steps for all data
+    time_tile = np.tile(history_time, N * seeds)
+
+    bin_num = 100
+
+    h_list = []
+
+    for i in range(4):
+        data_subfigure = Data_array[i]
+        data_trans = data_subfigure.transpose(0, 2, 1)
+        combined_data = data_trans.reshape(seeds * N, time_steps)
+        data_flat = combined_data.flatten()
+
+        h = np.histogram2d(time_tile, data_flat, bins=[time_steps, bin_num])
+    
+        h_list.append(h)
+
     createFolder(fileName)
-    save_object(Data_array, fileName + "/Data", "Data_array")
+
+    #save_object(Data_array, fileName + "/Data", "Data_array")
+
     save_object(base_params, fileName + "/Data", "base_params")
+    save_object(h_list, fileName + "/Data", "h_list")
 
     return fileName
 
@@ -83,7 +105,7 @@ if __name__ == '__main__':
     "imitation_state": "consumption",
     "vary_seed_state": "multi",
     "alpha_change_state": "dynamic_identity_determined_weights",
-    "seed_reps": 100,
+    "seed_reps": 100,#100,
     "network_structure_seed": 1, 
     "preferences_seed": 10, 
     "shuffle_homophily_seed": 20,
