@@ -18,6 +18,18 @@ def produce_param_list_only_stochastic_homo(params: dict) -> list[dict]:
         )  
     return params_list
 
+def generate_params_list(base_params, produce_param_list_only_stochastic_homo, homophily_values, coherance_values):
+    params_list = []
+    
+    for homophily_state in homophily_values:
+        for coherance_state in coherance_values:
+            base_params["homophily_state"] = homophily_state
+            base_params["coherance_state"] = coherance_state
+            params_seeds = produce_param_list_only_stochastic_homo(base_params)
+            params_list.extend(params_seeds)
+    
+    return params_list
+
 def main(
     base_params
 ) -> str: 
@@ -26,7 +38,7 @@ def main(
     fileName = produce_name_datetime(root)
     #pyperclip.copy(fileName)
     print("fileName:", fileName)
-
+    """
     params_list = []
     #case1
     base_params["homophily_state"] = 0
@@ -52,12 +64,20 @@ def main(
     #params_list.append(deepcopy(base_params))
     params_seeds = produce_param_list_only_stochastic_homo(base_params)
     params_list.extend(params_seeds)
+    """
+
+    homophily_values = [0, 0.9, 1]
+    coherance_values = [0, 0.9, 1]
+
+    total_reps = len(homophily_values)*len(coherance_values)
+
+    params_list = generate_params_list(base_params, produce_param_list_only_stochastic_homo, homophily_values, coherance_values)
 
     print("Total runs:",len(params_list))
     Data_array_flat = identity_timeseries_run(params_list)
     time_steps = Data_array_flat[0].shape[0]
 
-    Data_array = Data_array_flat.reshape(4, base_params["seed_reps"],time_steps, base_params["N"] )
+    Data_array = Data_array_flat.reshape(total_reps, base_params["seed_reps"],time_steps, base_params["N"] )
 
     seeds, time_steps, N = Data_array.shape[1], Data_array.shape[2], Data_array.shape[3]
     history_time = np.arange(time_steps)  # Assuming the same time steps for all data
@@ -67,13 +87,13 @@ def main(
 
     h_list = []
 
-    for i in range(4):
+    for i in range(total_reps):
         data_subfigure = Data_array[i]
         data_trans = data_subfigure.transpose(0, 2, 1)
         combined_data = data_trans.reshape(seeds * N, time_steps)
         data_flat = combined_data.flatten()
 
-        h = np.histogram2d(time_tile, data_flat, bins=[time_steps, bin_num])
+        h = np.histogram2d(time_tile, data_flat, bins=[time_steps, bin_num], density=True)
     
         h_list.append(h)
 
@@ -83,6 +103,8 @@ def main(
 
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(h_list, fileName + "/Data", "h_list")
+    save_object(homophily_values, fileName + "/Data", "homophily_values")
+    save_object(coherance_values, fileName + "/Data", "coherance_values")
 
     return fileName
 
