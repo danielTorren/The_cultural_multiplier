@@ -1,7 +1,5 @@
 """Generate data for sensitivity analysis
 
-
-
 Created: 10/10/2022
 """
 
@@ -13,11 +11,9 @@ import numpy.typing as npt
 from package.resources.utility import (
     createFolder,
     save_object,
-    produce_name_datetime,
-    produce_param_list_stochastic
+    produce_name_datetime
 )
 from package.resources.run import parallel_run_sa
-from package.plotting_data import sensitivity_analysis_plot
 
 # modules
 def generate_problem(
@@ -221,8 +217,3 @@ if __name__ == '__main__':
     VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
     calc_second_order = True
     )
-
-    RUN_PLOT = 0
-
-    if RUN_PLOT:
-        sensitivity_analysis_plot.main(fileName = fileName_Figure_6)

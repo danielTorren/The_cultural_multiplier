@@ -25,7 +25,7 @@
     "phi_lower": 0.02, 
     "homophily_state": 0,
     "coherance_state": 0.9,
-    "BA_nodes": 160,
+    "BA_density":0.1,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2,

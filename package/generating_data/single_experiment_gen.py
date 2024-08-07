@@ -39,7 +39,7 @@ if __name__ == '__main__':
     
     base_params = {
     "phi_lower": 0.03,
-    "network_type": "SW",
+    "network_type": "BA",
     "carbon_price_increased_lower": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
@@ -71,8 +71,7 @@ if __name__ == '__main__':
     "init_carbon_price": 0, 
     "homophily_state": 0,
     "coherance_state": 1,#0.95,
-    "BA_nodes": 160,
-    #"BA_density":0.1,
+    "BA_density":0.1,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2,

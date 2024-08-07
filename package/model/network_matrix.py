@@ -109,30 +109,19 @@ class Network_Matrix:
 
         elif self.network_type == "BA":
             self.BA_green_or_brown_hegemony = self.parameters["BA_green_or_brown_hegemony"]
-            #self.BA_density = int(self.parameters["BA_density"])
-            self.BA_nodes = int(self.parameters["BA_nodes"])
-            #self.BA_nodes = self._calculate_m_BA(self.BA_density, self.N)
+            self.BA_density = self.parameters["BA_density"]
+            #self.BA_nodes = int(self.parameters["BA_nodes"])
+            self.BA_nodes = int(round(self._calculate_m_BA()))
+            print("self.BA_nodes",  self.BA_nodes)
             #print("self.BA_nodes",self.BA_nodes)
             self.SBM_block_heterogenous_individuals_substitutabilities_state = 0
-    """
-    def _calculate_m_BA(self,rho, n):
-        term1 = n
-        term2 = (n**2 * (1 - 2 * rho) + 2 * rho * n)**(0.5)
-        
-        m1 = (term1 + term2) / 2
-        m2 = (term1 - term2) / 2
-        print(m1,m2)
-        quit()
-        # Ensure m is non-negative
-        if m1 >= 0 and m2 >= 0:
-            return m1, m2  # Return both valid solutions
-        elif m1 >= 0:
-            return m1
-        elif m2 >= 0:
-            return m2
-        else:
-            raise ValueError("No valid solution for m.")
-    """
+
+    def _calculate_m_BA(self):
+        term1 = 2 * self.N - 1
+        term2 = ((2 * self.N - 1) ** 2 - 4 * self.BA_density * self.N * (self.N - 1))**0.5
+        result = (term1 - term2) / 2
+        return result
+
     def _initialize_time_params(self):
         self.t = 0
         self.burn_in_duration = self.parameters["burn_in_duration"]
@@ -206,6 +195,8 @@ class Network_Matrix:
         #self.weighting_matrix = normalize(self.adjacency_matrix, axis=1, norm='l1')
         self.weighting_matrix = self._normlize_matrix(self.sparse_adjacency_matrix)
         self.network_density = nx.density(self.network)
+        print("self.network_density", self.network_density)
+        quit()
     
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
         np.random.seed(self.preferences_seed)#For inital construction set a seed

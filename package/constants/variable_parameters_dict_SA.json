@@ -3,6 +3,7 @@
     "carbon_price_increased_lower": {"property":"carbon_price_increased_lower","min":-0.5,"max": 5, "round":0},
     "carbon_price_increased_upper": {"property":"carbon_price_increased_upper","min":-0.5,"max": 5, "round":0},
     "M": {"property":"M","min":2,"max": 50, "round":1},
+    "N": {"property":"N","min":100,"max": 10000, "round":1},
     "sector_substitutability":{"property":"sector_substitutability","min":1.01,"max": 10, "round":0},
     "low_carbon_substitutability_lower": {"property":"low_carbon_substitutability_lower","min":1.01,"max":10, "round":0},
     "low_carbon_substitutability_upper": {"property":"low_carbon_substitutability_upper","min":1.01,"max":10, "round":0},

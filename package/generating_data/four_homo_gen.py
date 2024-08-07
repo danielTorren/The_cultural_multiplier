@@ -144,7 +144,7 @@ if __name__ == '__main__':
     "clipping_epsilon_init_preference": 1e-5, 
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
-    "BA_nodes": 160,
+    "BA_density":0.1,
     #"BA_density":0.1,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
