@@ -1,12 +1,10 @@
 # imports
-from copy import deepcopy
 from package.resources.run import  identity_timeseries_run
 from package.resources.utility import (
     createFolder, 
     save_object, 
     produce_name_datetime
 )
-from package.plotting_data import four_homo_plot
 
 def produce_param_list_only_stochastic_homo(params: dict) -> list[dict]:
     seeds_labels = ["shuffle_homophily_seed", "shuffle_coherance_seed"]
@@ -113,8 +111,3 @@ if __name__ == '__main__':
     }
 
     fileName = main(base_params=base_params)
-
-    RUN_PLOT = 1
-
-    if RUN_PLOT:
-        four_homo_plot.main(fileName = fileName)
