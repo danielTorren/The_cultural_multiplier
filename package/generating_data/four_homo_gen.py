@@ -25,7 +25,7 @@ def main(
 
     root = "homo_four"
     fileName = produce_name_datetime(root)
-    pyperclip.copy(fileName)
+    #pyperclip.copy(fileName)
     print("fileName:", fileName)
 
     params_list = []
