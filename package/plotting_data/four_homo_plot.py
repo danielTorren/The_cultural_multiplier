@@ -48,7 +48,7 @@ def plot_identity_matrix_density_four(fileName, data_list, dpi_save, bin_num, la
     plotName = fileName + "/Plots"
     f = plotName + "/plot_identity_timeseries_matrix_density_four"
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
-    
+
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     dpi_save = 600,
@@ -65,7 +65,7 @@ def main(
 
     
     #plot_identity_matrix(fileName, Data, dpi_save)
-    bin_num= 200
+    bin_num= 50
     plot_identity_matrix_density_four(fileName, Data_list, dpi_save, bin_num)
 
 

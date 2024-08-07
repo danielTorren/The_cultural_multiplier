@@ -91,6 +91,22 @@ def emissions_parallel_run(
     return np.asarray(emissions_list)
 ###################################################################################################
 
+def generate_identity_timeseries(params):
+    data = generate_data(params)
+    return data.history_identity_vec
+
+def identity_timeseries_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_identity_timeseries(i) for i in params_dict]
+    identity_timeseries_list = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_identity_timeseries)(i) for i in params_dict
+    )
+    return np.asarray(identity_timeseries_list)
+
+
+###################################################################################################
 def generate_emissions_stock_res_sectors(params):
     data = generate_data(params)
     return data.total_carbon_emissions_stock, data.total_carbon_emissions_stock_sectors
