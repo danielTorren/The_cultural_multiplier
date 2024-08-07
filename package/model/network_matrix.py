@@ -112,7 +112,7 @@ class Network_Matrix:
             self.BA_density = self.parameters["BA_density"]
             #self.BA_nodes = int(self.parameters["BA_nodes"])
             self.BA_nodes = int(round(self._calculate_m_BA()))
-            print("self.BA_nodes",  self.BA_nodes)
+            #print("self.BA_nodes",  self.BA_nodes)
             #print("self.BA_nodes",self.BA_nodes)
             self.SBM_block_heterogenous_individuals_substitutabilities_state = 0
 
@@ -195,8 +195,8 @@ class Network_Matrix:
         #self.weighting_matrix = normalize(self.adjacency_matrix, axis=1, norm='l1')
         self.weighting_matrix = self._normlize_matrix(self.sparse_adjacency_matrix)
         self.network_density = nx.density(self.network)
-        print("self.network_density", self.network_density)
-        quit()
+        #print("self.network_density", self.network_density)
+        #quit()
     
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
