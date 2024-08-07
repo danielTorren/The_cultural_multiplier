@@ -1,14 +1,6 @@
-"""Runs a single simulation to produce data which is saved
-
-A module that use dictionary of data for the simulation run. The single shot simulztion is run
-for a given initial set seed.
-
-
-
-Created: 10/10/2022
-"""
 # imports
-from package.resources.run import generate_data
+from copy import deepcopy
+from package.resources.run import  identity_timeseries_run
 from package.resources.utility import (
     createFolder, 
     save_object, 
@@ -16,6 +8,17 @@ from package.resources.utility import (
 )
 from package.plotting_data import four_homo_plot
 import pyperclip
+
+def produce_param_list_only_stochastic_homo(params: dict) -> list[dict]:
+    seeds_labels = ["shuffle_homophily_seed", "shuffle_coherance_seed"]
+    params_list = []
+    for j in range(params["seed_reps"]):
+        for k, label in enumerate(seeds_labels):
+            params[label] = int(10*k + j + 1)
+        params_list.append(
+            params.copy()
+        )  
+    return params_list
 
 def main(
     base_params
@@ -26,27 +29,40 @@ def main(
     pyperclip.copy(fileName)
     print("fileName:", fileName)
 
+    params_list = []
     #case1
     base_params["homophily_state"] = 0
     base_params["coherance_state"] = 0
-    Data1 = generate_data(base_params)  # run the simulation
+    #params_list.append(deepcopy(base_params))
+    params_seeds = produce_param_list_only_stochastic_homo(base_params)
+    params_list.extend(params_seeds)
     #case2
     base_params["homophily_state"] = 1
     base_params["coherance_state"] = 0
-    Data2 = generate_data(base_params)  # run the simulation
+    #params_list.append(deepcopy(base_params))
+    params_seeds = produce_param_list_only_stochastic_homo(base_params)
+    params_list.extend(params_seeds)
     #case3
     base_params["homophily_state"] = 0
     base_params["coherance_state"] = 1
-    Data3 = generate_data(base_params)  # run the simulation
+    #params_list.append(deepcopy(base_params))
+    params_seeds = produce_param_list_only_stochastic_homo(base_params)
+    params_list.extend(params_seeds)
     #case4
     base_params["homophily_state"] = 1
     base_params["coherance_state"] = 1
-    Data4 = generate_data(base_params)  # run the simulation
+    #params_list.append(deepcopy(base_params))
+    params_seeds = produce_param_list_only_stochastic_homo(base_params)
+    params_list.extend(params_seeds)
 
-    Data_list = [Data1, Data2, Data3, Data4]
+    print("Total runs:",len(params_list))
+    Data_array_flat = identity_timeseries_run(params_list)
+    time_steps = Data_array_flat[0].shape[0]
+
+    Data_array = Data_array_flat.reshape(4, base_params["seed_reps"],time_steps, base_params["N"] )
+
     createFolder(fileName)
-    save_object(Data_list, fileName + "/Data", "Data_list")
-    
+    save_object(Data_array, fileName + "/Data", "Data_array")
     save_object(base_params, fileName + "/Data", "base_params")
 
     return fileName
@@ -54,6 +70,8 @@ def main(
 if __name__ == '__main__':
     
     base_params = {
+    "preferences_seed": 72,
+    "network_structure_seed": 89, 
     "phi_lower": 0.03,
     "network_type": "SW",
     "carbon_price_increased_lower": 0,
@@ -68,7 +86,7 @@ if __name__ == '__main__':
     "imitation_state": "consumption",
     "vary_seed_state": "multi",
     "alpha_change_state": "dynamic_identity_determined_weights",
-    "seed_reps": 25,
+    "seed_reps": 100,
     "network_structure_seed": 1, 
     "preferences_seed": 10, 
     "shuffle_homophily_seed": 20,
