@@ -7,7 +7,6 @@ from package.resources.utility import (
     produce_name_datetime
 )
 from package.plotting_data import four_homo_plot
-import pyperclip
 
 def produce_param_list_only_stochastic_homo(params: dict) -> list[dict]:
     seeds_labels = ["shuffle_homophily_seed", "shuffle_coherance_seed"]
