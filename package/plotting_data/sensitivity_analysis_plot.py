@@ -285,6 +285,21 @@ def plot_second_order_matrix(fileName, data_list, names, N_samples, order, netwo
     #fig.savefig(f, dpi=600, format="eps")
     fig.savefig(f_png, dpi=600, format="png")
 
+def replace_nan_with_neighbors_avg(arr):
+    for i in range(len(arr)):
+        if np.isnan(arr[i]):
+            # Get the left and right neighbors
+            left = arr[i - 1] if i - 1 >= 0 else np.nan
+            right = arr[i + 1] if i + 1 < len(arr) else np.nan
+            
+            # Replace NaN with the average of left and right neighbors
+            if np.isnan(left):
+                arr[i] = right
+            elif np.isnan(right):
+                arr[i] = left
+            else:
+                arr[i] = (left + right) / 2
+    return arr
 
 def main(
     fileName = "results\SA_AV_reps_5_samples_15360_D_vars_13_N_samples_1024",
@@ -304,8 +319,20 @@ def main(
     Y_emissions_stock_SBM = load_object(fileName + "/Data", "Y_emissions_stock_SBM")
     Y_emissions_stock_BA = load_object(fileName + "/Data", "Y_emissions_stock_BA")
 
+
+    Y_emissions_stock_SW = replace_nan_with_neighbors_avg(Y_emissions_stock_SW)
+    Y_emissions_stock_SBM = replace_nan_with_neighbors_avg(Y_emissions_stock_SBM)
+    Y_emissions_stock_BA = replace_nan_with_neighbors_avg(Y_emissions_stock_BA)
+
+    #print(len(Y_emissions_stock_SW))
+    #num_nans = np.isnan(Y_emissions_stock_SW).sum()
+
+    #print("Number of NaN values:", num_nans)
+    #quit()
     N_samples = load_object(fileName + "/Data","N_samples" )
     calc_second_order = load_object(fileName + "/Data", "calc_second_order")
+    #calc_second_order = False
+
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
 
     if calc_second_order:
@@ -341,10 +368,14 @@ def main(
     data_list_first = [data_sa_dict_first_SW,  data_sa_dict_first_SBM, data_sa_dict_first_BA]
     data_list_total = [data_sa_dict_total_SW,  data_sa_dict_total_SBM, data_sa_dict_total_BA]
 
+    #print(data_sa_dict_first_SW)
+    #quit()
     multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_first, plot_outputs, titles, N_samples, "First", network_titles ,latex_bool = latex_bool)
     multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_total, plot_outputs, titles, N_samples, "Total", network_titles ,latex_bool = latex_bool)
     #print(titles)
     #quit()
+
+    """
     if calc_second_order:
         #print("variable_parameters_dict", variable_parameters_dict)
 
@@ -356,7 +387,7 @@ def main(
 
         data_list_second = [data_sa_dict_second_SW,  data_sa_dict_second_SBM, data_sa_dict_second_BA]
         plot_second_order_matrix(fileName, data_list_second,  titles, N_samples, "second", network_titles)
-    
+    """
     #TOTAL I DONT THINK WORKS AT THE MOMENT
     #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_total, plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
 
@@ -376,7 +407,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_BA_15_44_04__19_04_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
+        fileName="results/sensitivity_analysis_BA_15_30_40__08_08_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},
@@ -386,15 +417,34 @@ if __name__ == '__main__':
             "Sector min carbon price, $\\tau_{m,min}$",
             "Sector max carbon price, $\\tau_{m,max}$",
             "Number of individuals, $N$",
+            "Number of sectors, $M$",
             "Sector substitutability, $\\nu$",
             "Sector min low carbon substitutability, $\\sigma_{m, min}$",
             "Sector max low carbon substitutability, $\\sigma_{m, max}$",
             "Confirmation bias, $\\theta$",
             "Homophily state, $h$",
+            "Coherance state, $c$",
             "Initial environmental identity Beta, $a$ ",
             "Initial environmental identity Beta, $b$ ",
-            "Initial preferences standard deviation, $\\sigma_{A}$",
+            #"Initial preferences standard deviation, $\\sigma_{A}$",
         ]
     )
+"""
+{
+    "phi_lower": {"property":"phi_lower","min":0.001,"max": 1.0, "round":0},
+    "carbon_price_increased_lower": {"property":"carbon_price_increased_lower","min":0,"max": 2, "round":0},
+    "carbon_price_increased_upper": {"property":"carbon_price_increased_upper","min":0,"max": 2, "round":0},
+    "M": {"property":"M","min":1,"max": 50, "round":1},
+    "N": {"property":"N","min":100,"max": 3000, "round":1},
+    "sector_substitutability":{"property":"sector_substitutability","min":1.05,"max": 8, "round":0},
+    "low_carbon_substitutability_lower": {"property":"low_carbon_substitutability_lower","min":1.05,"max":8, "round":0},
+    "low_carbon_substitutability_upper": {"property":"low_carbon_substitutability_upper","min":1.05,"max":8, "round":0},
+    "confirmation_bias": {"property":"confirmation_bias","min":0,"max": 100, "round":0},
+    "homophily_state":{"property":"homophily_state","min":0,"max": 1, "round":0},
+    "coherance_state":{"property":"coherance_state","min":0,"max": 1, "round":0},
+    "a_preferences": {"property":"a_preferences","min":0.1,"max": 8, "round":0},
+    "b_preferences": {"property":"b_preferences","min":0.1,"max": 8, "round":0}
+}
+"""
 
 

@@ -182,7 +182,7 @@ def main(
 
     print("Total runs: ", len(params_list_sa))
 
-    root = "sensitivity_analysis_" + base_params["network_type"]
+    root = "sensitivity_analysis"
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
@@ -212,7 +212,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_6 = main(
-    N_samples = 256,
+    N_samples = 1024,
     BASE_PARAMS_LOAD = "package/constants/base_params_sensitivity.json",
     VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
     calc_second_order = True
