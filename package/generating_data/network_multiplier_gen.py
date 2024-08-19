@@ -266,7 +266,7 @@ def main(
     fileName,
     tau_lower_bound = -0.8, 
     tau_upper_bound = 50,
-    total_range_runs = 100
+    total_range_runs = 1000
 ) -> None:
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
 
