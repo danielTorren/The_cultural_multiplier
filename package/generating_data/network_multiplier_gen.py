@@ -220,7 +220,9 @@ def calc_required_static_carbon_tax_multi_seeds(
     )
     return tau_list, emissions_list
 
-def calc_M_vector(tau_social_vec ,tau_static_vec, emissions_social, emissions_static_full):
+def calc_predicted_reverse_tau_static(tau_static_vec, emissions_social, emissions_static_full):
+    #print(tau_social_vec.shape ,tau_static_vec.shape, emissions_social.shape, emissions_static_full.shape)
+    #quit()
     #I WANT TO INTERPOLATE WHAT THE TAU VALUES OF THE STATIC ARE THAT GIVE THE SOCIAL
 
     #WHY DOES CUBIC SPLINES REQUIRE INCREASIGN VALUES??
@@ -228,27 +230,35 @@ def calc_M_vector(tau_social_vec ,tau_static_vec, emissions_social, emissions_st
     reverse_tau_static_vec = tau_static_vec[::-1]
 
     reverse_cs_static_input_emissions_output_tau = CubicSpline(reverse_emissions_static_full, reverse_tau_static_vec)# given the emissions what is the predicted tau
-    predicted_reverse_tau_static = reverse_cs_static_input_emissions_output_tau(emissions_social)
+    predicted_tau_static = reverse_cs_static_input_emissions_output_tau(emissions_social)
 
-    trans_predicted_reverse_tau_static = np.transpose(predicted_reverse_tau_static,(3,0,1,2))
-    
-    trans_M_vals = 1 - tau_social_vec/trans_predicted_reverse_tau_static
+    #print("tau_social_vec",tau_social_vec)
+    #print("predicted_tau_static", predicted_tau_static[0][0])
+    #trans_M_vals = 1 - tau_social_vec/predicted_tau_static
 
-    M_vals = np.transpose(trans_M_vals,(1,2,3,0))
+    #print("trans_M_vals", trans_M_vals[0][0])
+    #quit()
 
-    return M_vals
+    return predicted_tau_static
 
 def calc_M_vector_seeds(tau_social_vec ,tau_static_list, emissions_social, emissions_static_list):
 
-    e_tau_list = zip(tau_static_list, emissions_static_list)
+    emissions_social_trans = np.transpose(emissions_social,(3,0,1,2))#move seed to front
+
+    e_tau_list = zip(emissions_social_trans, tau_static_list, emissions_static_list)
     num_cores = multiprocessing.cpu_count()
-    #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
-    M_vals = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(calc_M_vector)(tau_social_vec ,tau_vec, emissions_social, emissions_vec) for tau_vec, emissions_vec in e_tau_list
+    #predicted_reverse_tau_static = [calc_predicted_reverse_tau_static(tau_social_vec,tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list]
+    predicted_reverse_tau_static = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(calc_predicted_reverse_tau_static)(tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list
     )
-    return np.asarray(M_vals)
+    predicted_reverse_tau_static_arr = np.asarray(predicted_reverse_tau_static)
 
+    trans_M_vals = 1 - tau_social_vec/predicted_reverse_tau_static_arr
 
+    M_vals = np.transpose(trans_M_vals,(1,2,3,0))#move seed to back
+    #print(M_vals.shape)
+    #quit()
+    return M_vals
 
 def reconstruct_seeds_list(params: dict) -> list[dict]:
     seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed"]
@@ -264,8 +274,8 @@ def reconstruct_seeds_list(params: dict) -> list[dict]:
 
 def main(
     fileName,
-    tau_lower_bound = -0.8, 
-    tau_upper_bound = 50,
+    tau_lower_bound = -0.95, 
+    tau_upper_bound = 100,
     total_range_runs = 1000
 ) -> None:
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
@@ -274,10 +284,11 @@ def main(
     emissions_BA = load_object(fileName + "/Data","emissions_BA")
     emissions_networks = np.asarray([emissions_SW[1:],emissions_SBM[1:],emissions_BA[1:]])# DONT INCLUDE FIXED PREFERCNCES
     #emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_BA])
-
+    #print(emissions_networks.shape)
+    #quit()
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
-
+    """
     #################################################################
     #Recover the seeds used
     seeds_data_dicts = reconstruct_seeds_list(base_params)
@@ -294,9 +305,9 @@ def main(
     print("CALCULATED DATA")
     save_object(tau_list_matrix,fileName + "/Data", "tau_list_matrix")
     save_object(emissions_list_matrix,fileName + "/Data", "emissions_list_matrix")
-
-    #tau_list_matrix = load_object(fileName + "/Data", "tau_list_matrix")
-    #emissions_list_matrix = load_object(fileName + "/Data", "emissions_list_matrix")
+    """
+    tau_list_matrix = load_object(fileName + "/Data", "tau_list_matrix")
+    emissions_list_matrix = load_object(fileName + "/Data", "emissions_list_matrix")
 
 
     list_M_networks = calc_M_vector_seeds(property_values_list , tau_list_matrix, emissions_networks, emissions_list_matrix)
