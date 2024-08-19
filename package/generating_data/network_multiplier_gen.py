@@ -288,7 +288,7 @@ def main(
     #quit()
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
-    """
+    #"""
     #################################################################
     #Recover the seeds used
     seeds_data_dicts = reconstruct_seeds_list(base_params)
@@ -305,9 +305,9 @@ def main(
     print("CALCULATED DATA")
     save_object(tau_list_matrix,fileName + "/Data", "tau_list_matrix")
     save_object(emissions_list_matrix,fileName + "/Data", "emissions_list_matrix")
-    """
-    tau_list_matrix = load_object(fileName + "/Data", "tau_list_matrix")
-    emissions_list_matrix = load_object(fileName + "/Data", "emissions_list_matrix")
+    #"""
+    #tau_list_matrix = load_object(fileName + "/Data", "tau_list_matrix")
+    #emissions_list_matrix = load_object(fileName + "/Data", "emissions_list_matrix")
 
 
     list_M_networks = calc_M_vector_seeds(property_values_list , tau_list_matrix, emissions_networks, emissions_list_matrix)
