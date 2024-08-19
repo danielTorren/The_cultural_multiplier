@@ -37,7 +37,8 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
 
     parameters["time_steps_max"] = parameters["burn_in_duration"] + parameters["carbon_price_duration"]
 
-    #print("tim step max", parameters["time_steps_max"],parameters["burn_in_duration"], parameters["carbon_price_duration"])
+    #print("tim step max", parameters["time_steps_max"])
+    #quit()
     social_network = Network(parameters)
 
     #### RUN TIME STEPS
@@ -123,21 +124,6 @@ def emissions_parallel_run_sectors(
     return np.asarray(emissions_list), np.asarray(emissions_list_sectors)
 
 ###################################################################################################
-
-def generate_emissions_stock_res_BLOCK(params):
-    data = generate_data(params)
-    return data.total_carbon_emissions_stock, data.total_carbon_emissions_stock_blocks
-
-def emissions_parallel_run_BLOCKS(
-        params_dict: list[dict]
-) -> npt.NDArray:
-    num_cores = multiprocessing.cpu_count()
-    #res = [generate_emissions_stock_res_BLOCK(i) for i in params_dict]
-    res = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res_BLOCK)(i) for i in params_dict)
-    emissions_list, emissions_list_blocks = zip(
-        *res
-    )
-    return np.asarray(emissions_list),np.asarray(emissions_list_blocks)
 
 def generate_emissions_stock_res_timeseries(params):
     data = generate_data(params)

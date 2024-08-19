@@ -87,17 +87,28 @@ def calculate_emissions(t_max, B, N, M, a, P_L, A_matrix, sigma_matrix, nu, P_H_
 ##################################################################################################
 #REVERSE Engineer the carbon price based on the final emissions
 
-def objective_function_to_min(tau, *args):
+def calculate_emissions(base_params):
+    reference_run = generate_data(base_params)
+    E = reference_run.total_carbon_emissions_stock
+    return E
 
-    emissions_target, t_max, B, N, M, a, P_L, A, sigma, nu, P_H_init = args
+def objective_function_to_min_full_run(tau, base_params):
 
-    E = calculate_emissions(t_max, B, N, M, a, P_L, A, sigma, nu, P_H_init,tau)
-    #print("E,tau: ",E, tau, emissions_target)
-    convergence_val = (emissions_target - E )#*1e9
+    #emissions_target, t_max, B, N, M, a, P_L, A, sigma, nu, P_H_init = args
+    #print("TIME", base_params["time_max"])
+    #quit()
+    #print("ATTEMPT!")
+    #print("tau", tau, type(tau))
     
-    return convergence_val
+    base_params["carbon_price_increased_lower"] = tau
 
-def newton_raphson_with_bounds(func, initial_guess, args_E,bounds = None, tol=1e-3, max_iter=100, delta=1e-3):
+    E = calculate_emissions(base_params)
+    #print("E", E)
+    #print("E,tau: ",E, tau, emissions_target)
+    convergence_val = (base_params["emissions_target"] - E )#*1e9
+    #print("convergence_val", convergence_val)
+    return convergence_val
+def newton_raphson_with_bounds(func, initial_guess, base_params, bounds = None, tol=1e-3, max_iter=100, delta=1e-3):
     """
     Newton-Raphson method for finding a root of a function without an explicit derivative with bounds.
 
@@ -113,6 +124,90 @@ def newton_raphson_with_bounds(func, initial_guess, args_E,bounds = None, tol=1e
     - root: The approximate root found by the method.
     - iterations: The number of iterations performed.
     """
+
+    # NOT SURE IM COMFORTABLE WITH THIS
+
+    root = initial_guess
+    iterations = 0
+    #print("START")
+    #print("strt root",root, type(root))
+    #print("BASE PARAMS",base_params)
+
+    #print("whhats being set", base_params["carbon_price_increased_lower"])
+    while abs(func(root, base_params)) > tol and iterations < max_iter:
+        #print("NEW TRY")
+        #print("Current root", root)
+        # Numerical approximation of the derivative
+        derivative_approx = (func(root + delta, base_params) - func(root - delta, base_params)) / (2 * delta)
+        #print("derivative_approx",derivative_approx)
+        # Update the root using Newton-Raphson formula
+        root = root - func(root, base_params)/derivative_approx
+        #print("new root", root, type(root))
+        # Check if the updated root is within bounds
+        if bounds is not None:
+            root = max(min(root, bounds[1]), bounds[0])
+
+        iterations += 1
+
+    #print(" root, iterations ", root, iterations )
+
+    return root, iterations
+
+def optimize_tau(base_params,initial_guess,tau_lower_bound, tau_upper_bound):
+
+    bounds = (tau_lower_bound, tau_upper_bound) #THESE ARE BOUNDS FOR THE TAX
+    #print("NEXT SEED")
+    root, iterations = newton_raphson_with_bounds(objective_function_to_min_full_run, initial_guess = initial_guess, base_params = base_params, bounds = bounds,tol=1e-6, max_iter=100, delta=1e-4)
+    #print("DONE")
+    return root
+
+def calc_tau_static_preference(emissions_min, emissions_max, base_params, initial_guess_min, initial_guess_max,tau_lower_bound, tau_upper_bound):
+    #TO ACHIEVE THE GREATEST EMISSIONS YOU NEED THE LOWEST TAU
+    base_params["emissions_target"] = emissions_max
+    min_tau = optimize_tau(base_params, initial_guess_min,tau_lower_bound, tau_upper_bound)
+    #print("MIN DONE")
+
+    base_params["emissions_target"] = emissions_min
+    #TO ACHIEVE THE LOWEST EMISSIONS YOU NEED THE GREATEST TAU
+    max_tau = optimize_tau(base_params, initial_guess_max,tau_lower_bound, tau_upper_bound)
+    #print("MAX DONE")
+
+    return min_tau, max_tau
+
+def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, tau_lower_bound, tau_upper_bound, initial_guess_min_tau,initial_guess_max_tau,total_range_runs):
+    #SET IT NOW AS THEN LATER CHANGE IT FOR THE REFERENCE RUN
+    #REFERENCE CASE, helps with the base values
+    #base_params["set_seed"] = 5# DOESNT MATTER AS VARYIGN THE NETWORK STRUCTURE, BUT NEEDS TO BE SET
+    base_params["carbon_price_increased"] = 0#this doesnt matter but needs to be set
+    base_params["carbon_price_increased_lower"] = 0#this doesnt matter but needs to be set
+
+    base_params["alpha_change_state"] = "fixed_preferences"#THIS IS THE IMPORTANT ONE!
+
+    min_tau, max_tau = calc_tau_static_preference(emissions_min, emissions_max, base_params,initial_guess_min_tau, initial_guess_max_tau,tau_lower_bound, tau_upper_bound)
+    #now calc the emissions over the appropriate range
+    total_tau_range_static = np.linspace(min_tau, max_tau, total_range_runs)
+
+    emissions_array_static_full = []
+    for tau in total_tau_range_static:
+        base_params["carbon_price_increased_lower"] = tau
+        E = calculate_emissions(base_params)
+        emissions_array_static_full.append(E)
+
+    return  total_tau_range_static, emissions_array_static_full
+
+#####################################################################################################
+"""
+def objective_function_to_min(tau, *args):
+
+    emissions_target, t_max, B, N, M, a, P_L, A, sigma, nu, P_H_init = args
+
+    E = calculate_emissions(t_max, B, N, M, a, P_L, A, sigma, nu, P_H_init,tau)
+    #print("E,tau: ",E, tau, emissions_target)
+    convergence_val = (emissions_target - E )#*1e9
+    
+    return convergence_val
+
+def newton_raphson_with_bounds(func, initial_guess, args_E,bounds = None, tol=1e-3, max_iter=100, delta=1e-3):
 
     # NOT SURE IM COMFORTABLE WITH THIS
 
@@ -160,6 +255,7 @@ def calc_tau_static_preference(emissions_min, emissions_max, t_max, B, N, M, a, 
 
     return min_tau, max_tau
 
+
 def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, tau_lower_bound, tau_upper_bound, initial_guess_min_tau,initial_guess_max_tau,total_range_runs):
     #SET IT NOW AS THEN LATER CHANGE IT FOR THE REFERENCE RUN
     t_max = base_params["carbon_price_duration"] + base_params["burn_in_duration"]
@@ -167,11 +263,13 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, t
     #REFERENCE CASE, helps with the base values
     #base_params["set_seed"] = 5# DOESNT MATTER AS VARYIGN THE NETWORK STRUCTURE, BUT NEEDS TO BE SET
     base_params["carbon_price_increased"] = 0#this doesnt matter but needs to be set
-    base_params["carbon_price_increased_lower"] = 0
-    base_params["carbon_price_duration"] = 0#just make them begin
-    base_params["alpha_change_state"] = "fixed_preferences"
+    base_params["carbon_price_increased_lower"] = 0#this doesnt matter but needs to be set
+    base_params["carbon_price_duration"] = 0#just make them begin then STOP!
+
+    base_params["alpha_change_state"] = "fixed_preferences"#THIS IS THE IMPORTANT ONE!
 
     reference_run = generate_data(base_params)  # run the simulation
+
 
     B, N, M, a, P_L, A, sigma, nu, P_H_init = (
         reference_run.individual_expenditure_array,
@@ -185,35 +283,44 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, t
         reference_run.prices_high_carbon_m
         )
 
+
     #print("RAN REFERENCE CASE")
 
     ###################################################################
 
     #THESE ARE THE BOUNDS OF WHAT I NEED TO ACHIEVE, I ASSUME THAT BECAUSE THE FUNCTION IS MONOTONICALLY DECREASING IN TAu then emissions between max and min value are interior?
     min_tau, max_tau = calc_tau_static_preference(emissions_min, emissions_max, t_max, B, N, M, a, P_L, A, sigma, nu,P_H_init, initial_guess_min_tau, initial_guess_max_tau,tau_lower_bound, tau_upper_bound)
+
     #now calc the emissions over the appropriate range
     total_tau_range_static = np.linspace(min_tau, max_tau, total_range_runs)
+
     emissions_array_static_full = [calculate_emissions(t_max, B, N, M, a, P_L, A, sigma, nu, P_H_init, tau) for tau in total_tau_range_static]
 
     return  total_tau_range_static, emissions_array_static_full
+"""
 
 def calc_required_static_carbon_tax_seeds(seeds_data, base_params, property_values_list, emissions_networks_seed,tau_lower_bound, tau_upper_bound, total_range_runs):
+    #print("seeds_data", seeds_data)
     base_params.update(seeds_data)
     emissions_min, emissions_max = np.amin(emissions_networks_seed), np.amax(emissions_networks_seed)
-    print("emissions_max", emissions_max)
+    #print("emissions_min, emissions_max", emissions_min, emissions_max)    
     initial_guess_min_tau, initial_guess_max_tau  = min(property_values_list), max(property_values_list)
-
+    print("MIN MAX DONE")
     tau_list, emissions_list = calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, tau_lower_bound, tau_upper_bound, initial_guess_min_tau, initial_guess_max_tau, total_range_runs)
 
+    print("SEED DONE")
     return  np.asarray(tau_list), np.asarray(emissions_list)
 
 def calc_required_static_carbon_tax_multi_seeds(
         seeds_data_list: list[dict], base_params, property_values_list, emissions_networks,tau_lower_bound, tau_upper_bound, total_range_runs
 ) -> npt.NDArray:
+    
     emissions_networks_trans = np.transpose(emissions_networks, (3,0,1,2))
     seeds_em_data_list = zip(seeds_data_list,emissions_networks_trans )
     num_cores = multiprocessing.cpu_count()
     #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
+    #res =  [calc_required_static_carbon_tax_seeds(seeds, base_params, property_values_list, emissions_networks_seed,tau_lower_bound, tau_upper_bound, total_range_runs) for seeds, emissions_networks_seed in seeds_em_data_list]
+
     res= Parallel(n_jobs=num_cores, verbose=10)(
         delayed(calc_required_static_carbon_tax_seeds)(seeds, base_params, property_values_list, emissions_networks_seed,tau_lower_bound, tau_upper_bound, total_range_runs) for seeds, emissions_networks_seed in seeds_em_data_list
     )
@@ -278,12 +385,14 @@ def main(
     fileName,
     tau_lower_bound = -0.95, 
     tau_upper_bound = 100,
-    total_range_runs = 1000
+    total_range_runs = 100
 ) -> None:
+    
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
-
     emissions_SBM = load_object(fileName + "/Data","emissions_SBM")
     emissions_BA = load_object(fileName + "/Data","emissions_BA")
+    #print("emissions_SW", emissions_SW.shape)
+    #quit()
     emissions_networks = np.asarray([emissions_SW[1:],emissions_SBM[1:],emissions_BA[1:]])# DONT INCLUDE FIXED PREFERCNCES
     #emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_BA])
     #print(emissions_networks.shape)
@@ -297,7 +406,7 @@ def main(
         #################################################################
         #Recover the seeds used
         seeds_data_dicts = reconstruct_seeds_list(base_params)
-        #print(seeds_data_dicts[0])
+        #print(seeds_data_dicts)
         #quit()
         print("TOTAL SEEDS: ", len(seeds_data_dicts))
         #print(seeds_data_dicts)

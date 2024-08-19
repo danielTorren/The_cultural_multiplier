@@ -15,27 +15,27 @@ class Network_Matrix:
         self._initialize_time_params()
         self._initialize_prices()
         self._initialize_social_learning()
-        self._initialize_network_homophily()
         self._initialize_expenditure()
         self._initialize_sector_preferences()
+        self._initialize_preference_coherance()
         self._initialize_intra_sector_preferences()
-        self._create_network()
         self._update_carbon_price()
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
-
-        if self.homophily_state != 0:
-            self.low_carbon_preference_matrix = self._shuffle_preferences_start_mixed()
-
         self._initialize_substitutabilities()
         self._calc_consumption()
+
+        #NETWORKS
+        if self.alpha_change_state != "fixed_preferences":
+            self._initialize_network_homophily()
+            self._create_network()
+            if self.homophily_state != 0:
+                self.low_carbon_preference_matrix = self._shuffle_preferences_start_mixed()
+        
         self._initialize_social_component()
         self.carbon_dividend_array = self._calc_carbon_dividend_array()
 
         self.total_carbon_emissions_stock = 0
         self.total_carbon_emissions_stock_sectors = np.zeros(self.M)
-        if self.network_type == "SBM":
-            self.group_indices_list = self._calc_group_ids()
-            self.total_carbon_emissions_stock_blocks = np.zeros(self.SBM_block_num)
 
     def _set_seeds(self):
         #seeds
@@ -78,23 +78,15 @@ class Network_Matrix:
         self.alpha_change_state = self.parameters["alpha_change_state"]
         self.vary_seed_state = self.parameters["vary_seed_state"]
         self.network_type = self.parameters["network_type"]
-        """
-        attr_keys = [
-            "save_timeseries_data_state", "compression_factor_state", "heterogenous_intrasector_preferences_state",
-            "heterogenous_carbon_price_state", "heterogenous_sector_substitutabilities_state", "heterogenous_phi_state",
-            "imitation_state", "alpha_change_state", "vary_seed_state", "network_type", "N", "M", "burn_in_duration",
-            "carbon_price_duration", "confirmation_bias", "clipping_epsilon_init_preference", "sector_substitutability"
-        ]
-        for key in attr_keys:
-            setattr(self, key, self.parameters[key])
-            """
+        
+        self.N = int(round(self.parameters["N"]))
+        self.M = int(round(self.parameters["M"]))
+
+        self.shuffle_intensity = 1.5
 
     ###################################################################################################
 
     def _initialize_network_params(self):
-        self.N = int(round(self.parameters["N"]))
-        self.M = int(round(self.parameters["M"]))
-
         if self.network_type == "SW":
             self.SW_network_density_input = self.parameters["SW_network_density"]
             self.SW_K = int(round((self.N - 1) * self.SW_network_density_input))
@@ -147,12 +139,13 @@ class Network_Matrix:
         else:
             self.phi_array = np.full(self.M, self.parameters["phi_lower"])
 
+    def _initialize_preference_coherance(self):
+        self.coherance_state = self.parameters["coherance_state"]
+        self.shuffle_reps_coherance = int(round((self.N * (1 - self.coherance_state)) ** self.shuffle_intensity))
+
     def _initialize_network_homophily(self):
         self.homophily_state = self.parameters["homophily_state"]
-        self.coherance_state = self.parameters["coherance_state"]
-        self.shuffle_intensity = 1.5
         self.shuffle_reps_homophily = int(round((self.N * (1 - self.homophily_state)) ** self.shuffle_intensity))
-        self.shuffle_reps_coherance = int(round((self.N * (1 - self.coherance_state)) ** self.shuffle_intensity))
 
     def _initialize_expenditure(self):
         self.individual_expenditure_array = np.full(self.N, 1 / self.N)
@@ -434,10 +427,6 @@ class Network_Matrix:
         for group_id in np.unique(self.block_id_list):
             group_indices_list.append(np.where(self.block_id_list == group_id)[0])
         return group_indices_list
-
-    def _calc_block_emissions(self):
-        block_flows = np.asarray([np.sum(self.H_m_matrix[group_indices]) for group_indices in self.group_indices_list])
-        return  block_flows
     
     def _set_up_time_series(self):
         self.history_weighting_matrix = [self.weighting_matrix]
@@ -482,10 +471,7 @@ class Network_Matrix:
             self.total_carbon_emissions_flow_sectors = self.H_m_matrix.sum(axis = 0)
             self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
             self.total_carbon_emissions_stock_sectors = self.total_carbon_emissions_stock_sectors + self.total_carbon_emissions_flow_sectors
-            if self.network_type == "SBM":
-                block_flows = self._calc_block_emissions()
-                self.total_carbon_emissions_stock_blocks = self.total_carbon_emissions_stock_blocks + block_flows# [self.total_carbon_emissions_stock_blocks[x]+ block_flows[x] for x in range(self.SBM_block_num)]
-        
+
         if self.save_timeseries_data_state:
             self.total_carbon_emissions_flow_vec = self.H_m_matrix.sum(axis = 1)
             if self.t == self.burn_in_duration + 1:#want to create it the step after burn in is finished
