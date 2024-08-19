@@ -348,24 +348,35 @@ def calc_predicted_reverse_tau_static(tau_static_vec, emissions_social, emission
     #quit()
     return predicted_tau_static
 
-def calc_M_vector_seeds(tau_social_vec ,tau_static_list, emissions_social, emissions_static_list):
+def calc_predicted_reverse_tau_static_seeds(tau_static_list, emissions_social, emissions_static_list):
 
     emissions_social_trans = np.transpose(emissions_social,(3,0,1,2))#move seed to front
 
     e_tau_list = zip(emissions_social_trans, tau_static_list, emissions_static_list)
+
     num_cores = multiprocessing.cpu_count()
     predicted_reverse_tau_static = [calc_predicted_reverse_tau_static(tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list]
     #predicted_reverse_tau_static = Parallel(n_jobs=num_cores, verbose=10)(
     #    delayed(calc_predicted_reverse_tau_static)(tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list
     #)
-    predicted_reverse_tau_static_arr = np.asarray(predicted_reverse_tau_static)
+    return  np.asarray(predicted_reverse_tau_static)
+
+def calc_M_vector_seeds(tau_social_vec ,predicted_reverse_tau_static_arr):
 
     trans_M_vals = 1 - tau_social_vec/predicted_reverse_tau_static_arr
 
     M_vals = np.transpose(trans_M_vals,(1,2,3,0))#move seed to back
-    #print(M_vals.shape)
-    #quit()
+
     return M_vals
+
+def calc_ratio_seeds(tau_social_vec,predicted_reverse_tau_static_arr):
+
+    trans_ratio_vals = tau_social_vec/predicted_reverse_tau_static_arr
+
+    ratio_vals = np.transpose(trans_ratio_vals,(1,2,3,0))#move seed to back
+
+    return ratio_vals
+
 
 def reconstruct_seeds_list(params: dict) -> list[dict]:
     seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed"]
@@ -398,7 +409,7 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
     
-    RUN = 1
+    RUN = 0
 
     if RUN: 
         #"""
@@ -425,9 +436,14 @@ def main(
         tau_list_matrix = load_object(fileName + "/Data", "tau_list_matrix")
         emissions_list_matrix = load_object(fileName + "/Data", "emissions_list_matrix")
 
-
-    list_M_networks = calc_M_vector_seeds(property_values_list , tau_list_matrix, emissions_networks, emissions_list_matrix)
+    predicted_reverse_tau_static = calc_predicted_reverse_tau_static_seeds( tau_list_matrix, emissions_networks, emissions_list_matrix)
+    list_M_networks = calc_M_vector_seeds(property_values_list , predicted_reverse_tau_static)
+    list_ratio_networks = calc_ratio_seeds(property_values_list , predicted_reverse_tau_static)
     save_object(list_M_networks,fileName + "/Data", "list_M_networks")
+
+    tau_static = np.transpose(predicted_reverse_tau_static,(1,2,3,0))#move seed to back
+    save_object(tau_static,fileName + "/Data", "tau_static")
+    save_object(list_ratio_networks,fileName + "/Data", "list_ratio_networks")
 
 if __name__ == '__main__':
     plots = main(
