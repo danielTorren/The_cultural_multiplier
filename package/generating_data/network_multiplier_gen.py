@@ -104,7 +104,7 @@ def objective_function_to_min_full_run(tau, base_params):
 
     E = calculate_emissions(base_params)
     #print("E", E)
-    #print("E,tau: ",E, tau, emissions_target)
+    print("E,tau: ",E, tau, base_params["emissions_target"])
     convergence_val = (base_params["emissions_target"] - E )#*1e9
     #print("convergence_val", convergence_val)
     return convergence_val
