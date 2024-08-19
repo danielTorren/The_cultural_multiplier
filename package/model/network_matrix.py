@@ -102,17 +102,14 @@ class Network_Matrix:
         elif self.network_type == "BA":
             self.BA_green_or_brown_hegemony = self.parameters["BA_green_or_brown_hegemony"]
             self.BA_density = self.parameters["BA_density"]
-            #self.BA_nodes = int(self.parameters["BA_nodes"])
-            self.BA_nodes = int(round(self._calculate_m_BA()))
-            #print("self.BA_nodes",  self.BA_nodes)
-            #print("self.BA_nodes",self.BA_nodes)
+            self.BA_nodes = self._calculate_nodes_BA()
             self.SBM_block_heterogenous_individuals_substitutabilities_state = 0
 
-    def _calculate_m_BA(self):
+    def _calculate_nodes_BA(self):
         term1 = 2 * self.N - 1
         term2 = ((2 * self.N - 1) ** 2 - 4 * self.BA_density * self.N * (self.N - 1))**0.5
-        result = (term1 - term2) / 2
-        return result
+        nodes = (term1 - term2) / 2
+        return int(round(nodes))
 
     def _initialize_time_params(self):
         self.t = 0
@@ -193,7 +190,12 @@ class Network_Matrix:
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
         preferences_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
+        print("self.N*self.M", self.N*self.M)
+        print("before clip", np.mean(preferences_beta))
+
         preferences_capped_uncoherant = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
+        #print("after clip", np.mean(preferences_capped_uncoherant))
+        quit()
         if self.coherance_state != 0:
             preferences_sorted = sorted(preferences_capped_uncoherant)#LIST IS NOW SORTED
             preferences_coherance = self._partial_shuffle_vector(np.asarray(preferences_sorted), self.shuffle_reps_coherance)
