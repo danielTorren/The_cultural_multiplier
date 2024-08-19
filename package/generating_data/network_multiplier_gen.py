@@ -396,7 +396,7 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
     
-    RUN = 0
+    RUN = 1
 
     if RUN: 
         #"""
