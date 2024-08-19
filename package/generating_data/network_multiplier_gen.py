@@ -106,9 +106,10 @@ def objective_function_to_min_full_run(tau, base_params):
     #print("E", E)
     
     convergence_val = (base_params["emissions_target"] - E )#*1e9
-    print("tau, E, tagge, convergence: ",tau, E, base_params["emissions_target"], convergence_val)
+    #print("tau, E, tagge, convergence: ",tau, E, base_params["emissions_target"], convergence_val)
     #print("convergence_val", convergence_val)
     return convergence_val
+
 def newton_raphson_with_bounds(func, initial_guess, base_params, bounds = None, tol=1e-3, max_iter=100, delta=1e-3):
     """
     Newton-Raphson method for finding a root of a function without an explicit derivative with bounds.
@@ -306,10 +307,10 @@ def calc_required_static_carbon_tax_seeds(seeds_data, base_params, property_valu
     emissions_min, emissions_max = np.amin(emissions_networks_seed), np.amax(emissions_networks_seed)
     #print("emissions_min, emissions_max", emissions_min, emissions_max)    
     initial_guess_min_tau, initial_guess_max_tau  = min(property_values_list), max(property_values_list)
-    print("MIN MAX DONE")
+    #print("MIN MAX DONE")
     tau_list, emissions_list = calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, tau_lower_bound, tau_upper_bound, initial_guess_min_tau, initial_guess_max_tau, total_range_runs)
 
-    print("SEED DONE")
+    #print("SEED DONE")
     return  np.asarray(tau_list), np.asarray(emissions_list)
 
 def calc_required_static_carbon_tax_multi_seeds(
