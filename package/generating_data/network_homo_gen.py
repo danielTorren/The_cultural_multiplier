@@ -37,7 +37,7 @@ def main(
     params_list_no_tau_SW = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
     #Low "homophily_state"
-    params["homophily_state"] = 0.5   
+    params["homophily_state"] = 0.8   
     params_list_low_tau_SW = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
     #High "homophily_state"
@@ -54,7 +54,7 @@ def main(
     params_list_no_tau_SBM = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
     #Low "homophily_state"
-    params["homophily_state"] = 0.5   
+    params["homophily_state"] = 0.8   
     params_list_low_tau_SBM = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
     #High "homophily_state"

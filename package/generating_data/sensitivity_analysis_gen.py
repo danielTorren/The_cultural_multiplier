@@ -205,6 +205,7 @@ def main(
     save_object(Y_emissions_stock[0], fileName + "/Data", "Y_emissions_stock_SW")
     save_object(Y_emissions_stock[1], fileName + "/Data", "Y_emissions_stock_SBM")
     save_object(Y_emissions_stock[2], fileName + "/Data", "Y_emissions_stock_BA")
+    save_object(Y_emissions_stock_reshape, fileName + "/Data", "Y_emissions_stock_reshape")
     save_object(N_samples , fileName + "/Data","N_samples")
     save_object(calc_second_order, fileName + "/Data","calc_second_order")
 

@@ -301,6 +301,18 @@ def replace_nan_with_neighbors_avg(arr):
                 arr[i] = (left + right) / 2
     return arr
 
+def replace_nan_with_interpolation(arr):
+    # Get the indices where the values are not NaN
+    not_nan_indices = np.where(~np.isnan(arr))[0]
+    
+    # Get the indices where the values are NaN
+    nan_indices = np.where(np.isnan(arr))[0]
+    
+    # Interpolate the NaN indices based on the not NaN values
+    arr[nan_indices] = np.interp(nan_indices, not_nan_indices, arr[not_nan_indices])
+    
+    return arr
+
 def main(
     fileName = "results\SA_AV_reps_5_samples_15360_D_vars_13_N_samples_1024",
     plot_outputs = ['emissions_stock'],
@@ -320,10 +332,22 @@ def main(
     Y_emissions_stock_BA = load_object(fileName + "/Data", "Y_emissions_stock_BA")
 
 
+    #num_nans = np.isnan( Y_emissions_stock_SW).sum()
+
+    #print("Number of NaNs in the array:", len(Y_emissions_stock_SW), num_nans, (num_nans/len(Y_emissions_stock_SW))*100 )
+    #quit()
+    """
     Y_emissions_stock_SW = replace_nan_with_neighbors_avg(Y_emissions_stock_SW)
     Y_emissions_stock_SBM = replace_nan_with_neighbors_avg(Y_emissions_stock_SBM)
     Y_emissions_stock_BA = replace_nan_with_neighbors_avg(Y_emissions_stock_BA)
+    """
 
+    #"""
+    Y_emissions_stock_SW = replace_nan_with_interpolation(Y_emissions_stock_SW)
+    Y_emissions_stock_SBM = replace_nan_with_interpolation(Y_emissions_stock_SBM)
+    Y_emissions_stock_BA = replace_nan_with_interpolation(Y_emissions_stock_BA)
+    #"""
+    
     #print(len(Y_emissions_stock_SW))
     #num_nans = np.isnan(Y_emissions_stock_SW).sum()
 
@@ -407,7 +431,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_BA_15_30_40__08_08_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
+        fileName="results/sensitivity_analysis_17_54_56__12_08_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},

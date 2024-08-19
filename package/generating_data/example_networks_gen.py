@@ -17,12 +17,12 @@ def plot_network_examples(
 
     G_1 = nx.watts_strogatz_graph(n=50, k=5, p=0.05, seed=1)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])
     G_2 = nx.stochastic_block_model(sizes=[50,50], p=[[0.1,0.005],[0.005,0.1]], seed=1)
-    G_3 = nx.barabasi_albert_graph(n=50, m=5, seed= 1)
+    G_3 = nx.barabasi_albert_graph(n=50, m=3, seed= 1)
 
 
     pos_1 = prod_pos("circular", G_1)
     pos_2 = nx.spring_layout(G_2,seed=1)  # You can use other layout algorithms
-    pos_3 = nx.spring_layout(G_3,seed=1)  # You can use other layout algorithms
+    pos_3 = prod_pos("circular", G_3)#nx.spring_layout(G_3,seed=1)  # You can use other layout algorithms
 
     node_size_val = 70
      

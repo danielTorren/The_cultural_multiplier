@@ -155,5 +155,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_17_06_29__07_08_2024",
+        fileName= "results/networks_homo_tau_18_00_05__12_08_2024",
     )
