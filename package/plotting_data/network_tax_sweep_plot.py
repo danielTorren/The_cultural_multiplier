@@ -196,9 +196,9 @@ def main(
 
     #value_min = 0
     plot_emissions_lines(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
-    #plot_emissions_confidence(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
+    plot_emissions_confidence(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
     plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-    #plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+    plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
 
     plt.show()
 

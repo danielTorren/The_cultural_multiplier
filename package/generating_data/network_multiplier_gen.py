@@ -197,10 +197,10 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, t
 
     return  total_tau_range_static, emissions_array_static_full
 
-def calc_required_static_carbon_tax_seeds(seeds_data, base_params, property_values_list, emissions_networks,tau_lower_bound, tau_upper_bound, total_range_runs):
+def calc_required_static_carbon_tax_seeds(seeds_data, base_params, property_values_list, emissions_networks_seed,tau_lower_bound, tau_upper_bound, total_range_runs):
     base_params.update(seeds_data)
-    emissions_min, emissions_max = np.amin(emissions_networks), np.amax(emissions_networks)
-
+    emissions_min, emissions_max = np.amin(emissions_networks_seed), np.amax(emissions_networks_seed)
+    print("emissions_max", emissions_max)
     initial_guess_min_tau, initial_guess_max_tau  = min(property_values_list), max(property_values_list)
 
     tau_list, emissions_list = calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, tau_lower_bound, tau_upper_bound, initial_guess_min_tau, initial_guess_max_tau, total_range_runs)
@@ -210,10 +210,12 @@ def calc_required_static_carbon_tax_seeds(seeds_data, base_params, property_valu
 def calc_required_static_carbon_tax_multi_seeds(
         seeds_data_list: list[dict], base_params, property_values_list, emissions_networks,tau_lower_bound, tau_upper_bound, total_range_runs
 ) -> npt.NDArray:
+    emissions_networks_trans = np.transpose(emissions_networks, (3,0,1,2))
+    seeds_em_data_list = zip(seeds_data_list,emissions_networks_trans )
     num_cores = multiprocessing.cpu_count()
     #emissions_stock = [generate_emissions_stock(i) for i in params_dict]
     res= Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(calc_required_static_carbon_tax_seeds)(i, base_params, property_values_list, emissions_networks,tau_lower_bound, tau_upper_bound, total_range_runs) for i in seeds_data_list
+        delayed(calc_required_static_carbon_tax_seeds)(seeds, base_params, property_values_list, emissions_networks_seed,tau_lower_bound, tau_upper_bound, total_range_runs) for seeds, emissions_networks_seed in seeds_em_data_list
     )
     tau_list, emissions_list = zip(
         *res
@@ -288,26 +290,32 @@ def main(
     #quit()
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
-    #"""
-    #################################################################
-    #Recover the seeds used
-    seeds_data_dicts = reconstruct_seeds_list(base_params)
-    #print(seeds_data_dicts[0])
-    #quit()
-    print("TOTAL SEEDS: ", len(seeds_data_dicts))
-    #print(seeds_data_dicts)
-    #quit()
-    #################################################################  
+    
+    RUN = 1
+    if RUN: 
+        #"""
+        #################################################################
+        #Recover the seeds used
+        seeds_data_dicts = reconstruct_seeds_list(base_params)
+        #print(seeds_data_dicts[0])
+        #quit()
+        print("TOTAL SEEDS: ", len(seeds_data_dicts))
+        #print(seeds_data_dicts)
+        #quit()
+        #################################################################  
 
-    print("STARTING CALC")
-    tau_list_matrix, emissions_list_matrix = calc_required_static_carbon_tax_multi_seeds(seeds_data_dicts, base_params,property_values_list, emissions_networks,tau_lower_bound, tau_upper_bound, total_range_runs)#EMISSIONS CAN BE ANY OF THEM
+        print("STARTING CALC")
+        tau_list_matrix, emissions_list_matrix = calc_required_static_carbon_tax_multi_seeds(seeds_data_dicts, base_params,property_values_list, emissions_networks,tau_lower_bound, tau_upper_bound, total_range_runs)#EMISSIONS CAN BE ANY OF THEM
 
-    print("CALCULATED DATA")
-    save_object(tau_list_matrix,fileName + "/Data", "tau_list_matrix")
-    save_object(emissions_list_matrix,fileName + "/Data", "emissions_list_matrix")
-    #"""
-    #tau_list_matrix = load_object(fileName + "/Data", "tau_list_matrix")
-    #emissions_list_matrix = load_object(fileName + "/Data", "emissions_list_matrix")
+        print("CALCULATED DATA")
+        save_object(tau_list_matrix,fileName + "/Data", "tau_list_matrix")
+        save_object(emissions_list_matrix,fileName + "/Data", "emissions_list_matrix")
+        #"""
+
+        ##########################################
+    else:
+        tau_list_matrix = load_object(fileName + "/Data", "tau_list_matrix")
+        emissions_list_matrix = load_object(fileName + "/Data", "emissions_list_matrix")
 
 
     list_M_networks = calc_M_vector_seeds(property_values_list , tau_list_matrix, emissions_networks, emissions_list_matrix)
