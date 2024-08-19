@@ -380,7 +380,7 @@ def reconstruct_seeds_list(params: dict) -> list[dict]:
 
 def main(
     fileName,
-    tau_lower_bound = -0.7, 
+    tau_lower_bound = -0.6, 
     tau_upper_bound = 10,
     total_range_runs = 100
 ) -> None:
