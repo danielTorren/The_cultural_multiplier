@@ -157,7 +157,7 @@ def optimize_tau(base_params,initial_guess,tau_lower_bound, tau_upper_bound):
 
     bounds = (tau_lower_bound, tau_upper_bound) #THESE ARE BOUNDS FOR THE TAX
     #print("NEXT SEED")
-    root, iterations = newton_raphson_with_bounds(objective_function_to_min_full_run, initial_guess = initial_guess, base_params = base_params, bounds = bounds,tol=1e-6, max_iter=100, delta=1e-4)
+    root, iterations = newton_raphson_with_bounds(objective_function_to_min_full_run, initial_guess = initial_guess, base_params = base_params, bounds = bounds,tol=1e-6, max_iter=200, delta=1e-5)
     #print("DONE")
     return root
 
@@ -330,24 +330,20 @@ def calc_required_static_carbon_tax_multi_seeds(
     return tau_list, emissions_list
 
 def calc_predicted_reverse_tau_static(tau_static_vec, emissions_social, emissions_static_full):
-    #print(tau_social_vec.shape ,tau_static_vec.shape, emissions_social.shape, emissions_static_full.shape)
-    #quit()
-    #I WANT TO INTERPOLATE WHAT THE TAU VALUES OF THE STATIC ARE THAT GIVE THE SOCIAL
 
-    #WHY DOES CUBIC SPLINES REQUIRE INCREASIGN VALUES??
     reverse_emissions_static_full = emissions_static_full[::-1]
     reverse_tau_static_vec = tau_static_vec[::-1]
-
+    #print("next")
+    #print("tau_static_vec", tau_static_vec)
+    #print("emissions_social", emissions_social)
+    #print("emissions_static_full", emissions_static_full)
     reverse_cs_static_input_emissions_output_tau = CubicSpline(reverse_emissions_static_full, reverse_tau_static_vec)# given the emissions what is the predicted tau
     predicted_tau_static = reverse_cs_static_input_emissions_output_tau(emissions_social)
 
-    #print("tau_social_vec",tau_social_vec)
-    #print("predicted_tau_static", predicted_tau_static[0][0])
-    #trans_M_vals = 1 - tau_social_vec/predicted_tau_static
+    #print("predicted_tau_static",predicted_tau_static)
+    #print("tau_static_vec", tau_static_vec)
 
-    #print("trans_M_vals", trans_M_vals[0][0])
     #quit()
-
     return predicted_tau_static
 
 def calc_M_vector_seeds(tau_social_vec ,tau_static_list, emissions_social, emissions_static_list):
@@ -356,10 +352,10 @@ def calc_M_vector_seeds(tau_social_vec ,tau_static_list, emissions_social, emiss
 
     e_tau_list = zip(emissions_social_trans, tau_static_list, emissions_static_list)
     num_cores = multiprocessing.cpu_count()
-    #predicted_reverse_tau_static = [calc_predicted_reverse_tau_static(tau_social_vec,tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list]
-    predicted_reverse_tau_static = Parallel(n_jobs=num_cores, verbose=10)(
-        delayed(calc_predicted_reverse_tau_static)(tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list
-    )
+    predicted_reverse_tau_static = [calc_predicted_reverse_tau_static(tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list]
+    #predicted_reverse_tau_static = Parallel(n_jobs=num_cores, verbose=10)(
+    #    delayed(calc_predicted_reverse_tau_static)(tau_vec, emissions_social_seed, emissions_vec) for emissions_social_seed, tau_vec, emissions_vec in e_tau_list
+    #)
     predicted_reverse_tau_static_arr = np.asarray(predicted_reverse_tau_static)
 
     trans_M_vals = 1 - tau_social_vec/predicted_reverse_tau_static_arr
@@ -400,7 +396,8 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
     
-    RUN = 1
+    RUN = 0
+
     if RUN: 
         #"""
         #################################################################
