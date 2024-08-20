@@ -62,6 +62,51 @@ def plot_preferences_matrix_density_grid(fileName, preferneces_h_list, scenarios
     f = plotName + "/plot_preferences_timeseries_matrix_density_grid"
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
+def plot_stock(fileName, data_stock, scenarios, dpi_save, history_time):
+    
+    fig, axs = plt.subplots(1, len(scenarios), figsize=(12, 12), sharey=True)
+    y_title = "Cumulative carbon emissions, $E_t$"
+    
+    for i, scenario in enumerate(scenarios):
+        ax = axs[i]
+        ax.set_title(scenario)
+        data_scenario = data_stock[i]
+        
+        #print(len(history_time),data_scenario.shape )
+        for j, data in enumerate(data_scenario):
+            ax.plot(history_time, data)
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_stock_timer"
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+def plot_flow(fileName, data_flow, scenarios, dpi_save, history_time, sharey=True):
+    
+    fig, axs = plt.subplots(1, len(scenarios), figsize=(12, 12))
+    y_title = "Flow carbon emissions, $E_{F,t}$"
+    
+    for i, scenario in enumerate(scenarios):
+        ax = axs[i]
+        ax.set_title(scenario)
+        data_scenario = data_flow[i]
+
+        for j, data in enumerate(data_scenario):
+            ax.plot(history_time, data)
+
+    fig.supxlabel(r"Time")
+    fig.supylabel(r"%s" % y_title)
+
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_flow_timer"
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     dpi_save = 600,
@@ -70,16 +115,21 @@ def main(
     #data_array = load_object(fileName + "/Data", "data_array")
     h_list = load_object(fileName + "/Data", "h_list")
     preferences_h_list = load_object(fileName + "/Data", "h_list_preferences_sectors")
+    data_flow = load_object(fileName + "/Data", "data_flow")
+    data_stock = load_object(fileName + "/Data", "data_stock")
+    history_time = load_object(fileName + "/Data", "history_time")
     #scenarios = load_object(fileName + "/Data", "scenarios")
     scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ]
 
-    plot_identity_matrix_density_grid(fileName, h_list, scenarios, dpi_save)
-    plot_preferences_matrix_density_grid(fileName, preferences_h_list, scenarios, dpi_save)
+    #plot_identity_matrix_density_grid(fileName, h_list, scenarios, dpi_save)
+    #plot_preferences_matrix_density_grid(fileName, preferences_h_list, scenarios, dpi_save)
+    plot_stock(fileName, data_stock, scenarios, dpi_save, history_time)
+    plot_flow(fileName, data_flow, scenarios, dpi_save, history_time)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/undershoot_12_32_40__20_08_2024",
+        fileName = "results/undershoot_12_53_06__20_08_2024",
     )
 
 

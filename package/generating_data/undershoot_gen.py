@@ -1,5 +1,5 @@
 # imports
-from package.resources.run import  identity_timeseries_run,identity_preferences_timeseries_run
+from package.resources.run import  undershoot_timeseries_run
 from package.resources.utility import (
     createFolder, 
     save_object, 
@@ -77,7 +77,7 @@ def main(
 
     #Data_array_flat = identity_timeseries_run(params_list)
     
-    Data_array_flat_identity, Data_array_flat_preferences = identity_preferences_timeseries_run(params_list)
+    Data_array_flat_identity, Data_array_flat_preferences, data_flow_flat, data_stock_flat = undershoot_timeseries_run(params_list)
 
     print("RUNS DONE")
     #identity
@@ -124,16 +124,20 @@ def main(
         
             h_list_preferences.append(h)
         h_list_preferences_sectors.append(h_list_preferences)
-
+    ###################################################################################################
+    #STOCK AND FLOW
+    data_flow = data_flow_flat.reshape(len(scenarios), base_params["seed_reps"], time_steps)
+    data_stock = data_stock_flat.reshape(len(scenarios), base_params["seed_reps"], time_steps)
 
     createFolder(fileName)
-
-    #save_object(Data_array, fileName + "/Data", "Data_array")
 
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(h_list_identity, fileName + "/Data", "h_list")
     save_object(scenarios, fileName + "/Data", "scenarios")
     save_object(h_list_preferences_sectors, fileName + "/Data", "h_list_preferences_sectors")
+    save_object(data_flow, fileName + "/Data", "data_flow")
+    save_object(data_stock, fileName + "/Data", "data_stock")
+    save_object(history_time,fileName + "/Data","history_time")
 
     return fileName
 
@@ -156,7 +160,7 @@ if __name__ == '__main__':
     "seed_reps": 100,
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
-    "N": 200,#3000, 
+    "N": 3000,#3000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 
