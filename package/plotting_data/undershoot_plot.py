@@ -85,9 +85,9 @@ def plot_stock(fileName, data_stock, scenarios, dpi_save, history_time):
     f = plotName + "/plot_stock_timer"
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
-def plot_flow(fileName, data_flow, scenarios, dpi_save, history_time, sharey=True):
+def plot_flow(fileName, data_flow, scenarios, dpi_save, history_time):
     
-    fig, axs = plt.subplots(1, len(scenarios), figsize=(12, 12))
+    fig, axs = plt.subplots(1, len(scenarios), figsize=(12, 12), sharey=True)
     y_title = "Flow carbon emissions, $E_{F,t}$"
     
     for i, scenario in enumerate(scenarios):
@@ -122,7 +122,7 @@ def plot_final_values_histogram(fileName, data_stock, scenarios, dpi_save):
         # Plot histogram of final values
         ax.hist(final_values, bins=100, color='blue', alpha=0.7)
         
-        ax.set_xlabel("Final cumulative emissions, $E_{t_max}$")
+        ax.set_xlabel("Final cumulative emissions, $E_{t_{max}}$")
         if i == 0:
             ax.set_ylabel(y_title)
     
