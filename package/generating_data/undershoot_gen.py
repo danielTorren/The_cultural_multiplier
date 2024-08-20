@@ -1,5 +1,5 @@
 # imports
-from package.resources.run import  identity_timeseries_run
+from package.resources.run import  identity_timeseries_run,identity_preferences_timeseries_run
 from package.resources.utility import (
     createFolder, 
     save_object, 
@@ -63,26 +63,27 @@ def arrange_scenarios_tax(base_params_tax, scenarios):
     return params_list
 
 def main(
-    base_params
+    base_params,
+    scenarios
 ) -> str: 
 
     root = "undershoot"
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
-    scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ]
-
     base_params["network_type"] = "SW"
     params_list = arrange_scenarios_tax(base_params,scenarios)
     print("Total runs:",len(params_list))
 
-    Data_array_flat = identity_timeseries_run(params_list)
+    #Data_array_flat = identity_timeseries_run(params_list)
+    
+    Data_array_flat_identity, Data_array_flat_preferences = identity_preferences_timeseries_run(params_list)
 
     print("RUNS DONE")
-    
-    time_steps = Data_array_flat[0].shape[0]
+    #identity
+    time_steps = Data_array_flat_identity[0].shape[0]
 
-    Data_array = Data_array_flat.reshape(len(scenarios), base_params["seed_reps"], time_steps, base_params["N"] )
+    Data_array = Data_array_flat_identity.reshape(len(scenarios), base_params["seed_reps"], time_steps, base_params["N"] )
 
     seeds, time_steps, N = Data_array.shape[1], Data_array.shape[2], Data_array.shape[3]
     history_time = np.arange(time_steps)  # Assuming the same time steps for all data
@@ -90,7 +91,7 @@ def main(
 
     bin_num = 100
 
-    h_list = []
+    h_list_identity = []
 
     for i in range(len(scenarios)):
         data_subfigure = Data_array[i]
@@ -100,14 +101,39 @@ def main(
 
         h = np.histogram2d(time_tile, data_flat, bins=[time_steps, bin_num], density=True)
     
-        h_list.append(h)
+        h_list_identity.append(h)
+
+    ###############################################################################################
+    #preferneces
+
+    Data_array_preferences_shaped = Data_array_flat_preferences.reshape(len(scenarios), base_params["seed_reps"], time_steps, base_params["N"], base_params["M"] )
+    Data_array_preferences_sector = Data_array_preferences_shaped.transpose(4,0,1,2,3)
+
+    h_list_preferences_sectors = []
+    for m in range(base_params["M"]):
+        h_list_preferences = []
+        Data_array_preferences = Data_array_preferences_sector[m]
+
+        for i in range(len(scenarios)):
+            data_subfigure_preferences = Data_array_preferences[i]
+            data_trans_preferences = data_subfigure_preferences.transpose(0, 2, 1)
+            combined_data_preferences = data_trans_preferences.reshape(seeds * N, time_steps)
+            data_flat_preferences = combined_data_preferences.flatten()
+
+            h = np.histogram2d(time_tile, data_flat_preferences, bins=[time_steps, bin_num], density=True)
+        
+            h_list_preferences.append(h)
+        h_list_preferences_sectors.append(h_list_preferences)
+
 
     createFolder(fileName)
 
     #save_object(Data_array, fileName + "/Data", "Data_array")
 
     save_object(base_params, fileName + "/Data", "base_params")
-    save_object(h_list, fileName + "/Data", "h_list")
+    save_object(h_list_identity, fileName + "/Data", "h_list")
+    save_object(scenarios, fileName + "/Data", "scenarios")
+    save_object(h_list_preferences_sectors, fileName + "/Data", "h_list_preferences_sectors")
 
     return fileName
 
@@ -130,7 +156,7 @@ if __name__ == '__main__':
     "seed_reps": 100,
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
-    "N": 3000,#3000, 
+    "N": 200,#3000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 
@@ -150,4 +176,6 @@ if __name__ == '__main__':
     "SW_prob_rewire": 0.1
     }
 
-    fileName = main(base_params=base_params)
+    scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ]
+
+    fileName = main(base_params=base_params, scenarios= scenarios)

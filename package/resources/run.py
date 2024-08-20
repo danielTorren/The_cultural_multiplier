@@ -104,6 +104,25 @@ def identity_timeseries_run(
     )
     return np.asarray(identity_timeseries_list)
 
+###################################################################################################
+
+def generate_identity_preferences_timeseries(params):
+    data = generate_data(params)
+    return data.history_identity_vec, data.history_low_carbon_preference_matrix
+
+def identity_preferences_timeseries_run(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #res = [generate_identity_timeseries(i) for i in params_dict]
+    res = Parallel(n_jobs=num_cores, verbose=10)(
+        delayed(generate_identity_preferences_timeseries)(i) for i in params_dict
+    )
+    identity_timeseries_list, preferences_timeseries_list = zip(
+        *res
+    )
+
+    return np.asarray(identity_timeseries_list), np.asarray(preferences_timeseries_list)
 
 ###################################################################################################
 def generate_emissions_stock_res_sectors(params):
