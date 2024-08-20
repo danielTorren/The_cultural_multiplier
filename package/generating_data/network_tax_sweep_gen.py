@@ -4,7 +4,6 @@ from copy import deepcopy
 import json
 from package.resources.utility import createFolder, produce_name_datetime, save_object, produce_param_list_stochastic_multi
 from package.resources.run import emissions_parallel_run
-from copy import deepcopy
 from package.resources.utility import generate_vals
 
 def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):

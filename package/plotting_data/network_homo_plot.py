@@ -148,12 +148,12 @@ def main(
 
     seed_reps = base_params["seed_reps"]
 
-    #plot_BA_SBM_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
+    plot_BA_SBM_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
     plot_price_elasticies_BA_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_18_00_05__12_08_2024",
+        fileName= "results/networks_homo_tau_10_40_04__19_08_2024",
     )

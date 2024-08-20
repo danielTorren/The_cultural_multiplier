@@ -3,9 +3,11 @@ from package.resources.run import  identity_timeseries_run
 from package.resources.utility import (
     createFolder, 
     save_object, 
-    produce_name_datetime
+    produce_name_datetime, 
+    produce_param_list_only_stochastic_named
 )
 import numpy as np
+from copy import deepcopy
 
 def produce_param_list_only_stochastic_homo(params: dict) -> list[dict]:
     seeds_labels = ["shuffle_homophily_seed", "shuffle_coherance_seed"]
@@ -30,27 +32,57 @@ def generate_params_list(base_params, produce_param_list_only_stochastic_homo, h
     
     return params_list
 
+def arrange_scenarios_tax(base_params_tax, scenarios):
+    
+    seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed"]
+
+    base_params_tax_copy = deepcopy(base_params_tax)
+    params_list = []
+
+    # 1. Run with fixed preferences, Emissions: [S_n]
+    if "fixed_preferences" in scenarios:
+        base_params_copy_1 = deepcopy(base_params_tax_copy)
+        base_params_copy_1["alpha_change_state"] = "fixed_preferences"
+        params_sub_list_1 = produce_param_list_only_stochastic_named(base_params_copy_1,seeds_labels)
+        params_list.extend(params_sub_list_1)
+
+    # 5. Run with social learning, Emissions: [S_n]
+    if "dynamic_socially_determined_weights" in scenarios:
+        base_params_copy_5 = deepcopy(base_params_tax_copy)
+        base_params_copy_5["alpha_change_state"] = "dynamic_socially_determined_weights"
+        params_sub_list_5 = produce_param_list_only_stochastic_named(base_params_copy_5,seeds_labels)
+        params_list.extend(params_sub_list_5)
+
+    # 6.  Run with cultural learning, Emissions: [S_n]
+    if "dynamic_identity_determined_weights" in scenarios:
+        base_params_copy_6 = deepcopy(base_params_tax_copy)
+        base_params_copy_6["alpha_change_state"] = "dynamic_identity_determined_weights"
+        params_sub_list_6 = produce_param_list_only_stochastic_named(base_params_copy_6,seeds_labels)
+        params_list.extend(params_sub_list_6)
+    
+    return params_list
+
 def main(
     base_params
 ) -> str: 
 
-    root = "homo_four"
+    root = "undershoot"
     fileName = produce_name_datetime(root)
-    #pyperclip.copy(fileName)
     print("fileName:", fileName)
 
-    homophily_values = [0, 0.9, 1]
-    coherance_values = [0, 0.9, 1]
+    scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ]
 
-    total_reps = len(homophily_values)*len(coherance_values)
-
-    params_list = generate_params_list(base_params, produce_param_list_only_stochastic_homo, homophily_values, coherance_values)
-
+    base_params["network_type"] = "SW"
+    params_list = arrange_scenarios_tax(base_params,scenarios)
     print("Total runs:",len(params_list))
+
     Data_array_flat = identity_timeseries_run(params_list)
+
+    print("RUNS DONE")
+    
     time_steps = Data_array_flat[0].shape[0]
 
-    Data_array = Data_array_flat.reshape(total_reps, base_params["seed_reps"],time_steps, base_params["N"] )
+    Data_array = Data_array_flat.reshape(len(scenarios), base_params["seed_reps"], time_steps, base_params["N"] )
 
     seeds, time_steps, N = Data_array.shape[1], Data_array.shape[2], Data_array.shape[3]
     history_time = np.arange(time_steps)  # Assuming the same time steps for all data
@@ -60,7 +92,7 @@ def main(
 
     h_list = []
 
-    for i in range(total_reps):
+    for i in range(len(scenarios)):
         data_subfigure = Data_array[i]
         data_trans = data_subfigure.transpose(0, 2, 1)
         combined_data = data_trans.reshape(seeds * N, time_steps)
@@ -76,18 +108,15 @@ def main(
 
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(h_list, fileName + "/Data", "h_list")
-    save_object(homophily_values, fileName + "/Data", "homophily_values")
-    save_object(coherance_values, fileName + "/Data", "coherance_values")
 
     return fileName
 
 if __name__ == '__main__':
     
     base_params = {
-    "preferences_seed": 72,
-    "network_structure_seed": 89, 
+    "coherance_state": 0.9,
+    "homophily_state": 0,
     "phi_lower": 0.03,
-    "network_type": "SW",
     "carbon_price_increased_lower": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
@@ -96,18 +125,12 @@ if __name__ == '__main__':
     "heterogenous_sector_substitutabilities_state": 0,
     "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
     "heterogenous_phi_state": 0,
-
     "imitation_state": "consumption",
     "vary_seed_state": "multi",
-    "alpha_change_state": "dynamic_identity_determined_weights",
-    "seed_reps": 100,#100,
-    "network_structure_seed": 1, 
-    "preferences_seed": 10, 
-    "shuffle_homophily_seed": 20,
-    "shuffle_coherance_seed": 30,
+    "seed_reps": 100,
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
-    "N": 3000, 
+    "N": 3000,#3000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 

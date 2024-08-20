@@ -18,7 +18,7 @@ class Network_Matrix:
         self._initialize_expenditure()
         self._initialize_sector_preferences()
         self._initialize_preference_coherance()
-        self._initialize_intra_sector_preferences()
+        self._initialize_intra_sector_preferences()#this generates individuals preferences with the correct level of internal coherance, but position mixed entirely
         self._update_carbon_price()
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         self._initialize_substitutabilities()
@@ -190,12 +190,9 @@ class Network_Matrix:
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
         preferences_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
-        print("self.N*self.M", self.N*self.M)
-        print("before clip", np.mean(preferences_beta))
 
         preferences_capped_uncoherant = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
-        #print("after clip", np.mean(preferences_capped_uncoherant))
-        quit()
+
         if self.coherance_state != 0:
             preferences_sorted = sorted(preferences_capped_uncoherant)#LIST IS NOW SORTED
             preferences_coherance = self._partial_shuffle_vector(np.asarray(preferences_sorted), self.shuffle_reps_coherance)
@@ -203,8 +200,9 @@ class Network_Matrix:
         else:
             low_carbon_preference_matrix = preferences_capped_uncoherant.reshape(self.N,self.M)
         
-        np.random.seed(self.shuffle_coherance_seed)#For inital construction set a seed
-        np.random.shuffle(low_carbon_preference_matrix)
+        np.random.seed(self.shuffle_coherance_seed)#For inital construction set a seed. THIS IS REALLY NTO VERY IMPORTANT
+        #LINE BELOW IS IMPORTANT!
+        np.random.shuffle(low_carbon_preference_matrix)#THE IDEA IS TO HAVE ALL THE INDIVIDUALS MIXED BUT NOT THE ACTUAL PREFERENCES WITHIN EACH INDIVIDUAL
 
         return low_carbon_preference_matrix
 
@@ -233,7 +231,7 @@ class Network_Matrix:
         np.random.seed(self.shuffle_homophily_seed)#Set seed for shuffle
 
         low_carbon_preference_matrix_unsorted =  deepcopy(self.low_carbon_preference_matrix)
-        identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)
+        identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)#TAKES MEAN WITHIN A ROW, IE THE IDENTITY 
         zipped_lists = zip(identity_unsorted, low_carbon_preference_matrix_unsorted)
         sorted_lists = sorted(zipped_lists, key=lambda x: x[0])#order by the identity 
         _ , sorted_preferences_tuple = zip(*sorted_lists)
@@ -431,7 +429,6 @@ class Network_Matrix:
         return group_indices_list
     
     def _set_up_time_series(self):
-        self.history_weighting_matrix = [self.weighting_matrix]
         self.history_time = [self.t]
         self.history_identity_list = [self.identity_vec]
         self.history_flow_carbon_emissions = [self.total_carbon_emissions_flow]

@@ -351,32 +351,44 @@ def main(
     emissions_SBM = load_object(fileName + "/Data","emissions_SBM")
     emissions_BA = load_object(fileName + "/Data","emissions_BA")
     emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_BA])    
-    list_M_networks = load_object(fileName + "/Data","list_M_networks")
-    list_ratio_networks = load_object(fileName + "/Data","list_ratio_networks")
-    tau_static = load_object(fileName + "/Data","tau_static")
+    
+
+    base_params = load_object(fileName + "/Data","base_params")
+    print(base_params)
+    quit()
+
+    MULTIPLIER = 0
+
 
 
     #####################################################################################################
 
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
     scenario_labels = ["Fixed preferences","Dynamic social weighting", "Dynamic identity weighting"]
-    scenario_labels_M = ["Social mutliplier", "Cultural multiplier"]
+
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     #print(tau_static.shape)
     #quit()
     #value_min = 0
-    #plot_emissions_lines(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
-    #plot_emissions_confidence(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
-    #plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-    #plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-    #plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-    #plot_ratio_confidence(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-    plot_joint(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-    plot_joint_confidence(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+    plot_emissions_lines(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
+    plot_emissions_confidence(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
+
+    if MULTIPLIER:
+        list_M_networks = load_object(fileName + "/Data","list_M_networks")
+        list_ratio_networks = load_object(fileName + "/Data","list_ratio_networks")
+        tau_static = load_object(fileName + "/Data","tau_static")
+        scenario_labels_M = ["Social mutliplier", "Cultural multiplier"]
+        #plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        #plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        #plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        #plot_ratio_confidence(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        plot_joint(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        plot_joint_confidence(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_18_29_41__12_08_2024",
+        fileName = "results/tax_sweep_networks_18_23_13__19_08_2024",
        
     )

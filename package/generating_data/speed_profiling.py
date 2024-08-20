@@ -21,7 +21,7 @@ if __name__ == '__main__':
     "heterogenous_sector_substitutabilities_state": 0,
     "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
     "heterogenous_phi_state": 0,
-    "imperfect_learning_state": 1,
+
     "imitation_state": "consumption",
     "vary_seed_state": "network",
     "alpha_change_state": "dynamic_identity_determined_weights",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
