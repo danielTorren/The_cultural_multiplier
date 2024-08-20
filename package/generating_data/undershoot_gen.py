@@ -166,7 +166,7 @@ if __name__ == '__main__':
     "low_carbon_substitutability_lower": 2, 
     "low_carbon_substitutability_upper": 2, 
     "a_preferences": 2, 
-    "b_preferences": 2.5, 
+    "b_preferences": 2.1, 
     "clipping_epsilon_init_preference": 1e-5, 
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
