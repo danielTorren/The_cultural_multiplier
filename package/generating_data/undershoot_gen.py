@@ -157,7 +157,7 @@ if __name__ == '__main__':
     "heterogenous_phi_state": 0,
     "imitation_state": "consumption",
     "vary_seed_state": "multi",
-    "seed_reps": 100,
+    "seed_reps": 1000,
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
     "N": 3000,#3000, 

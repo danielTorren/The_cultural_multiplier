@@ -107,6 +107,32 @@ def plot_flow(fileName, data_flow, scenarios, dpi_save, history_time, sharey=Tru
     f = plotName + "/plot_flow_timer"
     fig.savefig(f + ".png", dpi=dpi_save, format="png")
 
+def plot_final_values_histogram(fileName, data_stock, scenarios, dpi_save):
+    
+    fig, axs = plt.subplots(1, len(scenarios), figsize=(12, 6), sharey=True)
+    y_title = "Frequency"
+    
+    for i, scenario in enumerate(scenarios):
+        ax = axs[i]
+        ax.set_title(scenario)
+        
+        # Extract final values from each time series in the scenario
+        final_values = [data[-1] for data in data_stock[i]]
+        
+        # Plot histogram of final values
+        ax.hist(final_values, bins=100, color='blue', alpha=0.7)
+        
+        ax.set_xlabel("Final cumulative emissions, $E_{t_max}$")
+        if i == 0:
+            ax.set_ylabel(y_title)
+    
+    plt.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/histogram_final_values"
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+    plt.show()
+
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
     dpi_save = 600,
@@ -121,15 +147,16 @@ def main(
     #scenarios = load_object(fileName + "/Data", "scenarios")
     scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ]
 
-    #plot_identity_matrix_density_grid(fileName, h_list, scenarios, dpi_save)
-    #plot_preferences_matrix_density_grid(fileName, preferences_h_list, scenarios, dpi_save)
+    plot_identity_matrix_density_grid(fileName, h_list, scenarios, dpi_save)
+    plot_preferences_matrix_density_grid(fileName, preferences_h_list, scenarios, dpi_save)
     plot_stock(fileName, data_stock, scenarios, dpi_save, history_time)
     plot_flow(fileName, data_flow, scenarios, dpi_save, history_time)
+    plot_final_values_histogram(fileName, data_stock, scenarios, dpi_save)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/undershoot_12_53_06__20_08_2024",
+        fileName = "results/undershoot_12_58_25__20_08_2024",
     )
 
 
