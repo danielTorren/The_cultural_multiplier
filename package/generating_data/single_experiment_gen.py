@@ -27,7 +27,7 @@ def main(
     print("fileName:", fileName)
 
     Data = generate_data(base_params)  # run the simulation
-    print("EM:", Data.total_carbon_emissions_stock)
+    #print("EM:", Data.total_carbon_emissions_stock)
 
     createFolder(fileName)
     save_object(Data, fileName + "/Data", "social_network")
@@ -43,30 +43,25 @@ if __name__ == '__main__':
     "carbon_price_increased_lower": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-    "heterogenous_intrasector_preferences_state": 1,
-    "heterogenous_carbon_price_state": 0,
-    "heterogenous_sector_substitutabilities_state": 0,
-    "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
-    "heterogenous_phi_state": 0,
     "imitation_state": "consumption",
     "vary_seed_state": "multi",
     "alpha_change_state": "fixed_preferences",#"fixed_preferences",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
     "seed_reps": 25,
-    "network_structure_seed": 1, 
-    "preferences_seed": 10, 
+    "network_structure_seed": 4, 
+    "preferences_seed": 110, 
     "shuffle_homophily_seed": 20,
-    "shuffle_coherance_seed": 30,
-    "carbon_price_duration": 360, 
+    "shuffle_coherance_seed": 31,
+    "carbon_price_duration": 0,#360, 
     "burn_in_duration": 0, 
-    "N": 2000, 
-    "M": 200, 
+    "N": 100, 
+    "M": 5, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 
     "low_carbon_substitutability_upper": 2, 
-    "a_preferences": 2, 
+    "a_preferences": 0.75, 
     "b_preferences": 2, 
     "clipping_epsilon_init_preference": 1e-5, 
-    "confirmation_bias": 1, 
+    "confirmation_bias": 5, 
     "init_carbon_price": 0, 
     "homophily_state": 0,
     "coherance_state": 0,#0.95,
@@ -75,13 +70,13 @@ if __name__ == '__main__':
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2,
     "SBM_network_density_input_inter_block": 0.005,
-    "SW_network_density": 0.1,
+    "SW_network_density": 0.5,#0.1,
     "SW_prob_rewire": 0.1
     }
 
     fileName = main(base_params=base_params)
 
-    RUN_PLOT = 1
+    RUN_PLOT = 0
 
     if RUN_PLOT:
         single_experiment_plot.main(fileName = fileName)

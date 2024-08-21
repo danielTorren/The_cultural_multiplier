@@ -24,8 +24,8 @@ class Network_Matrix:
         self._initialize_substitutabilities()
         self._calc_consumption()#Can come before network creatation as that just mixes rows of preference but not within the row ie within people
 
-        print("low_carbon_preference_matrix", self.low_carbon_preference_matrix.shape, np.mean(self.low_carbon_preference_matrix))
-        quit()
+        #print("low_carbon_preference_matrix", self.low_carbon_preference_matrix.shape, np.mean(self.low_carbon_preference_matrix))
+        #quit()
         #NETWORKS
         if self.alpha_change_state != "fixed_preferences":
             self._initialize_network_homophily()
@@ -70,14 +70,9 @@ class Network_Matrix:
             self.shuffle_homophily_seed = self.parameters["shuffle_homophily_seed"]
             self.shuffle_coherance_seed = int(round(self.parameters["set_seed"]))
 
-
     def _set_state_attributes(self):
         self.save_timeseries_data_state = self.parameters["save_timeseries_data_state"]
         self.compression_factor_state = self.parameters["compression_factor_state"]
-        self.heterogenous_intrasector_preferences_state = self.parameters["heterogenous_intrasector_preferences_state"]
-        self.heterogenous_carbon_price_state = self.parameters["heterogenous_carbon_price_state"]
-        self.heterogenous_sector_substitutabilities_state = self.parameters["heterogenous_sector_substitutabilities_state"]
-        self.heterogenous_phi_state = self.parameters["heterogenous_phi_state"]
         self.imitation_state = self.parameters["imitation_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
         self.vary_seed_state = self.parameters["vary_seed_state"]
@@ -95,10 +90,8 @@ class Network_Matrix:
             self.SW_network_density_input = self.parameters["SW_network_density"]
             self.SW_K = int(round((self.N - 1) * self.SW_network_density_input))
             self.SW_prob_rewire = self.parameters["SW_prob_rewire"]
-            self.SBM_block_heterogenous_individuals_substitutabilities_state = 0
 
         elif self.network_type == "SBM":
-            self.SBM_block_heterogenous_individuals_substitutabilities_state = self.parameters["SBM_block_heterogenous_individuals_substitutabilities_state"]
             self.SBM_block_num = int(self.parameters["SBM_block_num"])
             self.SBM_network_density_input_intra_block = self.parameters["SBM_network_density_input_intra_block"]
             self.SBM_network_density_input_inter_block = self.parameters["SBM_network_density_input_inter_block"]
@@ -107,7 +100,6 @@ class Network_Matrix:
             self.BA_green_or_brown_hegemony = self.parameters["BA_green_or_brown_hegemony"]
             self.BA_density = self.parameters["BA_density"]
             self.BA_nodes = self._calculate_nodes_BA()
-            self.SBM_block_heterogenous_individuals_substitutabilities_state = 0
 
     def _calculate_nodes_BA(self):
         term1 = 2 * self.N - 1
@@ -122,27 +114,20 @@ class Network_Matrix:
         self.time_step_max = self.burn_in_duration + self.carbon_price_duration
 
     def _initialize_prices(self):
-        self.prices_low_carbon_m = np.ones(self.M)
-        self.prices_high_carbon_m = np.ones(self.M)
-        self.carbon_price_m = np.zeros(self.M)
-
-        if self.heterogenous_carbon_price_state:
-            self.carbon_price_increased_m = np.linspace(self.parameters["carbon_price_increased_lower"], self.parameters["carbon_price_increased_upper"], num=self.M)
-        else:
-            self.carbon_price_increased_m = np.full(self.M, self.parameters["carbon_price_increased_lower"])
+        self.prices_low_carbon_m = 1
+        self.prices_high_carbon_m = 1
+        self.carbon_price_m = 0
+        self.carbon_price_increased_m = self.parameters["carbon_price_increased_lower"]
 
     def _initialize_social_learning(self):
         self.confirmation_bias = self.parameters["confirmation_bias"]
         self.clipping_epsilon_init_preference = self.parameters["clipping_epsilon_init_preference"]
-
-        if self.heterogenous_phi_state:
-            self.phi_array = np.linspace(self.parameters["phi_lower"], self.parameters["phi_upper"], num=self.M)
-        else:
-            self.phi_array = np.full(self.M, self.parameters["phi_lower"])
+        self.phi = self.parameters["phi_lower"]
 
     def _initialize_preference_coherance(self):
         self.coherance_state = self.parameters["coherance_state"]
-        self.shuffle_reps_coherance = int(round((self.N * (1 - self.coherance_state)) ** self.shuffle_intensity))
+        self.shuffle_reps_coherance = int(round(((self.N*self.M) * (1 - self.coherance_state)) ** self.shuffle_intensity))
+        print("self.shuffle_reps_coherance", self.shuffle_reps_coherance, self.N*self.M)
 
     def _initialize_network_homophily(self):
         self.homophily_state = self.parameters["homophily_state"]
@@ -150,25 +135,19 @@ class Network_Matrix:
 
     def _initialize_expenditure(self):
         #self.base_expenditure_array = np.full(self.N, 1 / self.N)
-        self.base_expenditure_array = np.full(self.N, 1 / (self.N*self.M))
-        #print("self.base_expenditure_array ", self.base_expenditure_array[0] )
-        self.instant_expenditure_vec = self.base_expenditure_array
+        self.base_expenditure = 1/self.N#1/self.N
+        #print("self.base_expenditure ", self.base_expenditure)
+        self.instant_expenditure = self.base_expenditure
 
     def _initialize_sector_preferences(self):
         self.sector_substitutability = self.parameters["sector_substitutability"]
         self.sector_preferences = np.full(self.M, 1 / self.M)
 
     def _initialize_intra_sector_preferences(self):
-        if self.heterogenous_intrasector_preferences_state == 1:
-            self.a_preferences = self.parameters["a_preferences"]
-            self.b_preferences = self.parameters["b_preferences"]
-            self.low_carbon_preference_matrix_init = self._generate_init_data_preferences_coherance()
-        elif self.heterogenous_intrasector_preferences_state == 0:
-            self.low_carbon_preference_matrix_init = np.full((self.N, self.M), 1 / self.M)
-        else:
-            self.low_carbon_preference_matrix_init = np.random.uniform(size=(self.N, self.M))
-
-        self.low_carbon_preference_matrix = self.low_carbon_preference_matrix_init
+        self.a_preferences = self.parameters["a_preferences"]
+        self.b_preferences = self.parameters["b_preferences"]
+        self.low_carbon_preference_matrix_init = self._generate_init_data_preferences_coherance()
+        self.low_carbon_preference_matrix = self.low_carbon_preference_matrix_init#have a copy of initial preferences
 
     def _create_network(self):
         if self.network_type == "SW":
@@ -189,7 +168,7 @@ class Network_Matrix:
 
         #SCIPY ALT
         self.weighting_matrix = self._normlize_matrix(self.sparse_adjacency_matrix)
-        self.network_density = nx.density(self.network)
+        #self.network_density = nx.density(self.network)
 
     ########################################################################################################
 
@@ -197,19 +176,32 @@ class Network_Matrix:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
         preferences_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
 
+        #np.random.shuffle(preferences_beta)#just to check 
+
         preferences_capped_uncoherant = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
+        np.random.seed(self.shuffle_coherance_seed)#For inital construction set a seed. THIS IS REALLY NTO VERY IMPORTANT
         if self.coherance_state != 0:
+            """the issue seems to be here"""
             preferences_sorted = sorted(preferences_capped_uncoherant)#LIST IS NOW SORTED
+            #preferences_sorted = sorted(preferences_capped_uncoherant)[::-1]#LIST IS NOW SORTED
+            
             preferences_coherance = self._partial_shuffle_vector(np.asarray(preferences_sorted), self.shuffle_reps_coherance)
             low_carbon_preference_matrix = preferences_coherance.reshape(self.N,self.M)
+            #print("means", np.mean(low_carbon_preference_matrix, axis =1)) 
+            #print(np.mean(low_carbon_preference_matrix))
         else:
             low_carbon_preference_matrix = preferences_capped_uncoherant.reshape(self.N,self.M)
+            #print("low_carbon_preference_matrix ", low_carbon_preference_matrix )
+            #quit()
         
-        np.random.seed(self.shuffle_coherance_seed)#For inital construction set a seed. THIS IS REALLY NTO VERY IMPORTANT
+        
         #LINE BELOW IS IMPORTANT!
-        np.random.shuffle(low_carbon_preference_matrix)#THE IDEA IS TO HAVE ALL THE INDIVIDUALS MIXED BUT NOT THE ACTUAL PREFERENCES WITHIN EACH INDIVIDUAL
-
+        np.random.shuffle(low_carbon_preference_matrix)#THIS MIXES ROWS BUT NOT WITHIN THE ROW#THE IDEA IS TO HAVE ALL THE INDIVIDUALS MIXED BUT NOT THE ACTUAL PREFERENCES WITHIN EACH INDIVIDUAL
+        #print("pos shuffle")
+        #print("means", np.mean(low_carbon_preference_matrix, axis =1)) 
+        #print(np.mean(low_carbon_preference_matrix), np.var(low_carbon_preference_matrix, axis = 1))
+        #print(low_carbon_preference_matrix)
         return low_carbon_preference_matrix
 
     def _circular_list(self, list_to_circle) -> list:
@@ -225,17 +217,13 @@ class Network_Matrix:
             matrix_to_shuffle[[a, b], :] = matrix_to_shuffle[[b, a], :]
         return matrix_to_shuffle
 
-    def _partial_shuffle_vector(self, vector_to_shuffle, shuffle_reps) -> list:
-        for _ in range(shuffle_reps):
-            a, b = np.random.randint(
-                low=0, high=len(vector_to_shuffle), size=2
-            )
+    def _partial_shuffle_vector(self, vector_to_shuffle, shuffle_reps) -> np.ndarray:
+        pairs = np.random.randint(low=0, high=len(vector_to_shuffle), size=(shuffle_reps,2) )
+        for a,b in pairs:
             vector_to_shuffle[a], vector_to_shuffle[b] = vector_to_shuffle[b], vector_to_shuffle[a]
         return vector_to_shuffle
     
     def _shuffle_preferences_start_mixed(self): 
-        np.random.seed(self.shuffle_homophily_seed)#Set seed for shuffle
-
         low_carbon_preference_matrix_unsorted =  deepcopy(self.low_carbon_preference_matrix)
         identity_unsorted = np.mean(low_carbon_preference_matrix_unsorted, axis = 1)#TAKES MEAN WITHIN A ROW, IE THE IDENTITY 
         zipped_lists = zip(identity_unsorted, low_carbon_preference_matrix_unsorted)
@@ -249,7 +237,8 @@ class Network_Matrix:
             sorted_preferences = self._circular_list(sorted_preferences)#agent list is now circular in terms of identity
         elif (self.network_type == "SBM"):
             pass
-        
+
+        np.random.seed(self.shuffle_homophily_seed)#Set seed for shuffle
         partial_shuffle_matrix = self._partial_shuffle_matrix(sorted_preferences, self.shuffle_reps_homophily)#partial shuffle of the list
 
         return partial_shuffle_matrix
@@ -262,17 +251,7 @@ class Network_Matrix:
             self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
 
     def _initialize_substitutabilities(self):
-        if (self.SBM_block_heterogenous_individuals_substitutabilities_state == 0) and (self.heterogenous_sector_substitutabilities_state == 1):
-            self.low_carbon_substitutability_array = np.linspace(self.parameters["low_carbon_substitutability_lower"], self.parameters["low_carbon_substitutability_upper"], num=self.M)
-            self.low_carbon_substitutability_matrix = np.asarray([self.low_carbon_substitutability_array]*self.N)
-        elif (self.SBM_block_heterogenous_individuals_substitutabilities_state == 1) and (self.heterogenous_sector_substitutabilities_state == 0):#fix this solution
-            #case 3
-            block_substitutabilities = np.linspace(self.parameters["low_carbon_substitutability_lower"], self.parameters["low_carbon_substitutability_upper"], num=self.SBM_block_num)
-            low_carbon_substitutability_matrix = np.tile(block_substitutabilities[:, np.newaxis], (1, self.M))
-            self.low_carbon_substitutability_matrix = np.repeat(low_carbon_substitutability_matrix, self.SBM_block_sizes, axis=0)
-        else:
-            self.low_carbon_substitutability_array = np.linspace(self.parameters["low_carbon_substitutability_upper"], self.parameters["low_carbon_substitutability_upper"], num=self.M)
-            self.low_carbon_substitutability_matrix = np.asarray([self.low_carbon_substitutability_array]*self.N)
+        self.low_carbon_substitutability = self.parameters["low_carbon_substitutability_lower"]
 
     def _initialize_social_component(self):
         if self.alpha_change_state == "fixed_preferences":
@@ -289,19 +268,33 @@ class Network_Matrix:
     ##################################################################################
 
     def _update_preferences(self):
-        low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preference_matrix + self.phi_array*self.social_component_vector
+        low_carbon_preferences = (1 - self.phi)*self.low_carbon_preference_matrix + self.phi*self.social_component_vector
         low_carbon_preferences_clipped  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon_init_preference, 1 - self.clipping_epsilon_init_preference)#this stops the guassian error from causing A to be too large or small thereby producing nans
         return low_carbon_preferences_clipped
     
     def _calc_Omega_m(self):
         term_1 = (self.prices_high_carbon_instant*self.low_carbon_preference_matrix)
+        #print(self.prices_high_carbon_instant,self.low_carbon_preference_matrix.shape )
+        #quit()
         term_2 = (self.prices_low_carbon_m*(1- self.low_carbon_preference_matrix))
-        omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_matrix)
-        #print("omega", np.mean(omega_vector))
+        omega_vector = (term_1/term_2)**self.low_carbon_substitutability
+        #print("self.low_carbon_preference_matrix", self.low_carbon_preference_matrix)
+        #print("omega", omega_vector[0])
+        #print("cum sum mean",  self.cum_mean( omega_vector[0]))
+        #quit()
         return omega_vector
-    
+
+    def cum_mean(self,arr):
+        cum_sum = np.cumsum(arr, axis=0)    
+        for i in range(cum_sum.shape[0]):       
+            if i == 0:
+                continue        
+            #print(cum_sum[i] / (i + 1))
+            cum_sum[i] =  cum_sum[i] / (i + 1)
+        return cum_sum
+
     def _calc_n_tilde_m(self):
-        n_tilde_m = (self.low_carbon_preference_matrix*(self.Omega_m_matrix**((self.low_carbon_substitutability_matrix-1)/self.low_carbon_substitutability_matrix))+(1-self.low_carbon_preference_matrix))**(self.low_carbon_substitutability_matrix/(self.low_carbon_substitutability_matrix-1))
+        n_tilde_m = (self.low_carbon_preference_matrix*(self.Omega_m_matrix**((self.low_carbon_substitutability-1)/self.low_carbon_substitutability))+(1-self.low_carbon_preference_matrix))**(self.low_carbon_substitutability/(self.low_carbon_substitutability-1))
         #print("n_tilde_m", np.mean(n_tilde_m))
         return n_tilde_m
         
@@ -318,24 +311,35 @@ class Network_Matrix:
         return Z
     
     def _calc_consumption_quantities_nested_CES(self):
-        #I DONT LIKE THIS FORUMALTION
-        term_1 = self.instant_expenditure_vec/self.Z_vec
-        term_1_matrix = np.tile(term_1, (self.M,1)).T
-        #print(self.chi_m_tensor.shape,term_1.shape, term_1_matrix.shape )
-        #quit()
-        H_m_matrix = term_1_matrix*self.chi_m_tensor
-        L_m_matrix = H_m_matrix*self.Omega_m_matrix
+        Z_matrix = np.tile(self.Z_vec, (self.M,1)).T
+        H_m_matrix = self.instant_expenditure*self.chi_m_tensor/Z_matrix
+        L_m_matrix = self.Omega_m_matrix*H_m_matrix
 
         return H_m_matrix, L_m_matrix
     
     def _calc_consumption(self):
         self.Omega_m_matrix = self._calc_Omega_m()
+
+        #print(self.Omega_m_matrix)
+        #quit()
+        #print("self.prices_high_carbon_instant", self.prices_high_carbon_instant.shape)
+        #print("self.low ", self.prices_low_carbon_m.shape)
+        #quit()
         self.n_tilde_m_matrix = self._calc_n_tilde_m()
         self.chi_m_tensor = self._calc_chi_m_nested_CES()
         self.Z_vec = self._calc_Z()
         self.H_m_matrix, self.L_m_matrix = self._calc_consumption_quantities_nested_CES()
-        print("TOTAL init",self.H_m_matrix.shape, np.sum(self.H_m_matrix))
-        quit()
+        #a = self._calc_consumption_ratio()
+
+        print("sum H_M",np.sum(self.H_m_matrix))
+        print("self.L_m_matrix", np.sum(self.L_m_matrix))
+        #print("ratio sums total", np.sum(self.L_m_matrix/(self.L_m_matrix + self.H_m_matrix)))
+        #print("prefernecs", self.low_carbon_preference_matrix)
+        #print("imitation ratio", a)
+
+        #print(self.L_m_matrix)
+        #print(self.H_m_matrix)
+        #print(np.sum(self.L_m_matrix + self.H_m_matrix,axis = 1))
 
     def _calc_ego_influence_degroot(self) -> npt.NDArray:
         # Perform the matrix multiplication using the dot method for sparse matrices
@@ -408,17 +412,17 @@ class Network_Matrix:
         return weighting_matrix_list  
 
     def _calc_emissions(self):
-        self.total_carbon_emissions_flow = self.H_m_matrix.sum()# Calculate the emissions flow for the current time step
+        self.total_carbon_emissions_flow = np.sum(self.H_m_matrix)# Calculate the emissions flow for the current time step
         self.total_carbon_emissions_stock += self.total_carbon_emissions_flow# Accumulate the emissions to compute the stock over time
     
     def _calc_carbon_dividend_array(self):
-        total_quantities_m = self.H_m_matrix.sum(axis = 0)
+        total_quantities_m = np.sum(self.H_m_matrix,axis = 0)
         tax_income_R =  np.sum(self.carbon_price_m*total_quantities_m) 
-        carbon_dividend_array = tax_income_R/self.N
-        return carbon_dividend_array
+        carbon_dividend = tax_income_R/self.N
+        return carbon_dividend
 
     def _calc_instant_expediture(self):
-        instant_expenditure = self.base_expenditure_array + self.carbon_dividend_array
+        instant_expenditure = self.base_expenditure + self.carbon_dividend
         return instant_expenditure
 
     def _split_into_groups(self):
@@ -454,7 +458,7 @@ class Network_Matrix:
 
         self.t += 1
         self._update_carbon_price()#check whether its time to update carbon price
-        self.instant_expenditure_vec = self._calc_instant_expediture()#update expenditures with previous steps gains
+        self.instant_expenditure = self._calc_instant_expediture()#update expenditures with previous steps gains
 
         if self.alpha_change_state != "fixed_preferences":
             self.low_carbon_preference_matrix = self._update_preferences()

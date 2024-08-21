@@ -91,11 +91,11 @@ if __name__ == '__main__':
     "carbon_price_increased_lower": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-    "heterogenous_intrasector_preferences_state": 1,
-    "heterogenous_carbon_price_state": 0,
-    "heterogenous_sector_substitutabilities_state": 0,
-    "SBM_block_heterogenous_individuals_substitutabilities_state": 0,
-    "heterogenous_phi_state": 0,
+
+   
+    
+    
+    
 
     "imitation_state": "consumption",
     "vary_seed_state": "multi",
