@@ -19,7 +19,7 @@ import numpy as np
 
 def plot_emissions_scatter(
     fileName, emissions, property_vals,
-    colors_scenarios, scenario_labels
+    colors_scenarios, scenario_labels, param_varied
 ):
     fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(11, 5), sharey=True)
 
@@ -32,12 +32,13 @@ def plot_emissions_scatter(
         
         # Error bars for the confidence intervals
         error_bars = [mu_emissions - lower_bound, upper_bound - mu_emissions]
-        
+        #ax.set_xscale('log')
         # Scatter plot with error bars
-        ax.errorbar(property_vals, mu_emissions, yerr=error_bars, fmt='o', color=colors_scenarios_complete[i], label=scenario_labels[i])
+        ax.errorbar(property_vals, mu_emissions, yerr=error_bars, fmt='o', color=colors_scenarios_complete[i], label=scenario_labels[i], alpha = 0.2)
 
     ax.set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
-    ax.set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    #ax.set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    ax.set_xlabel(param_varied, fontsize="12")
 
     handles, labels = ax.get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=3, fontsize="9")
@@ -60,18 +61,23 @@ def main(
     Data_array = load_object(fileName + "/Data","Data_array")
 
     base_params = load_object(fileName + "/Data","base_params")
-    a_preferences_vals = load_object(fileName + "/Data","a_preferences_vals")
+    print(base_params )
+    quit()
+    #param_vals = load_object(fileName + "/Data","param_vals")
+    param_vals = load_object(fileName + "/Data","a_preferences_vals")
     scenarios = load_object(fileName + "/Data","scenarios")
-
+    #param_varied = load_object(fileName + "/Data","param_varied")
+    param_varied = "a_preferences_vals"
+    
     #####################################################################################################
 
     scenario_labels = ["Fixed preferences","Dynamic social weighting", "Dynamic identity weighting"]  
 
-    plot_emissions_scatter(fileName, Data_array,a_preferences_vals,colors_scenarios, scenario_labels)
+    plot_emissions_scatter(fileName, Data_array,param_vals,colors_scenarios, scenario_labels, param_varied)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/undershoot_15_56_02__20_08_2024",
+        fileName = "results/undershoot_16_11_17__20_08_2024",
        
     )

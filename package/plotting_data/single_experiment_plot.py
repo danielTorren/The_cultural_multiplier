@@ -1053,9 +1053,9 @@ def main(
     ###PLOTS
 
     
-    #plot_identity_matrix(fileName, Data, dpi_save)
+    plot_identity_matrix(fileName, Data, dpi_save)
     bin_num= 200
-    plot_identity_matrix_density(fileName, Data, dpi_save, bin_num)
+    #plot_identity_matrix_density(fileName, Data, dpi_save, bin_num)
     #plot_emissions_flow_matrix(fileName, Data, dpi_save)
     #plot_emissions_individuals(fileName, Data, dpi_save)
     #plot_identity_timeseries(fileName, Data, dpi_save)

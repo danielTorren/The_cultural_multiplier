@@ -22,8 +22,10 @@ class Network_Matrix:
         self._update_carbon_price()
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         self._initialize_substitutabilities()
-        self._calc_consumption()
+        self._calc_consumption()#Can come before network creatation as that just mixes rows of preference but not within the row ie within people
 
+        print("low_carbon_preference_matrix", self.low_carbon_preference_matrix.shape, np.mean(self.low_carbon_preference_matrix))
+        quit()
         #NETWORKS
         if self.alpha_change_state != "fixed_preferences":
             self._initialize_network_homophily()
@@ -35,7 +37,9 @@ class Network_Matrix:
         self.carbon_dividend_array = self._calc_carbon_dividend_array()
 
         self.total_carbon_emissions_stock = 0
-        self.total_carbon_emissions_stock_sectors = np.zeros(self.M)
+        self.total_carbon_emissions_stock_alt = 0
+
+        print("E init flow:", self.H_m_matrix.sum())
 
     def _set_seeds(self):
         #seeds
@@ -145,8 +149,10 @@ class Network_Matrix:
         self.shuffle_reps_homophily = int(round((self.N * (1 - self.homophily_state)) ** self.shuffle_intensity))
 
     def _initialize_expenditure(self):
-        self.individual_expenditure_array = np.full(self.N, 1 / self.N)
-        self.instant_expenditure_vec = self.individual_expenditure_array
+        #self.base_expenditure_array = np.full(self.N, 1 / self.N)
+        self.base_expenditure_array = np.full(self.N, 1 / (self.N*self.M))
+        #print("self.base_expenditure_array ", self.base_expenditure_array[0] )
+        self.instant_expenditure_vec = self.base_expenditure_array
 
     def _initialize_sector_preferences(self):
         self.sector_substitutability = self.parameters["sector_substitutability"]
@@ -284,51 +290,43 @@ class Network_Matrix:
 
     def _update_preferences(self):
         low_carbon_preferences = (1 - self.phi_array)*self.low_carbon_preference_matrix + self.phi_array*self.social_component_vector
-        low_carbon_preferences  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)#this stops the guassian error from causing A to be too large or small thereby producing nans
-        return low_carbon_preferences
+        low_carbon_preferences_clipped  = np.clip(low_carbon_preferences, 0 + self.clipping_epsilon_init_preference, 1 - self.clipping_epsilon_init_preference)#this stops the guassian error from causing A to be too large or small thereby producing nans
+        return low_carbon_preferences_clipped
     
     def _calc_Omega_m(self):
         term_1 = (self.prices_high_carbon_instant*self.low_carbon_preference_matrix)
         term_2 = (self.prices_low_carbon_m*(1- self.low_carbon_preference_matrix))
         omega_vector = (term_1/term_2)**(self.low_carbon_substitutability_matrix)
+        #print("omega", np.mean(omega_vector))
         return omega_vector
     
     def _calc_n_tilde_m(self):
         n_tilde_m = (self.low_carbon_preference_matrix*(self.Omega_m_matrix**((self.low_carbon_substitutability_matrix-1)/self.low_carbon_substitutability_matrix))+(1-self.low_carbon_preference_matrix))**(self.low_carbon_substitutability_matrix/(self.low_carbon_substitutability_matrix-1))
+        #print("n_tilde_m", np.mean(n_tilde_m))
         return n_tilde_m
         
     def _calc_chi_m_nested_CES(self):
         chi_m = ((self.sector_preferences*(self.n_tilde_m_matrix**((self.sector_substitutability-1)/self.sector_substitutability)))/self.prices_high_carbon_instant)**self.sector_substitutability
+        #print("chi ", np.mean(chi_m))
         return chi_m
     
     def _calc_Z(self):
         common_vector = self.Omega_m_matrix*self.prices_low_carbon_m + self.prices_high_carbon_instant
         no_sum_Z_terms = self.chi_m_tensor*common_vector
         Z = no_sum_Z_terms.sum(axis = 1)
+        #print("Z", np.mean(Z))
         return Z
     
     def _calc_consumption_quantities_nested_CES(self):
+        #I DONT LIKE THIS FORUMALTION
         term_1 = self.instant_expenditure_vec/self.Z_vec
         term_1_matrix = np.tile(term_1, (self.M,1)).T
+        #print(self.chi_m_tensor.shape,term_1.shape, term_1_matrix.shape )
+        #quit()
         H_m_matrix = term_1_matrix*self.chi_m_tensor
         L_m_matrix = H_m_matrix*self.Omega_m_matrix
 
         return H_m_matrix, L_m_matrix
-
-    def _calc_consumption_ratio(self):
-        ratio = self.L_m_matrix/(self.L_m_matrix + self.H_m_matrix)
-        return ratio
-
-    def _calc_outward_social_influence(self):
-        if self.imitation_state == "consumption":
-            outward_social_influence_matrix = self.consumption_ratio_matrix
-        elif self.imitation_state == "expenditure": 
-            outward_social_influence_matrix = (self.L_m_matrix*self.prices_low_carbon_m)/self.instant_expenditure_vec
-        elif self.imitation_state == "common_knowledge":
-            outward_social_influence_matrix = self.low_carbon_preference_matrix#self.prices_low_carbon_m/(self.prices_high_carbon_instant*(1/self.Omega_m_matrix**(1/self.low_carbon_substitutability_array)) + self.prices_low_carbon_m)
-        else: 
-            raise ValueError("Invalid imitaiton_state:common_knowledge, expenditure, consumption")
-        return outward_social_influence_matrix
     
     def _calc_consumption(self):
         self.Omega_m_matrix = self._calc_Omega_m()
@@ -336,17 +334,21 @@ class Network_Matrix:
         self.chi_m_tensor = self._calc_chi_m_nested_CES()
         self.Z_vec = self._calc_Z()
         self.H_m_matrix, self.L_m_matrix = self._calc_consumption_quantities_nested_CES()
-        self.consumption_ratio_matrix = self._calc_consumption_ratio()
-        self.outward_social_influence_matrix = self._calc_outward_social_influence()
+        print("TOTAL init",self.H_m_matrix.shape, np.sum(self.H_m_matrix))
+        quit()
 
     def _calc_ego_influence_degroot(self) -> npt.NDArray:
-       
         # Perform the matrix multiplication using the dot method for sparse matrices
         neighbour_influence = self.weighting_matrix.dot(self.outward_social_influence_matrix)
-        # Convert the result to a dense NumPy array if necessary
         return neighbour_influence
-        
+
+    def _calc_consumption_ratio(self):
+        ratio = self.L_m_matrix/(self.L_m_matrix + self.H_m_matrix)
+        return ratio
+    
     def _calc_social_component_matrix(self) -> npt.NDArray:
+        self.outward_social_influence_matrix = self._calc_consumption_ratio()
+
         if self.alpha_change_state in ("static_socially_determined_weights","dynamic_socially_determined_weights"):
             social_influence = self._calc_ego_influence_degroot_independent()
         else:#culturally determined either static or dynamic
@@ -402,8 +404,13 @@ class Network_Matrix:
             low_carbon_preferences_list = attribute_matrix[m]
             norm_weighting_matrix = self._calc_weighting_matrix_attribute(low_carbon_preferences_list)
             weighting_matrix_list.append(norm_weighting_matrix)
+        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)#CAN REMOVE LATER, JUST TO KEEP TRACK OF IT
         return weighting_matrix_list  
 
+    def _calc_emissions(self):
+        self.total_carbon_emissions_flow = self.H_m_matrix.sum()# Calculate the emissions flow for the current time step
+        self.total_carbon_emissions_stock += self.total_carbon_emissions_flow# Accumulate the emissions to compute the stock over time
+    
     def _calc_carbon_dividend_array(self):
         total_quantities_m = self.H_m_matrix.sum(axis = 0)
         tax_income_R =  np.sum(self.carbon_price_m*total_quantities_m) 
@@ -411,7 +418,7 @@ class Network_Matrix:
         return carbon_dividend_array
 
     def _calc_instant_expediture(self):
-        instant_expenditure = self.individual_expenditure_array + self.carbon_dividend_array
+        instant_expenditure = self.base_expenditure_array + self.carbon_dividend_array
         return instant_expenditure
 
     def _split_into_groups(self):
@@ -455,7 +462,7 @@ class Network_Matrix:
         self._calc_consumption()
 
         if self.alpha_change_state != "fixed_preferences":
-            if self.alpha_change_state in ("dynamic_identity_determined_weights", "common_knowledge_dynamic_identity_determined_weights"):
+            if self.alpha_change_state == "dynamic_identity_determined_weights":
                 self.weighting_matrix = self._update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":#independent behaviours
                 self.weighting_matrix_tensor = self._update_weightings_list()
@@ -466,10 +473,7 @@ class Network_Matrix:
         self.carbon_dividend_array = self._calc_carbon_dividend_array()
         
         if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
-            self.total_carbon_emissions_flow = self.H_m_matrix.sum()
-            self.total_carbon_emissions_flow_sectors = self.H_m_matrix.sum(axis = 0)
-            self.total_carbon_emissions_stock = self.total_carbon_emissions_stock + self.total_carbon_emissions_flow
-            self.total_carbon_emissions_stock_sectors = self.total_carbon_emissions_stock_sectors + self.total_carbon_emissions_flow_sectors
+            self._calc_emissions()
 
         if self.save_timeseries_data_state:
             self.total_carbon_emissions_flow_vec = self.H_m_matrix.sum(axis = 1)

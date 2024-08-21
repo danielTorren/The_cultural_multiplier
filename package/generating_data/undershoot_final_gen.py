@@ -9,7 +9,7 @@ from package.resources.utility import (
 import numpy as np
 from copy import deepcopy
 
-def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
+def arrange_scenarios(base_params_tax, param_vals,scenarios, param_varied):
     base_params_tax_copy = deepcopy(base_params_tax)
     params_list = []
 
@@ -17,21 +17,21 @@ def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
     if "fixed_preferences" in scenarios:
         base_params_copy_1 = deepcopy(base_params_tax_copy)
         base_params_copy_1["alpha_change_state"] = "fixed_preferences"
-        params_sub_list_1 = produce_param_list_stochastic_multi(base_params_copy_1, carbon_tax_vals,"a_preferences")
+        params_sub_list_1 = produce_param_list_stochastic_multi(base_params_copy_1, param_vals,param_varied)
         params_list.extend(params_sub_list_1)
 
     # 5. Run with social learning, Emissions: [S_n]
     if "dynamic_socially_determined_weights" in scenarios:
         base_params_copy_5 = deepcopy(base_params_tax_copy)
         base_params_copy_5["alpha_change_state"] = "dynamic_socially_determined_weights"
-        params_sub_list_5 = produce_param_list_stochastic_multi(base_params_copy_5, carbon_tax_vals,"a_preferences")
+        params_sub_list_5 = produce_param_list_stochastic_multi(base_params_copy_5, param_vals,param_varied)
         params_list.extend(params_sub_list_5)
 
     # 6.  Run with cultural learning, Emissions: [S_n]
     if "dynamic_identity_determined_weights" in scenarios:
         base_params_copy_6 = deepcopy(base_params_tax_copy)
         base_params_copy_6["alpha_change_state"] = "dynamic_identity_determined_weights"
-        params_sub_list_6 = produce_param_list_stochastic_multi(base_params_copy_6, carbon_tax_vals,"a_preferences")
+        params_sub_list_6 = produce_param_list_stochastic_multi(base_params_copy_6, param_vals,param_varied)
         params_list.extend(params_sub_list_6)
 
     return params_list
@@ -68,10 +68,11 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName:", fileName)
 
-    reps = 20
-    a_preferences_vals = np.linspace(0.1, 4, reps)
+    reps = 10
+    param_vals = np.linspace(0, 5, reps)#np.logspace(np.log10(0.001), np.log10(0.05), reps)# np.linspace(0.1, 4, reps)
+    param_varied = "confirmation_bias"#"phi_lower"#"a_preferences"
 
-    params_list = arrange_scenarios_tax(base_params, a_preferences_vals, scenarios)
+    params_list = arrange_scenarios(base_params, param_vals, scenarios, param_varied)
     print("Total runs:",len(params_list))
 
     #Data_array_flat = identity_timeseries_run(params_list)
@@ -87,7 +88,8 @@ def main(
     save_object(base_params, fileName + "/Data", "base_params")
     save_object(Data_array, fileName + "/Data", "Data_array")
     save_object(scenarios, fileName + "/Data", "scenarios")
-    save_object(a_preferences_vals, fileName + "/Data", "a_preferences_vals")
+    save_object(param_vals, fileName + "/Data", "param_vals")
+    save_object(param_varied, fileName + "/Data", "param_varied" )
 
     return fileName
 
@@ -95,7 +97,7 @@ if __name__ == '__main__':
     
     base_params = {
     "network_type": "SW",
-    "coherance_state": 0.9,
+    "coherance_state": 0,
     "homophily_state": 0,
     "phi_lower": 0.03,
     "carbon_price_increased_lower": 0,
@@ -108,18 +110,18 @@ if __name__ == '__main__':
     "heterogenous_phi_state": 0,
     "imitation_state": "consumption",
     "vary_seed_state": "multi",
-    "seed_reps": 100,#100,
-    "carbon_price_duration": 360, 
+    "seed_reps": 5,#100,
+    "carbon_price_duration": 1,#360, 
     "burn_in_duration": 0, 
-    "N": 3000,#3000, 
+    "N": 500,#3000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability_lower": 2, 
     "low_carbon_substitutability_upper": 2, 
-    #"a_preferences": 2, 
+    "a_preferences": 2, 
     "b_preferences": 2, 
     "clipping_epsilon_init_preference": 1e-5, 
-    "confirmation_bias": 5, 
+    #"confirmation_bias": 5, 
     "init_carbon_price": 0, 
     "BA_density":0.1,
     #"BA_density":0.1,
