@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 class NCESUtilityCalculator:
     def __init__(self, low_carbon_preference_matrix, sector_preferences, prices_low_carbon_m, prices_high_carbon_instant, low_carbon_substitutability, sector_substitutability, instant_expenditure):
@@ -43,7 +44,7 @@ class NCESUtilityCalculator:
         Omega_m_matrix = self._calc_Omega_m()
 
         Z_matrix = np.tile(Z_vec, (self.low_carbon_preference_matrix.shape[1], 1)).T
-        H_m_matrix = self.instant_expenditure * chi_m_tensor / Z_matrix
+        H_m_matrix = self.instant_expenditure* chi_m_tensor / Z_matrix
         L_m_matrix = Omega_m_matrix * H_m_matrix
 
         return H_m_matrix, L_m_matrix
@@ -51,48 +52,55 @@ class NCESUtilityCalculator:
     def _calc_consumption(self):
         H_m_matrix, L_m_matrix = self._calc_consumption_quantities_nested_CES()
         return H_m_matrix, L_m_matrix
-    
-# Parameters
-N = 100
-M_values = [3, 30, 300]  # Different numbers of services
-low_carbon_preference_values = np.linspace(0, 1, 100)  # A values ranging from 0 to 1
-sector_substitutability = 2  # nu = 2
-instant_expenditure = 1/N  # Expenditure set to 1 for all agents
 
-prices_low_carbon_m = 1
-prices_high_carbon_instant = 1
+
+# Parameters
+N = 500  # Number of individuals
+M = 3  # Number of services
+a_values = np.linspace(0.1, 8, 50)  # Beta distribution parameter a
+b_values = np.linspace(0.1, 8, 50)  # Beta distribution parameter b
+
+prices_low_carbon_m = 1  # Prices for low-carbon goods set to 1
+prices_high_carbon_instant = 1  # Prices for high-carbon goods set to 1
 low_carbon_substitutability = 2  # sigma = 2
+sector_substitutability = 2  # nu = 2
+instant_expenditure = 1/N  # Expenditure set to 1 for all individuals
+
+M_values = [3, 30, 300]  # Different M values
+
 # Initialize the figure
 fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
 # Loop over different M values
 for k, M in enumerate(M_values):
     # Adjust sector preferences and prices to match M
-    sector_preferences = 1/M
-    # Store results for plotting
-    H_m_results = []
-    L_m_results = []
+    sector_preferences =1/M  # All sector preferences set to 1
+    
+    # Initialize results storage
+    emissions_results = np.zeros((len(a_values), len(b_values)))
 
-    # Calculate and store L and H for each A
-    for A in low_carbon_preference_values:
-        low_carbon_preference_matrix = np.full((N, M), A)
-        #print("low_carbon_preference_matrix",low_carbon_preference_matrix)
-        #quit()
-        calculator = NCESUtilityCalculator(low_carbon_preference_matrix, sector_preferences, prices_low_carbon_m, prices_high_carbon_instant, low_carbon_substitutability, sector_substitutability, instant_expenditure)
-        H_m_matrix, L_m_matrix = calculator._calc_consumption()
-        
-        # Aggregate the results for all services and agents
-        H_m_results.append(np.sum(H_m_matrix))
-        L_m_results.append(np.sum(L_m_matrix))
-    
-    # Plotting for the current M
-    axes[k].plot(low_carbon_preference_values, H_m_results, label='High-carbon goods (H_m)', color='red')
-    axes[k].plot(low_carbon_preference_values, L_m_results, label='Low-carbon goods (L_m)', color='green')
-    axes[k].set_xlabel('Preference for Low-carbon Goods (A)')
-    
-    axes[k].set_title(f'Sectors = {M}')
-    axes[k].legend()
-    axes[k].grid(True)
-axes[0].set_ylabel('Quantity')
+    # Compute emissions (sum(H)) for each combination of a and b
+    for i, a in enumerate(a_values):
+        for j, b in enumerate(b_values):
+            # Generate the preference matrix A using the beta distribution
+            low_carbon_preference_matrix = np.random.beta(a, b, (N, M))
+            
+            # Instantiate the calculator
+            calculator = NCESUtilityCalculator(low_carbon_preference_matrix, sector_preferences, prices_low_carbon_m, prices_high_carbon_instant, low_carbon_substitutability, sector_substitutability, instant_expenditure)
+            
+            # Calculate H and L
+            H_m_matrix, L_m_matrix = calculator._calc_consumption()
+            
+            # Calculate total emissions (sum(H))
+            emissions_results[i, j] = np.sum(H_m_matrix)
+
+    # Plotting the contour for the current M
+    contour = axes[k].contourf(b_values, a_values, emissions_results, cmap='viridis')
+    axes[k].set_title(f'M = {M}')
+    axes[k].set_xlabel('Beta distribution parameter b')
+    if k == 0:
+        axes[k].set_ylabel('Beta distribution parameter a')
+    fig.colorbar(contour, ax=axes[k])
+
 plt.tight_layout()
 plt.show()

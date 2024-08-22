@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Initialize the NCESUtilityCalculator class
 class NCESUtilityCalculator:
     def __init__(self, low_carbon_preference_matrix, sector_preferences, prices_low_carbon_m, prices_high_carbon_instant, low_carbon_substitutability, sector_substitutability, instant_expenditure):
         self.low_carbon_preference_matrix = low_carbon_preference_matrix
@@ -43,6 +44,10 @@ class NCESUtilityCalculator:
         Omega_m_matrix = self._calc_Omega_m()
 
         Z_matrix = np.tile(Z_vec, (self.low_carbon_preference_matrix.shape[1], 1)).T
+        #print(chi_m_tensor.shape)
+        #print(Z_matrix.shape)
+        #quit()
+
         H_m_matrix = self.instant_expenditure * chi_m_tensor / Z_matrix
         L_m_matrix = Omega_m_matrix * H_m_matrix
 
@@ -53,46 +58,38 @@ class NCESUtilityCalculator:
         return H_m_matrix, L_m_matrix
     
 # Parameters
-N = 100
+N = 100  # Number of individuals
 M_values = [3, 30, 300]  # Different numbers of services
-low_carbon_preference_values = np.linspace(0, 1, 100)  # A values ranging from 0 to 1
-sector_substitutability = 2  # nu = 2
-instant_expenditure = 1/N  # Expenditure set to 1 for all agents
-
+a, b = 1, 1  # Parameters for the beta distribution
+instant_expenditure = 1 / N  # Expenditure set to 1/N for all agents
 prices_low_carbon_m = 1
 prices_high_carbon_instant = 1
 low_carbon_substitutability = 2  # sigma = 2
+sector_substitutability = 2  # nu = 2
+
 # Initialize the figure
 fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
 # Loop over different M values
 for k, M in enumerate(M_values):
-    # Adjust sector preferences and prices to match M
-    sector_preferences = 1/M
-    # Store results for plotting
-    H_m_results = []
-    L_m_results = []
+    sector_preferences = 1 / M  # Sector preferences for M services
+    
+    # Generate A values using a beta distribution
+    A_values = np.random.beta(a, b, size=(N, M))
+    
+    # Calculate L and H for these A values
+    calculator = NCESUtilityCalculator(A_values, sector_preferences, prices_low_carbon_m, prices_high_carbon_instant, low_carbon_substitutability, sector_substitutability, instant_expenditure)
+    H_m_matrix, L_m_matrix = calculator._calc_consumption()
 
-    # Calculate and store L and H for each A
-    for A in low_carbon_preference_values:
-        low_carbon_preference_matrix = np.full((N, M), A)
-        #print("low_carbon_preference_matrix",low_carbon_preference_matrix)
-        #quit()
-        calculator = NCESUtilityCalculator(low_carbon_preference_matrix, sector_preferences, prices_low_carbon_m, prices_high_carbon_instant, low_carbon_substitutability, sector_substitutability, instant_expenditure)
-        H_m_matrix, L_m_matrix = calculator._calc_consumption()
-        
-        # Aggregate the results for all services and agents
-        H_m_results.append(np.sum(H_m_matrix))
-        L_m_results.append(np.sum(L_m_matrix))
-    
-    # Plotting for the current M
-    axes[k].plot(low_carbon_preference_values, H_m_results, label='High-carbon goods (H_m)', color='red')
-    axes[k].plot(low_carbon_preference_values, L_m_results, label='Low-carbon goods (L_m)', color='green')
+    # Scatter plot of A vs. H and A vs. L
+    axes[k].scatter(A_values.flatten(), H_m_matrix.flatten(), color='red', label='High-carbon goods (H_m)', alpha=0.6)
+    axes[k].scatter(A_values.flatten(), L_m_matrix.flatten(), color='green', label='Low-carbon goods (L_m)', alpha=0.6)
+
     axes[k].set_xlabel('Preference for Low-carbon Goods (A)')
-    
     axes[k].set_title(f'Sectors = {M}')
     axes[k].legend()
     axes[k].grid(True)
+
 axes[0].set_ylabel('Quantity')
 plt.tight_layout()
 plt.show()

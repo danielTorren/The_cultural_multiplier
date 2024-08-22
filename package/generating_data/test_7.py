@@ -53,46 +53,57 @@ class NCESUtilityCalculator:
         return H_m_matrix, L_m_matrix
     
 # Parameters
-N = 100
-M_values = [3, 30, 300]  # Different numbers of services
-low_carbon_preference_values = np.linspace(0, 1, 100)  # A values ranging from 0 to 1
+M = 2  # Number of sectors
+N = 100  # Number of individuals
+sector_preferences = np.ones(M) / M  # Sector preferences set to 1/M for each sector
+prices_low_carbon_m = np.ones(M)  # Prices for low-carbon goods set to 1 for each sector
+prices_high_carbon_instant = np.ones(M)  # Prices for high-carbon goods set to 1 for each sector
+low_carbon_substitutability = np.ones(M) * 2  # sigma = 2 for each sector
 sector_substitutability = 2  # nu = 2
-instant_expenditure = 1/N  # Expenditure set to 1 for all agents
+instant_expenditure = 1 / N  # Expenditure set to 1/N for each agent
 
-prices_low_carbon_m = 1
-prices_high_carbon_instant = 1
-low_carbon_substitutability = 2  # sigma = 2
-# Initialize the figure
-fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+# Create a grid of A_1 and A_2 values
+A1_values = np.linspace(0, 1, 100)
+A2_values = np.linspace(0, 1, 100)
+A1_grid, A2_grid = np.meshgrid(A1_values, A2_values)
 
-# Loop over different M values
-for k, M in enumerate(M_values):
-    # Adjust sector preferences and prices to match M
-    sector_preferences = 1/M
-    # Store results for plotting
-    H_m_results = []
-    L_m_results = []
+# Initialize matrices to store results
+H_m_results = np.zeros_like(A1_grid)
+L_m_results = np.zeros_like(A1_grid)
 
-    # Calculate and store L and H for each A
-    for A in low_carbon_preference_values:
-        low_carbon_preference_matrix = np.full((N, M), A)
-        #print("low_carbon_preference_matrix",low_carbon_preference_matrix)
-        #quit()
+# Calculate L and H for each pair of (A1, A2)
+for i in range(A1_grid.shape[0]):
+    for j in range(A1_grid.shape[1]):
+        A1 = A1_grid[i, j]
+        A2 = A2_grid[i, j]
+        
+        low_carbon_preference_matrix = np.array([[A1, A2]] * N)
         calculator = NCESUtilityCalculator(low_carbon_preference_matrix, sector_preferences, prices_low_carbon_m, prices_high_carbon_instant, low_carbon_substitutability, sector_substitutability, instant_expenditure)
         H_m_matrix, L_m_matrix = calculator._calc_consumption()
         
-        # Aggregate the results for all services and agents
-        H_m_results.append(np.sum(H_m_matrix))
-        L_m_results.append(np.sum(L_m_matrix))
-    
-    # Plotting for the current M
-    axes[k].plot(low_carbon_preference_values, H_m_results, label='High-carbon goods (H_m)', color='red')
-    axes[k].plot(low_carbon_preference_values, L_m_results, label='Low-carbon goods (L_m)', color='green')
-    axes[k].set_xlabel('Preference for Low-carbon Goods (A)')
-    
-    axes[k].set_title(f'Sectors = {M}')
-    axes[k].legend()
-    axes[k].grid(True)
-axes[0].set_ylabel('Quantity')
-plt.tight_layout()
+        # Sum the results for all agents
+        H_m_results[i, j] = np.sum(H_m_matrix)
+        L_m_results[i, j] = np.sum(L_m_matrix)
+
+# Compute the gradient of H and L
+H_m_gradient = np.gradient(H_m_results)
+L_m_gradient = np.gradient(L_m_results)
+
+# Plot the gradient maps
+fig, axes = plt.subplots(1, 2, figsize=(18, 6))
+
+# Gradient plot for H quantities
+
+axes[0].quiver(A1_grid, A2_grid, H_m_gradient[1], H_m_gradient[0], color='red', scale=0.6, scale_units='xy')
+axes[0].set_xlabel('Preference for Low-carbon Goods in Sector 1 (A1)')
+axes[0].set_ylabel('Preference for Low-carbon Goods in Sector 2 (A2)')
+axes[0].set_title('Gradient of High-carbon Goods Quantity (H)')
+
+# Gradient plot for L quantities
+axes[1].quiver(A1_grid, A2_grid, L_m_gradient[1], L_m_gradient[0], color='green', scale=0.6, scale_units='xy')
+axes[1].set_xlabel('Preference for Low-carbon Goods in Sector 1 (A1)')
+axes[1].set_ylabel('Preference for Low-carbon Goods in Sector 2 (A2)')
+axes[1].set_title('Gradient of Low-carbon Goods Quantity (L)')
+
+#plt.tight_layout()
 plt.show()
