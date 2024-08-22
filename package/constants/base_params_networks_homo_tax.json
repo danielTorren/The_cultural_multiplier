@@ -4,7 +4,7 @@
 
     "alpha_change_state": "dynamic_identity_determined_weights",
     "imitation_state": "consumption",
-    "vary_seed_state": "multi",
+
     "seed_reps": 100,
     "preferences_seed":8,
     "carbon_price_duration": 360, 

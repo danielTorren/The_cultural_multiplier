@@ -340,6 +340,7 @@ def plot_joint_confidence(
 
 def main(
     fileName,
+    MULTIPLIER = 1
 ) -> None:
     
     name = "tab20"
@@ -352,14 +353,7 @@ def main(
     emissions_BA = load_object(fileName + "/Data","emissions_BA")
     emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_BA])    
     
-
     base_params = load_object(fileName + "/Data","base_params")
-    print(base_params)
-    quit()
-
-    MULTIPLIER = 0
-
-
 
     #####################################################################################################
 
@@ -367,9 +361,7 @@ def main(
     scenario_labels = ["Fixed preferences","Dynamic social weighting", "Dynamic identity weighting"]
 
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
-    #print(tau_static.shape)
-    #quit()
-    #value_min = 0
+
     plot_emissions_lines(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
     plot_emissions_confidence(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
 
@@ -378,10 +370,10 @@ def main(
         list_ratio_networks = load_object(fileName + "/Data","list_ratio_networks")
         tau_static = load_object(fileName + "/Data","tau_static")
         scenario_labels_M = ["Social mutliplier", "Cultural multiplier"]
-        #plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        #plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        #plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        #plot_ratio_confidence(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        plot_ratio_confidence(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
         plot_joint(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
         plot_joint_confidence(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
 
@@ -389,6 +381,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_18_23_13__19_08_2024",
-       
+        fileName = "results/tax_sweep_networks_15_45_16__22_08_2024",
+        MULTIPLIER = 1
     )

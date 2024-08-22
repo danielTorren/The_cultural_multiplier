@@ -392,6 +392,7 @@ def reconstruct_seeds_list(params: dict) -> list[dict]:
 
 def main(
     fileName,
+    RUN = 0,
     tau_lower_bound = -0.6, 
     tau_upper_bound = 10,
     total_range_runs = 100
@@ -409,7 +410,7 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
     base_params = load_object(fileName + "/Data", "base_params") 
     
-    RUN = 0
+    
 
     if RUN: 
         #"""
@@ -447,5 +448,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/tax_sweep_networks_18_23_13__19_08_2024"
+        fileName= "results/tax_sweep_networks_18_23_13__19_08_2024",
+        RUN = 0
     )

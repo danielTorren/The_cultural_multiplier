@@ -5,6 +5,7 @@ import json
 from package.resources.utility import createFolder, produce_name_datetime, save_object, produce_param_list_stochastic_multi
 from package.resources.run import emissions_parallel_run
 from package.resources.utility import generate_vals
+from package.generating_data.network_multiplier_gen import main as calc_multiplier
 
 def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
     base_params_tax_copy = deepcopy(base_params_tax)
@@ -104,12 +105,14 @@ def main(
     save_object(property_values_list, fileName + "/Data", "property_values_list")
     save_object(scenarios, fileName + "/Data", "scenarios")
 
+    calc_multiplier(fileName, RUN = 1)
+
     return fileName
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_networks_tax_sweep_test.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_tax_sweep_test.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_networks_tax_sweep.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_tax_sweep.json",
         scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ],
     )
 

@@ -98,7 +98,7 @@ if __name__ == '__main__':
     
 
     "imitation_state": "consumption",
-    "vary_seed_state": "multi",
+
     "alpha_change_state": "dynamic_identity_determined_weights",
     "seed_reps": 100,#100,
     "network_structure_seed": 1, 

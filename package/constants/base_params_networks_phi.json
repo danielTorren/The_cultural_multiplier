@@ -3,7 +3,7 @@
     "compression_factor_state": 1,
 
     "imitation_state": "consumption",
-    "vary_seed_state": "multi",
+
     "alpha_change_state": "dynamic_identity_determined_weights",
     "seed_reps": 100,
     "carbon_price_duration": 360, 
