@@ -10,7 +10,6 @@
     
 
     "imitation_state": "consumption",
-    "vary_seed_state": "network",
 
     "network_structure_seed": 10, 
     "preferences_seed": 77, 

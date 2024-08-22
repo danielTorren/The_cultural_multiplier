@@ -48,7 +48,6 @@ class Network_Matrix:
         self.compression_factor_state = self.parameters["compression_factor_state"]
         self.imitation_state = self.parameters["imitation_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
-        self.vary_seed_state = self.parameters["vary_seed_state"]
         self.network_type = self.parameters["network_type"]
         
         self.N = int(round(self.parameters["N"]))
