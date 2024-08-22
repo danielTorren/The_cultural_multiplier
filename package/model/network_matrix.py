@@ -17,15 +17,13 @@ class Network_Matrix:
         self._initialize_social_learning()
         self._initialize_expenditure()
         self._initialize_sector_preferences()
-        #self._initialize_preference_coherance()
+        self._initialize_preference_coherance()
         self._initialize_intra_sector_preferences()#this generates individuals preferences with the correct level of internal coherance, but position mixed entirely
         self._update_carbon_price()
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         self._initialize_substitutabilities()
         self._calc_consumption()#Can come before network creatation as that just mixes rows of preference but not within the row ie within people
 
-        #print("low_carbon_preference_matrix", self.low_carbon_preference_matrix.shape, np.mean(self.low_carbon_preference_matrix))
-        #quit()
         #NETWORKS
         if self.alpha_change_state != "fixed_preferences":
             self._initialize_network_homophily()
@@ -34,12 +32,9 @@ class Network_Matrix:
                 self.low_carbon_preference_matrix = self._shuffle_preferences_start_mixed()
         
         self._initialize_social_component()
-        self.carbon_dividend_array = self._calc_carbon_dividend_array()
+        self.carbon_dividend = self._calc_carbon_dividend()
 
         self.total_carbon_emissions_stock = 0
-        self.total_carbon_emissions_stock_alt = 0
-
-        print("E init flow:", self.H_m_matrix.sum())
 
     def _set_seeds(self):
         self.preferences_seed = self.parameters["preferences_seed"]
@@ -102,12 +97,12 @@ class Network_Matrix:
         self.clipping_epsilon_init_preference = self.parameters["clipping_epsilon_init_preference"]
         self.phi = self.parameters["phi_lower"]
 
-    """
+    
     def _initialize_preference_coherance(self):
         self.coherance_state = self.parameters["coherance_state"]
         self.shuffle_reps_coherance = int(round(((self.N*self.M) * (1 - self.coherance_state)) ** self.shuffle_intensity))
         #print("self.shuffle_reps_coherance", self.shuffle_reps_coherance, self.N*self.M)
-    """
+    
 
     def _initialize_network_homophily(self):
         self.homophily_state = self.parameters["homophily_state"]
@@ -126,8 +121,7 @@ class Network_Matrix:
     def _initialize_intra_sector_preferences(self):
         self.a_preferences = self.parameters["a_preferences"]
         self.b_preferences = self.parameters["b_preferences"]
-        #self.low_carbon_preference_matrix_init = self._generate_init_data_preferences_coherance()
-        self.low_carbon_preference_matrix_init = self._generate_init_data_preferences()
+        self.low_carbon_preference_matrix_init = self._generate_init_data_preferences_coherance()
         self.low_carbon_preference_matrix = self.low_carbon_preference_matrix_init#have a copy of initial preferences
 
     def _create_network(self):
@@ -153,45 +147,25 @@ class Network_Matrix:
 
     ########################################################################################################
 
-    def _generate_init_data_preferences(self) -> tuple[npt.NDArray, npt.NDArray]:
-        np.random.seed(self.preferences_seed)#For inital construction set a seed
-        preferences_beta = np.random.beta( self.a_preferences, self.b_preferences, size=(self.N,self.M))# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
-        #preferences_capped = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
-
-        return preferences_beta#preferences_capped
-    """
     def _generate_init_data_preferences_coherance(self) -> tuple[npt.NDArray, npt.NDArray]:
         np.random.seed(self.preferences_seed)#For inital construction set a seed
         preferences_beta = np.random.beta( self.a_preferences, self.b_preferences, size=self.N*self.M)# THIS WILL ALWAYS PRODUCE THE SAME OUTPUT
-
-        #np.random.shuffle(preferences_beta)#just to check 
-
         preferences_capped_uncoherant = np.clip(preferences_beta, 0 + self.clipping_epsilon_init_preference, 1- self.clipping_epsilon_init_preference)
 
         np.random.seed(self.shuffle_coherance_seed)#For inital construction set a seed. THIS IS REALLY NTO VERY IMPORTANT
         if self.coherance_state != 0:
             #the issue seems to be here
             preferences_sorted = sorted(preferences_capped_uncoherant)#LIST IS NOW SORTED
-            #preferences_sorted = sorted(preferences_capped_uncoherant)[::-1]#LIST IS NOW SORTED
-            
             preferences_coherance = self._partial_shuffle_vector(np.asarray(preferences_sorted), self.shuffle_reps_coherance)
             low_carbon_preference_matrix = preferences_coherance.reshape(self.N,self.M)
-            #print("means", np.mean(low_carbon_preference_matrix, axis =1)) 
-            #print(np.mean(low_carbon_preference_matrix))
         else:
             low_carbon_preference_matrix = preferences_capped_uncoherant.reshape(self.N,self.M)
-            #print("low_carbon_preference_matrix ", low_carbon_preference_matrix )
-            #quit()
-        
-        
+
         #LINE BELOW IS IMPORTANT!
         np.random.shuffle(low_carbon_preference_matrix)#THIS MIXES ROWS BUT NOT WITHIN THE ROW#THE IDEA IS TO HAVE ALL THE INDIVIDUALS MIXED BUT NOT THE ACTUAL PREFERENCES WITHIN EACH INDIVIDUAL
-        #print("pos shuffle")
-        #print("means", np.mean(low_carbon_preference_matrix, axis =1)) 
-        #print(np.mean(low_carbon_preference_matrix), np.var(low_carbon_preference_matrix, axis = 1))
-        #print(low_carbon_preference_matrix)
+
         return low_carbon_preference_matrix
-    """
+    
 
     def _circular_list(self, list_to_circle) -> list:
         first_half = list_to_circle[::2]  # take every second element in the list, even indicies
@@ -283,8 +257,8 @@ class Network_Matrix:
         Z_matrix = np.tile(Z_vec, (self.M, 1)).T#repeat it so that can have chi tensor
         self.H_m_matrix = self.instant_expenditure * chi_m_tensor / Z_matrix
         self.L_m_matrix = Omega_m_matrix * self.H_m_matrix
+        self.outward_social_influence_matrix = self._calc_consumption_ratio()
 
-        #return H_m_matrix, L_m_matrix
     
 ########################################################################################
 
@@ -360,7 +334,7 @@ class Network_Matrix:
         self.total_carbon_emissions_flow = np.sum(self.H_m_matrix)# Calculate the emissions flow for the current time step
         self.total_carbon_emissions_stock += self.total_carbon_emissions_flow# Accumulate the emissions to compute the stock over time
     
-    def _calc_carbon_dividend_array(self):
+    def _calc_carbon_dividend(self):
         total_quantities_m = np.sum(self.H_m_matrix,axis = 0)
         tax_income_R =  np.sum(self.carbon_price_m*total_quantities_m) 
         carbon_dividend = tax_income_R/self.N
@@ -419,7 +393,7 @@ class Network_Matrix:
                 pass #this is for "uniform_network_weighting", "static_socially_determined_weights","static_culturally_determined_weights"
             self.social_component_vector = self._calc_social_component_matrix()
 
-        self.carbon_dividend_array = self._calc_carbon_dividend_array()
+        self.carbon_dividend = self._calc_carbon_dividend()
         
         if self.t > self.burn_in_duration:#what to do it on the end so that its ready for the next round with the tax already there
             self._calc_emissions()
