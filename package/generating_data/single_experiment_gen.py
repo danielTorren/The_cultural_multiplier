@@ -38,7 +38,7 @@ def main(
 if __name__ == '__main__':
     
     base_params = {
-    "phi_lower": 0.03,
+    "phi_lower": 0.02,
     "network_type": "SW",
     "carbon_price_increased_lower": 0,
     "save_timeseries_data_state": 1,

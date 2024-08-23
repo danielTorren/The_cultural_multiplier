@@ -370,6 +370,9 @@ def main(
         list_ratio_networks = load_object(fileName + "/Data","list_ratio_networks")
         tau_static = load_object(fileName + "/Data","tau_static")
         scenario_labels_M = ["Social mutliplier", "Cultural multiplier"]
+
+        #list_M_networks_reduc = list_M_networks[1:]
+
         plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
         plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
         plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
@@ -381,6 +384,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_15_45_16__22_08_2024",
+        fileName = "results/tax_sweep_networks_15_57_56__22_08_2024",
         MULTIPLIER = 1
     )

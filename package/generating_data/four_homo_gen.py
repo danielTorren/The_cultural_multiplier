@@ -86,21 +86,14 @@ if __name__ == '__main__':
     base_params = {
     "preferences_seed": 72,
     "network_structure_seed": 89, 
-    "phi_lower": 0.03,
+    "phi_lower": 0.02,
     "network_type": "SW",
     "carbon_price_increased_lower": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-
-   
-    
-    
-    
-
     "imitation_state": "consumption",
-
     "alpha_change_state": "dynamic_identity_determined_weights",
-    "seed_reps": 100,#100,
+    "seed_reps": 100,
     "network_structure_seed": 1, 
     "preferences_seed": 10, 
     "shuffle_homophily_seed": 20,
@@ -118,7 +111,6 @@ if __name__ == '__main__':
     "confirmation_bias": 5, 
     "init_carbon_price": 0, 
     "BA_density":0.1,
-    #"BA_density":0.1,
     "BA_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
     "SBM_network_density_input_intra_block": 0.2,
