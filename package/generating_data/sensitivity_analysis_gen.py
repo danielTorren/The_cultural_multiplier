@@ -213,7 +213,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_6 = main(
-    N_samples = 1024,
+    N_samples = 128,
     BASE_PARAMS_LOAD = "package/constants/base_params_sensitivity.json",
     VARIABLE_PARAMS_LOAD = "package/constants/variable_parameters_dict_SA.json",
     calc_second_order = True

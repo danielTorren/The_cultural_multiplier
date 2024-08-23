@@ -135,9 +135,10 @@ def plot_multiplier(
     fig.savefig(f+ ".eps", dpi=600, format="eps") 
 
 def plot_multiplier_confidence(
-    fileName_full,  M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios,
+    fileName_full,  M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios,value_min
 ):
 
+    index_min = np.where(property_vals > value_min)[0][0]
     #print(c,emissions_final)
     fig, axes = plt.subplots(ncols=3, nrows=1, figsize=(11, 5), sharey=True)
 
@@ -155,8 +156,8 @@ def plot_multiplier_confidence(
             #print("Data", Data.shape)
             mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
 
-            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c = colors_scenarios_complete[i+1])
-            ax.fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios_complete[i + 1], alpha=0.3)
+            ax.plot(property_vals[index_min:], mu_emissions[index_min:], label=scenarios_titles[i], c = colors_scenarios_complete[i+1])
+            ax.fill_between(property_vals[index_min:], lower_bound[index_min:], upper_bound[index_min:], color=colors_scenarios_complete[i + 1], alpha=0.3)
 
         ax.set_title(network_titles[k], fontsize="12")
 
@@ -362,23 +363,26 @@ def main(
 
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
 
-    plot_emissions_lines(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
-    plot_emissions_confidence(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
+    #plot_emissions_lines(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
+    #plot_emissions_confidence(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
 
     if MULTIPLIER:
         list_M_networks = load_object(fileName + "/Data","list_M_networks")
         list_ratio_networks = load_object(fileName + "/Data","list_ratio_networks")
         tau_static = load_object(fileName + "/Data","tau_static")
         scenario_labels_M = ["Social mutliplier", "Cultural multiplier"]
-
+        
+        # redu
+        #print(list_M_networks.shape)
+        #quit()
         #list_M_networks_reduc = list_M_networks[1:]
-
-        plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        plot_ratio_confidence(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        plot_joint(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
-        plot_joint_confidence(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        value_min = 0.05
+        #plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios,value_min )
+        #plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        #plot_ratio_confidence(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        #plot_joint(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
+        #plot_joint_confidence(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
 
     plt.show()
 
