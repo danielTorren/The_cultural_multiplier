@@ -28,41 +28,20 @@ def main(
     root = "networks_homo_tau"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
+    
+
+    homphily_states = [0, 0.8, 1]
+    homophily_networks = ["SW", "SBM"]
 
 ##########################################################################################################
-    #SW
-    params["network_type"] = "SW"
-    #NO "homophily_state"
-    params["homophily_state"] = 0    
-    params_list_no_tau_SW = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
-
-    #Low "homophily_state"
-    params["homophily_state"] = 0.8   
-    params_list_low_tau_SW = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
-
-    #High "homophily_state"
-    params["homophily_state"] = 1  
-    params_list_high_tau_SW = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
-
-    params_list_SW= params_list_no_tau_SW + params_list_low_tau_SW + params_list_high_tau_SW
-
-##########################################################################################################
-    #SBM
-    params["network_type"] = "SBM"
-    #NO "homophily_state"
-    params["homophily_state"] = 0    
-    params_list_no_tau_SBM = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
-
-    #Low "homophily_state"
-    params["homophily_state"] = 0.8   
-    params_list_low_tau_SBM = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
-
-    #High "homophily_state"
-    params["homophily_state"] = 1  
-    params_list_high_tau_SBM = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
-
-    params_list_SBM = params_list_no_tau_SBM + params_list_low_tau_SBM + params_list_high_tau_SBM
-
+    #DO SBM AND SW
+    params_list = []
+    for i in homophily_networks:
+        params["network_type"] = i
+        for j in homphily_states:
+            params["homophily_state"] = j
+            param_list_specfic = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
+            params_list.extend(param_list_specfic)
 #########################################################################################################
     #BA
     params["network_type"] = "BA"
@@ -83,12 +62,16 @@ def main(
 
     params_list_BA = params_list_no_heg_BA + params_list_green_heg_BA + params_list_brown_heg_BA
 
+    params_list.extend(params_list_BA)
 ############################################################################################################################
     #RUN THE STUFF
-    params_list = params_list_SW + params_list_SBM + params_list_BA
+   
     print("TOTAL RUNS", len(params_list))
 
     emissions_stock_serial = multi_emissions_stock(params_list)
+
+    print("RUNS DONE")
+
     emissions_array = emissions_stock_serial.reshape(3, 3, property_reps, params["seed_reps"])#2 is for BA and SBM,3 is for the 3 differents states
     
     emissions_array_SW = emissions_array[0]
@@ -102,13 +85,8 @@ def main(
     save_object(emissions_array_SW, fileName + "/Data", "emissions_array_SW")
     save_object(emissions_array_SBM, fileName + "/Data", "emissions_array_SBM")
     save_object(emissions_array_BA , fileName + "/Data", "emissions_array_BA")
-
+    save_object(homphily_states, fileName + "/Data", "homphily_states")
     save_object(params, fileName + "/Data", "base_params")
-
-    print("RUNS DONE")
-
-    ###############################################################################################################
-    
     save_object(var_params,fileName + "/Data" , "var_params")
     save_object(property_values_list,fileName + "/Data", "property_values_list")
 

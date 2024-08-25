@@ -133,18 +133,20 @@ def main(
     #BA
     base_params = load_object(fileName + "/Data", "base_params")
     var_params = load_object(fileName + "/Data" , "var_params")
+    homphily_states = load_object(fileName + "/Data" , "homphily_states")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     property_varied = var_params["property_varied"]
 
     emissions_array_BA = load_object(fileName + "/Data", "emissions_array_BA")
-    labels_BA = [r"No homophily, $h = 0$", r"Low-carbon hegemony, $h = 1$", r"High-carbon hegemony, $h = 1$"]
+    
+    labels_BA = [r"No homophily, $h = 0$", r"Low-carbon hegemony", r"High-carbon hegemony"]
     
     emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
-    labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = 0.5$", r"High homophily, $h = 1$"]
+    labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, %s$" % (homphily_states[2])]
 
 
     emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
-    labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = 0.5$", r"High homophily, $h = 1$"]
+    labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, $h = %s$" % (homphily_states[2])]
 
     seed_reps = base_params["seed_reps"]
 
@@ -155,5 +157,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_10_40_04__19_08_2024",
+        fileName= "results/networks_homo_tau_12_58_38__25_08_2024",
     )

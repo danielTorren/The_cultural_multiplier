@@ -53,7 +53,7 @@ class Network_Matrix:
         self.N = int(round(self.parameters["N"]))
         self.M = int(round(self.parameters["M"]))
 
-        self.shuffle_intensity = 1.5
+        self.shuffle_intensity = 1
 
     ###################################################################################################
 
@@ -201,6 +201,9 @@ class Network_Matrix:
             pass
 
         np.random.seed(self.shuffle_homophily_seed)#Set seed for shuffle
+
+        #print("homophily state", self.homophily_state, self.shuffle_reps_homophily)
+        #quit()
         partial_shuffle_matrix = self._partial_shuffle_matrix(sorted_preferences, self.shuffle_reps_homophily)#partial shuffle of the list
 
         return partial_shuffle_matrix
