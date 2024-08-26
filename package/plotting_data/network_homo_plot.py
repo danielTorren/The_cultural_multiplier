@@ -74,6 +74,47 @@ def plot_BA_SBM_3(
     fig.savefig(f + ".png", dpi=600, format="png")
     fig.savefig(f + ".eps", dpi=600, format="eps")
 
+def plot_BA_SBM_3_alt(
+    fileName: str, Data_arr_SW, Data_arr_BA, property_title, property_save, property_vals, labels_BA, Data_arr_SBM, labels_SBM, seed_reps, colors_scenarios
+):
+    #nrows=seed_reps
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(11, 5), constrained_layout=True, sharey=True)
+    
+    for j, Data_list in enumerate(Data_arr_BA):
+        data_SW = Data_arr_SW[j].T
+        data_BA = Data_arr_BA[j].T
+        data_SBM = Data_arr_SBM[j].T
+        for i in range(seed_reps):#loop through seeds
+            axes[0].plot(property_vals, data_SW[i], alpha = 0.1, color = colors_scenarios[j])
+            axes[1].plot(property_vals, data_SBM[i], alpha = 0.1, color = colors_scenarios[j])
+            axes[2].plot(property_vals, data_BA[i], alpha = 0.1,color = colors_scenarios[j])
+
+
+        mu_emissions_BA, _, _ = calc_bounds(data_BA.T, 0.95)
+        mu_emissions_SBM, _, _ = calc_bounds(data_SBM.T, 0.95)
+        mu_emissions_SW, _, _ = calc_bounds(data_SW.T, 0.95)
+
+        axes[0].plot(property_vals, mu_emissions_SW, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
+        axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
+        axes[2].plot(property_vals, mu_emissions_BA, label= labels_BA[j], color = colors_scenarios[j], alpha = 1)
+        
+        #axes[0].grid()
+        #axes[1].grid()
+        #axes[2].grid()
+        axes[0].legend( fontsize = "8")
+        axes[1].legend( fontsize = "8")
+        axes[2].legend(loc= "upper right", fontsize = "8" )
+        axes[0].set_title("Watt-Strogatz Small-World", fontsize = "12" )
+        axes[1].set_title("Stochastic Block Model", fontsize = "12" )
+        axes[2].set_title("Barabasi-Albert Scale-Free", fontsize = "12" )
+    
+    fig.supxlabel(property_title, fontsize = "12" )
+    fig.supylabel(r"Cumulative emissions, E", fontsize = "12" )
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_BA_SBM_seeds_3_alt" + property_save
+    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
 
 def plot_price_elasticies_BA_SBM_seeds_3(
     fileName: str, Data_arr_SW, Data_arr_BA, property_title, property_save, property_vals, labels_BA, Data_arr_SBM, labels_SBM, seed_reps, colors_scenarios
@@ -139,23 +180,30 @@ def main(
 
     emissions_array_BA = load_object(fileName + "/Data", "emissions_array_BA")
     
-    labels_BA = [r"No homophily, $h = 0$", r"Low-carbon hegemony", r"High-carbon hegemony"]
+ 
     
     emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
-    labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, %s$" % (homphily_states[2])]
 
 
     emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
-    labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, $h = %s$" % (homphily_states[2])]
+    
+    #labels_BA = [r"No homophily, $h = 0$", r"Low-carbon hegemony", r"High-carbon hegemony"]
+    #labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, %s$" % (homphily_states[2])]
+    #labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, $h = %s$" % (homphily_states[2])]
+
+    labels_BA = [r"No homophily", r"Low-carbon hegemony", r"High-carbon hegemony"]
+    labels_SBM = [r"No homophily", r"Low homophily", r"High homophily"]
+    labels_SBM = [r"No homophily", r"Low homophily", r"High homophily"]
 
     seed_reps = base_params["seed_reps"]
 
-    plot_BA_SBM_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
-    plot_price_elasticies_BA_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
+    #plot_BA_SBM_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
+    plot_BA_SBM_3_alt(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
+    #plot_price_elasticies_BA_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_BA, r"Carbon price, $\tau$", property_varied, property_values_list, labels_BA, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_12_58_38__25_08_2024",
+        fileName= "results/networks_homo_tau_13_08_51__25_08_2024",
     )
