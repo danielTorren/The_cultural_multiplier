@@ -38,7 +38,7 @@ def main(
     for network_type in network_types:
         params["network_type"] = network_type
         for carbon_price in carbon_price_list:
-            params["carbon_price_increased_lower"] = carbon_price
+            params["carbon_price_increased"] = carbon_price
             params_list += produce_param_list_stochastic_multi(params, property_values_list, property_varied)
 
     print("TOTAL RUNS", len(params_list))
@@ -51,7 +51,7 @@ def main(
     params["alpha_change_state"] = "fixed_preferences"
     params_list_fixed = []
     for carbon_price in carbon_price_list:
-        params["carbon_price_increased_lower"] = carbon_price
+        params["carbon_price_increased"] = carbon_price
         params_list_fixed += produce_param_list_only_stochastic_multi(params)
 
     print("TOTAL RUNS FIXED", len(params_list_fixed))

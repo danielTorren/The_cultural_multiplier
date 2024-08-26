@@ -100,7 +100,7 @@ def objective_function_to_min_full_run(tau, base_params):
     #print("ATTEMPT!")
     #print("tau", tau, type(tau))
     
-    base_params["carbon_price_increased_lower"] = tau
+    base_params["carbon_price_increased"] = tau
 
     E = calculate_emissions(base_params)
     #print("E", E)
@@ -135,7 +135,7 @@ def newton_raphson_with_bounds(func, initial_guess, base_params, bounds = None, 
     #print("strt root",root, type(root))
     #print("BASE PARAMS",base_params)
 
-    #print("whhats being set", base_params["carbon_price_increased_lower"])
+    #print("whhats being set", base_params["carbon_price_increased"])
     while abs(func(root, base_params)) > tol and iterations < max_iter:
         #print("NEW TRY")
         #print("Current root", root)
@@ -181,7 +181,7 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, t
     #REFERENCE CASE, helps with the base values
     #base_params["set_seed"] = 5# DOESNT MATTER AS VARYIGN THE NETWORK STRUCTURE, BUT NEEDS TO BE SET
     base_params["carbon_price_increased"] = 0#this doesnt matter but needs to be set
-    base_params["carbon_price_increased_lower"] = 0#this doesnt matter but needs to be set
+    base_params["carbon_price_increased"] = 0#this doesnt matter but needs to be set
 
     base_params["alpha_change_state"] = "fixed_preferences"#THIS IS THE IMPORTANT ONE!
 
@@ -191,7 +191,7 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, t
 
     emissions_array_static_full = []
     for tau in total_tau_range_static:
-        base_params["carbon_price_increased_lower"] = tau
+        base_params["carbon_price_increased"] = tau
         E = calculate_emissions(base_params)
         emissions_array_static_full.append(E)
 
@@ -265,7 +265,7 @@ def calc_required_static_carbon_tax(base_params, emissions_min, emissions_max, t
     #REFERENCE CASE, helps with the base values
     #base_params["set_seed"] = 5# DOESNT MATTER AS VARYIGN THE NETWORK STRUCTURE, BUT NEEDS TO BE SET
     base_params["carbon_price_increased"] = 0#this doesnt matter but needs to be set
-    base_params["carbon_price_increased_lower"] = 0#this doesnt matter but needs to be set
+    base_params["carbon_price_increased"] = 0#this doesnt matter but needs to be set
     base_params["carbon_price_duration"] = 0#just make them begin then STOP!
 
     base_params["alpha_change_state"] = "fixed_preferences"#THIS IS THE IMPORTANT ONE!

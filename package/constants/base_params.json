@@ -2,7 +2,7 @@
     "save_timeseries_data_state": 0, 
     "time_steps_max": 2000,
     "carbon_price_duration": 360,
-    "phi_lower": 0.02,
+    "phi": 0.02,
     "phi_upper": 0.05,
     "compression_factor_state": 10,
     "seed_list": [1,2,3,4,5],

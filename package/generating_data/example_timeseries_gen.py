@@ -22,11 +22,11 @@ def main(
     print("fileName:", fileName)
 
     #low carbon price
-    base_params["carbon_price_increased_lower"] = 0
+    base_params["carbon_price_increased"] = 0
     Data_no = generate_data(base_params)  # run the simulation
 
     #high carbon price
-    base_params["carbon_price_increased_lower"] = 0.15
+    base_params["carbon_price_increased"] = 0.15
     Data_high = generate_data(base_params)  # run the simulation
 
     #print(Data.average_identity)

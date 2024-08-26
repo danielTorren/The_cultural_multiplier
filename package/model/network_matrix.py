@@ -89,12 +89,12 @@ class Network_Matrix:
         self.prices_low_carbon_m = 1
         self.prices_high_carbon_m = 1
         self.carbon_price_m = 0
-        self.carbon_price_increased_m = self.parameters["carbon_price_increased_lower"]
+        self.carbon_price_increased_m = self.parameters["carbon_price_increased"]
 
     def _initialize_social_learning(self):
         self.confirmation_bias = self.parameters["confirmation_bias"]
         self.clipping_epsilon_init_preference = self.parameters["clipping_epsilon_init_preference"]
-        self.phi = self.parameters["phi_lower"]
+        self.phi = self.parameters["phi"]
 
     
     def _initialize_preference_coherance(self):
@@ -201,9 +201,7 @@ class Network_Matrix:
             pass
 
         np.random.seed(self.shuffle_homophily_seed)#Set seed for shuffle
-
-        #print("homophily state", self.homophily_state, self.shuffle_reps_homophily)
-        #quit()
+        
         partial_shuffle_matrix = self._partial_shuffle_matrix(sorted_preferences, self.shuffle_reps_homophily)#partial shuffle of the list
 
         return partial_shuffle_matrix
@@ -216,7 +214,7 @@ class Network_Matrix:
             self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
 
     def _initialize_substitutabilities(self):
-        self.low_carbon_substitutability = self.parameters["low_carbon_substitutability_lower"]
+        self.low_carbon_substitutability = self.parameters["low_carbon_substitutability"]
 
     def _initialize_social_component(self):
         if self.alpha_change_state == "fixed_preferences":

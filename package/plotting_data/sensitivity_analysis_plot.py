@@ -166,6 +166,7 @@ def convert_second_order_data(data, names):
         interaction_matrix_s2_conf[i, j] = interaction_s2_conf
 
     return {"S2": interaction_matrix_s2, "S2_conf":interaction_matrix_s2_conf}
+    #ileName, data_list_first, plot_outputs, titles, N_samples, "First", network_titles ,latex_bool = latex_boo
 
 def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
     fileName, data_list, dict_list, names, N_samples, order, network_type_list,  latex_bool = False
@@ -191,7 +192,6 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
             )
         else:
             #print("data_dict", data_dict[dict_list[0]]["data"])
-            #quit()
             ax.errorbar(
                 data_dict[dict_list[0]]["data"]["ST"].tolist(),
                 names,
@@ -206,6 +206,65 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
 
     fig.supxlabel(r"%s order Sobol index" % (order))
     #axes[2].legend()
+    plt.tight_layout()
+
+    plotName = fileName + "/Prints"
+    f = (
+        plotName
+        + "/"
+        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot_triple.eps"
+        % (len(names), N_samples, order)
+    )
+    f_png = (
+        plotName
+        + "/"
+        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot_triple.png"
+        % (len(names), N_samples, order)
+    )
+    fig.savefig(f, dpi=600, format="eps")
+    fig.savefig(f_png, dpi=600, format="png")
+
+
+def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
+    fileName, data_list, dict_list, names, N_samples, order, network_type_list, latex_bool=False
+):
+    """
+    Create scatter chart of results with only the data in `names`.
+    """
+
+    fig, axes = plt.subplots(ncols=3, nrows=1, constrained_layout=True, sharey=True, figsize=(12, 6))
+    
+    for i, ax in enumerate(axes.flat):
+        data_dict = data_list[i]
+        
+        # Filter data to include only the parameters in `names`
+        filtered_data = {}
+        filtered_yerr = {}
+        y_labels = []
+        for key, title in names.items():
+            if key in data_dict[dict_list[0]]["data"][order].keys():  # assuming `order` is 'S1' or 'ST'
+                filtered_data[key] = data_dict[dict_list[0]]["data"][order][key]
+                filtered_yerr[key] = data_dict[dict_list[0]]["yerr"][order][key]
+                y_labels.append(title)
+        
+        # Convert filtered data to lists for plotting
+        data_values = list(filtered_data.values())
+        yerr_values = list(filtered_yerr.values())
+        
+        # Plot the filtered data
+        ax.errorbar(
+            data_values,
+            y_labels,
+            xerr=yerr_values,
+            fmt="o",
+            ecolor="k",
+            color=data_dict[dict_list[0]]["colour"],
+        )
+        
+        ax.set_title(network_type_list[i])
+        ax.set_xlim(left=0)
+
+    fig.supxlabel(r"%s order Sobol index" % (order))
     plt.tight_layout()
 
     plotName = fileName + "/Prints"
@@ -438,37 +497,31 @@ if __name__ == '__main__':
         },
         titles = [    
             "Social suseptability, $\\phi$",
-            "Sector min carbon price, $\\tau_{m,min}$",
-            "Sector max carbon price, $\\tau_{m,max}$",
+            "Carbon price, $\\tau$",
             "Number of individuals, $N$",
             "Number of sectors, $M$",
             "Sector substitutability, $\\nu$",
-            "Sector min low carbon substitutability, $\\sigma_{m, min}$",
-            "Sector max low carbon substitutability, $\\sigma_{m, max}$",
+            "Low carbon substitutability, $\\sigma_{m}$",
             "Confirmation bias, $\\theta$",
             "Homophily state, $h$",
             "Coherance state, $c$",
-            "Initial environmental identity Beta, $a$ ",
-            "Initial environmental identity Beta, $b$ ",
-            #"Initial preferences standard deviation, $\\sigma_{A}$",
+            "Initial preference Beta, $a$ ",
+            "Initial preference Beta, $b$ ",
         ]
     )
-"""
-{
-    "phi_lower": {"property":"phi_lower","min":0.001,"max": 1.0, "round":0},
-    "carbon_price_increased_lower": {"property":"carbon_price_increased_lower","min":0,"max": 2, "round":0},
-    "carbon_price_increased_upper": {"property":"carbon_price_increased_upper","min":0,"max": 2, "round":0},
-    "M": {"property":"M","min":1,"max": 50, "round":1},
-    "N": {"property":"N","min":100,"max": 3000, "round":1},
-    "sector_substitutability":{"property":"sector_substitutability","min":1.05,"max": 8, "round":0},
-    "low_carbon_substitutability_lower": {"property":"low_carbon_substitutability_lower","min":1.05,"max":8, "round":0},
-    "low_carbon_substitutability_upper": {"property":"low_carbon_substitutability_upper","min":1.05,"max":8, "round":0},
-    "confirmation_bias": {"property":"confirmation_bias","min":0,"max": 100, "round":0},
-    "homophily_state":{"property":"homophily_state","min":0,"max": 1, "round":0},
-    "coherance_state":{"property":"coherance_state","min":0,"max": 1, "round":0},
-    "a_preferences": {"property":"a_preferences","min":0.1,"max": 8, "round":0},
-    "b_preferences": {"property":"b_preferences","min":0.1,"max": 8, "round":0}
-}
-"""
+
+    titles_dict = {
+            "phi_lower": "Social suseptability, $\\phi$",
+            "carbon_price_increased_lower": "Carbon price, $\\tau$",
+            "N": "Number of individuals, $N$",
+            "M": "Number of sectors, $M$",
+            "sector_substitutability": "Sector substitutability, $\\nu$",
+            "low_carbon_substitutability_lower": "Low carbon substitutability, $\\sigma_{m}$",
+            "confirmation_bias": "Confirmation bias, $\\theta$",
+            "homophily_state": "Homophily state, $h$",
+            "coherance_state": "Coherance state, $c$",
+            "a_preferences": "Initial preference Beta, $a$",
+            "b_preferences": "Initial preference Beta, $b$",
+        }
 
 

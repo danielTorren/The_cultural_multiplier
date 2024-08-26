@@ -86,9 +86,9 @@ if __name__ == '__main__':
     base_params = {
     "preferences_seed": 72,
     "network_structure_seed": 89, 
-    "phi_lower": 0.02,
+    "phi": 0.02,
     "network_type": "SW",
-    "carbon_price_increased_lower": 0,
+    "carbon_price_increased": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
     "imitation_state": "consumption",
@@ -103,8 +103,8 @@ if __name__ == '__main__':
     "N": 3000, 
     "M": 2, 
     "sector_substitutability": 2, 
-    "low_carbon_substitutability_lower": 2, 
-    "low_carbon_substitutability_upper": 2, 
+    "low_carbon_substitutability": 2, 
+     
     "a_preferences": 2, 
     "b_preferences": 2, 
     "clipping_epsilon_init_preference": 1e-5, 
