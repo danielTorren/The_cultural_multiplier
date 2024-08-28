@@ -277,7 +277,8 @@ class Network_Matrix:
         else:#culturally determined either static or dynamic
             social_influence = self._calc_ego_influence_degroot()           
         return social_influence
-
+    
+    """
     def _calc_weighting_matrix_attribute(self, attribute_matrix):
         #Calculate the weighting matrix based on the Euclidean distance between agents' attributes.
 
@@ -308,8 +309,9 @@ class Network_Matrix:
         norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
         
         return norm_weighting_matrix
-
     """
+    
+    #"""
     def _calc_weighting_matrix_attribute(self, attribute_array):
         # Compute the differences only for the non-zero entries
         differences = attribute_array[self.row_indices_sparse] - attribute_array[self.col_indices_sparse]
@@ -324,7 +326,7 @@ class Network_Matrix:
         norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
 
         return norm_weighting_matrix
-    """
+    #"""
 
     def _normlize_matrix(self, matrix: sp.csr_matrix) -> sp.csr_matrix:
         # Normalize the matrix row-wise
