@@ -44,7 +44,6 @@ if __name__ == '__main__':
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
     "imitation_state": "consumption",
-
     "alpha_change_state": "dynamic_socially_determined_weights",#"fixed_preferences",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
     "seed_reps": 25,
     "network_structure_seed": 4, 
@@ -53,11 +52,10 @@ if __name__ == '__main__':
     "shuffle_coherance_seed": 31,
     "carbon_price_duration": 360,#360, 
     "burn_in_duration": 0, 
-    "N": 3000, 
+    "N": 200,#3000, 
     "M": 2, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability": 2, 
-     
     "a_preferences": 2, 
     "b_preferences": 2, 
     "clipping_epsilon_init_preference": 1e-5, 
@@ -76,7 +74,7 @@ if __name__ == '__main__':
 
     fileName = main(base_params=base_params)
 
-    RUN_PLOT = 0
+    RUN_PLOT = 1
 
     if RUN_PLOT:
         single_experiment_plot.main(fileName = fileName)

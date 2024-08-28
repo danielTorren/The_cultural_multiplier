@@ -985,6 +985,40 @@ def plot_identity_matrix(fileName, Data, dpi_save,latex_bool = False):
     fig.savefig(f + ".png", dpi=600, format="png")
 
 
+def plot_preference_timeseries(fileName, Data, dpi_save, latex_bool=False):
+
+    if latex_bool:
+        plt.rcParams['text.usetex'] = True
+    else:
+        plt.rcParams['text.usetex'] = False
+
+    fig, axes = plt.subplots(nrows=1, ncols = Data.M,figsize=(10, 6))
+    
+    y_title = r"Low Carbon Preference, $A_{t,i,m}$"
+
+    # Transpose the preference history matrix to have individuals as rows and time as columns
+
+    Data_preferences_trans = np.asarray(Data.history_low_carbon_preference_matrix).T
+    # Plot each individual's preference evolution over time
+    for m in range(Data.M):
+        ax = axes[m]
+        for n in range(Data.N):
+            ax.plot(np.asarray(Data.history_time), Data_preferences_trans[m][n])
+            ax.set_xlabel(r"Time")
+            ax.set_title("m = %s" % (m+1))
+            #ax.set_ylabel(y_title)
+            # Optionally set y-axis limits if needed
+            # ax.set_ylim(0, 1)
+    axes[0].set_ylabel(y_title)
+    plt.tight_layout()
+
+    # Save the plots in the specified formats
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_preference_timeseries_matrix"
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
+
 def plot_identity_matrix_density(fileName, Data, dpi_save, bin_num, latex_bool=False):
     fig, ax = plt.subplots(figsize=(10, 6))
     y_title = r"Identity, $I_{t,n}$"
@@ -1054,24 +1088,14 @@ def main(
 
     
     plot_identity_matrix(fileName, Data, dpi_save)
+    plot_preference_timeseries(fileName, Data, dpi_save)
+
+
+
     bin_num= 200
     #plot_identity_matrix_density(fileName, Data, dpi_save, bin_num)
     #plot_emissions_flow_matrix(fileName, Data, dpi_save)
     #plot_emissions_individuals(fileName, Data, dpi_save)
-    #plot_identity_timeseries(fileName, Data, dpi_save)
-
-    """
-    if Data.burn_in_duration == 0:
-        plot_consumption_no_burn_in(fileName, Data, dpi_save)
-    else:
-        plot_consumption(fileName, Data, dpi_save)
-    """
-    #print("Data eminissions",Data.total_carbon_emissions_stock )
-    #quit()
-    #print(Data.parameters)
-    #quit()
-
-    
 
     #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
     #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
@@ -1112,7 +1136,7 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/single_experiment_18_55_45__06_08_2024",
+        fileName = "results/single_experiment_12_00_30__28_08_2024",
     )
 
 

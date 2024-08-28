@@ -225,65 +225,6 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
     fig.savefig(f_png, dpi=600, format="png")
 
 
-def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
-    fileName, data_list, dict_list, names, N_samples, order, network_type_list, latex_bool=False
-):
-    """
-    Create scatter chart of results with only the data in `names`.
-    """
-
-    fig, axes = plt.subplots(ncols=3, nrows=1, constrained_layout=True, sharey=True, figsize=(12, 6))
-    
-    for i, ax in enumerate(axes.flat):
-        data_dict = data_list[i]
-        
-        # Filter data to include only the parameters in `names`
-        filtered_data = {}
-        filtered_yerr = {}
-        y_labels = []
-        for key, title in names.items():
-            if key in data_dict[dict_list[0]]["data"][order].keys():  # assuming `order` is 'S1' or 'ST'
-                filtered_data[key] = data_dict[dict_list[0]]["data"][order][key]
-                filtered_yerr[key] = data_dict[dict_list[0]]["yerr"][order][key]
-                y_labels.append(title)
-        
-        # Convert filtered data to lists for plotting
-        data_values = list(filtered_data.values())
-        yerr_values = list(filtered_yerr.values())
-        
-        # Plot the filtered data
-        ax.errorbar(
-            data_values,
-            y_labels,
-            xerr=yerr_values,
-            fmt="o",
-            ecolor="k",
-            color=data_dict[dict_list[0]]["colour"],
-        )
-        
-        ax.set_title(network_type_list[i])
-        ax.set_xlim(left=0)
-
-    fig.supxlabel(r"%s order Sobol index" % (order))
-    plt.tight_layout()
-
-    plotName = fileName + "/Prints"
-    f = (
-        plotName
-        + "/"
-        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot_triple.eps"
-        % (len(names), N_samples, order)
-    )
-    f_png = (
-        plotName
-        + "/"
-        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot_triple.png"
-        % (len(names), N_samples, order)
-    )
-    fig.savefig(f, dpi=600, format="eps")
-    fig.savefig(f_png, dpi=600, format="png")
-
-
 def plot_second_order_matrix(fileName, data_list, names, N_samples, order, network_type_list):
     """
     Create second-order sensitivity matrix plot.
@@ -490,7 +431,7 @@ def main(
 if __name__ == '__main__':
 
     plots = main(
-        fileName="results/sensitivity_analysis_10_56_45__23_08_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
+        fileName="results/sensitivity_analysis_20_46_11__26_08_2024",#sensitivity_analysis_SBM_11_21_11__30_01_2024
         plot_outputs = ['emissions_stock'],#,'emissions_flow','var',"emissions_change"
         plot_dict = {
             "emissions_stock": {"title": r"Cumulative emissions, $E$", "colour": "red", "linestyle": "--"},

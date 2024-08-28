@@ -278,6 +278,38 @@ class Network_Matrix:
             social_influence = self._calc_ego_influence_degroot()           
         return social_influence
 
+    def _calc_weighting_matrix_attribute(self, attribute_matrix):
+        #Calculate the weighting matrix based on the Euclidean distance between agents' attributes.
+
+        # Check if the attribute_matrix is a vector (1D array)
+        if attribute_matrix.ndim == 1:
+            # Compute the differences only for the non-zero entries
+            summed_differences = np.abs(attribute_matrix[self.row_indices_sparse] - attribute_matrix[self.col_indices_sparse]) ** 2
+        else:
+            # For 2D matrix, compute the differences across each dimension
+            differences = np.abs(attribute_matrix[self.row_indices_sparse, :] - attribute_matrix[self.col_indices_sparse, :]) ** 2
+            # Sum the differences across all dimensions (axis=1 for 2D, no effect for 1D)
+            summed_differences = np.sum(differences, axis=1)
+
+        
+        # Compute the Euclidean distance (or Minkowski distance with p=2)
+        distances = summed_differences ** (1 / 2)
+        
+        # Compute the weighting values using the Euclidean distances
+        weights = np.exp(-self.confirmation_bias * distances)
+        
+        # Create a sparse matrix with the same structure as the adjacency matrix
+        non_diagonal_weighting_matrix = sp.csr_matrix(
+            (weights, (self.row_indices_sparse, self.col_indices_sparse)),
+            shape=self.adjacency_matrix.shape
+        )
+        
+        # Normalize the matrix row-wise
+        norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
+        
+        return norm_weighting_matrix
+
+    """
     def _calc_weighting_matrix_attribute(self, attribute_array):
         # Compute the differences only for the non-zero entries
         differences = attribute_array[self.row_indices_sparse] - attribute_array[self.col_indices_sparse]
@@ -292,6 +324,7 @@ class Network_Matrix:
         norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
 
         return norm_weighting_matrix
+    """
 
     def _normlize_matrix(self, matrix: sp.csr_matrix) -> sp.csr_matrix:
         # Normalize the matrix row-wise
