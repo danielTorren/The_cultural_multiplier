@@ -55,7 +55,7 @@ if __name__ == '__main__':
     "N": 200,#3000, 
     "M": 2, 
     "sector_substitutability": 2, 
-    "low_carbon_substitutability": 2, 
+    "low_carbon_substitutability": 4, 
     "a_preferences": 2, 
     "b_preferences": 2, 
     "clipping_epsilon_init_preference": 1e-5, 
