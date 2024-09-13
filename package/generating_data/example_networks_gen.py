@@ -50,9 +50,9 @@ def plot_network_examples(
         edgecolors="black"
     )
 
-    axes[0].set_title("Watts-Strogatz")
+    axes[0].set_title("Small-World")
     axes[1].set_title("Stochastic Block Model")
-    axes[2].set_title("Barabasi-Albert")
+    axes[2].set_title("Scale-Free")
 
     plotName = fileName + "/Prints"
 

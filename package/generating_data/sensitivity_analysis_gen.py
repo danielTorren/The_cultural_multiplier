@@ -173,12 +173,12 @@ def main(
     )
 
     #BA
-    base_params["network_type"] = "BA"
-    params_list_sa_BA = stochastic_produce_param_list_SA(
+    base_params["network_type"] = "SF"
+    params_list_sa_SF = stochastic_produce_param_list_SA(
         param_values, base_params, variable_parameters_dict
     )
 
-    params_list_sa = params_list_sa_SW + params_list_sa_SBM + params_list_sa_BA
+    params_list_sa = params_list_sa_SW + params_list_sa_SBM + params_list_sa_SF
 
     print("Total runs: ", len(params_list_sa))
 
@@ -204,7 +204,7 @@ def main(
     save_object(problem, fileName + "/Data", "problem")
     save_object(Y_emissions_stock[0], fileName + "/Data", "Y_emissions_stock_SW")
     save_object(Y_emissions_stock[1], fileName + "/Data", "Y_emissions_stock_SBM")
-    save_object(Y_emissions_stock[2], fileName + "/Data", "Y_emissions_stock_BA")
+    save_object(Y_emissions_stock[2], fileName + "/Data", "Y_emissions_stock_SF")
     save_object(Y_emissions_stock_reshape, fileName + "/Data", "Y_emissions_stock_reshape")
     save_object(N_samples , fileName + "/Data","N_samples")
     save_object(calc_second_order, fileName + "/Data","calc_second_order")

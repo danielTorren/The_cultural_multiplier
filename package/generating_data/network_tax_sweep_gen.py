@@ -66,16 +66,16 @@ def main(
         start_time = time.time()
     
 
-    network_labels = ["SW", "SBM", "BA"]
+    network_labels = ["SW", "SBM", "SF"]
     #Gen params lists
     params["network_type"] = "SW"
     params_list_tax_SW = arrange_scenarios_tax(params,property_values_list,scenarios)
     params["network_type"] = "SBM"
     params_list_tax_SBM = arrange_scenarios_tax(params,property_values_list,scenarios)
-    params["network_type"] = "BA"
-    params_list_tax_BA = arrange_scenarios_tax(params,property_values_list,scenarios)
+    params["network_type"] = "SF"
+    params_list_tax_SF = arrange_scenarios_tax(params,property_values_list,scenarios)
     
-    params_list = params_list_tax_SW + params_list_tax_SBM + params_list_tax_BA
+    params_list = params_list_tax_SW + params_list_tax_SBM + params_list_tax_SF
     print("Total runs: ",len(params_list))
     
     Data_serial = emissions_parallel_run(params_list)
@@ -83,7 +83,7 @@ def main(
     
     data_SW = data_array[0]
     data_SBM = data_array[1]
-    data_BA = data_array[2]
+    data_SF = data_array[2]
 
     if print_simu:
         print(
@@ -98,7 +98,7 @@ def main(
 
     save_object(data_SW, fileName + "/Data", "emissions_SW")
     save_object(data_SBM, fileName + "/Data", "emissions_SBM")
-    save_object(data_BA, fileName + "/Data", "emissions_BA")
+    save_object(data_SF, fileName + "/Data", "emissions_SF")
     save_object(params, fileName + "/Data", "base_params")
     save_object(property_varied, fileName + "/Data", "property_varied")
     save_object(property_varied_title, fileName + "/Data", "property_varied_title")

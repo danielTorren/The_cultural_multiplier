@@ -32,7 +32,7 @@ def main(
     print("fileName: ", fileName)
 
     carbon_price_list = [0, 0.1, 1]
-    network_types = ["SW", "SBM", "BA"]
+    network_types = ["SW", "SBM", "SF"]
     params_list = []
 
     for network_type in network_types:

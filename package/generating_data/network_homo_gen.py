@@ -44,25 +44,25 @@ def main(
             params_list.extend(param_list_specfic)
 #########################################################################################################
     #BA
-    params["network_type"] = "BA"
+    params["network_type"] = "SF"
     #NO HEGEMONOY AND COMPLETE MIXING
-    params["BA_green_or_brown_hegemony"] = 0    
+    params["SF_green_or_brown_hegemony"] = 0    
     params["homophily_state"] = 0
-    params_list_no_heg_BA = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
+    params_list_no_heg_SF = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
     #Green HEGEMONOY AND homophily
-    params["BA_green_or_brown_hegemony"] = 1   
+    params["SF_green_or_brown_hegemony"] = 1   
     params["homophily_state"] = 1
-    params_list_green_heg_BA = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
+    params_list_green_heg_SF = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
     #Brown HEGEMONOY AND homophily
-    params["BA_green_or_brown_hegemony"] = -1   
+    params["SF_green_or_brown_hegemony"] = -1   
     params["homophily_state"] = 1
-    params_list_brown_heg_BA = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
+    params_list_brown_heg_SF = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
-    params_list_BA = params_list_no_heg_BA + params_list_green_heg_BA + params_list_brown_heg_BA
+    params_list_SF = params_list_no_heg_SF + params_list_green_heg_SF + params_list_brown_heg_SF
 
-    params_list.extend(params_list_BA)
+    params_list.extend(params_list_SF)
 ############################################################################################################################
     #RUN THE STUFF
    
@@ -76,7 +76,7 @@ def main(
     
     emissions_array_SW = emissions_array[0]
     emissions_array_SBM = emissions_array[1]
-    emissions_array_BA = emissions_array[2]
+    emissions_array_SF = emissions_array[2]
 
     #SAVE STUFF
 
@@ -84,7 +84,7 @@ def main(
 
     save_object(emissions_array_SW, fileName + "/Data", "emissions_array_SW")
     save_object(emissions_array_SBM, fileName + "/Data", "emissions_array_SBM")
-    save_object(emissions_array_BA , fileName + "/Data", "emissions_array_BA")
+    save_object(emissions_array_SF , fileName + "/Data", "emissions_array_SF")
     save_object(homphily_states, fileName + "/Data", "homphily_states")
     save_object(params, fileName + "/Data", "base_params")
     save_object(var_params,fileName + "/Data" , "var_params")

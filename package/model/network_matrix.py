@@ -68,14 +68,14 @@ class Network_Matrix:
             self.SBM_network_density_input_intra_block = self.parameters["SBM_network_density_input_intra_block"]
             self.SBM_network_density_input_inter_block = self.parameters["SBM_network_density_input_inter_block"]
 
-        elif self.network_type == "BA":
-            self.BA_green_or_brown_hegemony = self.parameters["BA_green_or_brown_hegemony"]
-            self.BA_density = self.parameters["BA_density"]
-            self.BA_nodes = self._calculate_nodes_BA()
+        elif self.network_type == "SF":
+            self.SF_green_or_brown_hegemony = self.parameters["SF_green_or_brown_hegemony"]
+            self.SF_density = self.parameters["SF_density"]
+            self.SF_nodes = self._calculate_nodes_SF()
 
-    def _calculate_nodes_BA(self):
+    def _calculate_nodes_SF(self):
         term1 = 2 * self.N - 1
-        term2 = ((2 * self.N - 1) ** 2 - 4 * self.BA_density * self.N * (self.N - 1))**0.5
+        term2 = ((2 * self.N - 1) ** 2 - 4 * self.SF_density * self.N * (self.N - 1))**0.5
         nodes = (term1 - term2) / 2
         return int(round(nodes))
 
@@ -132,8 +132,8 @@ class Network_Matrix:
             np.fill_diagonal(block_probs, self.SBM_network_density_input_intra_block)
             self.network = nx.stochastic_block_model(sizes=self.SBM_block_sizes, p=block_probs, seed=self.network_structure_seed)
             self.block_id_list = np.asarray([i for i, size in enumerate(self.SBM_block_sizes) for _ in range(size)])
-        elif self.network_type == "BA":
-            self.network = nx.barabasi_albert_graph(n=self.N, m=self.BA_nodes, seed=self.network_structure_seed)
+        elif self.network_type == "SF":
+            self.network = nx.barabasi_albert_graph(n=self.N, m=self.SF_nodes, seed=self.network_structure_seed)
 
         self.adjacency_matrix = nx.to_numpy_array(self.network)
         self.sparse_adjacency_matrix = sp.csr_matrix(self.adjacency_matrix)
@@ -193,7 +193,7 @@ class Network_Matrix:
         _ , sorted_preferences_tuple = zip(*sorted_lists)
         sorted_preferences = np.asarray(sorted_preferences_tuple)
 
-        if (self.network_type== "BA") and (self.BA_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
+        if (self.network_type== "SF") and (self.SF_green_or_brown_hegemony == 1):#WHY DOES IT ORDER IT THE WRONG WAY ROUND???
             sorted_preferences = sorted_preferences[::-1]
         elif (self.network_type== "SW"):
             sorted_preferences = self._circular_list(sorted_preferences)#agent list is now circular in terms of identity

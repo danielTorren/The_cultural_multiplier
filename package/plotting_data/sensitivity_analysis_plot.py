@@ -329,7 +329,7 @@ def main(
 
     Y_emissions_stock_SW = load_object(fileName + "/Data", "Y_emissions_stock_SW")
     Y_emissions_stock_SBM = load_object(fileName + "/Data", "Y_emissions_stock_SBM")
-    Y_emissions_stock_BA = load_object(fileName + "/Data", "Y_emissions_stock_BA")
+    Y_emissions_stock_SF = load_object(fileName + "/Data", "Y_emissions_stock_SF")
 
 
     #num_nans = np.isnan( Y_emissions_stock_SW).sum()
@@ -339,13 +339,13 @@ def main(
     """
     Y_emissions_stock_SW = replace_nan_with_neighbors_avg(Y_emissions_stock_SW)
     Y_emissions_stock_SBM = replace_nan_with_neighbors_avg(Y_emissions_stock_SBM)
-    Y_emissions_stock_BA = replace_nan_with_neighbors_avg(Y_emissions_stock_BA)
+    Y_emissions_stock_SF = replace_nan_with_neighbors_avg(Y_emissions_stock_SF)
     """
 
     #"""
     Y_emissions_stock_SW = replace_nan_with_interpolation(Y_emissions_stock_SW)
     Y_emissions_stock_SBM = replace_nan_with_interpolation(Y_emissions_stock_SBM)
-    Y_emissions_stock_BA = replace_nan_with_interpolation(Y_emissions_stock_BA)
+    Y_emissions_stock_SF = replace_nan_with_interpolation(Y_emissions_stock_SF)
     #"""
     
     #print(len(Y_emissions_stock_SW))
@@ -362,11 +362,11 @@ def main(
     if calc_second_order:
         data_sa_dict_total_SW, data_sa_dict_first_SW, second_emissions_stock_df_SW  = get_plot_data(problem, Y_emissions_stock_SW,calc_second_order)  
         data_sa_dict_total_SBM, data_sa_dict_first_SBM, second_emissions_stock_df_SBM  = get_plot_data(problem, Y_emissions_stock_SBM,calc_second_order)  
-        data_sa_dict_total_BA, data_sa_dict_first_BA, second_emissions_stock_df_BA  = get_plot_data(problem, Y_emissions_stock_BA,calc_second_order)  
+        data_sa_dict_total_SF, data_sa_dict_first_SF, second_emissions_stock_df_SF  = get_plot_data(problem, Y_emissions_stock_SF,calc_second_order)  
     else:
         data_sa_dict_total_SW, data_sa_dict_first_SW, _ = get_plot_data(problem, Y_emissions_stock_SW,calc_second_order)
         data_sa_dict_total_SBM, data_sa_dict_first_SBM, _ = get_plot_data(problem, Y_emissions_stock_SBM,calc_second_order)
-        data_sa_dict_total_BA, data_sa_dict_first_BA, _ = get_plot_data(problem, Y_emissions_stock_BA,calc_second_order)
+        data_sa_dict_total_SF, data_sa_dict_first_SF, _ = get_plot_data(problem, Y_emissions_stock_SF,calc_second_order)
 
     data_sa_dict_first_SW = Merge_dict_SA(data_sa_dict_first_SW, plot_dict)
     data_sa_dict_total_SW = Merge_dict_SA(data_sa_dict_total_SW, plot_dict)
@@ -377,8 +377,8 @@ def main(
     data_sa_dict_first_SBM = Merge_dict_SA(data_sa_dict_first_SBM, plot_dict)
     data_sa_dict_total_SBM = Merge_dict_SA(data_sa_dict_total_SBM, plot_dict)
 
-    data_sa_dict_first_BA = Merge_dict_SA(data_sa_dict_first_BA, plot_dict)
-    data_sa_dict_total_BA = Merge_dict_SA(data_sa_dict_total_BA, plot_dict)
+    data_sa_dict_first_SF = Merge_dict_SA(data_sa_dict_first_SF, plot_dict)
+    data_sa_dict_total_SF = Merge_dict_SA(data_sa_dict_total_SF, plot_dict)
 
     #quit()
 
@@ -386,11 +386,11 @@ def main(
     #print("titles", len(titles))
     #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SW, plot_outputs, titles, N_samples, "First", "SW", latex_bool = latex_bool)
     #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SBM, plot_outputs, titles, N_samples, "First", "SBM" ,latex_bool = latex_bool)
-    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_BA, plot_outputs, titles, N_samples, "First", "BA" ,latex_bool = latex_bool)
+    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SF, plot_outputs, titles, N_samples, "First", "SF" ,latex_bool = latex_bool)
 
     network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
-    data_list_first = [data_sa_dict_first_SW,  data_sa_dict_first_SBM, data_sa_dict_first_BA]
-    data_list_total = [data_sa_dict_total_SW,  data_sa_dict_total_SBM, data_sa_dict_total_BA]
+    data_list_first = [data_sa_dict_first_SW,  data_sa_dict_first_SBM, data_sa_dict_first_SF]
+    data_list_total = [data_sa_dict_total_SW,  data_sa_dict_total_SBM, data_sa_dict_total_SF]
 
     #print(data_sa_dict_first_SW)
     #quit()
@@ -407,9 +407,9 @@ def main(
 
         data_sa_dict_second_SW = convert_second_order_data(second_emissions_stock_df_SW, properties_list)
         data_sa_dict_second_SBM = convert_second_order_data(second_emissions_stock_df_SBM, properties_list)
-        data_sa_dict_second_BA =  convert_second_order_data(second_emissions_stock_df_BA, properties_list)
+        data_sa_dict_second_SF =  convert_second_order_data(second_emissions_stock_df_SF, properties_list)
 
-        data_list_second = [data_sa_dict_second_SW,  data_sa_dict_second_SBM, data_sa_dict_second_BA]
+        data_list_second = [data_sa_dict_second_SW,  data_sa_dict_second_SBM, data_sa_dict_second_SF]
         plot_second_order_matrix(fileName, data_list_second,  titles, N_samples, "second", network_titles)
     """
     #TOTAL I DONT THINK WORKS AT THE MOMENT

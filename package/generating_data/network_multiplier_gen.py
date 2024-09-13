@@ -400,11 +400,11 @@ def main(
     
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
     emissions_SBM = load_object(fileName + "/Data","emissions_SBM")
-    emissions_BA = load_object(fileName + "/Data","emissions_BA")
+    emissions_SF = load_object(fileName + "/Data","emissions_SF")
     #print("emissions_SW", emissions_SW.shape)
     #quit()
-    emissions_networks = np.asarray([emissions_SW[1:],emissions_SBM[1:],emissions_BA[1:]])# DONT INCLUDE FIXED PREFERCNCES
-    #emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_BA])
+    emissions_networks = np.asarray([emissions_SW[1:],emissions_SBM[1:],emissions_SF[1:]])# DONT INCLUDE FIXED PREFERCNCES
+    #emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_SF])
     #print(emissions_networks.shape)
     #quit()
     property_values_list = load_object(fileName + "/Data", "property_values_list")       

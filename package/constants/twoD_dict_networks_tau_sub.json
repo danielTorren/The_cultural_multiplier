@@ -1,0 +1,4 @@
+{
+    "row":{"property_varied":"low_carbon_substitutability","property_min":1.1, "property_max": 10, "property_varied_title": "Low-carbon substitutability","property_divisions": "geo", "property_reps": 5}, 
+    "col":{"property_varied":"carbon_price_increased","property_min":0, "property_max": 1, "property_varied_title": "Carbon price","property_divisions": "linear", "property_reps": 100} 
+}

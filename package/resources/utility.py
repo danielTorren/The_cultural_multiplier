@@ -120,6 +120,11 @@ def generate_vals(variable_parameters_dict):
         print("Invalid divisions, try linear or log")
     return property_values_list 
 
+def generate_vals_2D(variable_parameters_dict):
+    for i in variable_parameters_dict.values():
+        i["property_vals"] = generate_vals(i)
+    return variable_parameters_dict
+
 def produce_param_list(params: dict, property_list: list, property: str) -> list[dict]:
     """
     Produce a list of the dicts for each experiment
@@ -232,4 +237,17 @@ def produce_param_list_only_stochastic_named(params: dict,seeds_labels) -> list[
         params_list.append(
             params.copy()
         )  
+    return params_list
+
+def produce_param_list_stochastic_n_double(params_dict: dict, variable_parameters_dict: dict[dict], seeds_labels) -> list[dict]:
+    
+    params_list = []
+    for i in variable_parameters_dict["row"]["property_vals"]:
+        params_dict[variable_parameters_dict["row"]["property_varied"]] = i
+        for j in variable_parameters_dict["col"]["property_vals"]:
+            params_dict[variable_parameters_dict["col"]["property_varied"]] = j
+            for k in range(params_dict["seed_reps"]):
+                for l, label in enumerate(seeds_labels):
+                    params_dict[label] = int(10*l + k + 1)
+                params_list.append(params_dict.copy())
     return params_list
