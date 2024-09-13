@@ -27,7 +27,7 @@ def main(
     params = json.load(f)
 
 
-    root = "phi_vary"
+    root = "phi_homo"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 

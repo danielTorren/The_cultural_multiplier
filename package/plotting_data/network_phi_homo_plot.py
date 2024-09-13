@@ -125,6 +125,50 @@ def plot_emissions_simple_xlog_homo(
     f = plotName + "/network_emissions_simple_phi_xlog"
     fig.savefig(f + ".png", dpi=600, format="png", bbox_inches='tight')
 
+def plot_emissions_simple_xlog_homo_confidence(
+    fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
+):
+    fig, axes = plt.subplots(ncols=len(emissions_networks), nrows=len(emissions_networks[0]), figsize=(15, 8), sharey=True)  # Increased width
+
+    for i, network_em in enumerate(emissions_networks):
+        for j, homo_em in enumerate(network_em): 
+            for k in range(len(homo_em)):
+                Data = homo_em[k]
+                mu_emissions = Data.mean(axis=1)
+                axes[j][i].plot(property_vals, mu_emissions, label=scenarios_titles[k], c=colors_scenarios[k])
+                mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
+                # Plot the 95% confidence interval as a shaded area
+                axes[j][i].fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios[k], alpha=0.3)
+
+        axes[j][i].set_xscale('log')
+        #axes[j][i].set_ylabel(r"Homophily, $\phi$")
+        axes[0][i].set_title(network_titles[i], fontsize="12")
+    
+    #DEAL WITH y labels
+    homo_title_list = [r"No homophily", r"Low homophily", r"High homophily"]
+    for i, homo_title in enumerate(homo_title_list):
+        axes[i][0].set_ylabel(homo_title)
+
+    heg_list = [r"No homophily", r"Low-carbon hegemony", r"High-carbon hegemony"]
+    for i, heg_title in enumerate(heg_list):
+        axes[i][2].set_ylabel(heg_title)
+
+    fig.supxlabel(r"Social susceptibility, $\phi$", fontsize="12")
+    fig.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
+    #axes[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
+    handles, labels = axes[0][0].get_legend_handles_labels()
+    
+    #fig.subplots_adjust(right=0.2)  # Adjust right margin to make space for legend
+
+    fig.legend(handles, labels, loc='right', bbox_to_anchor=(1.01, 0.5), ncol=1, fontsize="10")
+
+    #plt.tight_layout()
+    
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_emissions_simple_phi_xlog_confidence"
+    fig.savefig(f + ".png", dpi=600, format="png", bbox_inches='tight')
+
 
 def main(
     fileName
@@ -141,11 +185,12 @@ def main(
     scenarios_titles = [r"$\tau = 0$", r"$\tau = 0.1$", r"$\tau = 1$"]
 
     plot_emissions_simple_xlog_homo(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    plot_emissions_simple_xlog_homo_confidence(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
 
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_vary_11_13_58__13_09_2024",
+        fileName= "results/phi_vary_11_22_06__13_09_2024",
     )
