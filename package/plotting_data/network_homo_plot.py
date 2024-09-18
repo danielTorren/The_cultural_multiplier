@@ -162,6 +162,64 @@ def plot_price_elasticies_SF_SBM_seeds_3(
     f = plotName + "/plot_price_elasticies_SF_SBM_seeds_3" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
 
+
+def plot_SW_SBM(
+    fileName: str, Data_arr_SW, Data_arr_SBM, property_title, property_save, property_vals, labels_SBM, seed_reps, colors_scenarios
+):
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8, 5), constrained_layout=True, sharey=True)
+
+    for j, Data_list in enumerate(Data_arr_SW):
+        data_SW = Data_arr_SW[j].T
+        data_SBM = Data_arr_SBM[j].T
+
+        mu_emissions_SW, lower_bound_SW, upper_bound_SW = calc_bounds(data_SW.T, 0.95)
+        mu_emissions_SBM, lower_bound_SBM, upper_bound_SBM = calc_bounds(data_SBM.T, 0.95)
+        
+
+        axes[0].plot(property_vals, mu_emissions_SW, label=labels_SBM[j], color=colors_scenarios[j], alpha=1)
+        axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color=colors_scenarios[j], alpha=1)
+
+        axes[0].fill_between(property_vals, lower_bound_SW, upper_bound_SW, color=colors_scenarios[j], alpha=0.3)
+        axes[1].fill_between(property_vals, lower_bound_SBM, upper_bound_SBM, color=colors_scenarios[j], alpha=0.3)
+
+        #axes[0].legend(fontsize="8")
+        axes[1].legend(fontsize="8")
+        axes[0].set_title("Small-World", fontsize="12")
+        axes[1].set_title("Stochastic Block Model", fontsize="12")
+
+    fig.supxlabel(property_title, fontsize="12")
+    fig.supylabel(r"Cumulative emissions, E", fontsize="12")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_SW_SBM_seeds_" + property_save
+    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+
+def plot_SF(
+    fileName: str, Data_arr_SF, property_title, property_save, property_vals, labels_SF, seed_reps, colors_scenarios
+):
+    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True)
+
+    for j, Data_list in enumerate(Data_arr_SF):
+        data_SF = Data_arr_SF[j].T
+        mu_emissions_SF, lower_bound_SF, upper_bound_SF = calc_bounds(data_SF.T, 0.95)
+        
+        ax.plot(property_vals, mu_emissions_SF, label=labels_SF[j], color=colors_scenarios[j], alpha=1)
+        ax.fill_between(property_vals, lower_bound_SF, upper_bound_SF, color=colors_scenarios[j], alpha=0.3)
+
+
+        ax.legend(loc="upper right", fontsize="8")
+        ax.set_title("Scale-Free", fontsize="12")
+
+    fig.supxlabel(property_title, fontsize="12")
+    fig.supylabel(r"Cumulative emissions, E", fontsize="12")
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/plot_emissions_SF_seeds_" + property_save
+    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=600, format="eps")
+
+
 def main(
     fileName
     ) -> None: 
@@ -196,10 +254,13 @@ def main(
     labels_SBM = [r"No homophily", r"Low homophily", r"High homophily"]
 
     seed_reps = base_params["seed_reps"]
-
+    property_title = r"Carbon price, $\tau$"
     #plot_SF_SBM_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
-    plot_SF_SBM_3_alt(fileName, emissions_array_SW, emissions_array_SF, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
+    #plot_SF_SBM_3_alt(fileName, emissions_array_SW, emissions_array_SF, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
     #plot_price_elasticies_SF_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
+    plot_SW_SBM(fileName, emissions_array_SW, emissions_array_SBM, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SBM, seed_reps,colors_scenarios)
+    
+    plot_SF(fileName, emissions_array_SF , property_title, property_varied, property_values_list, labels_SF, seed_reps, colors_scenarios)
     
     plt.show()
 

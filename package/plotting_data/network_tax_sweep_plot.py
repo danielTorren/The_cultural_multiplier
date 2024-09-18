@@ -508,7 +508,7 @@ def main(
         #print(list_M_networks.shape)
         #quit()
         #list_M_networks_reduc = list_M_networks[1:]
-        value_min = 0.01
+        value_min = -1
         #plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
         #plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios,value_min )
         #plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
@@ -523,6 +523,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_15_57_56__22_08_2024",#tax_sweep_networks_15_57_56__22_08_2024",
+        fileName = "results/tax_sweep_networks_15_40_36__13_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
         MULTIPLIER = 1
     )

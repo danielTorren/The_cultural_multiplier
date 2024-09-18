@@ -84,7 +84,7 @@ def plot_var_emisisons_simple_xlog_ylog(
 def plot_emissions_simple_xlog_homo(
     fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
 ):
-    fig, axes = plt.subplots(ncols=len(emissions_networks), nrows=len(emissions_networks[0]), figsize=(15, 8), sharey=True)  # Increased width
+    fig, axes = plt.subplots(ncols=len(emissions_networks), nrows=len(emissions_networks[0]), figsize=(15, 8), sharex=True)  # Increased width
 
     for i, network_em in enumerate(emissions_networks):
         for j, homo_em in enumerate(network_em): 
@@ -96,7 +96,7 @@ def plot_emissions_simple_xlog_homo(
                 for v in range(len(data_trans)):
                     axes[j][i].plot(property_vals, data_trans[v], color=colors_scenarios[k], alpha=0.1)
 
-        axes[j][i].set_xscale('log')
+        #axes[j][i].set_xscale('log')
         #axes[j][i].set_ylabel(r"Homophily, $\phi$")
         axes[0][i].set_title(network_titles[i], fontsize="12")
     
@@ -128,7 +128,7 @@ def plot_emissions_simple_xlog_homo(
 def plot_emissions_simple_xlog_homo_confidence(
     fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
 ):
-    fig, axes = plt.subplots(ncols=len(emissions_networks), nrows=len(emissions_networks[0]), figsize=(15, 8), sharey=True)  # Increased width
+    fig, axes = plt.subplots(ncols=len(emissions_networks), nrows=len(emissions_networks[0]), figsize=(15, 8), sharey=True, sharex=True)  # Increased width
 
     for i, network_em in enumerate(emissions_networks):
         for j, homo_em in enumerate(network_em): 
@@ -185,12 +185,12 @@ def main(
     scenarios_titles = [r"$\tau = 0$", r"$\tau = 0.1$", r"$\tau = 1$"]
 
     plot_emissions_simple_xlog_homo(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
-    plot_emissions_simple_xlog_homo_confidence(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    #plot_emissions_simple_xlog_homo_confidence(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
 
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_vary_11_22_06__13_09_2024",
+        fileName= "results/phi_homo_15_35_47__13_09_2024",
     )
