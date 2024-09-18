@@ -35,7 +35,7 @@ def plot_emissions_confidence(
         ax.set_title(rf"Substitutability, $\phi$ = {sub_vals[k]}", fontsize=12)
     
     axes[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=3, fontsize="9")

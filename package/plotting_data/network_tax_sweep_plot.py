@@ -42,7 +42,7 @@ def plot_emissions_lines(
         ax.set_title(network_titles[k], fontsize="12")
     
     axes[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=3, fontsize="9")
@@ -80,7 +80,7 @@ def plot_emissions_confidence(
         ax.set_title(network_titles[k], fontsize="12")
     
     axes[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=3, fontsize="9")
@@ -121,8 +121,8 @@ def plot_multiplier(
 
         ax.set_title(network_titles[k], fontsize="12")
 
-    axes[0].set_ylabel(r"Carbon price reduction, M", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[0].set_ylabel(r"Carbon tax reduction, M", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -161,8 +161,8 @@ def plot_multiplier_confidence(
 
         ax.set_title(network_titles[k], fontsize="12")
 
-    axes[0].set_ylabel(r"Carbon price reduction, M", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[0].set_ylabel(r"Carbon tax reduction, M", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -175,9 +175,8 @@ def plot_multiplier_confidence(
     fig.savefig(f+ ".eps", dpi=600, format="eps") 
 
 def plot_multiplier_confidence_two(
-    fileName_full,  M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios, value_min
+    fileName_full,  M_networks, scenarios_titles, property_vals, network_titles, colors_scenarios
 ):
-    index_min = np.where(property_vals > value_min)[0][0]
     
     # First figure: only the first column
     fig1, ax1 = plt.subplots(ncols=1, nrows=1, figsize=(5, 5), sharey=True)
@@ -190,12 +189,13 @@ def plot_multiplier_confidence_two(
         Data = emissions_0[i]
         mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
 
-        ax1.plot(property_vals[index_min:], mu_emissions[index_min:], label=scenarios_titles[i], c=colors_scenarios_complete_0[i + 1])
-        ax1.fill_between(property_vals[index_min:], lower_bound[index_min:], upper_bound[index_min:], color=colors_scenarios_complete_0[i + 1], alpha=0.3)
-
+        ax1.plot(property_vals, mu_emissions, label=scenarios_titles[i], c=colors_scenarios_complete_0[i + 1])
+        ax1.fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios_complete_0[i + 1], alpha=0.3)
+    
+    ax1.grid()
     ax1.set_title(network_titles[0], fontsize="12")
-    ax1.set_ylabel(r"Carbon price reduction, M", fontsize="12")
-    ax1.set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    ax1.set_ylabel(r"Carbon tax reduction, M", fontsize="12")
+    ax1.set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
     handles_1, labels_1 = ax1.get_legend_handles_labels()
     fig1.legend(handles_1, labels_1, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
     fig1.subplots_adjust(bottom=0.2)  # Adjust bottom margin for legend
@@ -219,14 +219,14 @@ def plot_multiplier_confidence_two(
             Data = emissions[i]
             mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
 
-            ax.plot(property_vals[index_min:], mu_emissions[index_min:], label=scenarios_titles[i], c=colors_scenarios_complete[i + 1])
-            ax.fill_between(property_vals[index_min:], lower_bound[index_min:], upper_bound[index_min:], color=colors_scenarios_complete[i + 1], alpha=0.3)
-
+            ax.plot(property_vals, mu_emissions, label=scenarios_titles[i], c=colors_scenarios_complete[i + 1])
+            ax.fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios_complete[i + 1], alpha=0.3)
+        ax.grid()
         ax.set_title(network_titles[k], fontsize="12")
 
-    axes2[0].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
-    axes2[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
-    axes2[0].set_ylabel(r"Carbon price reduction, M", fontsize="12")
+    axes2[0].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
+    axes2[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
+    axes2[0].set_ylabel(r"Carbon tax reduction, M", fontsize="12")
     handles_2, labels_2 = axes2[0].get_legend_handles_labels()
     fig2.legend(handles_2, labels_2, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
     fig2.subplots_adjust(bottom=0.2)  # Adjust bottom margin for legend
@@ -267,8 +267,8 @@ def plot_ratio(
 
         ax.set_title(network_titles[k], fontsize="12")
 
-    axes[0].set_ylabel(r"Carbon price ratio", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[0].set_ylabel(r"Carbon tax ratio", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -306,8 +306,8 @@ def plot_ratio_confidence(
 
         ax.set_title(network_titles[k], fontsize="12")
 
-    axes[0].set_ylabel(r"Carbon price ratio", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[0].set_ylabel(r"Carbon tax ratio", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -351,7 +351,7 @@ def plot_joint(
         ax.set_title(network_titles[k], fontsize="12")
 
     axes[0].set_ylabel(r"Equivalent carbon price fixed", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -390,7 +390,7 @@ def plot_joint_confidence(
         ax.set_title(network_titles[k], fontsize="12")
 
     axes[0].set_ylabel(r"Equivalent carbon price fixed", fontsize="12")
-    axes[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -423,10 +423,10 @@ def plot_emissions_confidence_two(
 
         # Plot the 95% confidence interval as a shaded area
         ax1.fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios_complete_0[i], alpha=0.3)
-
+        ax1.grid()
     ax1.set_title(network_titles[0], fontsize="12")
     ax1.set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
-    ax1.set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+    ax1.set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles_1, labels_1 = ax1.get_legend_handles_labels()
     fig1.legend(handles_1, labels_1, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -452,14 +452,14 @@ def plot_emissions_confidence_two(
 
             # Plot the mean line
             ax.plot(property_vals, mu_emissions, label=scenario_labels[i], c=colors_scenarios_complete[i])
-
+            
             # Plot the 95% confidence interval as a shaded area
             ax.fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios_complete[i], alpha=0.3)
 
         ax.set_title(network_titles[k], fontsize="12")
-
-    axes2[0].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
-    axes2[1].set_xlabel(r"Carbon price, $\tau$", fontsize="12")
+        ax.grid()
+    axes2[0].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
+    axes2[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
     axes2[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
     handles_2, labels_2 = axes2[0].get_legend_handles_labels()
     fig2.legend(handles_2, labels_2, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -482,7 +482,7 @@ def main(
     #FULL
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
     emissions_SBM = load_object(fileName + "/Data","emissions_SBM")
-    emissions_SF = load_object(fileName + "/Data","emissions_SF")
+    emissions_SF = load_object(fileName + "/Data","emissions_BA")
     emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_SF])    
     
     base_params = load_object(fileName + "/Data","base_params")
@@ -507,8 +507,7 @@ def main(
         # redu
         #print(list_M_networks.shape)
         #quit()
-        #list_M_networks_reduc = list_M_networks[1:]
-        value_min = -1
+
         #plot_multiplier(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
         #plot_multiplier_confidence(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios,value_min )
         #plot_ratio(fileName,list_ratio_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
@@ -517,12 +516,12 @@ def main(
         #plot_joint_confidence(fileName,tau_static, scenario_labels_M, property_values_list, network_titles, colors_scenarios )
 
 
-        plot_multiplier_confidence_two(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios,value_min )
+        plot_multiplier_confidence_two(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios)
 
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_15_40_36__13_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
+        fileName = "results/tax_sweep_networks_15_57_56__22_08_2024",#",#tax_sweep_networks_15_40_36__13_09_2024
         MULTIPLIER = 1
     )

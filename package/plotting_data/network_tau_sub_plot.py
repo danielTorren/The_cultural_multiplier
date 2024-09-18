@@ -29,7 +29,7 @@ def plot_means_end_points_emissions(
                 axes[j].plot(property_values_list_col, data_run, c = colors[k], alpha = 0.1)
 
         
-    fig.supxlabel(r"Carbon price, $\tau$")
+    fig.supxlabel(r"Carbon tax, $\tau$")
     fig.supylabel(r"Cumulative carbon emissions, E")
 
     axes[2].legend( fontsize="8")
@@ -61,7 +61,7 @@ def plot_means_end_points_emissions_confidence(
             axes[j].fill_between(property_values_list_col, lower_bound, upper_bound, color=colors[k], alpha=0.3)
 
         
-    fig.supxlabel(r"Carbon price, $\tau$")
+    fig.supxlabel(r"Carbon tax, $\tau$")
     fig.supylabel(r"Cumulative carbon emissions, E")
 
     axes[2].legend( fontsize="8")

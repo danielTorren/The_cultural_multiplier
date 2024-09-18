@@ -854,13 +854,13 @@ def multi_identity_timeseries_carbon_price(
     
     #axes[1][0].set_ylabel(title)
     
-    #axes[k][i].set_title(r"Carbon price = %s" % (carbon_prices[i]))
+    #axes[k][i].set_title(r"Carbon tax = %s" % (carbon_prices[i]))
 
     ani_step_colours = cmap(property_values_list)
 
     for i in range(len(carbon_prices)):#carbon price
         axes[len(seed_list)-1][i].set_xlabel(r"Time")
-        axes[0][i].set_title(r"Carbon price = %s" % (carbon_prices[i]))
+        axes[0][i].set_title(r"Carbon tax = %s" % (carbon_prices[i]))
         for j in range(len(property_values_list)):#mu
             for k, seed in enumerate(seed_list):#seed, and rows!
                 axes[k][0].set_ylabel(title)
@@ -916,7 +916,7 @@ def multi_emissions_timeseries_carbon_price(
             #ax.plot(Data.history_time, Data, color = ani_step_colours[j])
         ax.set_xlabel(r"Time")
         
-        ax.set_title(r"Carbon price = %s" % (carbon_prices[i]))
+        ax.set_title(r"Carbon tax = %s" % (carbon_prices[i]))
         
     cbar = fig.colorbar(
         plt.cm.ScalarMappable(cmap=cmap), ax=axes.ravel().tolist()
@@ -956,7 +956,7 @@ def multi_emissions_timeseries_carbon_price(
             #ax.plot(Data.history_time, Data, color = ani_step_colours[j])
         ax.set_xlabel(r"Time")
         
-        ax.set_title(r"Carbon price = %s" % (carbon_prices[i]))
+        ax.set_title(r"Carbon tax = %s" % (carbon_prices[i]))
         
     cbar = fig.colorbar(
         plt.cm.ScalarMappable(cmap=cmap), ax=axes.ravel().tolist()
@@ -996,7 +996,7 @@ def multi_emissions_timeseries_carbon_price_quantile(
             #ax.plot(Data.history_time, Data, color = ani_step_colours[j])
         ax.set_xlabel(r"Time")
         
-        ax.set_title(r"Carbon price = %s" % (carbon_prices[i]))
+        ax.set_title(r"Carbon tax = %s" % (carbon_prices[i]))
         
     cbar = fig.colorbar(
         plt.cm.ScalarMappable(cmap=cmap), ax=axes.ravel().tolist()

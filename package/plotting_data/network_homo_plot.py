@@ -254,11 +254,11 @@ def main(
     labels_SBM = [r"No homophily", r"Low homophily", r"High homophily"]
 
     seed_reps = base_params["seed_reps"]
-    property_title = r"Carbon price, $\tau$"
-    #plot_SF_SBM_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
-    #plot_SF_SBM_3_alt(fileName, emissions_array_SW, emissions_array_SF, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
-    #plot_price_elasticies_SF_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
-    plot_SW_SBM(fileName, emissions_array_SW, emissions_array_SBM, r"Carbon price, $\tau$", property_varied, property_values_list, labels_SBM, seed_reps,colors_scenarios)
+    property_title = r"Carbon tax, $\tau$"
+    #plot_SF_SBM_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
+    #plot_SF_SBM_3_alt(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
+    #plot_price_elasticies_SF_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
+    plot_SW_SBM(fileName, emissions_array_SW, emissions_array_SBM, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SBM, seed_reps,colors_scenarios)
     
     plot_SF(fileName, emissions_array_SF , property_title, property_varied, property_values_list, labels_SF, seed_reps, colors_scenarios)
     

@@ -1,9 +1,9 @@
 
 # imports
 import matplotlib.pyplot as plt
-from pyrsistent import v
 from package.resources.utility import load_object, calc_bounds
 from matplotlib.cm import  get_cmap
+import numpy as np
 
 def plot_emissions_simple_xlog(
     fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
@@ -170,6 +170,58 @@ def plot_emissions_simple_xlog_homo_confidence(
     fig.savefig(f + ".png", dpi=600, format="png", bbox_inches='tight')
 
 
+def plot_emissions_simple_xlog_homo_confidence_invert(
+    fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
+):
+    
+    fig, axes = plt.subplots(ncols=len(emissions_networks), nrows=len(emissions_networks[0]), figsize=(15, 8), sharey=True, sharex=True)  # Increased width
+    
+    homo_title_list = [r"No homophily", r"Low homophily", r"High homophily"]
+    heg_list = [r"No homophily", r"Low-carbon hegemony", r"High-carbon hegemony"]
+
+    #print(emissions_networks.shape)
+    #quit()
+    emissions_networks = np.transpose(emissions_networks, (0,2,1,3,4))#transpose to shift
+    #print(emissions_networks.shape)
+    
+    for i, network_em in enumerate(emissions_networks):
+        for j, tau_em in enumerate(network_em): 
+            for k in range(len(tau_em)):
+                Data = tau_em[k]
+                mu_emissions = Data.mean(axis=1)
+                if i < 2:
+                    axes[j][i].plot(property_vals, mu_emissions, label= homo_title_list[k], c=colors_scenarios[k])
+                else:
+                    axes[j][i].plot(property_vals, mu_emissions, label= heg_list[k], c=colors_scenarios[k])
+                #mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
+                # Plot the 95% confidence interval as a shaded area
+                #axes[j][i].fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios[k], alpha=0.3)
+
+        axes[j][i].set_xscale('log')
+        #axes[j][i].set_ylabel(r"Homophily, $\phi$")
+        axes[0][i].set_title(network_titles[i], fontsize="12")
+    
+    #DEAL WITH y labels
+    
+    for i, tau_title in enumerate(scenarios_titles):
+        axes[i][0].set_ylabel(tau_title)
+
+    fig.supxlabel(r"Social susceptibility, $\phi$", fontsize="12")
+    fig.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
+    #axes[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
+    #handles, labels = axes[0][0].get_legend_handles_labels()
+    
+    #fig.subplots_adjust(right=0.2)  # Adjust right margin to make space for legend
+
+    #fig.legend(handles, labels, loc='right', bbox_to_anchor=(1.01, 0.5), ncol=1, fontsize="10")
+
+    #plt.tight_layout()
+    
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/network_emissions_simple_phi_xlog_confidence_invert"
+    fig.savefig(f + ".png", dpi=600, format="png", bbox_inches='tight')
+
 def main(
     fileName
     ) -> None: 
@@ -181,10 +233,11 @@ def main(
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     emissions_array = load_object(fileName + "/Data", "emissions_array")
-    scenarios_titles = [r"No carbon price, $\tau = 0$", r"Low carbon price, $\tau = 0.1$", r"High carbon price, $\tau = 1$"]
+    #scenarios_titles = [r"No carbon price, $\tau = 0$", r"Low carbon price, $\tau = 0.1$", r"High carbon price, $\tau = 1$"]
     scenarios_titles = [r"$\tau = 0$", r"$\tau = 0.1$", r"$\tau = 1$"]
 
-    plot_emissions_simple_xlog_homo(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    #plot_emissions_simple_xlog_homo(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    plot_emissions_simple_xlog_homo_confidence_invert(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_emissions_simple_xlog_homo_confidence(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
 
 

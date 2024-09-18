@@ -438,7 +438,7 @@ if __name__ == '__main__':
         },
         titles = [    
             "Social suseptability, $\\phi$",
-            "Carbon price, $\\tau$",
+            "Carbon tax, $\\tau$",
             "Number of individuals, $N$",
             "Number of sectors, $M$",
             "Sector substitutability, $\\nu$",
@@ -453,7 +453,7 @@ if __name__ == '__main__':
 
     titles_dict = {
             "phi_lower": "Social suseptability, $\\phi$",
-            "carbon_price_increased_lower": "Carbon price, $\\tau$",
+            "carbon_price_increased_lower": "Carbon tax, $\\tau$",
             "N": "Number of individuals, $N$",
             "M": "Number of sectors, $M$",
             "sector_substitutability": "Sector substitutability, $\\nu$",
