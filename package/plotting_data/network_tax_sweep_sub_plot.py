@@ -33,13 +33,13 @@ def plot_emissions_confidence(
             ax.fill_between(property_vals, lower_bound, upper_bound, color=colors_scenarios_complete[i], alpha=0.3)
 
         ax.set_title(rf"Substitutability, $\phi$ = {sub_vals[k]}", fontsize=12)
-    
+        ax.grid()
     axes[0].set_ylabel(r"Cumulative carbon emissions, E", fontsize="12")
     axes[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=3, fontsize="9")
-    fig.subplots_adjust(bottom=0.2)  # Adjust bottom margin to make space for legend
+    fig.subplots_adjust(bottom=0.17)  # Adjust bottom margin to make space for legend
     #plt.tight_layout()  # Adjust layout to make space for the legend
     
     plotName = fileName + "/Plots"

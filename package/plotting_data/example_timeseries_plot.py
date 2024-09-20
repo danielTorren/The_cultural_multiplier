@@ -24,8 +24,8 @@ def plot_identity_matrix_2(fileName, Data_1, Data_2):
     axes[0].set_xlabel(r"Timestep")
     axes[1].set_xlabel(r"Timestep")
 
-    axes[0].set_title(r"Carbon tax, $\tau_m = 0$")
-    axes[1].set_title(r"Carbon tax, $\tau_m = 0.15$")
+    axes[0].set_title(r"Carbon tax, $\tau = 0$")
+    axes[1].set_title(r"Carbon tax, $\tau = 0.15$")
 
     axes[0].set_ylabel(r"Environmental identity, $I_{t,i}$")
 

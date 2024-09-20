@@ -8,11 +8,7 @@ import matplotlib.pyplot as plt
 from SALib.analyze import sobol
 import numpy.typing as npt
 from package.resources.utility import (
-    load_object,
-    save_object
-)
-from package.resources.plot import (
-    multi_scatter_seperate_total_sensitivity_analysis_plot,
+    load_object
 )
 import numpy as np
 
@@ -329,7 +325,7 @@ def main(
 
     Y_emissions_stock_SW = load_object(fileName + "/Data", "Y_emissions_stock_SW")
     Y_emissions_stock_SBM = load_object(fileName + "/Data", "Y_emissions_stock_SBM")
-    Y_emissions_stock_SF = load_object(fileName + "/Data", "Y_emissions_stock_SF")
+    Y_emissions_stock_SF = load_object(fileName + "/Data", "Y_emissions_stock_BA")
 
 
     #num_nans = np.isnan( Y_emissions_stock_SW).sum()
@@ -388,7 +384,7 @@ def main(
     #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SBM, plot_outputs, titles, N_samples, "First", "SBM" ,latex_bool = latex_bool)
     #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SF, plot_outputs, titles, N_samples, "First", "SF" ,latex_bool = latex_bool)
 
-    network_titles = ["Watt-Strogatz Small-World", "Stochastic Block Model", "Barabasi-Albert Scale-Free"]
+    network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     data_list_first = [data_sa_dict_first_SW,  data_sa_dict_first_SBM, data_sa_dict_first_SF]
     data_list_total = [data_sa_dict_total_SW,  data_sa_dict_total_SBM, data_sa_dict_total_SF]
 

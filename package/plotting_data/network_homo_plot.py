@@ -62,9 +62,9 @@ def plot_SF_SBM_3(
         axes[0].legend( fontsize = "8")
         axes[1].legend( fontsize = "8")
         axes[2].legend(loc= "upper right", fontsize = "8" )
-        axes[0].set_title("Watt-Strogatz Small-World", fontsize = "12" )
+        axes[0].set_title("Small-World", fontsize = "12" )
         axes[1].set_title("Stochastic Block Model", fontsize = "12" )
-        axes[2].set_title("Barabasi-Albert Scale-Free", fontsize = "12" )
+        axes[2].set_title("Scale-Free", fontsize = "12" )
     
     fig.supxlabel(property_title, fontsize = "12" )
     fig.supylabel(r"Cumulative emissions, E", fontsize = "12" )
@@ -104,9 +104,9 @@ def plot_SF_SBM_3_alt(
         axes[0].legend( fontsize = "8")
         axes[1].legend( fontsize = "8")
         axes[2].legend(loc= "upper right", fontsize = "8" )
-        axes[0].set_title("Watt-Strogatz Small-World", fontsize = "12" )
+        axes[0].set_title("Small-World", fontsize = "12" )
         axes[1].set_title("Stochastic Block Model", fontsize = "12" )
-        axes[2].set_title("Barabasi-Albert Scale-Free", fontsize = "12" )
+        axes[2].set_title("Scale-Free", fontsize = "12" )
     
     fig.supxlabel(property_title, fontsize = "12" )
     fig.supylabel(r"Cumulative emissions, E", fontsize = "12" )
@@ -145,15 +145,15 @@ def plot_price_elasticies_SF_SBM_seeds_3(
             axes[1].plot(property_vals[1:], stochastic_array_price_elasticities_SBM[i], color = colors_scenarios[j], alpha = 0.1)
             axes[2].plot(property_vals[1:], stochastic_array_price_elasticities_SF[i], color = colors_scenarios[j], alpha = 0.1)
 
-        #axes[0].grid()
-        #axes[1].grid()
-        #axes[2].grid()
+        axes[0].grid()
+        axes[1].grid()
+        axes[2].grid()
         axes[0].legend()
         axes[1].legend()
         axes[2].legend()
-        axes[0].set_title("Watt-Strogatz Small-World")
+        axes[0].set_title("Small-World")
         axes[1].set_title("Stochastic Block Model")
-        axes[2].set_title("Barabasi-Albert Scale-Free")
+        axes[2].set_title("Scale-Free")
     
     fig.supxlabel(property_title)
     fig.supylabel(r"Price elasticity of emissions, $\epsilon$")
@@ -161,6 +161,7 @@ def plot_price_elasticies_SF_SBM_seeds_3(
     plotName = fileName + "/Plots"
     f = plotName + "/plot_price_elasticies_SF_SBM_seeds_3" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
+
 
 
 def plot_SW_SBM(
@@ -186,7 +187,9 @@ def plot_SW_SBM(
         axes[1].legend(fontsize="8")
         axes[0].set_title("Small-World", fontsize="12")
         axes[1].set_title("Stochastic Block Model", fontsize="12")
-
+        
+    axes[0].grid()
+    axes[1].grid()
     fig.supxlabel(property_title, fontsize="12")
     fig.supylabel(r"Cumulative emissions, E", fontsize="12")
 
@@ -210,7 +213,7 @@ def plot_SF(
 
         ax.legend(loc="upper right", fontsize="8")
         ax.set_title("Scale-Free", fontsize="12")
-
+    ax.grid()
     fig.supxlabel(property_title, fontsize="12")
     fig.supylabel(r"Cumulative emissions, E", fontsize="12")
 
@@ -257,7 +260,7 @@ def main(
     property_title = r"Carbon tax, $\tau$"
     #plot_SF_SBM_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
     #plot_SF_SBM_3_alt(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
-    #plot_price_elasticies_SF_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
+    plot_price_elasticies_SF_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
     plot_SW_SBM(fileName, emissions_array_SW, emissions_array_SBM, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SBM, seed_reps,colors_scenarios)
     
     plot_SF(fileName, emissions_array_SF , property_title, property_varied, property_values_list, labels_SF, seed_reps, colors_scenarios)

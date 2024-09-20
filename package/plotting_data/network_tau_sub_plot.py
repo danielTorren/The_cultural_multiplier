@@ -45,10 +45,10 @@ def plot_means_end_points_emissions_confidence(
     ncols = 3 
     nrows = 1
     #print(c,emissions_final)
-    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, figsize=(15,6), constrained_layout = True)# 
+    fig, axes = plt.subplots(ncols = ncols, nrows = nrows, figsize=(12,6), constrained_layout = True)# 
 
     for j in range(ncols):
-        axes[j].set_title(network_titles[j])
+        axes[j].set_title(network_titles[j], fontsize = "12")
         for k in range(len(property_values_list_row)):
             axes[j].grid()
             Data = emissions_networks[j][k]
@@ -61,8 +61,8 @@ def plot_means_end_points_emissions_confidence(
             axes[j].fill_between(property_values_list_col, lower_bound, upper_bound, color=colors[k], alpha=0.3)
 
         
-    fig.supxlabel(r"Carbon tax, $\tau$")
-    fig.supylabel(r"Cumulative carbon emissions, E")
+    fig.supxlabel(r"Carbon tax, $\tau$", fontsize = "12")
+    fig.supylabel(r"Cumulative carbon emissions, E", fontsize = "12")
 
     axes[2].legend( fontsize="8")
     #print("what worong")
