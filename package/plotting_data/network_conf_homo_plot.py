@@ -81,7 +81,7 @@ def plot_var_emisisons_simple_xlog_ylog(
     fig.savefig(f+ ".png", dpi=600, format="png") 
     #fig.savefig(f+ ".eps", dpi=600, format="eps") 
 
-def plot_emissions_simple_xlog_homo(
+def plot_emissions_simple_homo(
     fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
 ):
     fig, axes = plt.subplots(ncols=len(emissions_networks), nrows=len(emissions_networks[0]), figsize=(15, 8), sharex=True)  # Increased width
@@ -96,7 +96,7 @@ def plot_emissions_simple_xlog_homo(
                 for v in range(len(data_trans)):
                     axes[j][i].plot(property_vals, data_trans[v], color=colors_scenarios[k], alpha=0.1)
 
-        axes[j][i].set_xscale('log')
+        #axes[j][i].set_xscale('log')
         #axes[j][i].set_ylabel(r"Homophily, $\phi$")
         axes[0][i].set_title(network_titles[i], fontsize="12")
     
@@ -122,7 +122,7 @@ def plot_emissions_simple_xlog_homo(
     
 
     plotName = fileName + "/Plots"
-    f = plotName + "/network_emissions_simple_phi_xlog"
+    f = plotName + "/network_emissions_simple_conf"
     fig.savefig(f + ".png", dpi=600, format="png", bbox_inches='tight')
 
 def plot_emissions_simple_xlog_homo_confidence(
@@ -224,7 +224,7 @@ def plot_emissions_simple_xlog_homo_confidence_invert(
     f = plotName + "/network_emissions_simple_phi_xlog_confidence_invert"
     fig.savefig(f + ".png", dpi=600, format="png", bbox_inches='tight')
 
-def plot_emissions_simple_xlog_homo_invert(
+def plot_emissions_simple_homo_invert(
     fileName, emissions_networks, scenarios_titles, property_vals, colors_scenarios, network_titles
 ):
     
@@ -252,7 +252,7 @@ def plot_emissions_simple_xlog_homo_invert(
                     axes[j][i].plot(property_vals, data_trans[v], color=colors_scenarios[k], alpha=0.1)
             axes[j][i].legend()
 
-        axes[j][i].set_xscale('log')
+        #axes[j][i].set_xscale('log')
         #axes[j][i].set_ylabel(r"Homophily, $\phi$")
         axes[0][i].set_title(network_titles[i], fontsize="12")
     
@@ -274,7 +274,7 @@ def plot_emissions_simple_xlog_homo_invert(
     
 
     plotName = fileName + "/Plots"
-    f = plotName + "/network_emissions_simple_phi_xlog_invert"
+    f = plotName + "/network_emissions_simple_conf_invert"
     fig.savefig(f + ".png", dpi=600, format="png", bbox_inches='tight')
 
 def main(
@@ -292,15 +292,15 @@ def main(
     scenarios_titles = [r"$\tau = 0$", r"$\tau = 0.1$", r"$\tau = 1$"]
     base_params =  load_object(fileName + "/Data", "base_params")
     print(base_params )
-    quit()
-    plot_emissions_simple_xlog_homo(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    #quit()
+    plot_emissions_simple_homo(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_emissions_simple_xlog_homo_confidence(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_emissions_simple_xlog_homo_confidence_invert(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
-    plot_emissions_simple_xlog_homo_invert(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
+    plot_emissions_simple_homo_invert(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_homo_10_35_19__19_09_2024",
+        fileName= "results/conf_homo_12_23_16__20_09_2024",
     )

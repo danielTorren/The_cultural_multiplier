@@ -291,8 +291,8 @@ def main(
     #scenarios_titles = [r"No carbon price, $\tau = 0$", r"Low carbon price, $\tau = 0.1$", r"High carbon price, $\tau = 1$"]
     scenarios_titles = [r"$\tau = 0$", r"$\tau = 0.1$", r"$\tau = 1$"]
     base_params =  load_object(fileName + "/Data", "base_params")
-    print(base_params )
-    quit()
+    #print(base_params )
+    #quit()
     plot_emissions_simple_xlog_homo(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_emissions_simple_xlog_homo_confidence(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
     #plot_emissions_simple_xlog_homo_confidence_invert(fileName, emissions_array, scenarios_titles, property_values_list, colors_scenarios, network_titles)
@@ -302,5 +302,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_homo_10_35_19__19_09_2024",
+        fileName= "results/phi_homo_11_28_12__20_09_2024",
     )
