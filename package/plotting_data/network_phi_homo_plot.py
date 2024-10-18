@@ -302,5 +302,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_homo_11_28_12__20_09_2024",
+        fileName= "results/phi_homo_21_57_42__18_09_2024",
     )

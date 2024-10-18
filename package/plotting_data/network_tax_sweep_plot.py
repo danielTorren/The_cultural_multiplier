@@ -481,12 +481,16 @@ def main(
 
     #FULL
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
+    #print(emissions_SW.shape)
+    #quit()
     emissions_SBM = load_object(fileName + "/Data","emissions_SBM")
     emissions_SF = load_object(fileName + "/Data","emissions_BA")
     emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_SF])    
     
     base_params = load_object(fileName + "/Data","base_params")
+    
 
+    
     #####################################################################################################
 
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]

@@ -168,6 +168,8 @@ def main(
     property_varied = var_params["property_varied"]
 
     emissions_array_SF = load_object(fileName + "/Data", "emissions_array_SF")    
+    #print(emissions_array_SF.shape)
+    #quit()
     emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
     emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
     

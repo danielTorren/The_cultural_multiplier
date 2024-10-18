@@ -55,6 +55,7 @@ def main(
         params_list_fixed += produce_param_list_only_stochastic_multi(params)
 
     print("TOTAL RUNS FIXED", len(params_list_fixed))
+    #quit()
 
     fixed_emissions_stock_serial = multi_emissions_stock(params_list_fixed)
     fixed_emissions_array = fixed_emissions_stock_serial.reshape( len(carbon_price_list), params["seed_reps"])

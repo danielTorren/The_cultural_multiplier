@@ -134,6 +134,7 @@ def main(
     property_varied = var_params["property_varied"]
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     emissions_array = load_object(fileName + "/Data", "emissions_array")
+    print(emissions_array.shape)
     scenarios_titles = [r"No carbon price, $\tau = 0$", r"Low carbon price, $\tau = 0.1$", r"High carbon price, $\tau = 1$"]
     scenarios_titles = [r"$\tau = 0$", r"$\tau = 0.1$", r"$\tau = 1$"]
 

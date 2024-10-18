@@ -67,6 +67,7 @@ def main(
     #RUN THE STUFF
    
     print("TOTAL RUNS", len(params_list))
+    #quit()
 
     emissions_stock_serial = multi_emissions_stock(params_list)
 
