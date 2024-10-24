@@ -196,6 +196,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_13_08_51__25_08_2024",
+        fileName= "results/networks_homo_tau_18_49_01__18_10_2024",
         fileName_fixed = "results/tax_sweep_networks_15_57_56__22_08_2024"
     )

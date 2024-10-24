@@ -145,5 +145,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/phi_vary_16_44_12__22_08_2024",
+        fileName= "results/phi_vary_18_49_57__18_10_2024"#phi_vary_16_44_12__22_08_2024",
     )

@@ -12,7 +12,7 @@ def plot_network_examples(
         fileName
     ):
 
-    fig, axes = plt.subplots(nrows=1,ncols=3,figsize=(9,4), constrained_layout = True)
+    fig, axes = plt.subplots(nrows=1,ncols=3,figsize=(9,3.2), constrained_layout = True)
 
 
     G_1 = nx.watts_strogatz_graph(n=50, k=5, p=0.05, seed=1)  # Watts–Strogatz small-world graph,watts_strogatz_graph( n, k, p[, seed])

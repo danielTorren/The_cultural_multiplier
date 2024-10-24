@@ -194,7 +194,7 @@ def plot_multiplier_confidence_two(
     
     ax1.grid()
     ax1.set_title(network_titles[0], fontsize="12")
-    ax1.set_ylabel(r"Carbon tax reduction, M", fontsize="12")
+    ax1.set_ylabel(r"Carbon tax reduction, $M_{tax}$", fontsize="12")
     ax1.set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
     handles_1, labels_1 = ax1.get_legend_handles_labels()
     fig1.legend(handles_1, labels_1, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
@@ -226,7 +226,7 @@ def plot_multiplier_confidence_two(
 
     axes2[0].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
     axes2[1].set_xlabel(r"Carbon tax, $\tau$", fontsize="12")
-    axes2[0].set_ylabel(r"Carbon tax reduction, M", fontsize="12")
+    axes2[0].set_ylabel(r"Carbon tax reduction, $M_{tax}$", fontsize="12")
     handles_2, labels_2 = axes2[0].get_legend_handles_labels()
     fig2.legend(handles_2, labels_2, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2, fontsize="9")
     fig2.subplots_adjust(bottom=0.2)  # Adjust bottom margin for legend
@@ -484,7 +484,7 @@ def main(
     #print(emissions_SW.shape)
     #quit()
     emissions_SBM = load_object(fileName + "/Data","emissions_SBM")
-    emissions_SF = load_object(fileName + "/Data","emissions_BA")
+    emissions_SF = load_object(fileName + "/Data","emissions_SF")
     emissions_networks = np.asarray([emissions_SW,emissions_SBM,emissions_SF])    
     
     base_params = load_object(fileName + "/Data","base_params")
