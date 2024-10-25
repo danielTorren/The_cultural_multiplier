@@ -81,6 +81,13 @@ class Network_Matrix:
         
         self.N = int(round(self.parameters["N"]))
         self.M = int(round(self.parameters["M"]))
+
+        if self.alpha_change_state == "dynamic_hybrid_determined_weights":
+            self.M_identity = int(round(self.M*self.parameters["M_identity_prop"]))
+            #print(self.M, self.M_identity)
+            if self.M_identity < 0 or self.M_identity > self.M:
+                raise ValueError(f"M_identity must be between 0 and {self.M}")
+    
         self.shuffle_intensity = 1
 
     def _initialize_network_params(self):
@@ -528,6 +535,43 @@ class Network_Matrix:
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         return weighting_matrix_list  
 
+    def _update_weightings_hybrid(self) -> list:
+        """
+        Update weighting matrices using a hybrid approach where the first M_identity sectors
+        use identity-based weighting, while the remaining sectors use individual preferences.
+        
+        Args:
+            M_identity (int): Number of sectors to use identity-based weighting for
+            
+        Returns:
+            list: List of weighting matrices where:
+                - First M_identity matrices are identical (based on identity)
+                - Remaining (M - M_identity) matrices are individually calculated
+        """
+        
+        weighting_matrix_list = []
+        
+        if self.M_identity > 0:
+            # Calculate identity-based weighting matrix for the first M_identity sectors
+            identity_preferences = self.low_carbon_preference_matrix[:, :self.M_identity]
+            identity = np.mean(identity_preferences, axis=1)
+            identity_based_matrix = self._calc_weighting_matrix_attribute(identity)
+            
+            # Add the same identity-based matrix M_identity times
+            weighting_matrix_list.extend([identity_based_matrix] * self.M_identity)
+        
+        # Calculate individual preference-based matrices for remaining sectors
+        attribute_matrix = self.outward_social_influence_matrix.T
+        for m in range(self.M_identity, self.M):
+            preferences = attribute_matrix[m]
+            individual_matrix = self._calc_weighting_matrix_attribute(preferences)
+            weighting_matrix_list.append(individual_matrix)
+        
+        # Update identity vector using all sectors (maintaining existing behavior)
+        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+        
+        return weighting_matrix_list
+
     def _calc_emissions(self):
         """
         Calculate and update carbon emissions flow and stock.
@@ -624,6 +668,8 @@ class Network_Matrix:
                 self.weighting_matrix = self._update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":
                 self.weighting_matrix_tensor = self._update_weightings_list()
+            elif self.alpha_change_state == "dynamic_hybrid_determined_weights":
+                self.weighting_matrix_tensor = self._update_weightings_hybrid()
 
             self.social_component_vector = self._calc_social_component_matrix()
 
