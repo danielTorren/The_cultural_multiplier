@@ -34,7 +34,7 @@ def main(
     carbon_price_list = [0, 0.1, 1]
 
     #CUTLRUAL MULTIPLIER
-    params["alpha_change_state"] =  "dynamic_identity_determined_weights",
+    params["alpha_change_state"] =  "dynamic_identity_determined_weights"
     params_list_cultural = []
 
     for carbon_price in carbon_price_list:
@@ -43,7 +43,7 @@ def main(
 
 ###########################################################################################################
     #SOCaIL MULTIPLIER
-    params["alpha_change_state"] =  "dynamic_socially_determined_weights",
+    params["alpha_change_state"] =  "dynamic_socially_determined_weights"
     params_list_socially = []
 
     for carbon_price in carbon_price_list:
