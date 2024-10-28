@@ -42,14 +42,14 @@ def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
     if "hybrid_50" in scenarios:
         base_params_copy_8 = deepcopy(base_params_tax_copy)
         base_params_copy_8["alpha_change_state"] = "dynamic_hybrid_determined_weights"
-        base_params_copy_8["M_identity"] = 4
+        base_params_copy_8["M_identity"] = 3
         params_sub_list_8 = produce_param_list_stochastic_multi(base_params_copy_8, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_8)
 
     if "hybrid_75" in scenarios:
         base_params_copy_9 = deepcopy(base_params_tax_copy)
         base_params_copy_9["alpha_change_state"] = "dynamic_hybrid_determined_weights"
-        base_params_copy_9["M_identity"] = 6
+        base_params_copy_9["M_identity"] = 4
         params_sub_list_9 = produce_param_list_stochastic_multi(base_params_copy_9, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_9)
 

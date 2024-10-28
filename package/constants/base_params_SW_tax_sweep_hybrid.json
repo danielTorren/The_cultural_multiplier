@@ -1,11 +1,11 @@
 {
     "save_timeseries_data_state": 0,
     "compression_factor_state": 1,
-    "seed_reps": 5,
+    "seed_reps": 1,
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
     "N": 3000, 
-    "M": 8, 
+    "M": 5, 
     "sector_substitutability": 2, 
     "low_carbon_substitutability": 2, 
     "a_preferences": 2, 

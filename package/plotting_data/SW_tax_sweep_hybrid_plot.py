@@ -53,7 +53,9 @@ def main(
 
     #FULL
     emissions_SW = load_object(fileName + "/Data","emissions_SW")
-    
+    print(emissions_SW[-1] -  emissions_SW[-2])
+    quit()
+
     base_params = load_object(fileName + "/Data","base_params")
     
 
@@ -70,6 +72,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/SW_tax_sweep_hybrid_21_21_59__28_10_2024",#tax_sweep_networks_15_57_56__22_08_2024",#",#tax_sweep_networks_15_40_36__13_09_2024
+        fileName = "results/SW_tax_sweep_hybrid_21_51_39__28_10_2024",#tax_sweep_networks_15_57_56__22_08_2024",#",#tax_sweep_networks_15_40_36__13_09_2024
         MULTIPLIER = 0
     )

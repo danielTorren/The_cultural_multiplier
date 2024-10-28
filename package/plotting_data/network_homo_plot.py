@@ -131,19 +131,18 @@ def plot_price_elasticies_SF_SBM_seeds_3(
         stochastic_array_price_elasticities_SW = np.asarray([calculate_price_elasticity(property_vals,x) for x in data_SW])
         stochastic_array_price_elasticities_SF = np.asarray([calculate_price_elasticity(property_vals,x) for x in data_SF])
         stochastic_array_price_elasticities_SBM = np.asarray([calculate_price_elasticity(property_vals,x) for x in  data_SBM])#calc_price_elasticities_2D((Data_arr_SBM[j]).T, property_vals_SBM)
+        
+        mu_emissions_SW, lower_bound_SW, upper_bound_SW = calc_bounds(stochastic_array_price_elasticities_SW.T, 0.95)
+        mu_emissions_SBM, lower_bound_SBM, upper_bound_SBM = calc_bounds(stochastic_array_price_elasticities_SBM.T, 0.95)
+        mu_emissions_SF, lower_bound_SF, upper_bound_SF = calc_bounds(stochastic_array_price_elasticities_SF.T, 0.95)
 
-        mean_SW = stochastic_array_price_elasticities_SW.mean(axis=0)
-        mean_SF = stochastic_array_price_elasticities_SF.mean(axis=0)
-        mean_SBM = stochastic_array_price_elasticities_SBM.mean(axis=0)
+        axes[0].plot(property_vals[1:], mu_emissions_SW, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
+        axes[1].plot(property_vals[1:], mu_emissions_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
+        axes[2].plot(property_vals[1:], mu_emissions_SF, label= labels_SF[j], color = colors_scenarios[j], alpha = 1)
 
-        axes[0].plot(property_vals[1:], mean_SW, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
-        axes[1].plot(property_vals[1:], mean_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
-        axes[2].plot(property_vals[1:], mean_SF, label= labels_SF[j], color = colors_scenarios[j], alpha = 1)
-
-        for i in range(seed_reps):
-            axes[0].plot(property_vals[1:], stochastic_array_price_elasticities_SW[i], color = colors_scenarios[j], alpha = 0.1)
-            axes[1].plot(property_vals[1:], stochastic_array_price_elasticities_SBM[i], color = colors_scenarios[j], alpha = 0.1)
-            axes[2].plot(property_vals[1:], stochastic_array_price_elasticities_SF[i], color = colors_scenarios[j], alpha = 0.1)
+        axes[0].fill_between(property_vals[1:], lower_bound_SW, upper_bound_SW, color=colors_scenarios[j], alpha=0.3)
+        axes[1].fill_between(property_vals[1:], lower_bound_SBM, upper_bound_SBM, color=colors_scenarios[j], alpha=0.3)
+        axes[2].fill_between(property_vals[1:], lower_bound_SF, upper_bound_SF, color=colors_scenarios[j], alpha=0.3)
 
         axes[0].grid()
         axes[1].grid()

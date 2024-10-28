@@ -92,9 +92,9 @@ class Network_Matrix:
         if self.alpha_change_state == "dynamic_hybrid_determined_weights":
             #print("self.parameters", self.parameters)
             self.M_identity = int(round(self.parameters["M_identity"]))
-            #print(self.M, self.M_identity)
+            print(self.M, self.M_identity)
             if self.M_identity < 0 or self.M_identity > self.M:
-                print("self.M_identity > self.M", self.M_identity ,  self.M)
+                print("self.M_identity > self.M", self.M_identity, self.M)
                 raise ValueError(f"M_identity must be between 0 and {self.M}")
     
         self.shuffle_intensity = 1
@@ -566,23 +566,16 @@ class Network_Matrix:
         
         weighting_matrix_list = []
         
-        if self.M_identity > 0:
+        if self.M_identity > 1:#AS if 1 its the same as the socially determined case
             # Calculate identity-based weighting matrix for the first M_identity sectors
             identity_preferences = self.low_carbon_preference_matrix[:, :self.M_identity]
             identity = np.mean(identity_preferences, axis=1)
-            self.identity_vec = identity#update identity with only chosen sectors
-            #print("identity", identity, len(identity), np.mean(identity))
-            #quit()
-            #print("idnetiy", type(identity))
+            #self.identity_vec = identity#update identity with only chosen sectors
             identity_based_matrix = self._calc_weighting_matrix_attribute(identity)
-            #print("identity_based_matrix", type(identity_based_matrix))
-            #print(identity_based_matrix)
-            #quit()
             # Add the same identity-based matrix M_identity times
             for _ in range(self.M_identity):
                 weighting_matrix_list.append(identity_based_matrix)
-        #print("weighting_matrix_list before", weighting_matrix_list, type(weighting_matrix_list))
-        #quit()
+
         # Calculate individual preference-based matrices for remaining sectors
         attribute_matrix = self.outward_social_influence_matrix.T
         for m in range(self.M_identity, self.M):
@@ -594,7 +587,7 @@ class Network_Matrix:
 
         #quit()
         # Update identity vector using all sectors (maintaining existing behavior)
-        #self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         
         return weighting_matrix_list
 
