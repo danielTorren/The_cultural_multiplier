@@ -17,11 +17,8 @@ def main(
     var_params = json.load(f_var) 
 
     property_varied = var_params["property_varied"]#"ratio_preference_or_consumption_state",
-    property_reps = var_params["property_reps"]#10,
-
-    property_values_list = generate_vals(
-        var_params
-    )
+    property_values_list = var_params["property_values_list"]
+    property_reps = len(property_values_list)#10,
 
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
@@ -31,7 +28,8 @@ def main(
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
-    carbon_price_list = [0, 0.1, 1]
+    carbon_price_list = [0, 0.1, 1]#
+    #M VALS
 
     #CUTLRUAL MULTIPLIER
     params["alpha_change_state"] =  "dynamic_identity_determined_weights"
@@ -59,7 +57,6 @@ def main(
 
     emissions_stock_serial_socially = multi_emissions_stock(params_list_socially)
     emissions_array_socially = emissions_stock_serial_socially.reshape(len(carbon_price_list), property_reps, params["seed_reps"])#2 is for BA and SBM,3 is for the 3 differents states
-
 
     print("RUNS DONE")
 ########################################################################################################### 
