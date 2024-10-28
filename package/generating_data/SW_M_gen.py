@@ -41,6 +41,7 @@ def main(
         params["carbon_price_increased"] = carbon_price
         params_list_cultural += produce_param_list_stochastic_multi(params, property_values_list, property_varied)
 
+###########################################################################################################
     #SOCaIL MULTIPLIER
     params["alpha_change_state"] =  "dynamic_socially_determined_weights",
     params_list_socially = []
@@ -51,8 +52,10 @@ def main(
 
     print("TOTAL RUNS", len(params_list_socially) + len(params_list_cultural) )
 
+###########################################################################################################
+
     emissions_stock_serial_cultural = multi_emissions_stock(params_list_cultural)
-    emissions_array_cultural = emissions_stock_serial_cultural.reshape(len(carbon_price_list), property_reps, params["seed_reps"])#2 is for BA and SBM,3 is for the 3 differents states
+    emissions_array_identity = emissions_stock_serial_cultural.reshape(len(carbon_price_list), property_reps, params["seed_reps"])#2 is for BA and SBM,3 is for the 3 differents states
 
     emissions_stock_serial_socially = multi_emissions_stock(params_list_socially)
     emissions_array_socially = emissions_stock_serial_socially.reshape(len(carbon_price_list), property_reps, params["seed_reps"])#2 is for BA and SBM,3 is for the 3 differents states
@@ -78,7 +81,7 @@ def main(
     createFolder(fileName)
     
     save_object(emissions_array_socially , fileName + "/Data", "emissions_array_socially")
-    save_object(emissions_array_cultural , fileName + "/Data", "emissions_array_identity")
+    save_object(emissions_array_identity , fileName + "/Data", "emissions_array_identity")
     save_object(fixed_emissions_array, fileName + "/Data", "fixed_emissions_array")
     save_object(params, fileName + "/Data", "base_params")
     save_object(var_params,fileName + "/Data" , "var_params")

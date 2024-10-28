@@ -54,12 +54,15 @@ class Network_Matrix:
         self._initialize_substitutabilities()
         self._calc_consumption()
 
+        
         if self.alpha_change_state != "fixed_preferences":
             self._initialize_network_homophily()
             self._create_network()
             if self.homophily_state != 0:
                 self.low_carbon_preference_matrix = self._shuffle_preferences_start_mixed()
         
+        #print("state: ", self.alpha_change_state, self.M, self.carbon_price_increased_m)
+
         self._initialize_social_component()
         self.carbon_dividend = self._calc_carbon_dividend()
         self.total_carbon_emissions_stock = 0
@@ -75,12 +78,12 @@ class Network_Matrix:
         """Initialize state attributes from parameters."""
         self.save_timeseries_data_state = self.parameters["save_timeseries_data_state"]
         self.compression_factor_state = self.parameters["compression_factor_state"]
-        self.imitation_state = self.parameters["imitation_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
         self.network_type = self.parameters["network_type"]
         
         self.N = int(round(self.parameters["N"]))
         self.M = int(round(self.parameters["M"]))
+
 
         if self.alpha_change_state == "dynamic_hybrid_determined_weights":
             self.M_identity = int(round(self.M*self.parameters["M_identity_prop"]))

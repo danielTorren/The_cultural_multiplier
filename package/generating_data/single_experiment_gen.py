@@ -43,7 +43,7 @@ if __name__ == '__main__':
     "carbon_price_increased": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-    "imitation_state": "consumption",
+    
     "alpha_change_state": "dynamic_socially_determined_weights",#"fixed_preferences",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
     "seed_reps": 1,
     "network_structure_seed": 4, 

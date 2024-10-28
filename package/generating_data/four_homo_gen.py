@@ -91,7 +91,7 @@ if __name__ == '__main__':
     "carbon_price_increased": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-    "imitation_state": "consumption",
+    
     "alpha_change_state": "dynamic_identity_determined_weights",
     "seed_reps": 100,
     "network_structure_seed": 1, 

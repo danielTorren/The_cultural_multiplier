@@ -1,0 +1,9 @@
+{
+    "property_varied":"M",
+    "property_min" : 1,
+    "property_max" :20,
+    "property_reps": 10,
+    "property_varied_title" : "Consumption categories, M",
+    "property_divisions": "linear",
+    "round": 0
+}
