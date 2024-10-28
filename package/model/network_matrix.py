@@ -81,18 +81,16 @@ class Network_Matrix:
         self.alpha_change_state = self.parameters["alpha_change_state"]
 
         if self.alpha_change_state not in ["dynamic_hybrid_determined_weights","dynamic_socially_determined_weights","fixed_preferences","dynamic_identity_determined_weights"]:
-                raise ValueError(f"Invalid alpha change state")
+            raise ValueError(f"Invalid alpha change state")
     
         self.network_type = self.parameters["network_type"]
         
         self.N = int(round(self.parameters["N"]))
         self.M = int(round(self.parameters["M"]))
 
-
         if self.alpha_change_state == "dynamic_hybrid_determined_weights":
-            #print("self.parameters", self.parameters)
             self.M_identity = int(round(self.parameters["M_identity"]))
-            print(self.M, self.M_identity)
+            #print(self.M, self.M_identity)
             if self.M_identity < 0 or self.M_identity > self.M:
                 print("self.M_identity > self.M", self.M_identity, self.M)
                 raise ValueError(f"M_identity must be between 0 and {self.M}")
@@ -454,7 +452,7 @@ class Network_Matrix:
         Returns:
             np.ndarray: Matrix of social influences
         """
-        if self.alpha_change_state in ("static_socially_determined_weights", "dynamic_socially_determined_weights"):
+        if self.alpha_change_state in ("static_socially_determined_weights", "dynamic_socially_determined_weights", "dynamic_hybrid_determined_weights"):
             social_influence = self._calc_ego_influence_degroot_independent()
         else:
             social_influence = self._calc_ego_influence_degroot()           
