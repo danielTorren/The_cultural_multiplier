@@ -118,7 +118,7 @@ def generate_vals(variable_parameters_dict):
         property_values_list = np.geomspace(variable_parameters_dict["property_min"],variable_parameters_dict["property_max"], variable_parameters_dict["property_reps"])
     else:
         print("Invalid divisions, try linear or log")
-    if variable_parameters_dict["round"]:
+    if variable_parameters_dict["round"] == 1:
         property_values_list = np.round(property_values_list)
         #print("ROUND",property_values_list)#
         #quit()
