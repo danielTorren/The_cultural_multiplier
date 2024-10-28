@@ -102,7 +102,7 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_networks_tax_sweep_sub_alt.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_tax_sweep_sub_alt.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_tax_sweep_sub.json",
         scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights" ],
     )
 
