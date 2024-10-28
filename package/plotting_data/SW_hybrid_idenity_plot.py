@@ -5,34 +5,32 @@ from package.resources.utility import load_object
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_emissions(data_serial, variable_parameters_dict):
-    # Reshape the data as required and calculate the mean across the 'seed_reps' axis
-    data_mean = data_serial.reshape(
-        variable_parameters_dict["row"]["property_reps"],
-        variable_parameters_dict["col"]["property_reps"],
-        -1
-    ).mean(axis=-1)
+def plot_emissions_scatter(variable_parameters_dict, emissions_data):
+    """
+    Plot emissions as a scatter plot with M on the x-axis, M_identity on the y-axis,
+    and emissions represented by color.
 
-    # Define the M and M_identity range (assuming these are sequential or predefined)
-    M_values = np.arange(data_mean.shape[1])
-    M_identity_values = np.arange(data_mean.shape[0])
+    Parameters:
+        variable_parameters_dict (dict): Dictionary containing valid (M, M_identity) combinations.
+        emissions_data (list or numpy.ndarray): Emissions values for each (M, M_identity) pair.
+    """
+    # Extract M and M_identity values from variable_parameters_dict
+    M_M_identity_combinations = variable_parameters_dict["M_M_identity_combinations"]
+    M_values = [pair[0] for pair in M_M_identity_combinations]
+    M_identity_values = [pair[1] for pair in M_M_identity_combinations]
 
-    # Create a meshgrid for M and M_identity
-    M_grid, M_identity_grid = np.meshgrid(M_values, M_identity_values)
-
-    # Plot the emissions data as a single heatmap
+    emissions_data_reduc =  emissions_data.reshape(len(M_identity_values), 2 )
+    emissions_data = np.mean(emissions_data_reduc, axis = 1)
     plt.figure(figsize=(10, 8))
-    color_plot = plt.pcolormesh(M_grid, M_identity_grid, data_mean, shading='auto', cmap='viridis')
     
-    # Add labels and color bar
+    # Scatter plot where color represents emissions
+    scatter = plt.scatter(M_values, M_identity_values, c=emissions_data, cmap="viridis", s=100, edgecolor='k')
+    plt.colorbar(scatter, label='Average Emissions')
+    
     plt.xlabel("M")
-    plt.ylabel("Proportion cultural multiplier")
-    plt.colorbar(color_plot, label='Emissions')
-    plt.title("Mean Emissions Across Seed Reps")
-
+    plt.ylabel("M_identity")
+    plt.title("Emissions Scatter Plot by M and M_identity")
     plt.show()
-
-
 
 def main(
     fileName
@@ -40,14 +38,13 @@ def main(
     
     #FULL
     emissions_data = load_object(fileName + "/Data","emissions_data") 
-    print(emissions_data.shape)
     variable_parameters_dict = load_object(fileName + "/Data","variable_parameters_dict")  
 
-    plot_emissions(emissions_data , variable_parameters_dict)
-    
+    plot_emissions_scatter(variable_parameters_dict, emissions_data)
+
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/SW_M_M_identity_18_37_08__25_10_2024"#tax_sweep_networks_16_44_43__18_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
+        fileName = "results/SW_M_M_identity_18_55_12__28_10_2024"#tax_sweep_networks_16_44_43__18_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
     )

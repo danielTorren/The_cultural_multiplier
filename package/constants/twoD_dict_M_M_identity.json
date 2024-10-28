@@ -1,4 +1,4 @@
 {
-    "row":{"property_varied":"M_identity_prop","property_min":0, "property_max": 1, "property_varied_title": "Proportion M identity ","property_divisions": "linear", "property_reps": 10, "round": 0}, 
-    "col":{"property_varied":"M","property_min":1, "property_max": 20, "property_varied_title": "M","property_divisions": "linear", "property_reps": 10, "round": 1} 
+    "row":{"property_varied":"M_identity","property_min":0, "property_max": 20, "property_varied_title": "M identity ","property_divisions": "linear", "property_reps": 5, "round": 1}, 
+    "col":{"property_varied":"M","property_min":1, "property_max": 20, "property_varied_title": "M","property_divisions": "linear", "property_reps": 5, "round": 1} 
 }
