@@ -4,5 +4,6 @@
     "property_max" :1,
     "property_reps": 100,
     "property_varied_title" : "Carbon tax",
-    "property_divisions": "linear"
+    "property_divisions": "linear",
+    "round": 0
 }

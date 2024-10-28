@@ -342,16 +342,16 @@ class Network_Matrix:
         if self.alpha_change_state == "fixed_preferences":
             self.social_component_vector = self.low_carbon_preference_matrix
         else:
-            if self.alpha_change_state in ("uniform_network_weighting", "static_culturally_determined_weights",
-                                         "dynamic_identity_determined_weights", "common_knowledge_dynamic_identity_determined_weights"):
+            if self.alpha_change_state == "dynamic_identity_determined_weights":
                 self.weighting_matrix = self._update_weightings()
-            elif self.alpha_change_state in ("static_socially_determined_weights", "dynamic_socially_determined_weights"):
+            elif self.alpha_change_state == "dynamic_socially_determined_weights":
                 self.weighting_matrix_tensor = self._update_weightings_list()
             elif self.alpha_change_state == "dynamic_hybrid_determined_weights":
                 self.weighting_matrix_tensor = self._update_weightings_hybrid()
 
             self.social_component_vector = self._calc_social_component_matrix()
-
+            #print("self.social_component_vector", self.social_component_vector, np.mean(self.social_component_vector))
+            #quit()
     def _update_preferences(self) -> np.ndarray:
         """
         Update agent preferences based on social influence and current preferences.
@@ -425,16 +425,6 @@ class Network_Matrix:
         self.L_m_matrix = Omega_m_matrix * self.H_m_matrix
         self.outward_social_influence_matrix = self._calc_consumption_ratio()
 
-    def _calc_ego_influence_degroot(self) -> np.ndarray:
-        """
-        Calculate social influence using DeGroot learning model.
-        
-        Returns:
-            np.ndarray: Matrix of social influences
-        """
-        neighbour_influence = self.weighting_matrix.dot(self.outward_social_influence_matrix)
-        return neighbour_influence
-
     def _calc_consumption_ratio(self) -> np.ndarray:
         """
         Calculate ratio of low-carbon to total consumption.
@@ -452,7 +442,7 @@ class Network_Matrix:
         Returns:
             np.ndarray: Matrix of social influences
         """
-        if self.alpha_change_state in ("static_socially_determined_weights", "dynamic_socially_determined_weights", "dynamic_hybrid_determined_weights"):
+        if self.alpha_change_state in ("dynamic_socially_determined_weights", "dynamic_hybrid_determined_weights"):
             social_influence = self._calc_ego_influence_degroot_independent()
         else:
             social_influence = self._calc_ego_influence_degroot()           
@@ -505,7 +495,38 @@ class Network_Matrix:
             np.ndarray: Vector of identity values
         """
         return np.mean(low_carbon_preference_matrix, axis=1)
-
+    
+    def _calc_ego_influence_degroot(self) -> np.ndarray:
+        """
+        Calculate social influence using DeGroot learning model.
+        
+        Returns:
+            np.ndarray: Matrix of social influences
+        """
+        neighbour_influence = self.weighting_matrix.dot(self.outward_social_influence_matrix)
+        #print("neighbour_influence", np.mean(neighbour_influence), np.mean(self.weighting_matrix), np.mean(self.outward_social_influence_matrix))
+        #print("self.outward_social_influence_matrix", self.outward_social_influence_matrix)
+        #quit()
+        return neighbour_influence
+    
+    def _calc_ego_influence_degroot_independent(self) -> np.ndarray:
+        """
+        Calculate independent DeGroot learning influence for each sector.
+        
+        Returns:
+            np.ndarray: Matrix of sector-specific social influences
+        """
+        neighbour_influence = np.zeros((self.N, self.M))
+        if self.M > 1:
+            for m in range(self.M):
+                neighbour_influence[:, m] = self.weighting_matrix_tensor[m].dot(self.outward_social_influence_matrix[:, m])
+        else:
+            neighbour_influence = self.weighting_matrix_tensor.dot(self.outward_social_influence_matrix)#NOT ACTUALLY A TENSOR AS THERE IS ONLY ONE SECTOR
+        #print("neighbour_influence", np.mean(neighbour_influence), np.mean(self.weighting_matrix_tensor), np.mean(self.outward_social_influence_matrix))
+        #print("self.outward_social_influence_matrix", self.outward_social_influence_matrix)
+        #quit()
+        return neighbour_influence
+    
     def _update_weightings(self) -> sp.csr_matrix:
         """
         Update weighting matrix based on current identities.
@@ -517,18 +538,6 @@ class Network_Matrix:
         norm_weighting_matrix = self._calc_weighting_matrix_attribute(self.identity_vec)
         return norm_weighting_matrix
 
-    def _calc_ego_influence_degroot_independent(self) -> np.ndarray:
-        """
-        Calculate independent DeGroot learning influence for each sector.
-        
-        Returns:
-            np.ndarray: Matrix of sector-specific social influences
-        """
-        neighbour_influence = np.zeros((self.N, self.M))
-        for m in range(self.M):
-            neighbour_influence[:, m] = self.weighting_matrix_tensor[m].dot(self.outward_social_influence_matrix[:, m])
-        return neighbour_influence
-    
     def _update_weightings_list(self) -> list:
         """
         Update weighting matrices for each sector independently.
@@ -536,17 +545,21 @@ class Network_Matrix:
         Returns:
             list: List of weighting matrices for each sector
         """
-        weighting_matrix_list = []
-        attribute_matrix = (self.outward_social_influence_matrix).T
-        for m in range(self.M):
-            low_carbon_preferences_list = attribute_matrix[m]
-            norm_weighting_matrix = self._calc_weighting_matrix_attribute(low_carbon_preferences_list)
-            #print("norm_weighting_matrix", type(norm_weighting_matrix))
-            weighting_matrix_list.append(norm_weighting_matrix)
-        #print("weighting_matrix_list", weighting_matrix_list, type( weighting_matrix_list))
-        #quit()
-        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
-        return weighting_matrix_list  
+        #attribute_matrix = (self.outward_social_influence_matrix).T
+        attribute_matrix = (self.low_carbon_preference_matrix).T
+        if self.M == 1:
+            norm_weighting_matrix = self._calc_weighting_matrix_attribute(attribute_matrix[0])
+            return norm_weighting_matrix
+        else:
+            weighting_matrix_list = []
+            for m in range(self.M):
+                low_carbon_preferences_list = attribute_matrix[m]
+                norm_weighting_matrix = self._calc_weighting_matrix_attribute(low_carbon_preferences_list)
+                weighting_matrix_list.append(norm_weighting_matrix)
+            self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+            
+            return weighting_matrix_list  
+
 
     def _update_weightings_hybrid(self) -> list:
         """
@@ -561,33 +574,32 @@ class Network_Matrix:
                 - First M_identity matrices are identical (based on identity)
                 - Remaining (M - M_identity) matrices are individually calculated
         """
-        
-        weighting_matrix_list = []
-        
-        if self.M_identity > 1:#AS if 1 its the same as the socially determined case
-            # Calculate identity-based weighting matrix for the first M_identity sectors
-            identity_preferences = self.low_carbon_preference_matrix[:, :self.M_identity]
-            identity = np.mean(identity_preferences, axis=1)
-            #self.identity_vec = identity#update identity with only chosen sectors
-            identity_based_matrix = self._calc_weighting_matrix_attribute(identity)
-            # Add the same identity-based matrix M_identity times
-            for _ in range(self.M_identity):
-                weighting_matrix_list.append(identity_based_matrix)
+        #attribute_matrix = (self.outward_social_influence_matrix).T
+        attribute_matrix = (self.low_carbon_preference_matrix).T
 
-        # Calculate individual preference-based matrices for remaining sectors
-        attribute_matrix = self.outward_social_influence_matrix.T
-        for m in range(self.M_identity, self.M):
-            preferences = attribute_matrix[m]
-            individual_matrix = self._calc_weighting_matrix_attribute(preferences)
-            weighting_matrix_list.append(individual_matrix)
+        if self.M == 1:
+            norm_weighting_matrix = self._calc_weighting_matrix_attribute(attribute_matrix[0])
+            return norm_weighting_matrix
+        else:
+            weighting_matrix_list = []
+            if self.M_identity > 1:#AS if 1 its the same as the socially determined case
+                # Calculate identity-based weighting matrix for the first M_identity sectors
+                identity_preferences = self.low_carbon_preference_matrix[:, :self.M_identity]
+                identity = np.mean(identity_preferences, axis=1)
+                #self.identity_vec = identity#update identity with only chosen sectors
+                identity_based_matrix = self._calc_weighting_matrix_attribute(identity)
+                # Add the same identity-based matrix M_identity times
+                for _ in range(self.M_identity):
+                    weighting_matrix_list.append(identity_based_matrix)
 
-        #print("weighting_matrix_list before", weighting_matrix_list, type(weighting_matrix_list))
-
-        #quit()
-        # Update identity vector using all sectors (maintaining existing behavior)
-        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
-        
-        return weighting_matrix_list
+            # Calculate individual preference-based matrices for remaining sectors
+            for m in range(self.M_identity, self.M):
+                preferences = attribute_matrix[m]
+                individual_matrix = self._calc_weighting_matrix_attribute(preferences)
+                weighting_matrix_list.append(individual_matrix)
+            # Update identity vector using all sectors (maintaining existing behavior)
+            self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+            return weighting_matrix_list
 
     def _calc_emissions(self):
         """

@@ -4,5 +4,6 @@
     "property_max" :50,
     "property_reps": 20,
     "property_varied_title" : "Confirmation bias",
-    "property_divisions": "linear"
+    "property_divisions": "linear",
+    "round": 0
 }

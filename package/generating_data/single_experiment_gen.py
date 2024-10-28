@@ -43,17 +43,17 @@ if __name__ == '__main__':
     "carbon_price_increased": 0.1,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-    #"alpha_change_state": "dynamic_socially_determined_weights",#"dynamic_hybrid_determined_weights",#"fixed_preferences",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
+    "alpha_change_state": "dynamic_socially_determined_weights",#"dynamic_hybrid_determined_weights",#"fixed_preferences",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
     "seed_reps": 1,
     "network_structure_seed": 4, 
-    "preferences_seed": 10, 
-    "shuffle_homophily_seed": 20,
+    "preferences_seed": 99, 
+    "shuffle_homophily_seed": 55,
     "shuffle_coherance_seed": 31,
     "carbon_price_duration": 360,#360, 
     "burn_in_duration": 0, 
-    "N": 3000,#3000, 
-    "M": 4, 
-    "M_identity": 2,
+    "N": 30,#3000, 
+    "M": 2, 
+    "M_identity": 1,
     "sector_substitutability": 2, 
     "low_carbon_substitutability": 2, 
     "a_preferences": 2, 
@@ -72,14 +72,7 @@ if __name__ == '__main__':
     "SW_prob_rewire": 0.1
     }
 
-    #fileName = main(base_params=base_params)
-    base_params["alpha_change_state"] = "dynamic_socially_determined_weights"
-    fileName_socially = main(base_params=base_params)
-    base_params["alpha_change_state"] = "dynamic_identity_determined_weights"
-    fileName_identity = main(base_params=base_params)
-    base_params["alpha_change_state"] = "dynamic_hybrid_determined_weights"
-    fileName_hybrid = main(base_params=base_params)
-
+    fileName = main(base_params=base_params)
 
     RUN_PLOT = 0
 

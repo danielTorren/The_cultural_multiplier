@@ -75,9 +75,9 @@ def main(
     #FULL
     emissions_array_socially = load_object(fileName + "/Data","emissions_array_socially")
     emissions_array_identity = load_object(fileName + "/Data","emissions_array_identity")
-    print(emissions_array_socially - emissions_array_identity)  
+    #print(emissions_array_socially - emissions_array_identity)  
 
-    quit()
+    #quit()
     fixed_emissions_array = load_object(fileName + "/Data","fixed_emissions_array")
     carbon_price_list = load_object(fileName + "/Data","carbon_price_list")
     scenario_labels = ["Fixed preferences","Social multiplier", "Cultural multiplier"]
@@ -90,5 +90,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/M_vary_14_46_05__28_10_2024"
+        fileName = "results/M_vary_22_40_55__28_10_2024"
     )
