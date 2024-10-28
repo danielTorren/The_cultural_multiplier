@@ -18,9 +18,12 @@ def plot_emissions_scatter(variable_parameters_dict, emissions_data):
     M_M_identity_combinations = variable_parameters_dict["M_M_identity_combinations"]
     M_values = [pair[0] for pair in M_M_identity_combinations]
     M_identity_values = [pair[1] for pair in M_M_identity_combinations]
-
-    emissions_data_reduc =  emissions_data.reshape(len(M_identity_values), 2 )
+    #print(emissions_data.shape)
+    #quit()
+    emissions_data_reduc =  emissions_data.reshape(len(M_identity_values), 5 )
     emissions_data = np.mean(emissions_data_reduc, axis = 1)
+    print("emissions_data", emissions_data)
+    print("M_M_identity_combinations", M_M_identity_combinations)
     plt.figure(figsize=(10, 8))
     
     # Scatter plot where color represents emissions
@@ -46,5 +49,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/SW_M_M_identity_18_55_12__28_10_2024"#tax_sweep_networks_16_44_43__18_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
+        fileName = "results/SW_M_M_identity_20_00_26__28_10_2024"#tax_sweep_networks_16_44_43__18_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
     )

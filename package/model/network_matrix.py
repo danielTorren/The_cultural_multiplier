@@ -79,6 +79,10 @@ class Network_Matrix:
         self.save_timeseries_data_state = self.parameters["save_timeseries_data_state"]
         self.compression_factor_state = self.parameters["compression_factor_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
+
+        if self.alpha_change_state not in ["dynamic_hybrid_determined_weights","dynamic_socially_determined_weights","fixed_preferences","dynamic_identity_determined_weights"]:
+                raise ValueError(f"Invalid alpha change state")
+    
         self.network_type = self.parameters["network_type"]
         
         self.N = int(round(self.parameters["N"]))
@@ -86,6 +90,7 @@ class Network_Matrix:
 
 
         if self.alpha_change_state == "dynamic_hybrid_determined_weights":
+            #print("self.parameters", self.parameters)
             self.M_identity = int(round(self.parameters["M_identity"]))
             #print(self.M, self.M_identity)
             if self.M_identity < 0 or self.M_identity > self.M:
@@ -344,6 +349,9 @@ class Network_Matrix:
                 self.weighting_matrix = self._update_weightings()
             elif self.alpha_change_state in ("static_socially_determined_weights", "dynamic_socially_determined_weights"):
                 self.weighting_matrix_tensor = self._update_weightings_list()
+            elif self.alpha_change_state == "dynamic_hybrid_determined_weights":
+                self.weighting_matrix_tensor = self._update_weightings_hybrid()
+
             self.social_component_vector = self._calc_social_component_matrix()
 
     def _update_preferences(self) -> np.ndarray:
@@ -535,7 +543,10 @@ class Network_Matrix:
         for m in range(self.M):
             low_carbon_preferences_list = attribute_matrix[m]
             norm_weighting_matrix = self._calc_weighting_matrix_attribute(low_carbon_preferences_list)
+            #print("norm_weighting_matrix", type(norm_weighting_matrix))
             weighting_matrix_list.append(norm_weighting_matrix)
+        #print("weighting_matrix_list", weighting_matrix_list, type( weighting_matrix_list))
+        #quit()
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         return weighting_matrix_list  
 
@@ -559,20 +570,31 @@ class Network_Matrix:
             # Calculate identity-based weighting matrix for the first M_identity sectors
             identity_preferences = self.low_carbon_preference_matrix[:, :self.M_identity]
             identity = np.mean(identity_preferences, axis=1)
+            self.identity_vec = identity#update identity with only chosen sectors
+            #print("identity", identity, len(identity), np.mean(identity))
+            #quit()
+            #print("idnetiy", type(identity))
             identity_based_matrix = self._calc_weighting_matrix_attribute(identity)
-            
+            #print("identity_based_matrix", type(identity_based_matrix))
+            #print(identity_based_matrix)
+            #quit()
             # Add the same identity-based matrix M_identity times
-            weighting_matrix_list.extend([identity_based_matrix] * self.M_identity)
-        
+            for _ in range(self.M_identity):
+                weighting_matrix_list.append(identity_based_matrix)
+        #print("weighting_matrix_list before", weighting_matrix_list, type(weighting_matrix_list))
+        #quit()
         # Calculate individual preference-based matrices for remaining sectors
         attribute_matrix = self.outward_social_influence_matrix.T
         for m in range(self.M_identity, self.M):
             preferences = attribute_matrix[m]
             individual_matrix = self._calc_weighting_matrix_attribute(preferences)
             weighting_matrix_list.append(individual_matrix)
-        
+
+        #print("weighting_matrix_list before", weighting_matrix_list, type(weighting_matrix_list))
+
+        #quit()
         # Update identity vector using all sectors (maintaining existing behavior)
-        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+        #self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         
         return weighting_matrix_list
 

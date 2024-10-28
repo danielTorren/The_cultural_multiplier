@@ -111,7 +111,7 @@ def main(
 
     # Save data
     createFolder(fileName)
-    save_object(Data_serial , fileName + "/Data", "emissions_data")
+    save_object(data_array , fileName + "/Data", "emissions_data")
     save_object(params, fileName + "/Data", "base_params")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
 
