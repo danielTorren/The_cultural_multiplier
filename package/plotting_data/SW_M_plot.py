@@ -27,7 +27,7 @@ def plot_emissions_confidence(
     colors_scenarios_complete = colours_list[0::2]
 
     # Create figure with columns equal to the length of carbon_tax_list
-    fig, axs = plt.subplots(ncols=len(carbon_tax_list), nrows=1, figsize=(5 * len(carbon_tax_list), 5))
+    fig, axs = plt.subplots(ncols=len(carbon_tax_list), nrows=1, figsize=(5 * len(carbon_tax_list), 5), sharey=True)
 
     # Loop through each carbon tax level using carbon_tax_list
     for i, carbon_tax in enumerate(carbon_tax_list):
@@ -90,5 +90,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/M_vary_00_01_30__29_10_2024"
+        fileName = "results/M_vary_09_33_22__29_10_2024"
     )
