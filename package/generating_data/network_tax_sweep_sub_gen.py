@@ -56,7 +56,7 @@ def main(
     f = open(BASE_PARAMS_LOAD)
     params = json.load(f)
     print("params", params)
-    root = "tax_sweep_networks?sub"
+    root = "tax_sweep_networks_sub"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
@@ -65,7 +65,7 @@ def main(
     
     #Gen params lists
     params["network_type"] = "SW"
-    substitutability_vals = [1.01, 2, 5]
+    substitutability_vals = [1.01, 2, 10]
     params_list = []
     for sub in substitutability_vals:
         params["low_carbon_substitutability"] = sub

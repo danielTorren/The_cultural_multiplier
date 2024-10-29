@@ -103,7 +103,7 @@ if __name__ == '__main__':
     "N": 3000, 
     "M": 2, 
     "sector_substitutability": 2, 
-    "low_carbon_substitutability": 2, 
+    "low_carbon_substitutability": 4, 
      
     "a_preferences": 2, 
     "b_preferences": 2, 

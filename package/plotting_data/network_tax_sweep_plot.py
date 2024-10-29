@@ -526,6 +526,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_14_40_25__28_10_2024",#tax_sweep_networks_15_57_56__22_08_2024",#",#tax_sweep_networks_15_40_36__13_09_2024
-        MULTIPLIER = 0
+        fileName = "results/tax_sweep_networks_23_57_20__28_10_2024",#tax_sweep_networks_14_40_25__28_10_2024",#tax_sweep_networks_15_57_56__22_08_2024",#",#tax_sweep_networks_15_40_36__13_09_2024
+        MULTIPLIER = 1
     )
