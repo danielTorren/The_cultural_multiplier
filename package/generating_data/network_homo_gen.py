@@ -116,7 +116,7 @@ def main(
 
 if __name__ == '__main__':
     fileName_Figure_1 = main(
-        BASE_PARAMS_LOAD = "package/constants/base_params_networks_homo_tax_high_sub.json",
+        BASE_PARAMS_LOAD = "package/constants/base_params_networks_homo_tax.json",
         VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_networks_homo_tax.json",
         VARIABLE_RUNS = 1,
         FIXED_RUNS = 1
