@@ -89,7 +89,7 @@ def plot_SW_SBM(
     mu_emissions, lower_bound, upper_bound = calc_bounds(emissions_fixed, 0.95)
 
     for i in [0,1]:
-        axes[i].plot(property_vals, mu_emissions, color="black", alpha=1, linestyle= "dashed")
+        axes[i].plot(property_vals, mu_emissions, color="black", alpha=1, linestyle= "dashed", label = "Fixed preferences")
         #axes[i].fill_between(property_vals, lower_bound, upper_bound, color="black", alpha=0.3)
 
     for j, Data_list in enumerate(Data_arr_SW):
@@ -127,7 +127,7 @@ def plot_SF(
     fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True)
 
     mu_emissions, lower_bound, upper_bound = calc_bounds(emissions_fixed, 0.95)
-    ax.plot(property_vals, mu_emissions, color="black", alpha=1, linestyle= "dashed")
+    ax.plot(property_vals, mu_emissions, color="black", alpha=1, linestyle= "dashed", label = "Fixed preferences")
     #ax.fill_between(property_vals, lower_bound, upper_bound, color="black", alpha=0.3)
 
     for j, Data_list in enumerate(Data_arr_SF):
@@ -173,7 +173,7 @@ def main(
     emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
     emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
     
-    emissions_fixed = load_object(fileName_fixed + "/Data","emissions_SW")[0]
+    emissions_fixed = load_object(fileName_fixed + "/Data","fixed_emissions_array")
 
     #labels_SF = [r"No homophily, $h = 0$", r"Low-carbon hegemony", r"High-carbon hegemony"]
     #labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, %s$" % (homphily_states[2])]
@@ -196,6 +196,6 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_17_05_44__24_10_2024",
-        fileName_fixed = "results/tax_sweep_networks_15_57_56__22_08_2024"
+        fileName= "results/networks_homo_tau_18_49_01__18_10_2024",
+        fileName_fixed = "results/networks_homo_tau_10_21_00__29_10_2024"
     )

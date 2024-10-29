@@ -5,6 +5,7 @@ Created: 10/10/2022
 
 # imports
 import matplotlib.pyplot as plt
+from sklearn import base
 from package.resources.utility import load_object, calc_bounds
 import numpy as np
 from scipy.interpolate import interp1d
@@ -233,6 +234,9 @@ def main(
     ############################
     #BA
     base_params = load_object(fileName + "/Data", "base_params")
+
+    print(base_params)
+    quit()
     var_params = load_object(fileName + "/Data" , "var_params")
     homphily_states = load_object(fileName + "/Data" , "homphily_states")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
@@ -268,5 +272,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_17_05_44__24_10_2024"#networks_homo_tau_18_49_01__18_10_2024",
+        fileName= "results/networks_homo_tau_18_49_01__18_10_2024"#networks_homo_tau_17_05_44__24_10_2024"#networks_homo_tau_18_49_01__18_10_2024",
     )
