@@ -16,11 +16,11 @@
     "phi": 0.02, 
     "homophily_state": 0,
     "coherance_state": 0.9,
-    "SF_density":0.1,
+    "SF_density":0.01,
     "SF_green_or_brown_hegemony": 0,
     "SBM_block_num": 2,
-    "SBM_network_density_input_intra_block": 0.2,
-    "SBM_network_density_input_inter_block": 0.005,
-    "SW_network_density": 0.1,
+    "SBM_network_density_input_intra_block": 0.02,
+    "SBM_network_density_input_inter_block": 0.0005,
+    "SW_network_density": 0.01,
     "SW_prob_rewire": 0.1
     }

@@ -90,12 +90,10 @@ def main(
         emissions_array_SF = emissions_array[2]
 
         #SAVE STUFF
-
-        
-
         save_object(emissions_array_SW, fileName + "/Data", "emissions_array_SW")
         save_object(emissions_array_SBM, fileName + "/Data", "emissions_array_SBM")
         save_object(emissions_array_SF , fileName + "/Data", "emissions_array_SF")
+        
     if FIXED_RUNS:
         ########################################################################################################### 
         # I ONLY NEED TO CALCULATE THE emissiosn for the propoerty reps

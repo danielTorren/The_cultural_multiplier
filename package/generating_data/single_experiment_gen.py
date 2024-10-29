@@ -51,7 +51,7 @@ if __name__ == '__main__':
     "shuffle_coherance_seed": 31,
     "carbon_price_duration": 360,#360, 
     "burn_in_duration": 0, 
-    "N": 300,#3000, 
+    "N": 3000,#3000, 
     "M": 1, 
     "M_identity": 1,
     "sector_substitutability": 2, 
@@ -63,12 +63,12 @@ if __name__ == '__main__':
     "init_carbon_price": 0, 
     "homophily_state": 1,
     "coherance_state": 0.9,
-    "SF_density":0.1,
+    "SF_density":0.01,
     "SF_green_or_brown_hegemony": -1,
     "SBM_block_num": 2,
-    "SBM_network_density_input_intra_block": 0.2,
-    "SBM_network_density_input_inter_block": 0.005,
-    "SW_network_density": 0.1,#0.1,
+    "SBM_network_density_input_intra_block": 0.02,
+    "SBM_network_density_input_inter_block": 0.0005,
+    "SW_network_density": 0.01,#0.1,
     "SW_prob_rewire": 0.1
     }
 
