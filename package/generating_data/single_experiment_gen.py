@@ -39,7 +39,7 @@ if __name__ == '__main__':
     
     base_params = {
     "phi": 0.02,
-    "network_type": "SF",
+    "network_type": "SBM",
     "carbon_price_increased": 0.5,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     "shuffle_coherance_seed": 31,
     "carbon_price_duration": 360,#360, 
     "burn_in_duration": 0, 
-    "N": 3000,#3000, 
+    "N": 300,#3000, 
     "M": 1, 
     "M_identity": 1,
     "sector_substitutability": 2, 
