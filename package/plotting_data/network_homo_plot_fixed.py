@@ -117,7 +117,7 @@ def plot_SW_SBM(
     fig.supylabel(r"Cumulative emissions, E", fontsize="12")
 
     plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_SW_SBM_seeds_" + property_save
+    f = plotName + "/plot_emissions_SW_SBM_FIXED_seeds_" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
     fig.savefig(f + ".eps", dpi=600, format="eps")
 
@@ -145,7 +145,7 @@ def plot_SF(
     fig.supylabel(r"Cumulative emissions, E", fontsize="12")
 
     plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_SF_seeds_" + property_save
+    f = plotName + "/plot_emissions_SF_FIXED_seeds_" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
     fig.savefig(f + ".eps", dpi=600, format="eps")
 
@@ -168,7 +168,9 @@ def main(
     property_varied = var_params["property_varied"]
 
     emissions_array_SF = load_object(fileName + "/Data", "emissions_array_SF")    
+
     #print(emissions_array_SF.shape)
+    #quit()
     #quit()
     emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
     emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")

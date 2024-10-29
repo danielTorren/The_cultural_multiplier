@@ -49,7 +49,7 @@ def plot_emissions_confidence(
         axs[i].fill_between(property_vals, lower_bound_identity, upper_bound_identity, color=colors_scenarios_complete[2], alpha=0.3)
 
         # Set title with carbon tax value
-        axs[i].set_title(f"Carbon Tax: {carbon_tax}")
+        axs[i].set_title(f"Carbon tax, $\\tau = {carbon_tax}$")
         axs[i].set_xlabel(r"Consumption categories, $M$", fontsize="12")
 
     # Set common y-axis label and add legend

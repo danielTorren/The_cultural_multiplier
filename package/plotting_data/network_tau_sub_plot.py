@@ -213,7 +213,7 @@ def main(
     property_values_list_col = col_dict["property_vals"]
     property_values_list_row = row_dict["property_vals"]
 
-    row_titles = ["Elasticity of substitution, $\sigma_m$ = %s" % (round(i,3)) for i in property_values_list_row]
+    row_titles = ["Elasticity of substitution, $\sigma$ = %s" % (round(i,3)) for i in property_values_list_row]
     #plot_means_end_points_emissions(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)
     #plot_means_end_points_emissions_confidence(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)
     #plot_means_end_points_emissions_confidence_split(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles,colors)

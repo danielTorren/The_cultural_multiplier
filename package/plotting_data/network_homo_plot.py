@@ -235,8 +235,8 @@ def main(
     #BA
     base_params = load_object(fileName + "/Data", "base_params")
 
-    print(base_params)
-    quit()
+    ##print(base_params)
+    #quit()
     var_params = load_object(fileName + "/Data" , "var_params")
     homphily_states = load_object(fileName + "/Data" , "homphily_states")
     property_values_list = load_object(fileName + "/Data", "property_values_list")

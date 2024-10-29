@@ -40,7 +40,7 @@ def plot_emissions_confidence(
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0), ncol=3, fontsize="9")
     fig.subplots_adjust(bottom=0.17)  # Adjust bottom margin to make space for legend
-    plt.tight_layout()  # Adjust layout to make space for the legend
+    #plt.tight_layout()  # Adjust layout to make space for the legend
     
     plotName = fileName + "/Plots"
     f = plotName + "/network_emissions_sub_confidence"
@@ -75,5 +75,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_sub_09_31_18__29_10_2024"#tax_sweep_networks_16_44_43__18_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
+        fileName = "results/tax_sweep_networks_sub_11_07_48__29_10_2024"#tax_sweep_networks_sub_09_31_18__29_10_2024"#tax_sweep_networks_16_44_43__18_09_2024",#tax_sweep_networks_15_57_56__22_08_2024",
     )
