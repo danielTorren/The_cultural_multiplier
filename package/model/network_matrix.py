@@ -118,7 +118,7 @@ class Network_Matrix:
             self.SF_green_or_brown_hegemony = self.parameters["SF_green_or_brown_hegemony"]
             self.SF_density = self.parameters["SF_density"]
             self.SF_nodes = self._calculate_nodes_SF()
-            print(self.SF_nodes)
+            #print(self.SF_nodes)
 
     def _calculate_nodes_SF(self) -> int:
         """
