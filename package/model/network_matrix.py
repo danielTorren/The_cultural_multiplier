@@ -216,26 +216,6 @@ class Network_Matrix:
         self.sparse_adjacency_matrix = sp.csr_matrix(self.adjacency_matrix)
         self.row_indices_sparse, self.col_indices_sparse = self.sparse_adjacency_matrix.nonzero()
         self.weighting_matrix = self._normlize_matrix(self.sparse_adjacency_matrix)
-        print(nx.density(self.network))
-
-        import matplotlib.pyplot as plt
-
-        G = self.network
-        degree_sequence = sorted((d for n, d in G.degree()), reverse=True)
-
-        fig = plt.figure("Degree of a random graph", figsize=(8, 8))
-        # Create a gridspec for adding subplots of different sizes
-
-        ax2 = fig.add_subplot()
-        ax2.bar(*np.unique(degree_sequence, return_counts=True))
-        ax2.set_title("Degree histogram")
-        ax2.set_xlabel("Degree")
-        ax2.set_ylabel("# of Nodes")
-
-        fig.tight_layout()
-        plt.show()
-
-        quit()
 
 
     def _generate_init_data_preferences_coherance(self) -> np.ndarray:
@@ -374,6 +354,7 @@ class Network_Matrix:
             self.social_component_vector = self._calc_social_component_matrix()
             #print("self.social_component_vector", self.social_component_vector, np.mean(self.social_component_vector))
             #quit()
+
     def _update_preferences(self) -> np.ndarray:
         """
         Update agent preferences based on social influence and current preferences.
@@ -526,9 +507,7 @@ class Network_Matrix:
             np.ndarray: Matrix of social influences
         """
         neighbour_influence = self.weighting_matrix.dot(self.outward_social_influence_matrix)
-        #print("neighbour_influence", np.mean(neighbour_influence), np.mean(self.weighting_matrix), np.mean(self.outward_social_influence_matrix))
-        #print("self.outward_social_influence_matrix", self.outward_social_influence_matrix)
-        #quit()
+
         return neighbour_influence
     
     def _calc_ego_influence_degroot_independent(self) -> np.ndarray:
@@ -544,9 +523,7 @@ class Network_Matrix:
                 neighbour_influence[:, m] = self.weighting_matrix_tensor[m].dot(self.outward_social_influence_matrix[:, m])
         else:
             neighbour_influence = self.weighting_matrix_tensor.dot(self.outward_social_influence_matrix)#NOT ACTUALLY A TENSOR AS THERE IS ONLY ONE SECTOR
-        #print("neighbour_influence", np.mean(neighbour_influence), np.mean(self.weighting_matrix_tensor), np.mean(self.outward_social_influence_matrix))
-        #print("self.outward_social_influence_matrix", self.outward_social_influence_matrix)
-        #quit()
+
         return neighbour_influence
     
     def _update_weightings(self) -> sp.csr_matrix:
