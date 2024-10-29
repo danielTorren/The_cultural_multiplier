@@ -118,6 +118,7 @@ class Network_Matrix:
             self.SF_green_or_brown_hegemony = self.parameters["SF_green_or_brown_hegemony"]
             self.SF_density = self.parameters["SF_density"]
             self.SF_nodes = self._calculate_nodes_SF()
+            print(self.SF_nodes)
 
     def _calculate_nodes_SF(self) -> int:
         """
@@ -215,6 +216,28 @@ class Network_Matrix:
         self.sparse_adjacency_matrix = sp.csr_matrix(self.adjacency_matrix)
         self.row_indices_sparse, self.col_indices_sparse = self.sparse_adjacency_matrix.nonzero()
         self.weighting_matrix = self._normlize_matrix(self.sparse_adjacency_matrix)
+        #print(nx.density(self.network))
+        #quit()
+
+        import matplotlib.pyplot as plt
+
+        G = self.network
+        degree_sequence = sorted((d for n, d in G.degree()), reverse=True)
+
+        fig = plt.figure("Degree of a random graph", figsize=(8, 8))
+        # Create a gridspec for adding subplots of different sizes
+
+        ax2 = fig.add_subplot()
+        ax2.bar(*np.unique(degree_sequence, return_counts=True))
+        ax2.set_title("Degree histogram")
+        ax2.set_xlabel("Degree")
+        ax2.set_ylabel("# of Nodes")
+
+        fig.tight_layout()
+        plt.show()
+
+        #quit()
+
 
     def _generate_init_data_preferences_coherance(self) -> np.ndarray:
         """

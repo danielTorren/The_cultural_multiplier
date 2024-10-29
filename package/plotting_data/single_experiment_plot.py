@@ -1071,6 +1071,42 @@ def plot_emissions_flow_matrix(fileName, Data, dpi_save,latex_bool = False):
 
 
 
+def plot_network(network_obj):
+    """
+    Plot the social network with nodes colored by identity values at the initial and final time steps.
+    
+    Args:
+        network_obj (Network_Matrix): Instance of the Network_Matrix class
+    """
+    G = network_obj.network
+    
+    # Get initial and final identity values
+    initial_identity = network_obj.history_identity_vec[0]
+    final_identity = network_obj.history_identity_vec[-1]
+    
+    # Create a colormap based on the identity values
+    cmap = plt.get_cmap('viridis')
+    
+    # Set up the figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Plot the initial network
+    pos = nx.spring_layout(G)
+    node_colors = [cmap(v) for v in initial_identity]
+    nx.draw(G, pos, with_labels=False, node_color=node_colors, node_size=3, ax=ax1)
+    ax1.set_title("Initial Network")
+    
+    # Plot the final network
+    node_colors = [cmap(v) for v in final_identity]
+    nx.draw(G, pos, with_labels=False, node_color=node_colors, node_size=3, ax=ax2)
+    ax2.set_title("Final Network")
+    
+    # Add a shared colorbar
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=1))
+    sm._A = []
+    fig.colorbar(sm, ax=[ax1, ax2], location='right', pad=0.15)
+    fig.suptitle("Social Network Evolution")
+
 
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
@@ -1086,9 +1122,9 @@ def main(
     #anim_save_bool = False#Need to install the saving thing
     ###PLOTS
 
-    
+    plot_network(Data)
     plot_identity_matrix(fileName, Data, dpi_save)
-    plot_preference_timeseries(fileName, Data, dpi_save)
+    #plot_preference_timeseries(fileName, Data, dpi_save)
 
 
 
