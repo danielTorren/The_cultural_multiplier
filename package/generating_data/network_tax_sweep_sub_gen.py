@@ -65,7 +65,7 @@ def main(
     
     #Gen params lists
     params["network_type"] = "SW"
-    substitutability_vals = [1.01, 10, 20]
+    substitutability_vals = [1.01, 2, 10]
     params_list = []
     for sub in substitutability_vals:
         params["low_carbon_substitutability"] = sub
