@@ -199,8 +199,8 @@ def main(
 
     #quit()
     emissions_networks = load_object(fileName + "/Data","emissions_data_networks")
-    print(emissions_networks.shape)
-    quit()
+    #print(emissions_networks.shape)
+    #quit()
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     base_params = load_object(fileName + "/Data", "base_params") 
