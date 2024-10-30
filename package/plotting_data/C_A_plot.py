@@ -32,22 +32,17 @@ def plot_A_vs_C_triple_alt(sigma_values, Q_values, A_range, line_style_list,colo
     f = plotName + "/C_A_triple_alt"
     fig.savefig(f + ".eps", dpi=600, format="eps")
     fig.savefig(f + ".png", dpi=600, format="png")  
-
+    plt.show()
 
 
 if __name__ == '__main__':
-    
-    # Example usage:
-    #sigma_values = [1, 2]
     sigma_values = [1, 2,10]
     Q_values = [0.5, 0.75, 1.0]
     A_range = np.linspace(0, 1, 1000)
     line_style_list = ["solid", "dotted", "dashed", "dashdot","solid", "dotted"]
     colour_list = [ "red", "blue", "green", "yellow", "purple", "orange", "white", "black" ]
 
-    #plot_A_vs_C(sigma_values, Q_values, A_range,line_style_list,colour_list)
     plot_A_vs_C_triple_alt(sigma_values, Q_values, A_range,line_style_list,colour_list)
-    #plot_A_vs_C_triple_expenditure(sigma_values, Q_values, A_range,line_style_list,colour_list)
-    plt.show()
+
 
 

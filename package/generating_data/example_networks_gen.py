@@ -72,7 +72,6 @@ def main(
 
     plot_network_examples(fileName)
   
-
     plt.show()
 
 if __name__ == '__main__':

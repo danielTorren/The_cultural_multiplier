@@ -447,18 +447,3 @@ if __name__ == '__main__':
         ]
     )
 
-    titles_dict = {
-            "phi_lower": "Social suseptability, $\\phi$",
-            "carbon_price_increased_lower": "Carbon tax, $\\tau$",
-            "N": "Number of individuals, $N$",
-            "M": "Number of sectors, $M$",
-            "sector_substitutability": "Sector substitutability, $\\nu$",
-            "low_carbon_substitutability_lower": "Low carbon substitutability, $\\sigma_{m}$",
-            "confirmation_bias": "Confirmation bias, $\\theta$",
-            "homophily_state": "Homophily state, $h$",
-            "coherance_state": "Coherance state, $c$",
-            "a_preferences": "Initial preference Beta, $a$",
-            "b_preferences": "Initial preference Beta, $b$",
-        }
-
-

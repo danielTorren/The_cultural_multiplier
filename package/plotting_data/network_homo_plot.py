@@ -5,7 +5,6 @@ Created: 10/10/2022
 
 # imports
 import matplotlib.pyplot as plt
-from sklearn import base
 from package.resources.utility import load_object, calc_bounds
 import numpy as np
 from scipy.interpolate import interp1d
@@ -33,89 +32,6 @@ def calc_price_elasticities_2D(emissions_trans, price):
 
     return price_elasticity
 
-def plot_SF_SBM_3(
-    fileName: str, Data_arr_SW, Data_arr_SF, property_title, property_save, property_vals, labels_SF, Data_arr_SBM, labels_SBM, seed_reps, colors_scenarios
-):
-    #nrows=seed_reps
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(11, 5), constrained_layout=True)
-    
-    for j, Data_list in enumerate(Data_arr_SF):
-        data_SW = Data_arr_SW[j].T
-        data_SF = Data_arr_SF[j].T
-        data_SBM = Data_arr_SBM[j].T
-        for i in range(seed_reps):#loop through seeds
-            axes[0].plot(property_vals, data_SW[i], alpha = 0.1, color = colors_scenarios[j])
-            axes[1].plot(property_vals, data_SBM[i], alpha = 0.1, color = colors_scenarios[j])
-            axes[2].plot(property_vals, data_SF[i], alpha = 0.1,color = colors_scenarios[j])
-
-
-        mu_emissions_SF, _, _ = calc_bounds(data_SF.T, 0.95)
-        mu_emissions_SBM, _, _ = calc_bounds(data_SBM.T, 0.95)
-        mu_emissions_SW, _, _ = calc_bounds(data_SW.T, 0.95)
-
-        axes[0].plot(property_vals, mu_emissions_SW, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
-        axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
-        axes[2].plot(property_vals, mu_emissions_SF, label= labels_SF[j], color = colors_scenarios[j], alpha = 1)
-        
-        #axes[0].grid()
-        #axes[1].grid()
-        #axes[2].grid()
-        axes[0].legend( fontsize = "8")
-        axes[1].legend( fontsize = "8")
-        axes[2].legend(loc= "upper right", fontsize = "8" )
-        axes[0].set_title("Small-World", fontsize = "12" )
-        axes[1].set_title("Stochastic Block Model", fontsize = "12" )
-        axes[2].set_title("Scale-Free", fontsize = "12" )
-    
-    fig.supxlabel(property_title, fontsize = "12" )
-    fig.supylabel(r"Cumulative emissions, E", fontsize = "12" )
-
-    plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_SF_SBM_seeds_3" + property_save
-    fig.savefig(f + ".png", dpi=600, format="png")
-    fig.savefig(f + ".eps", dpi=600, format="eps")
-
-def plot_SF_SBM_3_alt(
-    fileName: str, Data_arr_SW, Data_arr_SF, property_title, property_save, property_vals, labels_SF, Data_arr_SBM, labels_SBM, seed_reps, colors_scenarios
-):
-    #nrows=seed_reps
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(11, 5), constrained_layout=True, sharey=True)
-    
-    for j, Data_list in enumerate(Data_arr_SF):
-        data_SW = Data_arr_SW[j].T
-        data_SF = Data_arr_SF[j].T
-        data_SBM = Data_arr_SBM[j].T
-        for i in range(seed_reps):#loop through seeds
-            axes[0].plot(property_vals, data_SW[i], alpha = 0.1, color = colors_scenarios[j])
-            axes[1].plot(property_vals, data_SBM[i], alpha = 0.1, color = colors_scenarios[j])
-            axes[2].plot(property_vals, data_SF[i], alpha = 0.1,color = colors_scenarios[j])
-
-
-        mu_emissions_SF, _, _ = calc_bounds(data_SF.T, 0.95)
-        mu_emissions_SBM, _, _ = calc_bounds(data_SBM.T, 0.95)
-        mu_emissions_SW, _, _ = calc_bounds(data_SW.T, 0.95)
-
-        axes[0].plot(property_vals, mu_emissions_SW, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
-        axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color = colors_scenarios[j], alpha = 1)
-        axes[2].plot(property_vals, mu_emissions_SF, label= labels_SF[j], color = colors_scenarios[j], alpha = 1)
-        
-        #axes[0].grid()
-        #axes[1].grid()
-        #axes[2].grid()
-        axes[0].legend( fontsize = "8")
-        axes[1].legend( fontsize = "8")
-        axes[2].legend(loc= "upper right", fontsize = "8" )
-        axes[0].set_title("Small-World", fontsize = "12" )
-        axes[1].set_title("Stochastic Block Model", fontsize = "12" )
-        axes[2].set_title("Scale-Free", fontsize = "12" )
-    
-    fig.supxlabel(property_title, fontsize = "12" )
-    fig.supylabel(r"Cumulative emissions, E", fontsize = "12" )
-
-    plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_SF_SBM_seeds_3_alt" + property_save
-    fig.savefig(f + ".png", dpi=600, format="png")
-    fig.savefig(f + ".eps", dpi=600, format="eps")
 
 def plot_price_elasticies_SF_SBM_seeds_3(
     fileName: str, Data_arr_SW, Data_arr_SF, property_title, property_save, property_vals, labels_SF, Data_arr_SBM, labels_SBM, seed_reps, colors_scenarios
@@ -165,9 +81,15 @@ def plot_price_elasticies_SF_SBM_seeds_3(
 
 
 def plot_SW_SBM(
-    fileName: str, Data_arr_SW, Data_arr_SBM, property_title, property_save, property_vals, labels_SBM, seed_reps, colors_scenarios
+    fileName: str, Data_arr_SW, Data_arr_SBM, property_title, property_save, property_vals, labels_SBM, seed_reps, colors_scenarios, emissions_fixed
 ):
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8, 5), constrained_layout=True, sharey=True)
+
+    mu_emissions, lower_bound, upper_bound = calc_bounds(emissions_fixed, 0.95)
+
+    for i in [0,1]:
+        axes[i].plot(property_vals, mu_emissions, color="black", alpha=1, linestyle= "dashed", label = "Fixed preferences")
+        #axes[i].fill_between(property_vals, lower_bound, upper_bound, color="black", alpha=0.3)
 
     for j, Data_list in enumerate(Data_arr_SW):
         data_SW = Data_arr_SW[j].T
@@ -176,7 +98,7 @@ def plot_SW_SBM(
         mu_emissions_SW, lower_bound_SW, upper_bound_SW = calc_bounds(data_SW.T, 0.95)
         mu_emissions_SBM, lower_bound_SBM, upper_bound_SBM = calc_bounds(data_SBM.T, 0.95)
         
-
+        emissions_fixed
         axes[0].plot(property_vals, mu_emissions_SW, label=labels_SBM[j], color=colors_scenarios[j], alpha=1)
         axes[1].plot(property_vals, mu_emissions_SBM, label=labels_SBM[j], color=colors_scenarios[j], alpha=1)
 
@@ -194,14 +116,18 @@ def plot_SW_SBM(
     fig.supylabel(r"Cumulative emissions, E", fontsize="12")
 
     plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_SW_SBM_seeds_" + property_save
+    f = plotName + "/plot_emissions_SW_SBM_FIXED_seeds_" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
     fig.savefig(f + ".eps", dpi=600, format="eps")
 
 def plot_SF(
-    fileName: str, Data_arr_SF, property_title, property_save, property_vals, labels_SF, seed_reps, colors_scenarios
+    fileName: str, Data_arr_SF, property_title, property_save, property_vals, labels_SF, seed_reps, colors_scenarios,  emissions_fixed
 ):
     fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True)
+
+    mu_emissions, lower_bound, upper_bound = calc_bounds(emissions_fixed, 0.95)
+    ax.plot(property_vals, mu_emissions, color="black", alpha=1, linestyle= "dashed", label = "Fixed preferences")
+    #ax.fill_between(property_vals, lower_bound, upper_bound, color="black", alpha=0.3)
 
     for j, Data_list in enumerate(Data_arr_SF):
         data_SF = Data_arr_SF[j].T
@@ -218,7 +144,7 @@ def plot_SF(
     fig.supylabel(r"Cumulative emissions, E", fontsize="12")
 
     plotName = fileName + "/Plots"
-    f = plotName + "/plot_emissions_SF_seeds_" + property_save
+    f = plotName + "/plot_emissions_SF_FIXED_seeds_" + property_save
     fig.savefig(f + ".png", dpi=600, format="png")
     fig.savefig(f + ".eps", dpi=600, format="eps")
 
@@ -232,24 +158,18 @@ def main(
     colors_scenarios = cmap.colors  # type: list
 
     ############################
-    #BA
     base_params = load_object(fileName + "/Data", "base_params")
-
-    ##print(base_params)
-    #quit()
     var_params = load_object(fileName + "/Data" , "var_params")
     homphily_states = load_object(fileName + "/Data" , "homphily_states")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     property_varied = var_params["property_varied"]
 
-    emissions_array_SF = load_object(fileName + "/Data", "emissions_array_SF")
+    emissions_array_SF = load_object(fileName + "/Data", "emissions_array_SF")    
+
     emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
     emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
-    print(emissions_array_SW.shape)
-    quit()
-    #labels_SF = [r"No homophily, $h = 0$", r"Low-carbon hegemony", r"High-carbon hegemony"]
-    #labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, %s$" % (homphily_states[2])]
-    #labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, $h = %s$" % (homphily_states[2])]
+    
+    emissions_fixed = load_object(fileName + "/Data","fixed_emissions_array")
 
     labels_SF = [r"No homophily", r"Low-carbon hegemony", r"High-carbon hegemony"]
     labels_SBM = [r"No homophily", r"Low homophily", r"High homophily"]
@@ -257,16 +177,15 @@ def main(
 
     seed_reps = base_params["seed_reps"]
     property_title = r"Carbon tax, $\tau$"
-    #plot_SF_SBM_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
-    #plot_SF_SBM_3_alt(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM, labels_SBM, seed_reps,colors_scenarios)
+
+    plot_SW_SBM(fileName, emissions_array_SW, emissions_array_SBM, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SBM, seed_reps,colors_scenarios, emissions_fixed)
+    plot_SF(fileName, emissions_array_SF , property_title, property_varied, property_values_list, labels_SF, seed_reps, colors_scenarios, emissions_fixed)
+
     plot_price_elasticies_SF_SBM_seeds_3(fileName, emissions_array_SW, emissions_array_SF, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SF, emissions_array_SBM,  labels_SBM, seed_reps,colors_scenarios)
-    plot_SW_SBM(fileName, emissions_array_SW, emissions_array_SBM, r"Carbon tax, $\tau$", property_varied, property_values_list, labels_SBM, seed_reps,colors_scenarios)
-    
-    plot_SF(fileName, emissions_array_SF , property_title, property_varied, property_values_list, labels_SF, seed_reps, colors_scenarios)
     
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_22_29_12__29_10_2024"#networks_homo_tau_17_05_44__24_10_2024"#networks_homo_tau_18_49_01__18_10_2024",
+        fileName= "results/networks_homo_tau_18_49_01__18_10_2024",
     )
