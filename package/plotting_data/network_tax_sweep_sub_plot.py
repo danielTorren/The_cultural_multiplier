@@ -57,7 +57,8 @@ def main(
 
     #FULL
     data_array = load_object(fileName + "/Data","data_array") 
-    print(data_array.shape)
+    #print(data_array.shape)
+    #quit()
     base_params = load_object(fileName + "/Data","base_params")
 
     #####################################################################################################

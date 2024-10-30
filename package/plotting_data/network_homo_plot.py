@@ -243,14 +243,10 @@ def main(
     property_varied = var_params["property_varied"]
 
     emissions_array_SF = load_object(fileName + "/Data", "emissions_array_SF")
-    
- 
-    
     emissions_array_SBM = load_object(fileName + "/Data", "emissions_array_SBM")
-
-
     emissions_array_SW = load_object(fileName + "/Data", "emissions_array_SW")
-    
+    print(emissions_array_SW.shape)
+    quit()
     #labels_SF = [r"No homophily, $h = 0$", r"Low-carbon hegemony", r"High-carbon hegemony"]
     #labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, %s$" % (homphily_states[2])]
     #labels_SBM = [r"No homophily, $h = 0$", r"Low homophily, $h = %s$" % (homphily_states[1]), r"High homophily, $h = %s$" % (homphily_states[2])]

@@ -60,8 +60,7 @@ class Network_Matrix:
             self._create_network()
             if self.homophily_state != 0:
                 self.low_carbon_preference_matrix = self._shuffle_preferences_start_mixed()
-        
-        #print("state: ", self.alpha_change_state, self.M, self.carbon_price_increased_m)
+    
 
         self._initialize_social_component()
         self.carbon_dividend = self._calc_carbon_dividend()
@@ -80,7 +79,7 @@ class Network_Matrix:
         self.compression_factor_state = self.parameters["compression_factor_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
 
-        if self.alpha_change_state not in ["dynamic_hybrid_determined_weights","dynamic_socially_determined_weights","fixed_preferences","dynamic_identity_determined_weights"]:
+        if self.alpha_change_state not in ["dynamic_socially_determined_weights","fixed_preferences","dynamic_identity_determined_weights"]:
             raise ValueError(f"Invalid alpha change state")
     
         self.network_type = self.parameters["network_type"]
@@ -88,13 +87,6 @@ class Network_Matrix:
         self.N = int(round(self.parameters["N"]))
         self.M = int(round(self.parameters["M"]))
 
-        if self.alpha_change_state == "dynamic_hybrid_determined_weights":
-            self.M_identity = int(round(self.parameters["M_identity"]))
-            #print(self.M, self.M_identity)
-            if self.M_identity < 0 or self.M_identity > self.M:
-                print("self.M_identity > self.M", self.M_identity, self.M)
-                raise ValueError(f"M_identity must be between 0 and {self.M}")
-    
         self.shuffle_intensity = 1
 
     def _initialize_network_params(self):
@@ -118,7 +110,6 @@ class Network_Matrix:
             self.SF_green_or_brown_hegemony = self.parameters["SF_green_or_brown_hegemony"]
             self.SF_density = self.parameters["SF_density"]
             self.SF_nodes = self._calculate_nodes_SF()
-            #print(self.SF_nodes)
 
     def _calculate_nodes_SF(self) -> int:
         """
@@ -348,12 +339,8 @@ class Network_Matrix:
                 self.weighting_matrix = self._update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":
                 self.weighting_matrix_tensor = self._update_weightings_list()
-            elif self.alpha_change_state == "dynamic_hybrid_determined_weights":
-                self.weighting_matrix_tensor = self._update_weightings_hybrid()
 
             self.social_component_vector = self._calc_social_component_matrix()
-            #print("self.social_component_vector", self.social_component_vector, np.mean(self.social_component_vector))
-            #quit()
 
     def _update_preferences(self) -> np.ndarray:
         """
@@ -445,7 +432,7 @@ class Network_Matrix:
         Returns:
             np.ndarray: Matrix of social influences
         """
-        if self.alpha_change_state in ("dynamic_socially_determined_weights", "dynamic_hybrid_determined_weights"):
+        if self.alpha_change_state == "dynamic_socially_determined_weights":
             social_influence = self._calc_ego_influence_degroot_independent()
         else:
             social_influence = self._calc_ego_influence_degroot()           
@@ -559,47 +546,6 @@ class Network_Matrix:
             
             return weighting_matrix_list  
 
-
-    def _update_weightings_hybrid(self) -> list:
-        """
-        Update weighting matrices using a hybrid approach where the first M_identity sectors
-        use identity-based weighting, while the remaining sectors use individual preferences.
-        
-        Args:
-            M_identity (int): Number of sectors to use identity-based weighting for
-            
-        Returns:
-            list: List of weighting matrices where:
-                - First M_identity matrices are identical (based on identity)
-                - Remaining (M - M_identity) matrices are individually calculated
-        """
-        #attribute_matrix = (self.outward_social_influence_matrix).T
-        attribute_matrix = (self.low_carbon_preference_matrix).T
-
-        if self.M == 1:
-            norm_weighting_matrix = self._calc_weighting_matrix_attribute(attribute_matrix[0])
-            return norm_weighting_matrix
-        else:
-            weighting_matrix_list = []
-            if self.M_identity > 1:#AS if 1 its the same as the socially determined case
-                # Calculate identity-based weighting matrix for the first M_identity sectors
-                identity_preferences = self.low_carbon_preference_matrix[:, :self.M_identity]
-                identity = np.mean(identity_preferences, axis=1)
-                #self.identity_vec = identity#update identity with only chosen sectors
-                identity_based_matrix = self._calc_weighting_matrix_attribute(identity)
-                # Add the same identity-based matrix M_identity times
-                for _ in range(self.M_identity):
-                    weighting_matrix_list.append(identity_based_matrix)
-
-            # Calculate individual preference-based matrices for remaining sectors
-            for m in range(self.M_identity, self.M):
-                preferences = attribute_matrix[m]
-                individual_matrix = self._calc_weighting_matrix_attribute(preferences)
-                weighting_matrix_list.append(individual_matrix)
-            # Update identity vector using all sectors (maintaining existing behavior)
-            self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
-            return weighting_matrix_list
-
     def _calc_emissions(self):
         """
         Calculate and update carbon emissions flow and stock.
@@ -696,8 +642,6 @@ class Network_Matrix:
                 self.weighting_matrix = self._update_weightings()
             elif self.alpha_change_state == "dynamic_socially_determined_weights":
                 self.weighting_matrix_tensor = self._update_weightings_list()
-            elif self.alpha_change_state == "dynamic_hybrid_determined_weights":
-                self.weighting_matrix_tensor = self._update_weightings_hybrid()
 
             self.social_component_vector = self._calc_social_component_matrix()
 

@@ -489,7 +489,8 @@ def main(
     
     base_params = load_object(fileName + "/Data","base_params")
     
-
+    #print(emissions_SBM.shape)
+    #quit()
     
     #####################################################################################################
 

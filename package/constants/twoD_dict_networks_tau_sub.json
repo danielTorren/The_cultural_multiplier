@@ -1,4 +1,4 @@
 {
-    "row":{"property_varied":"low_carbon_substitutability","property_min":1.01, "property_max": 5, "property_varied_title": "Low-carbon substitutability","property_divisions": "geo", "property_reps": 5}, 
-    "col":{"property_varied":"carbon_price_increased","property_min":0, "property_max": 1, "property_varied_title": "Carbon tax","property_divisions": "linear", "property_reps": 100} 
+    "row":{"property_varied":"low_carbon_substitutability","property_min":1.01, "property_max": 5, "property_varied_title": "Low-carbon substitutability","property_divisions": "geo", "property_reps": 5, "round": 0}, 
+    "col":{"property_varied":"carbon_price_increased","property_min":0, "property_max": 1, "property_varied_title": "Carbon tax","property_divisions": "linear", "property_reps": 100, "round": 0} 
 }

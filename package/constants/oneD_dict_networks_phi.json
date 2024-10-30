@@ -1,9 +1,0 @@
-{
-    "property_varied" : "phi",
-    "property_min" : 1e-3,
-    "property_max" :1,
-    "property_reps": 100,
-    "property_varied_title" : "Phi",
-    "property_divisions": "log",
-    "round": 0
-}

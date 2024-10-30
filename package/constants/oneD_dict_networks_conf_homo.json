@@ -1,9 +1,0 @@
-{
-    "property_varied" : "confirmation_bias",
-    "property_min" : 0,
-    "property_max" :50,
-    "property_reps": 20,
-    "property_varied_title" : "Confirmation bias",
-    "property_divisions": "linear",
-    "round": 0
-}

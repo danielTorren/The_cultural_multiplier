@@ -204,7 +204,7 @@ def main(
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     base_params = load_object(fileName + "/Data", "base_params") 
-    print("base_params",base_params)
+    
 
     col_dict = variable_parameters_dict["col"]
     row_dict = variable_parameters_dict["row"]
