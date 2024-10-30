@@ -1104,7 +1104,8 @@ def plot_network(network_obj):
     # Add a shared colorbar
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=1))
     sm._A = []
-    fig.colorbar(sm, ax=[ax1, ax2], location='right', pad=0.15)
+    cbar = fig.colorbar(sm, ax=[ax1, ax2], location='right', pad=0.15)
+    cbar.set_label("Environmental identity, I")  # Add label here
     fig.suptitle("Social Network Evolution")
 
 
@@ -1128,13 +1129,13 @@ def main(
 
 
 
-    bin_num= 200
+    #bin_num= 200
     #plot_identity_matrix_density(fileName, Data, dpi_save, bin_num)
     #plot_emissions_flow_matrix(fileName, Data, dpi_save)
     #plot_emissions_individuals(fileName, Data, dpi_save)
 
-    #plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
-    #plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
+    plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
     #plot_chi(fileName, Data, dpi_save)
     #plot_omega(fileName, Data, dpi_save)
     #plot_consum_ratio(fileName, Data, dpi_save)
