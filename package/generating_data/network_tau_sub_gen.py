@@ -40,7 +40,6 @@ def main(
 
 
     Data_serial = emissions_parallel_run(params_list)
-    #print(len(Data_serial))
 
     data_array = Data_serial.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
 

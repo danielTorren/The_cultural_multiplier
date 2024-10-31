@@ -1,4 +1,3 @@
-from matplotlib.lines import lineStyles
 import numpy as np
 import matplotlib.pyplot as plt
 from package.resources.utility import check_other_folder

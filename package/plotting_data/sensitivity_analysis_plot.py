@@ -153,10 +153,8 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
                 fmt="o",
                 ecolor="k",
                 color=data_dict[dict_list[0]]["colour"],
-                #label=data_dict[dict_list[0]]["title"],
             )
         else:
-            #print("data_dict", data_dict[dict_list[0]]["data"])
             ax.errorbar(
                 data_dict[dict_list[0]]["data"]["ST"].tolist(),
                 names,
@@ -164,13 +162,11 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
                 fmt="o",
                 ecolor="k",
                 color=data_dict[dict_list[0]]["colour"],
-                #label=data_dict[dict_list[0]]["title"],
             )
         ax.set_title(network_type_list[i])
         ax.set_xlim(left=0)
 
     fig.supxlabel(r"%s order Sobol index" % (order))
-    #axes[2].legend()
     plt.tight_layout()
 
     plotName = fileName + "/Prints"

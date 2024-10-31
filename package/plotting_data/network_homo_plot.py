@@ -7,7 +7,6 @@ Created: 10/10/2022
 import matplotlib.pyplot as plt
 from package.resources.utility import load_object, calc_bounds
 import numpy as np
-from scipy.interpolate import interp1d
 from matplotlib.cm import get_cmap
 
 def calculate_price_elasticity(price, emissions):

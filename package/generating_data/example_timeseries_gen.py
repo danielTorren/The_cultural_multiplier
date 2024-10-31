@@ -6,7 +6,6 @@ from package.resources.utility import (
     produce_name_datetime
 )
 from package.plotting_data import example_timeseries_plot
-import pyperclip
 import json
 
 def main(
@@ -18,7 +17,6 @@ def main(
 
     root = "example_timerseries"
     fileName = produce_name_datetime(root)
-    pyperclip.copy(fileName)
     print("fileName:", fileName)
 
     #low carbon price

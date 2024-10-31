@@ -1,10 +1,6 @@
 """Run simulation 
 A module that use input data to run the simulation for a given number of timesteps.
 Multiple simulations at once in parallel can also be run. 
-
-
-
-Created: 10/10/2022
 """
 
 # imports
@@ -42,7 +38,6 @@ def generate_data(parameters: dict,print_simu = 0) -> Network:
     #### RUN TIME STEPS
     while social_network.t < parameters["time_steps_max"]:
         social_network.next_step()
-        #print("step", social_network.t)
 
     if print_simu:
         print(

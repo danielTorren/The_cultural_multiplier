@@ -4,9 +4,6 @@ import json
 from package.resources.utility import createFolder,produce_name_datetime,save_object
 from package.resources.run import multi_emissions_stock
 from package.resources.utility import produce_param_list_stochastic_multi, produce_param_list_only_stochastic_multi
-##################################################################################################
-#REVERSE Engineer the carbon price based on the final emissions
-
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params.json",

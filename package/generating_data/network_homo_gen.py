@@ -1,7 +1,6 @@
 
 # imports
 import json
-import numpy as np
 from package.resources.utility import createFolder,produce_name_datetime,save_object, produce_param_list_stochastic_multi_named
 from package.resources.run import multi_emissions_stock
 from package.resources.utility import generate_vals

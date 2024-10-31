@@ -11,19 +11,16 @@ import multiprocessing
 
 ###########################################################################
 def calc_Omega_m(P_H,P_L,A_matrix, sigma_matrix):
-    #CORRECT I THINK
     term_1 = (P_H*A_matrix)
     term_2 = (P_L*(1- A_matrix))
     omega_vector = (term_1/term_2)**(sigma_matrix)
     return omega_vector
 
 def calc_n_tilde_m(A_matrix,Omega_m,sigma_matrix):
-    #LASO CORRECT
     n_tilde_m = (A_matrix*(Omega_m**((sigma_matrix-1)/sigma_matrix))+(1-A_matrix))**(sigma_matrix/(sigma_matrix-1))
     return n_tilde_m
     
 def calc_chi_m_nested_CES(a,n_tilde_m,nu, P_H):
-    #CORRECT
     chi_m = (a*(n_tilde_m**((nu-1)/nu)))/P_H
     return chi_m
 
@@ -31,7 +28,7 @@ def calc_Z(Omega_m,P_L,P_H,chi_m,nu):
     common_vector = Omega_m*P_L + P_H
     chi_pow = chi_m**nu
     no_sum_Z_terms = chi_pow*common_vector
-    Z = no_sum_Z_terms.sum(axis = 1)#SO NOW ITS 1d vector for each individual
+    Z = no_sum_Z_terms.sum(axis = 1)
     return Z
 
 def calc_consum(instant_B, P_L, A_matrix, sigma_matrix, nu, P_H, a_matrix,M):
@@ -42,7 +39,7 @@ def calc_consum(instant_B, P_L, A_matrix, sigma_matrix, nu, P_H, a_matrix,M):
 
     term_1 = instant_B/Z
     term_1_matrix = np.tile(term_1, (M,1)).T
-    H_m = term_1_matrix*(chi_m**nu)# I WROTE IT OUT THE SAME WAY AS IN THE NETWORK MATRIX
+    H_m = term_1_matrix*(chi_m**nu)
 
     return H_m
 
@@ -134,7 +131,6 @@ def calc_tau_static_preference(emissions_min, emissions_max, base_params, initia
     #TO ACHIEVE THE GREATEST EMISSIONS YOU NEED THE LOWEST TAU
     base_params["emissions_target"] = emissions_max
     min_tau = optimize_tau(base_params, initial_guess_min,tau_lower_bound, tau_upper_bound)
-    #print("MIN DONE")
 
     base_params["emissions_target"] = emissions_min
     #TO ACHIEVE THE LOWEST EMISSIONS YOU NEED THE GREATEST TAU
