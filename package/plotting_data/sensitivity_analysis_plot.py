@@ -1,8 +1,3 @@
-"""Performs sobol sensitivity analysis on the model. 
-
-Created: 10/10/2022
-"""
-
 # imports
 import matplotlib.pyplot as plt
 from SALib.analyze import sobol
@@ -44,8 +39,7 @@ def get_plot_data(
 
     if calc_second_order:
         total_emissions_stock, first_emissions_stock, second_emissions_stock = Si_emissions_stock.to_df()
-        #print("second_emissions_stock", second_emissions_stock, second_emissions_stock.shape)
-        #quit()
+
     else:
         total_emissions_stock, first_emissions_stock = Si_emissions_stock.to_df()
 
@@ -138,31 +132,6 @@ def analyze_results(
     
     return Si_emissions_stock
 
-def convert_second_order_data(data, names):
-
-
-    # Assuming `data` is your DataFrame
-    data.reset_index(inplace=True)
-    data.rename(columns={"index": "variable_pair"}, inplace=True)
-
-    #new col with names post
-    data['variable_pair_indices'] = data['variable_pair'].apply(lambda x: [names.index(param) for param in x])
-    
-    # Step 1: Create empty numpy matrices
-    num_params = len(names)
-    interaction_matrix_s2 = np.full([num_params, num_params], np.nan)#np.zeros((num_params, num_params))
-    interaction_matrix_s2_conf = np.full([num_params, num_params], np.nan)#np.zeros((num_params, num_params))
-
-    # Step 2: Update matrices with the data from DataFrame
-    for index_row, pair_indices in data['variable_pair_indices'].items():
-        i, j = pair_indices
-        interaction_s2 = data.loc[index_row, 'S2']
-        interaction_s2_conf = data.loc[index_row, 'S2_conf']
-        interaction_matrix_s2[i, j] = interaction_s2
-        interaction_matrix_s2_conf[i, j] = interaction_s2_conf
-
-    return {"S2": interaction_matrix_s2, "S2_conf":interaction_matrix_s2_conf}
-    #ileName, data_list_first, plot_outputs, titles, N_samples, "First", network_titles ,latex_bool = latex_boo
 
 def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
     fileName, data_list, dict_list, names, N_samples, order, network_type_list,  latex_bool = False
@@ -221,82 +190,6 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
     fig.savefig(f_png, dpi=600, format="png")
 
 
-def plot_second_order_matrix(fileName, data_list, names, N_samples, order, network_type_list):
-    """
-    Create second-order sensitivity matrix plot.
-    """
-    ncols = 3
-    nrows = 2
-    fig, axes = plt.subplots(ncols=ncols, nrows=nrows, constrained_layout=True, figsize=(20, 10), sharex=True, sharey = True)#,#sharex=True# figsize=(14, 7) # len(list(data_dict.keys())))
-    
-
-    for i in range(ncols):
-        data = data_list[i]
-        # Extracting data
-        second_order_matrix = data["S2"]
-        second_order_conf = data["S2_conf"]
-        num_vars = len(names)
-
-        # Creating heatmap
-        #print(second_order_matrix)
-        im = axes[0][i].imshow(second_order_matrix, cmap='viridis')
-        cbar = axes[0][i].figure.colorbar(im, ax=axes[0][i])
-        if i == 2:
-            cbar.set_label('Second-order sensitivity')
-
-        # Creating heatmap
-        im_conf = axes[1][i].imshow(second_order_conf, cmap='viridis')
-        cbar_conf = axes[1][i].figure.colorbar(im_conf, ax=axes[1][i])
-        if i == 2:
-            cbar_conf.set_label('Second-order confidence interval')
-
-        # Set ticks and labels
-        axes[0][i].set_title(network_type_list[i])
-
-        axes[1][i].set_xticks([])
-        #axes[1][i].set_xticks(np.arange(num_vars))
-        #axes[1][i].set_xticklabels(names,fontsize=4, rotation=45)
-
-        #fig.supxlabel('Second-order sensitivity matrix')#, fontsize=16
-
-    axes[0][0].set_yticks(np.arange(num_vars))
-    axes[0][0].set_yticklabels(names)
-
-    #plt.rc('ytick', labelsize=4) 
-    #plt.rc('xtick', labelsize=4) 
-
-    plotName = fileName + "/Prints"
-    f = (
-        plotName
-        + "/"
-        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot_triple.eps"
-        % (len(names), N_samples, order)
-    )
-    f_png = (
-        plotName
-        + "/"
-        + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot_triple.png"
-        % (len(names), N_samples, order)
-    )
-    #fig.savefig(f, dpi=600, format="eps")
-    fig.savefig(f_png, dpi=600, format="png")
-
-def replace_nan_with_neighbors_avg(arr):
-    for i in range(len(arr)):
-        if np.isnan(arr[i]):
-            # Get the left and right neighbors
-            left = arr[i - 1] if i - 1 >= 0 else np.nan
-            right = arr[i + 1] if i + 1 < len(arr) else np.nan
-            
-            # Replace NaN with the average of left and right neighbors
-            if np.isnan(left):
-                arr[i] = right
-            elif np.isnan(right):
-                arr[i] = left
-            else:
-                arr[i] = (left + right) / 2
-    return arr
-
 def replace_nan_with_interpolation(arr):
     # Get the indices where the values are not NaN
     not_nan_indices = np.where(~np.isnan(arr))[0]
@@ -320,55 +213,30 @@ def main(
     ) -> None: 
 
     problem = load_object(fileName + "/Data", "problem")
-    #print("problem",problem,len(problem["names"]) - len(titles))
-    #quit()
 
     Y_emissions_stock_SW = load_object(fileName + "/Data", "Y_emissions_stock_SW")
     Y_emissions_stock_SBM = load_object(fileName + "/Data", "Y_emissions_stock_SBM")
     Y_emissions_stock_SF = load_object(fileName + "/Data", "Y_emissions_stock_BA")
+    
+    print("Amount of Data (Averaged over stochastic runs)", np.count_nonzero(Y_emissions_stock_SW), np.count_nonzero(Y_emissions_stock_SBM), np.count_nonzero(Y_emissions_stock_SF ))
+    print("Amount of Nans in Data", np.count_nonzero(np.isnan(Y_emissions_stock_SW)), np.count_nonzero(np.isnan(Y_emissions_stock_SBM)), np.count_nonzero(np.isnan(Y_emissions_stock_SF )))
 
-
-    #num_nans = np.isnan( Y_emissions_stock_SW).sum()
-
-    #print("Number of NaNs in the array:", len(Y_emissions_stock_SW), num_nans, (num_nans/len(Y_emissions_stock_SW))*100 )
-    #quit()
-    """
-    Y_emissions_stock_SW = replace_nan_with_neighbors_avg(Y_emissions_stock_SW)
-    Y_emissions_stock_SBM = replace_nan_with_neighbors_avg(Y_emissions_stock_SBM)
-    Y_emissions_stock_SF = replace_nan_with_neighbors_avg(Y_emissions_stock_SF)
-    """
-
-    #"""
+    #There are sometimes be a few of nans in the data, interpolate the closest values to acount for this as dont want to throw away 150,000 + rusn for a few errors. Usually however this is not required.
     Y_emissions_stock_SW = replace_nan_with_interpolation(Y_emissions_stock_SW)
     Y_emissions_stock_SBM = replace_nan_with_interpolation(Y_emissions_stock_SBM)
     Y_emissions_stock_SF = replace_nan_with_interpolation(Y_emissions_stock_SF)
-    #"""
-    
-    #print(len(Y_emissions_stock_SW))
-    #num_nans = np.isnan(Y_emissions_stock_SW).sum()
 
-    #print("Number of NaN values:", num_nans)
-    #quit()
     N_samples = load_object(fileName + "/Data","N_samples" )
     calc_second_order = load_object(fileName + "/Data", "calc_second_order")
-    #calc_second_order = False
 
-    variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
+    #variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
 
-    if calc_second_order:
-        data_sa_dict_total_SW, data_sa_dict_first_SW, second_emissions_stock_df_SW  = get_plot_data(problem, Y_emissions_stock_SW,calc_second_order)  
-        data_sa_dict_total_SBM, data_sa_dict_first_SBM, second_emissions_stock_df_SBM  = get_plot_data(problem, Y_emissions_stock_SBM,calc_second_order)  
-        data_sa_dict_total_SF, data_sa_dict_first_SF, second_emissions_stock_df_SF  = get_plot_data(problem, Y_emissions_stock_SF,calc_second_order)  
-    else:
-        data_sa_dict_total_SW, data_sa_dict_first_SW, _ = get_plot_data(problem, Y_emissions_stock_SW,calc_second_order)
-        data_sa_dict_total_SBM, data_sa_dict_first_SBM, _ = get_plot_data(problem, Y_emissions_stock_SBM,calc_second_order)
-        data_sa_dict_total_SF, data_sa_dict_first_SF, _ = get_plot_data(problem, Y_emissions_stock_SF,calc_second_order)
+    data_sa_dict_total_SW, data_sa_dict_first_SW, _ = get_plot_data(problem, Y_emissions_stock_SW,calc_second_order)
+    data_sa_dict_total_SBM, data_sa_dict_first_SBM, _ = get_plot_data(problem, Y_emissions_stock_SBM,calc_second_order)
+    data_sa_dict_total_SF, data_sa_dict_first_SF, _ = get_plot_data(problem, Y_emissions_stock_SF,calc_second_order)
 
     data_sa_dict_first_SW = Merge_dict_SA(data_sa_dict_first_SW, plot_dict)
     data_sa_dict_total_SW = Merge_dict_SA(data_sa_dict_total_SW, plot_dict)
-    #print("data_sa_dict_total_SW",data_sa_dict_total_SW)
-    #print("data_sa_dict_first_SW",)
-    #quit()
 
     data_sa_dict_first_SBM = Merge_dict_SA(data_sa_dict_first_SBM, plot_dict)
     data_sa_dict_total_SBM = Merge_dict_SA(data_sa_dict_total_SBM, plot_dict)
@@ -376,53 +244,15 @@ def main(
     data_sa_dict_first_SF = Merge_dict_SA(data_sa_dict_first_SF, plot_dict)
     data_sa_dict_total_SF = Merge_dict_SA(data_sa_dict_total_SF, plot_dict)
 
-    #quit()
-
-    ###############################
-    #print("titles", len(titles))
-    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SW, plot_outputs, titles, N_samples, "First", "SW", latex_bool = latex_bool)
-    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SBM, plot_outputs, titles, N_samples, "First", "SBM" ,latex_bool = latex_bool)
-    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_first_SF, plot_outputs, titles, N_samples, "First", "SF" ,latex_bool = latex_bool)
-
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     data_list_first = [data_sa_dict_first_SW,  data_sa_dict_first_SBM, data_sa_dict_first_SF]
     data_list_total = [data_sa_dict_total_SW,  data_sa_dict_total_SBM, data_sa_dict_total_SF]
 
-    #print(data_sa_dict_first_SW)
-    #quit()
     multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_first, plot_outputs, titles, N_samples, "First", network_titles ,latex_bool = latex_bool)
     multi_scatter_seperate_total_sensitivity_analysis_plot_triple(fileName, data_list_total, plot_outputs, titles, N_samples, "Total", network_titles ,latex_bool = latex_bool)
-    #print(titles)
-    #quit()
 
-    """
-    if calc_second_order:
-        #print("variable_parameters_dict", variable_parameters_dict)
-
-        properties_list = list(variable_parameters_dict.keys())
-
-        data_sa_dict_second_SW = convert_second_order_data(second_emissions_stock_df_SW, properties_list)
-        data_sa_dict_second_SBM = convert_second_order_data(second_emissions_stock_df_SBM, properties_list)
-        data_sa_dict_second_SF =  convert_second_order_data(second_emissions_stock_df_SF, properties_list)
-
-        data_list_second = [data_sa_dict_second_SW,  data_sa_dict_second_SBM, data_sa_dict_second_SF]
-        plot_second_order_matrix(fileName, data_list_second,  titles, N_samples, "second", network_titles)
-    """
-    #TOTAL I DONT THINK WORKS AT THE MOMENT
-    #multi_scatter_seperate_total_sensitivity_analysis_plot(fileName, data_sa_dict_total, plot_outputs, titles, N_samples, "Total", latex_bool = latex_bool)
-
-    """
-    array_first = data_sa_dict_first['emissions_stock']["data"]["S1"].to_numpy() 
-    array_total = data_sa_dict_total['emissions_stock']["data"]["ST"].to_numpy() 
-    diff = array_total- array_first
-    print("Difference total - first", diff)
-    save_object(diff, fileName + "/Data","diff")
-    #a = second_emissions_stock_df.plot()
-    #print(a)
-    """
     plt.show()
 
-    
 
 if __name__ == '__main__':
 

@@ -75,13 +75,8 @@ def main(
     #FULL
     emissions_array_socially = load_object(fileName + "/Data","emissions_array_socially")
     emissions_array_identity = load_object(fileName + "/Data","emissions_array_identity")
-    #print(emissions_array_socially - emissions_array_identity)  
 
-    #quit()
     fixed_emissions_array = load_object(fileName + "/Data","fixed_emissions_array")
-    print(emissions_array_socially.shape,fixed_emissions_array.shape )
-    
-    quit()
     carbon_price_list = load_object(fileName + "/Data","carbon_price_list")
     scenario_labels = ["Fixed preferences","Social multiplier", "Cultural multiplier"]
 

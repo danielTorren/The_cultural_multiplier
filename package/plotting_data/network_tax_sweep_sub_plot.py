@@ -57,13 +57,11 @@ def main(
 
     #FULL
     data_array = load_object(fileName + "/Data","data_array") 
-    #print(data_array.shape)
-    #quit()
     base_params = load_object(fileName + "/Data","base_params")
 
     #####################################################################################################
 
-    network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
+    #network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     scenario_labels = ["Fixed preferences","Social multiplier", "Cultural multiplier"]
 
     sub_vals = load_object(fileName + "/Data", "substitutability_vals")    

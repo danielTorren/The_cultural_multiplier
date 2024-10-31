@@ -1,7 +1,5 @@
 """Contains functions that are not crucial to the simulation itself and are shared amongst files.
 A module that aides in preparing folders, saving, loading and generating data for plots.
-
-Created: 10/10/2022
 """
 
 # imports
@@ -120,8 +118,6 @@ def generate_vals(variable_parameters_dict):
         print("Invalid divisions, try linear or log")
     if variable_parameters_dict["round"] == 1:
         property_values_list = np.round(property_values_list)
-        #print("ROUND",property_values_list)#
-        #quit()
 
     return property_values_list 
 

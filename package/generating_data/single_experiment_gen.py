@@ -3,9 +3,6 @@
 A module that use dictionary of data for the simulation run. The single shot simulztion is run
 for a given initial set seed.
 
-
-
-Created: 10/10/2022
 """
 # imports
 from package.resources.run import generate_data

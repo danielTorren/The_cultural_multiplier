@@ -72,8 +72,7 @@ def main(
         params_list.extend(arrange_scenarios_tax(params,property_values_list,scenarios))
 
     print("Total runs: ",len(params_list))
-    
-    #quit()
+
     
     Data_serial = emissions_parallel_run(params_list)
     data_array = Data_serial.reshape(len(substitutability_vals), scenario_reps , property_reps, params["seed_reps"] )

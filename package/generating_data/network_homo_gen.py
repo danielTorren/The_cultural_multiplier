@@ -77,7 +77,7 @@ def main(
         #RUN THE STUFF
     
         print("TOTAL RUNS", len(params_list))
-        #quit()
+
 
         emissions_stock_serial = multi_emissions_stock(params_list)
 
@@ -96,13 +96,13 @@ def main(
         
     if FIXED_RUNS:
         ########################################################################################################### 
-        # I ONLY NEED TO CALCULATE THE emissiosn for the propoerty reps
+        # ONLY NEED TO CALCULATE THE emissiosn for the property reps
         params["network_type"] = "SW"
         params["alpha_change_state"] = "fixed_preferences"
         fixed_params_list = produce_param_list_stochastic_multi_named(params, property_values_list, property_varied, seed_labels)
 
         print("TOTAL RUNS FIXED", len(fixed_params_list))
-        #quit()
+
 
         fixed_emissions_stock_serial = multi_emissions_stock(fixed_params_list)
         fixed_emissions_array = fixed_emissions_stock_serial.reshape( len(property_values_list), params["seed_reps"])

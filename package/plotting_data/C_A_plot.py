@@ -19,8 +19,6 @@ def plot_A_vs_C_triple_alt(sigma_values, Q_values, A_range, line_style_list,colo
         axes[i].set_title(("Substitutability, $\sigma_m$ = %s") % (sigma), fontsize="12")
         for j,Q in enumerate(Q_values):
             C_values = [calculate_C_alt(A, Q, sigma) for A in A_range]
-            #print(a)
-            #quit()
             axes[i].plot(A_range, C_values, label = "$\\bar{P_m}$ = %s" % (Q), linestyle= line_style_list[i])## c = colour_list[j]
         axes[i].grid()
         

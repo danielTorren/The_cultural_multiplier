@@ -127,7 +127,6 @@ def plot_SF(
 
     mu_emissions, lower_bound, upper_bound = calc_bounds(emissions_fixed, 0.95)
     ax.plot(property_vals, mu_emissions, color="black", alpha=1, linestyle= "dashed", label = "Fixed preferences")
-    #ax.fill_between(property_vals, lower_bound, upper_bound, color="black", alpha=0.3)
 
     for j, Data_list in enumerate(Data_arr_SF):
         data_SF = Data_arr_SF[j].T
@@ -160,7 +159,6 @@ def main(
     ############################
     base_params = load_object(fileName + "/Data", "base_params")
     var_params = load_object(fileName + "/Data" , "var_params")
-    homphily_states = load_object(fileName + "/Data" , "homphily_states")
     property_values_list = load_object(fileName + "/Data", "property_values_list")
     property_varied = var_params["property_varied"]
 

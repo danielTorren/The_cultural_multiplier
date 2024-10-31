@@ -10,7 +10,7 @@ import pyperclip
 import json
 
 def main(
-   BASE_PARAMS_LOAD = ""
+   BASE_PARAMS_LOAD
 ) -> str: 
     
     f = open(BASE_PARAMS_LOAD)
@@ -28,8 +28,6 @@ def main(
     #high carbon price
     base_params["carbon_price_increased"] = 0.15
     Data_high = generate_data(base_params)  # run the simulation
-
-    #print(Data.average_identity)
 
     createFolder(fileName)
     save_object(Data_no, fileName + "/Data", "Data_no")

@@ -38,7 +38,6 @@ def main(
 
     print("Total runs: ",len(params_list))
 
-    #quit()
 
     Data_serial = emissions_parallel_run(params_list)
     #print(len(Data_serial))

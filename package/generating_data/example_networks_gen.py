@@ -1,12 +1,25 @@
 # imports
 from package.resources.utility import (
     createFolder, 
-    save_object, 
     produce_name_datetime
 )
 import matplotlib.pyplot as plt
 import networkx as nx
-from package.resources.plot import prod_pos
+
+def prod_pos(layout_type: str, network: nx.Graph) -> nx.Graph:
+
+    if layout_type == "circular":
+        pos_identity_network = nx.circular_layout(network)
+    elif layout_type == "spring":
+        pos_identity_network = nx.spring_layout(network)
+    elif layout_type == "kamada_kawai":
+        pos_identity_network = nx.kamada_kawai_layout(network)
+    elif layout_type == "planar":
+        pos_identity_network = nx.planar_layout(network)
+    else:
+        raise Exception("Invalid layout given")
+
+    return pos_identity_network
 
 def plot_network_examples(    
         fileName

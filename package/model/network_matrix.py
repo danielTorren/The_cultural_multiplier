@@ -1,42 +1,42 @@
 import numpy as np
 import networkx as nx
-import numpy.typing as npt
 from copy import deepcopy
 import scipy.sparse as sp
 
 class Network_Matrix:
-    """
-    A class representing a social network with preferences and economic behavior modeling.
-    
-    This class implements a complex socio-economic network model that simulates how individual
-    preferences for low-carbon vs high-carbon products evolve through social learning and
-    economic incentives like carbon pricing.
-
-    Attributes:
-        parameters (dict): Configuration parameters for the network and simulation
-        N (int): Number of agents in the network
-        M (int): Number of sectors/products
-        t (int): Current time step in the simulation
-        network (networkx.Graph): The social network structure
-        low_carbon_preference_matrix (np.ndarray): Matrix of agent preferences for low-carbon options
-        carbon_price_m (float): Current carbon price
-        total_carbon_emissions_stock (float): Accumulated carbon emissions over time
-    """
-
     def __init__(self, parameters: dict):
         """
-        Initialize the Network_Matrix with given parameters.
+        Initialize the Network_Matrix with given simulation parameters.
 
         Args:
-            parameters (dict): Dictionary containing all necessary simulation parameters
-                Required keys include:
-                - N: Number of agents
-                - M: Number of sectors
-                - preferences_seed: Random seed for preferences
-                - network_structure_seed: Random seed for network structure
-                - shuffle_homophily_seed: Random seed for homophily shuffling
-                - shuffle_coherance_seed: Random seed for coherence shuffling
-                And others as defined in the parameters dictionary
+            parameters (dict): Dictionary containing all necessary simulation parameters.
+
+                Keys:
+                - save_timeseries_data_state (int): If 1, time-series data will be saved; 0 if not.
+                - compression_factor_state (int): Compression factor applied to stored data, reducing memory usage.
+                - seed_reps (int): Number of seed repetitions for stochastic simulation consistency.
+                - carbon_price_duration (int): Duration (in time steps) for which the carbon price remains active.
+                - burn_in_duration (int): Initial duration for system to reach stability before main simulation starts. Set to zero
+                - N (int): Number of agents in the network.
+                - M (int): Number of sectors/categories represented in the network.
+                - sector_substitutability (float): Elasticity of substitution between different sectors.
+                - low_carbon_substitutability (float): Elasticity of substitution for low-carbon alternatives.
+                - a_preferences (float): Beta function parameter used to create initial preference level for consumption.
+                - b_preferences (float):  Beta function parameter used to create initial preference level for consumption.
+                - clipping_epsilon_init_preference (float): Small value to prevent zero preferences, ensuring stability.
+                - confirmation_bias (float): Degree of confirmation bias in agents' decision-making processes.
+                - init_carbon_price (float): Initial carbon price at the start of the simulation, set to 0
+                - increased_carbon_price (float): Carbon tax value
+                - phi (float): Influence of social network on individual preferences, ranging from 0 to 1.
+                - homophily_state (float): Degree of homophily in the network (0 = none, 1 = strong).
+                - coherance_state (float): Degree of coherence within agents regarding  preferences.
+                - SF_density (float): Density parameter for Scale-Free (SF) network structure.
+                - SF_green_or_brown_hegemony (int): Initial dominance in network (0 = neutral, 1 = pro-environment, -1 = anti-environment).
+                - SBM_block_num (int): Number of blocks or communities in the Stochastic Block Model (SBM) network.
+                - SBM_network_density_input_intra_block (float): Intra-block density for SBM network.
+                - SBM_network_density_input_inter_block (float): Inter-block density for SBM network.
+                - SW_network_density (float): Density of Small-World (SW) network structure.
+                - SW_prob_rewire (float): Probability of rewiring edges in the SW network to increase randomness.
         """
         self.parameters = parameters
         self._set_seeds()
@@ -156,7 +156,7 @@ class Network_Matrix:
         """
         Initialize network homophily parameters.
         
-        Homophily determines how likely agents are to connect with others who have similar preferences.
+        Homophily determines how likely agents are to connect with others who have similar envrionemtnal identity.
         """
         self.homophily_state = self.parameters["homophily_state"]
         self.shuffle_reps_homophily = int(round((self.N * (1 - self.homophily_state)) ** self.shuffle_intensity))
