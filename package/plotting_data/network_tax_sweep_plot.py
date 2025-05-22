@@ -37,8 +37,8 @@ def plot_multiplier_confidence_two(
     # Saving the first figure
     plotName = fileName_full + "/Plots"
     f1 = plotName + "/multiplier_conf_column1"
-    fig1.savefig(f1 + ".png", dpi=600, format="png")
-    fig1.savefig(f1 + ".eps", dpi=600, format="eps")
+    fig1.savefig(f1 + ".png", dpi=300, format="png")
+    fig1.savefig(f1 + ".eps", dpi=300, format="eps")
 
     # Second figure: second and third columns
     fig2, axes2 = plt.subplots(ncols=2, nrows=1, figsize=(10, 5), sharey=True)
@@ -67,8 +67,8 @@ def plot_multiplier_confidence_two(
 
     # Saving the second figure
     f2 = plotName + "/multiplier_conf_columns2_3"
-    fig2.savefig(f2 + ".png", dpi=600, format="png")
-    fig2.savefig(f2 + ".eps", dpi=600, format="eps")
+    fig2.savefig(f2 + ".png", dpi=300, format="png")
+    fig2.savefig(f2 + ".eps", dpi=300, format="eps")
 
 def plot_emissions_confidence_two(
     fileName, emissions_networks,
@@ -103,7 +103,7 @@ def plot_emissions_confidence_two(
     # Save the first figure
     plotName = fileName + "/Plots"
     f1 = plotName + "/network_emissions_confidence_column1"
-    fig1.savefig(f1 + ".png", dpi=600, format="png")
+    fig1.savefig(f1 + ".png", dpi=300, format="png")
 
     # Second figure: second and third columns
     fig2, axes2 = plt.subplots(ncols=2, nrows=1, figsize=(10, 5), sharey=True)
@@ -135,7 +135,7 @@ def plot_emissions_confidence_two(
 
     # Save the second figure
     f2 = plotName + "/network_emissions_confidence_columns2_3"
-    fig2.savefig(f2 + ".png", dpi=600, format="png")
+    fig2.savefig(f2 + ".png", dpi=300, format="png")
 
 
 def main(

@@ -75,7 +75,7 @@ def plot_price_elasticies_SF_SBM_seeds_3(
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_price_elasticies_SF_SBM_seeds_3" + property_save
-    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".png", dpi=300, format="png")
 
 
 
@@ -116,8 +116,8 @@ def plot_SW_SBM(
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_emissions_SW_SBM_FIXED_seeds_" + property_save
-    fig.savefig(f + ".png", dpi=600, format="png")
-    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
+    fig.savefig(f + ".eps", dpi=300, format="eps")
 
 def plot_SF(
     fileName: str, Data_arr_SF, property_title, property_save, property_vals, labels_SF, seed_reps, colors_scenarios,  emissions_fixed
@@ -143,8 +143,8 @@ def plot_SF(
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_emissions_SF_FIXED_seeds_" + property_save
-    fig.savefig(f + ".png", dpi=600, format="png")
-    fig.savefig(f + ".eps", dpi=600, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
+    fig.savefig(f + ".eps", dpi=300, format="eps")
 
 
 def main(
@@ -184,5 +184,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/networks_homo_tau_18_49_01__18_10_2024",
+        fileName= "results/networks_homo_tau_11_06_39__31_10_2024",
     )

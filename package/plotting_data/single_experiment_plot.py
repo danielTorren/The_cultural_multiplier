@@ -27,8 +27,8 @@ def plot_identity_matrix(fileName, Data, dpi_save,latex_bool = False):
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_identity_timeseries_matrix"
-    fig.savefig(f + ".eps", dpi=600, format="eps")
-    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=300, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
 
 
 def plot_preference_timeseries(fileName, Data, dpi_save, latex_bool=False):
@@ -117,7 +117,7 @@ def plot_total_flow_carbon_emissions_timeseries(
     plot_network_timeseries(fileName, Data, y_title, property, dpi_save)
 
 def plot_network_timeseries(
-    fileName: str, Data: Network, y_title: str, property: str, dpi_save: int,latex_bool = False
+    fileName: str, Data, y_title: str, property: str, dpi_save: int,latex_bool = False
 ):
     fig, ax = plt.subplots(figsize=(10,6))
     data = eval("Data.%s" % property)
@@ -131,8 +131,23 @@ def plot_network_timeseries(
 
     plotName = fileName + "/Plots"
     f = plotName + "/" + property + "_timeseries"
-    fig.savefig(f + ".eps", dpi=600, format="eps")
-    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=300, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
+
+
+def plot_expenditures(fileName: str, Data):
+    fig, ax = plt.subplots(figsize=(10,6))
+    # bodge
+    ax.hist(Data.base_expenditure)
+    ax.set_xlabel(r"Expenditure")
+    ax.set_ylabel(r"Freuqnecy")
+
+    fig.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/expentitude_dist"
+    fig.savefig(f + ".eps", dpi=300, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
 
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",
@@ -146,7 +161,7 @@ def main(
     plot_preference_timeseries(fileName, Data, dpi_save)
     plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
     plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
-
+    plot_expenditures(fileName, Data)
     plt.show()
 
 if __name__ == '__main__':

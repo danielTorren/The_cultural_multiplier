@@ -72,6 +72,7 @@ class Network_Matrix:
         self.network_structure_seed = self.parameters["network_structure_seed"]
         self.shuffle_homophily_seed = self.parameters["shuffle_homophily_seed"]
         self.shuffle_coherance_seed = self.parameters["shuffle_coherance_seed"]
+        self.expenditure_seed = self.parameters["expenditure_seed"]
 
     def _set_state_attributes(self):
         """Initialize state attributes from parameters."""
@@ -163,7 +164,15 @@ class Network_Matrix:
 
     def _initialize_expenditure(self):
         """Initialize agent expenditure parameters."""
-        self.base_expenditure = 1/self.N
+        self.expenditure_inequality_state = self.parameters["expenditure_inequality_state"]
+        if self.expenditure_inequality_state:
+            np.random.seed(self.expenditure_seed)
+            self.a_expenditure = self.parameters["a_expenditure"]
+            self.b_expenditure = self.parameters["b_expenditure"]
+            expenditure_beta = np.random.beta(self.a_expenditure, self.b_expenditure, size=self.N)
+            self.base_expenditure = (expenditure_beta/np.sum(expenditure_beta))#Total expenditure in the system needs to be 1
+        else:
+            self.base_expenditure = 1/self.N
         self.instant_expenditure = self.base_expenditure
 
     def _initialize_sector_preferences(self):
@@ -411,7 +420,10 @@ class Network_Matrix:
         Z_vec = self._calc_Z(Omega_m_matrix, chi_m_tensor)
 
         Z_matrix = np.tile(Z_vec, (self.M, 1)).T
-        self.H_m_matrix = self.instant_expenditure * chi_m_tensor / Z_matrix
+        #print("self.instant_expenditure",self.instant_expenditure.shape )
+        #print("(chi_m_tensor / Z_matrix).T",((chi_m_tensor / Z_matrix).T).shape )
+        #print("self.H_m_matrix",((self.instant_expenditure * (chi_m_tensor / Z_matrix).T).T).shape )
+        self.H_m_matrix = (self.instant_expenditure * (chi_m_tensor / Z_matrix).T).T#WRITE THIS IN A MORE SUCINT WAY
         self.L_m_matrix = Omega_m_matrix * self.H_m_matrix
         self.outward_social_influence_matrix = self._calc_consumption_ratio()
 

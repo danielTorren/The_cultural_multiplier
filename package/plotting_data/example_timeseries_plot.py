@@ -33,8 +33,8 @@ def plot_identity_matrix_2(fileName, Data_1, Data_2):
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_example_timerseries"
-    fig.savefig(f + ".eps", dpi=600, format="eps")
-    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=300, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
 
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",

@@ -7,7 +7,7 @@ Multiple simulations at once in parallel can also be run.
 import time
 import numpy as np
 import numpy.typing as npt
-from joblib import Parallel, delayed
+#from joblib import Parallel, delayed
 import multiprocessing
 from package.model.network_matrix import Network_Matrix as Network
 
@@ -72,7 +72,7 @@ def emissions_parallel_run(
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
     #emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
-    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(    delayed(generate_emissions_stock_res)(i) for i in params_dict)
+    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res)(i) for i in params_dict)
     return np.asarray(emissions_list)
 
 ##############################################################################

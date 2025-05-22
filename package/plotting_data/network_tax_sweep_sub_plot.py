@@ -44,7 +44,7 @@ def plot_emissions_confidence(
     
     plotName = fileName + "/Plots"
     f = plotName + "/network_emissions_sub_confidence"
-    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".png", dpi=300, format="png")
 
 
 def main(

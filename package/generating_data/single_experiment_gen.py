@@ -12,7 +12,7 @@ from package.resources.utility import (
     produce_name_datetime
 )
 from package.plotting_data import single_experiment_plot
-import pyperclip
+#import pyperclip
 
 def main(
     base_params
@@ -20,7 +20,7 @@ def main(
 
     root = "single_experiment"
     fileName = produce_name_datetime(root)
-    pyperclip.copy(fileName)
+    #pyperclip.copy(fileName)
     print("fileName:", fileName)
 
     Data = generate_data(base_params)  # run the simulation
@@ -36,21 +36,25 @@ if __name__ == '__main__':
     
     base_params = {
     "phi": 0.02,
-    "network_type": "SBM",
-    "carbon_price_increased": 0.5,
+    "network_type": "SW",
+    "carbon_price_increased": 0,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
     "alpha_change_state": "dynamic_identity_determined_weights",#"dynamic_hybrid_determined_weights",#"fixed_preferences",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
+    "expenditure_inequality_state": 1,
     "seed_reps": 1,
     "network_structure_seed": 2, 
     "preferences_seed": 99, 
     "shuffle_homophily_seed": 55,
     "shuffle_coherance_seed": 31,
+    "expenditure_seed": 31,
+    "a_expenditure": 0.5,
+    "b_expenditure": 4,
     "carbon_price_duration": 360,#360, 
     "burn_in_duration": 0, 
-    "N": 300,#3000, 
-    "M": 1, 
-    "M_identity": 1,
+    "N": 300, 
+    "M": 3, 
+    "M_identity": 3,
     "sector_substitutability": 2, 
     "low_carbon_substitutability": 4, 
     "a_preferences": 2, 

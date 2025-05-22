@@ -182,8 +182,8 @@ def multi_scatter_seperate_total_sensitivity_analysis_plot_triple(
         + "%s_%s_%s_multi_scatter_seperate_sensitivity_analysis_plot_triple.png"
         % (len(names), N_samples, order)
     )
-    fig.savefig(f, dpi=600, format="eps")
-    fig.savefig(f_png, dpi=600, format="png")
+    fig.savefig(f, dpi=300, format="eps")
+    fig.savefig(f_png, dpi=300, format="png")
 
 
 def replace_nan_with_interpolation(arr):

@@ -70,8 +70,8 @@ def plot_network_examples(
     plotName = fileName + "/Prints"
 
     f = plotName + "/network_example"
-    fig.savefig(f + ".eps", dpi=600, format="eps")
-    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".eps", dpi=300, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
 
 def main(
     fileName = "results/single_shot_11_52_34__05_01_2023",

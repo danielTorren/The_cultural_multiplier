@@ -27,8 +27,8 @@ def plot_A_vs_C_triple_alt(sigma_values, Q_values, A_range, line_style_list,colo
     check_other_folder()
     plotName = "results/Other"
     f = plotName + "/C_A_triple_alt"
-    fig.savefig(f + ".eps", dpi=600, format="eps")
-    fig.savefig(f + ".png", dpi=600, format="png")  
+    fig.savefig(f + ".eps", dpi=300, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")  
     plt.show()
 
 

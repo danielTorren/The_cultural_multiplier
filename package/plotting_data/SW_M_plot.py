@@ -60,7 +60,7 @@ def plot_emissions_confidence(
     # Save the plot
     plotName = fileName + "/Plots"
     f = plotName + "/network_emissions_confidence_M"
-    fig.savefig(f + ".png", dpi=600, format="png")
+    fig.savefig(f + ".png", dpi=300, format="png")
 
 
 

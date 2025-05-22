@@ -40,7 +40,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
     # Save the small-world network figure
     plotName_sw = fileName + "/Plots"
     f_sw = plotName_sw + "/small_world_tau_emissions_confidence"
-    fig_sw.savefig(f_sw + ".png", dpi=600, format="png")
+    fig_sw.savefig(f_sw + ".png", dpi=300, format="png")
     
     # Second figure: Stochastic Block Model and Scale-free networks
     ncols_other = 2
@@ -64,7 +64,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
     # Save the Stochastic Block Model and Scale-free networks figure
     plotName_other = fileName + "/Plots"
     f_other = plotName_other + "/sbm_scale_free_tau_emissions_confidence"
-    fig_other.savefig(f_other + ".png", dpi=600, format="png")
+    fig_other.savefig(f_other + ".png", dpi=300, format="png")
 
 def main(
     fileName = "results/tax_sweep_11_29_20__28_09_2023"
@@ -81,7 +81,7 @@ def main(
     property_values_list_row = row_dict["property_vals"]
 
     row_titles = ["Elasticity of substitution, $\sigma$ = %s" % (round(i,3)) for i in property_values_list_row]
-
+    name = "plasma"
     plot_means_end_points_emissions_confidence_split_gradient(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
     plt.show()
 
