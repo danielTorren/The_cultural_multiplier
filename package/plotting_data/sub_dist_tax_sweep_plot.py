@@ -87,5 +87,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/network_ineq_tau_15_08_40__23_05_2025"
+        fileName= "results/network_ineq_tau_11_09_03__11_06_2025"
     )

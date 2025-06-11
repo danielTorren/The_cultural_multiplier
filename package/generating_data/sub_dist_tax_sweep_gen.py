@@ -27,7 +27,8 @@ def main(
 
     if print_simu:
         start_time = time.time()
-    seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed", "expenditure_seed", "low_carbon_substitutability_seed"]
+    #seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed", "expenditure_seed", "low_carbon_substitutability_seed"]
+    seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed", "expenditure_seed"]
     #Gen params lists
     networks_list = ["SW","SBM", "SF"]
     params_list = []
