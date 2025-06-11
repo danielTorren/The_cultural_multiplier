@@ -73,6 +73,7 @@ class Network_Matrix:
         self.shuffle_homophily_seed = self.parameters["shuffle_homophily_seed"]
         self.shuffle_coherance_seed = self.parameters["shuffle_coherance_seed"]
         self.expenditure_seed = self.parameters["expenditure_seed"]
+        self.low_carbon_substitutability_seed = self.parameters["low_carbon_substitutability_seed"]
 
     def _set_state_attributes(self):
         """Initialize state attributes from parameters."""
@@ -329,7 +330,19 @@ class Network_Matrix:
         """
         Initialize substitutability parameters for low-carbon options.
         """
-        self.low_carbon_substitutability = self.parameters["low_carbon_substitutability"]
+        np.random.seed(self.low_carbon_substitutability_seed)
+        self.low_carbon_substitutability_dist_state = self.parameters["low_carbon_substitutability_dist_state"]
+        if self.low_carbon_substitutability_dist_state:
+            self.low_carbon_substitutability_beta_a = self.parameters["low_carbon_substitutability_beta_a"]
+            self.low_carbon_substitutability_beta_b = self.parameters["low_carbon_substitutability_beta_b"]
+            self.mean_low_carbon_substitutability = self.parameters["mean_low_carbon_substitutability"]
+            self.width_low_carbon_substitutability = self.parameters["width_low_carbon_substitutability"]
+            if self.mean_low_carbon_substitutability- 0.5*self.width_low_carbon_substitutability < 1:
+                raise Exception("scale too large or mean substitituabilty too low, as some distribution values can be < 1")
+            self.low_carbon_substitutability_arr =  self.mean_low_carbon_substitutability - 0.5*self.width_low_carbon_substitutability + self.width_low_carbon_substitutability*np.random.beta(self.low_carbon_substitutability_beta_a, self.low_carbon_substitutability_beta_b, size=self.N)
+        else:
+            self.low_carbon_substitutability_arr = np.asarray([self.parameters["low_carbon_substitutability"]]*self.N)
+
 
     def _initialize_social_component(self):
         """
@@ -371,8 +384,7 @@ class Network_Matrix:
         Returns:
             np.ndarray: Omega matrix incorporating prices and preferences
         """
-        omega_vector = ((self.prices_high_carbon_instant * self.low_carbon_preference_matrix) / 
-                       (self.prices_low_carbon_m * (1 - self.low_carbon_preference_matrix))) ** self.low_carbon_substitutability
+        omega_vector = ((self.prices_high_carbon_instant * self.low_carbon_preference_matrix)/(self.prices_low_carbon_m * (1 - self.low_carbon_preference_matrix))) ** self.low_carbon_substitutability_arr[:, np.newaxis]
         return omega_vector
 
     def _calc_chi_m_nested_CES(self, Omega_m_matrix: np.ndarray) -> np.ndarray:
@@ -385,13 +397,11 @@ class Network_Matrix:
         Returns:
             np.ndarray: Chi matrix for consumption calculations
         """
-        chi_m = (((self.sector_preferences * self.low_carbon_preference_matrix) /
-                 (self.prices_low_carbon_m * Omega_m_matrix**(1/self.low_carbon_substitutability))) *
-                (self.low_carbon_preference_matrix * Omega_m_matrix**((self.low_carbon_substitutability-1)/
-                                                                    (self.low_carbon_substitutability)) +
-                 1 - self.low_carbon_preference_matrix)**((self.sector_substitutability-self.low_carbon_substitutability)/
-                                                        (self.sector_substitutability*(self.low_carbon_substitutability-1)))
-                ) ** self.sector_substitutability
+        component_1 = ((self.sector_preferences * self.low_carbon_preference_matrix) /(self.prices_low_carbon_m * Omega_m_matrix**(1/self.low_carbon_substitutability_arr[:, np.newaxis])))
+        component_2 = (self.low_carbon_preference_matrix * Omega_m_matrix**((self.low_carbon_substitutability_arr[:, np.newaxis]-1)/ (self.low_carbon_substitutability_arr[:, np.newaxis])) + 1 - self.low_carbon_preference_matrix)
+        componeent_3 = ((self.sector_substitutability-self.low_carbon_substitutability_arr)/(self.sector_substitutability*(self.low_carbon_substitutability_arr-1)))[:, np.newaxis]
+        
+        chi_m = ( component_1*(component_2**componeent_3)) ** self.sector_substitutability
         return chi_m
 
     def _calc_Z(self, Omega_m_matrix: np.ndarray, chi_m_tensor: np.ndarray) -> np.ndarray:

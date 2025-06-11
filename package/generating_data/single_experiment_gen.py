@@ -70,12 +70,18 @@ if __name__ == '__main__':
     "SBM_network_density_input_intra_block": 0.2,
     "SBM_network_density_input_inter_block": 0.005,
     "SW_network_density": 0.1,#0.1,
-    "SW_prob_rewire": 0.1
+    "SW_prob_rewire": 0.1,
+    "low_carbon_substitutability_dist_state": 0,
+    "low_carbon_substitutability_seed": 77,
+    "low_carbon_substitutability_beta_a": 1,
+    "low_carbon_substitutability_beta_b": 1,
+    "mean_low_carbon_substitutability": 4,
+    "width_low_carbon_substitutability": 4,
     }
 
     fileName = main(base_params=base_params)
 
-    RUN_PLOT = 1
+    RUN_PLOT = 0
 
     if RUN_PLOT:
         single_experiment_plot.main(fileName = fileName)

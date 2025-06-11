@@ -7,7 +7,7 @@ Multiple simulations at once in parallel can also be run.
 import time
 import numpy as np
 import numpy.typing as npt
-#from joblib import Parallel, delayed
+from joblib import Parallel, delayed
 import multiprocessing
 from package.model.network_matrix import Network_Matrix as Network
 

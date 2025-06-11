@@ -33,5 +33,11 @@
     "price_high_carbon_factor": 1.0,
     "ratio_preference_or_consumption_state": 1.0,
     "carbon_tax_implementation": "flat",
-    "clipping_epsilon": 1e-3
+    "clipping_epsilon": 1e-3,
+    "low_carbon_substitutability_dist_state": 0,
+    "low_carbon_substitutability_seed": 77,
+    "low_carbon_substitutability_beta_a": 1,
+    "low_carbon_substitutability_beta_b": 1,
+    "mean_low_carbon_substitutability": 4,
+    "width_low_carbon_substitutability": 4
 }
