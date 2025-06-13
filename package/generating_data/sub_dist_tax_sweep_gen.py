@@ -21,7 +21,7 @@ def main(
     # AVERAGE OVER MULTIPLE RUNS
     variable_parameters_dict = generate_vals_2D(variable_parameters_dict)
 
-    root = "network_ineq_tau"
+    root = "sub_dist_tax_sweep"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 

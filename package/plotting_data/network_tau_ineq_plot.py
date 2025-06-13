@@ -67,7 +67,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
     fig_other.savefig(f_other + ".png", dpi=300, format="png")
 
 def main(
-    fileName = "results/tax_sweep_11_29_20__28_09_2023"
+    fileName = "results/network_ineq_tau_12_00_32__11_06_2025"
 ) -> None:
 
     emissions_networks = load_object(fileName + "/Data","emissions_data_networks")

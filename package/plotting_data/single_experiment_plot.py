@@ -140,12 +140,28 @@ def plot_expenditures(fileName: str, Data):
     # bodge
     ax.hist(Data.base_expenditure)
     ax.set_xlabel(r"Expenditure")
-    ax.set_ylabel(r"Freuqnecy")
+    ax.set_ylabel(r"Frequency")
+    print("Data.base_expenditure", Data.base_expenditure[0:100])
 
     fig.tight_layout()
 
     plotName = fileName + "/Plots"
     f = plotName + "/expentitude_dist"
+    fig.savefig(f + ".eps", dpi=300, format="eps")
+    fig.savefig(f + ".png", dpi=300, format="png")
+
+def plot_low_carbon_substitutabilities(fileName: str, Data):
+    fig, ax = plt.subplots(figsize=(10,6))
+    # bodge
+    ax.hist(Data.low_carbon_substitutability_arr)
+    print("Data.low_carbon_substitutability_arr", Data.low_carbon_substitutability_arr[0:100])
+    ax.set_xlabel(r"Low Carbon Substitutability")
+    ax.set_ylabel(r"Frequency")
+
+    fig.tight_layout()
+
+    plotName = fileName + "/Plots"
+    f = plotName + "/elow_carb_dist"
     fig.savefig(f + ".eps", dpi=300, format="eps")
     fig.savefig(f + ".png", dpi=300, format="png")
 
@@ -162,6 +178,8 @@ def main(
     plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)
     plot_total_flow_carbon_emissions_timeseries(fileName, Data, dpi_save)
     plot_expenditures(fileName, Data)
+    plot_low_carbon_substitutabilities(fileName, Data)
+
     plt.show()
 
 if __name__ == '__main__':
