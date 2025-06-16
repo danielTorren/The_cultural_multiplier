@@ -31,8 +31,8 @@
     "SW_prob_rewire": 0.1,
     "low_carbon_substitutability_dist_state": 1,
     "low_carbon_substitutability_seed": 77,
-    "low_carbon_substitutability_beta_a": 1,
+    "low_carbon_substitutability_beta_a": 3,
     "low_carbon_substitutability_beta_b": 3,
     "mean_low_carbon_substitutability": 4,
-    "width_low_carbon_substitutability": 4
+    "width_low_carbon_substitutability": 1
     }

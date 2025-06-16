@@ -62,5 +62,5 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_sub_dist_tax_sweep.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/twoD_dict_sub_dist_tax_sweep.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/twoD_dict_sub_dist_tax_sweep_alt.json",
     )
