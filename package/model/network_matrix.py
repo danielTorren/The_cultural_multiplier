@@ -52,7 +52,21 @@ class Network_Matrix:
         self._update_carbon_price()
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         self._initialize_substitutabilities()
-        self._calc_consumption()
+
+        if self.state_minimum_h:
+            self.h_min = np.asarray(self.parameters["h_m"])
+            self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
+            self.minimum_expenditure_sum = sum(self.h_min*self.prices_high_carbon_instant)
+            #print("Minimum expenditure needed:", self.minimum_expenditure_sum)
+            #print("Current minimum expenditure", np.min(self.instant_expenditure))
+
+            if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
+                print("Minimum expenditure needed:", self.minimum_expenditure_sum)
+                print("Current minimum expenditure", np.min(self.instant_expenditure))
+                raise Exception("minimum h quantities too high, poorest cannot afford necessities. Lower quantity required.")
+            self._calc_consumption_minimum_h()
+        else:
+            self._calc_consumption()
 
         
         if self.alpha_change_state != "fixed_preferences":
@@ -80,6 +94,7 @@ class Network_Matrix:
         self.save_timeseries_data_state = self.parameters["save_timeseries_data_state"]
         self.compression_factor_state = self.parameters["compression_factor_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
+        self.state_minimum_h = self.parameters["state_minimum_h"]
 
         if self.alpha_change_state not in ["dynamic_socially_determined_weights","fixed_preferences","dynamic_identity_determined_weights"]:
             raise ValueError(f"Invalid alpha change state")
@@ -437,6 +452,21 @@ class Network_Matrix:
         self.L_m_matrix = Omega_m_matrix * self.H_m_matrix
         self.outward_social_influence_matrix = self._calc_consumption_ratio()
 
+    def _calc_consumption_minimum_h(self):
+        """
+        Calculate consumption patterns for all agents across sectors.
+        Updates H_m_matrix (high-carbon consumption) and L_m_matrix (low-carbon consumption).
+        """
+        Omega_m_matrix = self._calc_Omega_m()
+        chi_m_tensor = self._calc_chi_m_nested_CES(Omega_m_matrix)
+        Z_vec = self._calc_Z(Omega_m_matrix, chi_m_tensor)
+        Z_matrix = np.tile(Z_vec, (self.M, 1)).T
+
+        self.H_m_matrix = ((self.instant_expenditure - self.minimum_expenditure_sum) * (chi_m_tensor / Z_matrix).T).T + self.minimum_h_matrix#WRITE THIS IN A MORE SUCINT WAY
+        self.L_m_matrix = Omega_m_matrix * (self.H_m_matrix - self.minimum_h_matrix)
+
+        self.outward_social_influence_matrix = self._calc_consumption_ratio()
+
     def _calc_consumption_ratio(self) -> np.ndarray:
         """
         Calculate ratio of low-carbon to total consumption.
@@ -657,7 +687,10 @@ class Network_Matrix:
         if self.alpha_change_state != "fixed_preferences":
             self.low_carbon_preference_matrix = self._update_preferences()
 
-        self._calc_consumption()
+        if self.state_minimum_h:
+            self._calc_consumption_minimum_h()
+        else:
+            self._calc_consumption()
 
         if self.alpha_change_state != "fixed_preferences":
             if self.alpha_change_state == "dynamic_identity_determined_weights":

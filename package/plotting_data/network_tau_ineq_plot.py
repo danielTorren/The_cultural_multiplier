@@ -80,12 +80,12 @@ def main(
     property_values_list_col = col_dict["property_vals"]
     property_values_list_row = row_dict["property_vals"]
 
-    row_titles = ["a expditure = %s" % (round(i,3)) for i in property_values_list_row]
+    row_titles = ["a Beta distribution, Expenditure = %s" % (round(i,3)) for i in property_values_list_row]
     name = "plasma"
     plot_means_end_points_emissions_confidence_split_gradient(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/network_ineq_tau_15_08_40__23_05_2025"
+        fileName= "results/network_ineq_tau_11_59_40__11_06_2025"
     )

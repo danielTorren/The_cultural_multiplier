@@ -33,7 +33,55 @@ def main(
     return fileName
 
 if __name__ == '__main__':
-    
+    base_params = {
+    "carbon_price_increased": 1,
+    "network_type": "SW",
+    "expenditure_inequality_state": 1,
+    "expenditure_seed": 31,
+    "a_expenditure": 0.5,
+    "b_expenditure": 4,
+    "save_timeseries_data_state": 1,
+    "compression_factor_state": 1,
+    "alpha_change_state": "dynamic_identity_determined_weights",
+    "seed_reps": 1,
+    "network_structure_seed": 2, 
+    "preferences_seed": 99, 
+    "shuffle_homophily_seed": 55,
+    "shuffle_coherance_seed": 31,
+    "expenditure_seed": 31,
+    "preferences_seed":8,
+    "carbon_price_duration": 360, 
+    "burn_in_duration": 0, 
+    "N": 3000, 
+    "M": 2, 
+    "sector_substitutability": 2, 
+    "low_carbon_substitutability": 4,
+    "a_preferences": 2, 
+    "b_preferences": 2, 
+    "clipping_epsilon_init_preference": 1e-5,
+    "confirmation_bias": 5, 
+    "init_carbon_price": 0, 
+    "phi": 0.02, 
+    "homophily_state": 0,
+    "coherance_state": 0.9,
+    "SF_density":0.1,
+    "SF_green_or_brown_hegemony": 0,
+    "SBM_block_num": 2,
+    "SBM_network_density_input_intra_block": 0.2,
+    "SBM_network_density_input_inter_block": 0.005,
+    "SW_network_density": 0.1,
+    "SW_prob_rewire": 0.1,
+    "low_carbon_substitutability_dist_state": 0,
+    "low_carbon_substitutability_seed": 77,
+    "low_carbon_substitutability_beta_a": 1,
+    "low_carbon_substitutability_beta_b": 1,
+    "mean_low_carbon_substitutability": 4,
+    "width_low_carbon_substitutability": 4,
+    "state_minimum_h": 1,
+    "h_m": [1e-13,0]
+    }
+
+    """
     base_params = {
     "phi": 0.02,
     "network_type": "SW",
@@ -78,6 +126,7 @@ if __name__ == '__main__':
     "mean_low_carbon_substitutability": 4,
     "width_low_carbon_substitutability": 4,
     }
+    """
 
     fileName = main(base_params=base_params)
 

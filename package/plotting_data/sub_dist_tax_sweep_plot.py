@@ -80,12 +80,13 @@ def main(
     property_values_list_col = col_dict["property_vals"]
     property_values_list_row = row_dict["property_vals"]
 
-    row_titles = ["a expditure = %s" % (round(i,3)) for i in property_values_list_row]
+    #row_titles = ["Mean elasticity of substitution = %s" % (round(i,3)) for i in property_values_list_row]
+    row_titles = ["a Beta distribution, Elasticity of substitution = %s" % (round(i,3)) for i in property_values_list_row]
     name = "plasma"
     plot_means_end_points_emissions_confidence_split_gradient(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/sub_dist_tax_sweep_13_59_33__13_06_2025"
+        fileName= "results/sub_dist_tax_sweep_13_59_33__13_06_2025"#sub_dist_tax_sweep_11_43_29__16_06_2025"
     )
