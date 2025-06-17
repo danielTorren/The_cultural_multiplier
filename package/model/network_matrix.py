@@ -202,8 +202,10 @@ class Network_Matrix:
             # Equal expenditure
             self.base_expenditure = np.full(self.N, 1.0 / self.N)
 
+        print(self.a_expenditure, self.b_expenditure,np.sum(self.instant_expenditure))
+        quit()
         self.instant_expenditure = self.base_expenditure
-        self.gini_expenditure = self._gini(self.base_expenditure)
+        self.gini_expenditure = self._gini(self.instant_expenditure)
 
 
     def _gini(self, x):
@@ -212,7 +214,6 @@ class Network_Matrix:
         n = len(x)
         cumx = np.cumsum(x)
         return (n + 1 - 2 * np.sum(cumx) / cumx[-1]) / n
-
 
     def _initialize_sector_preferences(self):
         """Initialize sector-level preference parameters."""
