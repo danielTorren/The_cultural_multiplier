@@ -173,6 +173,8 @@ class Network_Matrix:
             self.h_min = np.asarray(self.parameters["h_m"])
             self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
             self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_m)
+            self.minimum_expenditure_sum_instant = sum(self.h_min * self.prices_high_carbon_instant)
+            
             self.min_expenditure_individual = self.minimum_expenditure_sum*2#GIVE INDIVIDUALS more than they need,this accoutns for the max carbon price 
         else:
             self.min_expenditure_individual = 0
@@ -229,8 +231,8 @@ class Network_Matrix:
             #print("self.minimum_expenditure_sum", self.minimum_expenditure_sum)
             #print("np.min(self.instant_expenditure)", np.min(self.instant_expenditure))
             #print("prop expenditure on needs", self.minimum_expenditure_sum/np.min(self.instant_expenditure))
-            if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
-                print("Minimum expenditure needed:", self.minimum_expenditure_sum)
+            if np.min(self.instant_expenditure) < self.minimum_expenditure_sum_instant:
+                print("Minimum expenditure needed:", self.minimum_expenditure_sum_instant)
                 print("poorest person expenditure", np.min(self.instant_expenditure))
                 raise Exception("minimum h quantities too high, poorest cannot afford necessities. Lower quantity required.")
             self._calc_consumption_minimum_h()
@@ -493,7 +495,7 @@ class Network_Matrix:
         Z_vec = self._calc_Z(Omega_m_matrix, chi_m_tensor)
         Z_matrix = np.tile(Z_vec, (self.M, 1)).T
 
-        self.H_m_matrix = ((self.instant_expenditure - self.minimum_expenditure_sum) * (chi_m_tensor / Z_matrix).T).T + self.minimum_h_matrix#WRITE THIS IN A MORE SUCINT WAY
+        self.H_m_matrix = ((self.instant_expenditure - self.minimum_expenditure_sum_instant) * (chi_m_tensor / Z_matrix).T).T + self.minimum_h_matrix#WRITE THIS IN A MORE SUCINT WAY
         self.L_m_matrix = Omega_m_matrix * (self.H_m_matrix - self.minimum_h_matrix)
 
         self.outward_social_influence_matrix = self._calc_consumption_ratio()
