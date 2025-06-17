@@ -53,22 +53,6 @@ class Network_Matrix:
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         self._initialize_substitutabilities()
         self._initialize_consumption()
-        if self.state_minimum_h:
-            self.h_min = np.asarray(self.parameters["h_m"])
-            self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
-            self.minimum_expenditure_sum = sum(self.h_min*self.prices_high_carbon_instant)
-            print(self.h_min, self.prices_high_carbon_instant)
-            #print("Minimum expenditure needed:", self.minimum_expenditure_sum)
-            #print("Current minimum expenditure", np.min(self.instant_expenditure))
-
-            if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
-                print("Minimum expenditure needed:", self.minimum_expenditure_sum)
-                print("poorest person expenditure", np.min(self.instant_expenditure))
-                raise Exception("minimum h quantities too high, poorest cannot afford necessities. Lower quantity required.")
-            self._calc_consumption_minimum_h()
-        else:
-            self._calc_consumption()
-
         
         if self.alpha_change_state != "fixed_preferences":
             self._initialize_network_homophily()
@@ -209,11 +193,7 @@ class Network_Matrix:
             self.h_min = np.asarray(self.parameters["h_m"])
             self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
             self.minimum_expenditure_sum = sum(self.h_min*self.prices_high_carbon_instant)
-            #print(self.h_min, self.prices_high_carbon_instant)
             print("prop expenditure on needs", self.minimum_expenditure_sum/np.min(self.instant_expenditure))
-            #print("Minimum expenditure needed:", self.minimum_expenditure_sum)
-            #print("Current minimum expenditure", np.min(self.instant_expenditure))
-
             if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
                 print("Minimum expenditure needed:", self.minimum_expenditure_sum)
                 print("poorest person expenditure", np.min(self.instant_expenditure))
@@ -464,9 +444,6 @@ class Network_Matrix:
         Z_vec = self._calc_Z(Omega_m_matrix, chi_m_tensor)
 
         Z_matrix = np.tile(Z_vec, (self.M, 1)).T
-        #print("self.instant_expenditure",self.instant_expenditure.shape )
-        #print("(chi_m_tensor / Z_matrix).T",((chi_m_tensor / Z_matrix).T).shape )
-        #print("self.H_m_matrix",((self.instant_expenditure * (chi_m_tensor / Z_matrix).T).T).shape )
         self.H_m_matrix = (self.instant_expenditure * (chi_m_tensor / Z_matrix).T).T#WRITE THIS IN A MORE SUCINT WAY
         self.L_m_matrix = Omega_m_matrix * self.H_m_matrix
         self.outward_social_influence_matrix = self._calc_consumption_ratio()
