@@ -175,7 +175,7 @@ class Network_Matrix:
             self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_m)
             self.minimum_expenditure_sum_instant = sum(self.h_min * self.prices_high_carbon_instant)
             
-            self.min_expenditure_individual = self.minimum_expenditure_sum*2#GIVE INDIVIDUALS more than they need,this accoutns for the max carbon price 
+            self.min_expenditure_individual = self.minimum_expenditure_sum*2.01#GIVE INDIVIDUALS more than they need,this accoutns for the max carbon price 
         else:
             self.min_expenditure_individual = 0
 
