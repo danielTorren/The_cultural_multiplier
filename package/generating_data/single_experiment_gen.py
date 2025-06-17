@@ -34,21 +34,20 @@ def main(
 
 if __name__ == '__main__':
     base_params = {
-    "carbon_price_increased": 1,
     "network_type": "SW",
+    "shuffle_homophily_seed": 99,
+    "shuffle_coherance_seed'": 77,
+    "shuffle_coherance_seed": 51,
+    "carbon_price_increased": 0,
     "expenditure_inequality_state": 1,
     "expenditure_seed": 31,
-    "a_expenditure": 0.5,
+    "network_structure_seed": 6,
+    "a_expenditure": 1,
     "b_expenditure": 4,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
     "alpha_change_state": "dynamic_identity_determined_weights",
-    "seed_reps": 1,
-    "network_structure_seed": 2, 
-    "preferences_seed": 99, 
-    "shuffle_homophily_seed": 55,
-    "shuffle_coherance_seed": 31,
-    "expenditure_seed": 31,
+    "seed_reps": 5,
     "preferences_seed":8,
     "carbon_price_duration": 360, 
     "burn_in_duration": 0, 
@@ -78,55 +77,8 @@ if __name__ == '__main__':
     "mean_low_carbon_substitutability": 4,
     "width_low_carbon_substitutability": 4,
     "state_minimum_h": 1,
-    "h_m": [1e-13,0]
+    "h_m": [1e-11,0]
     }
-
-    """
-    base_params = {
-    "phi": 0.02,
-    "network_type": "SW",
-    "carbon_price_increased": 0,
-    "save_timeseries_data_state": 1,
-    "compression_factor_state": 1,
-    "alpha_change_state": "dynamic_identity_determined_weights",#"dynamic_hybrid_determined_weights",#"fixed_preferences",#"dynamic_socially_determined_weights",#"dynamic_identity_determined_weights"
-    "expenditure_inequality_state": 1,
-    "seed_reps": 1,
-    "network_structure_seed": 2, 
-    "preferences_seed": 99, 
-    "shuffle_homophily_seed": 55,
-    "shuffle_coherance_seed": 31,
-    "expenditure_seed": 31,
-    "a_expenditure": 0.5,
-    "b_expenditure": 4,
-    "carbon_price_duration": 360,#360, 
-    "burn_in_duration": 0, 
-    "N": 3000, 
-    "M": 2, 
-    "M_identity": 3,
-    "sector_substitutability": 2, 
-    "low_carbon_substitutability": 4, 
-    "a_preferences": 2, 
-    "b_preferences": 2, 
-    "clipping_epsilon_init_preference": 1e-5, 
-    "confirmation_bias": 5, 
-    "init_carbon_price": 0, 
-    "homophily_state": 1,
-    "coherance_state": 0.9,
-    "SF_density":0.1,
-    "SF_green_or_brown_hegemony": -1,
-    "SBM_block_num": 2,
-    "SBM_network_density_input_intra_block": 0.2,
-    "SBM_network_density_input_inter_block": 0.005,
-    "SW_network_density": 0.1,#0.1,
-    "SW_prob_rewire": 0.1,
-    "low_carbon_substitutability_dist_state": 1,
-    "low_carbon_substitutability_seed": 77,
-    "low_carbon_substitutability_beta_a": 5,
-    "low_carbon_substitutability_beta_b": 3,
-    "mean_low_carbon_substitutability": 4,
-    "width_low_carbon_substitutability": 4,
-    }
-    """
 
     fileName = main(base_params=base_params)
 

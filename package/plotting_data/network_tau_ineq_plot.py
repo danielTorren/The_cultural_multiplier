@@ -120,7 +120,7 @@ def main(
         mean_poorest, _, _ = calc_bounds_1d(poorest_samples, 0.95)
         mean_richest, _, _ = calc_bounds_1d(richest_samples, 0.95)
         row_titles.append(
-            f"a Beta distribution, Expenditure = {np.round(a, 3)}, Gini = {np.round(mean_gini, 3)}, Poorest Prop= {np.round(mean_poorest, 3)}, Richest Prop= {np.round(mean_richest, 3)} "
+            f"a Beta distribution, Expenditure = {np.round(a, 5)}, Gini = {np.round(mean_gini, 5)}, Poorest Prop= {np.round(mean_poorest, 5)}, Richest Prop= {np.round(mean_richest, 5)} "
         )
 
 
@@ -129,5 +129,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/network_ineq_tau_17_24_33__17_06_2025"#network_ineq_tau_11_50_31__17_06_2025"#network_ineq_tau_10_27_38__17_06_2025"#network_ineq_tau_11_59_40__11_06_2025"
+        fileName= "results/network_ineq_tau_17_49_31__17_06_2025"#network_ineq_tau_17_24_33__17_06_2025"#network_ineq_tau_11_50_31__17_06_2025"#network_ineq_tau_10_27_38__17_06_2025"#network_ineq_tau_11_59_40__11_06_2025"
     )
