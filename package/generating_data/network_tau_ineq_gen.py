@@ -2,7 +2,7 @@
 import time
 import json
 from package.resources.utility import createFolder, produce_name_datetime, save_object, generate_vals_2D, produce_param_list_stochastic_n_double
-from package.resources.run import emissions_parallel_run
+from package.resources.run import emissions_parallel_run_gini
 
 def main(
         BASE_PARAMS_LOAD = "package/constants/base_params_tau_vary.json",
@@ -38,9 +38,10 @@ def main(
 
     print("Total runs: ",len(params_list))
 
-    Data_serial = emissions_parallel_run(params_list)
+    Data_serial, gini_serial = emissions_parallel_run_gini(params_list)
     data_array = Data_serial.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
-
+    gini_array =  gini_serial.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    
     if print_simu:
         print(
             "SIMULATION time taken: %s minutes" % ((time.time() - start_time) / 60),
@@ -55,6 +56,7 @@ def main(
     save_object(data_array, fileName + "/Data", "emissions_data_networks")
     save_object(params, fileName + "/Data", "base_params")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
+    save_object(gini_array, fileName  + "/Data" , "gini_array")
 
     return fileName
 

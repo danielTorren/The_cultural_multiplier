@@ -81,6 +81,7 @@ def main(
 ) -> None:
 
     emissions_networks = load_object(fileName + "/Data","emissions_data_networks")
+    gini_networks = load_object(fileName + "/Data","gini_networks")
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     
@@ -96,11 +97,19 @@ def main(
     base_params = load_object(fileName + "/Data", "base_params")
     b_expenditure = base_params["b_expenditure"]
     N = base_params["b_expenditure"]
-    # Compute Gini for each a and build row titles
+
+    # Compute average Gini and 95% confidence interval for each a value
     row_titles = []
-    for a in property_values_list_row:
-        gini = compute_gini_for_beta(a, b_expenditure, N)
-        row_titles.append(f"a Beta distribution, Expenditure = {round(a, 3)}, Gini = {round(gini, 3)}")
+    for i, a in enumerate(property_values_list_row):
+        gini_data = gini_networks[0][i]  # Use network 0 for the Gini label
+        mean_gini, lower_gini, upper_gini = calc_bounds(gini_data, 0.95)
+        lower_err = mean_gini - lower_gini
+        upper_err = upper_gini - mean_gini
+        # Format label with ± error assuming symmetric interval (you can also use asymmetric if needed)
+        avg_err = round((upper_err + lower_err) / 2, 3)
+        row_titles.append(
+            f"a Beta distribution, Expenditure = {round(a, 3)}, Gini = {round(mean_gini, 3)} ± {avg_err}"
+        )
 
     plot_means_end_points_emissions_confidence_split_gradient(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
     plt.show()

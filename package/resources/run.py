@@ -75,6 +75,25 @@ def emissions_parallel_run(
     emissions_list = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res)(i) for i in params_dict)
     return np.asarray(emissions_list)
 
+###################################################################################################
+
+
+def generate_emissions_stock_res_gini(params):
+    data = generate_data(params)
+    return data.total_carbon_emissions_stock, data.gini_expenditure
+
+def emissions_parallel_run_gini(
+        params_dict: list[dict]
+) -> npt.NDArray:
+    num_cores = multiprocessing.cpu_count()
+    #emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
+    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res)(i) for i in params_dict)
+    res = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res_gini)(i) for i in params_dict)
+    emissions_list, gini_list = zip(
+        *res
+    )
+    return np.asarray(emissions_list), np.asarray(gini_list)
+
 ##############################################################################
 
 def generate_emissions_stock(params):

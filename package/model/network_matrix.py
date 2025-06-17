@@ -172,8 +172,8 @@ class Network_Matrix:
         if self.state_minimum_h:
             self.h_min = np.asarray(self.parameters["h_m"])
             self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
-            self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_instant)
-            self.min_expenditure_individual = self.minimum_expenditure_sum
+            self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_m)
+            self.min_expenditure_individual = self.minimum_expenditure_sum*2#GIVE INDIVIDUALS more than they need,this accoutns for the max carbon price 
         else:
             self.min_expenditure_individual = 0
 
@@ -187,8 +187,7 @@ class Network_Matrix:
             expenditure_beta = np.random.beta(self.a_expenditure, self.b_expenditure, size=self.N)
 
             # Compute remaining income to distribute after needs
-            total_expenditure_available = 1.0  # normalized system total
-            total_variable_expenditure = total_expenditure_available - self.min_expenditure_individual * self.N
+            total_variable_expenditure = 1 - (self.min_expenditure_individual * self.N)
             if total_variable_expenditure < 0:
                 raise ValueError("Minimum needs exceed total system expenditure. Adjust h_min.")
 
@@ -201,9 +200,6 @@ class Network_Matrix:
         else:
             # Equal expenditure
             self.base_expenditure = np.full(self.N, 1.0 / self.N)
-
-        print(self.a_expenditure, self.b_expenditure,np.sum(self.base_expenditure))
-        quit()
         self.instant_expenditure = self.base_expenditure
         self.gini_expenditure = self._gini(self.instant_expenditure)
 
@@ -230,9 +226,9 @@ class Network_Matrix:
     def _initialize_consumption(self):
         if self.state_minimum_h:
             
-            print("self.minimum_expenditure_sum", self.minimum_expenditure_sum)
-            print("np.min(self.instant_expenditure)", np.min(self.instant_expenditure))
-            print("prop expenditure on needs", self.minimum_expenditure_sum/np.min(self.instant_expenditure))
+            #print("self.minimum_expenditure_sum", self.minimum_expenditure_sum)
+            #print("np.min(self.instant_expenditure)", np.min(self.instant_expenditure))
+            #print("prop expenditure on needs", self.minimum_expenditure_sum/np.min(self.instant_expenditure))
             if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
                 print("Minimum expenditure needed:", self.minimum_expenditure_sum)
                 print("poorest person expenditure", np.min(self.instant_expenditure))
