@@ -202,7 +202,7 @@ class Network_Matrix:
             # Equal expenditure
             self.base_expenditure = np.full(self.N, 1.0 / self.N)
 
-        print(self.a_expenditure, self.b_expenditure,np.sum(self.instant_expenditure))
+        print(self.a_expenditure, self.b_expenditure,np.sum(self.base_expenditure))
         quit()
         self.instant_expenditure = self.base_expenditure
         self.gini_expenditure = self._gini(self.instant_expenditure)
