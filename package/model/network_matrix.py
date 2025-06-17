@@ -204,6 +204,8 @@ class Network_Matrix:
             self.h_min = np.asarray(self.parameters["h_m"])
             self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
             self.minimum_expenditure_sum = sum(self.h_min*self.prices_high_carbon_instant)
+            print("self.minimum_expenditure_sum", self.minimum_expenditure_sum)
+            print("np.min(self.instant_expenditure)", np.min(self.instant_expenditure))
             print("prop expenditure on needs", self.minimum_expenditure_sum/np.min(self.instant_expenditure))
             if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
                 print("Minimum expenditure needed:", self.minimum_expenditure_sum)
