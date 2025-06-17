@@ -167,6 +167,7 @@ class Network_Matrix:
         """Initialize agent expenditure parameters."""
         self.expenditure_inequality_state = self.parameters["expenditure_inequality_state"]
         if self.expenditure_inequality_state:
+            self.expenditure_seed = 10
             np.random.seed(self.expenditure_seed)
             self.a_expenditure = self.parameters["a_expenditure"]
             self.b_expenditure = self.parameters["b_expenditure"]
