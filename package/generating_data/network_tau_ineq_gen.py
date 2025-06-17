@@ -61,5 +61,5 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_networks_tau_ineq_alt.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/twoD_dict_networks_tau_ineq.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/twoD_dict_networks_tau_ineq_alt.json",
     )

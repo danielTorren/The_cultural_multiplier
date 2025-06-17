@@ -62,7 +62,7 @@ class Network_Matrix:
 
             if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
                 print("Minimum expenditure needed:", self.minimum_expenditure_sum)
-                print("Current minimum expenditure", np.min(self.instant_expenditure))
+                print("poorest person expenditure", np.min(self.instant_expenditure))
                 raise Exception("minimum h quantities too high, poorest cannot afford necessities. Lower quantity required.")
             self._calc_consumption_minimum_h()
         else:
