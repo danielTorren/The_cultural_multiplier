@@ -164,17 +164,41 @@ class Network_Matrix:
         self.shuffle_reps_homophily = int(round((self.N * (1 - self.homophily_state)) ** self.shuffle_intensity))
 
     def _initialize_expenditure(self):
-        """Initialize agent expenditure parameters."""
+        """Initialize agent expenditure parameters with inequality and minimum needs."""
         self.expenditure_inequality_state = self.parameters["expenditure_inequality_state"]
+
+        # Compute minimum expenditure per agent (h_min ⋅ prices)
+        if self.state_minimum_h:
+            self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_instant)
+            self.min_expenditure_individual = self.minimum_expenditure_sum
+        else:
+            self.min_expenditure_individual = 0
+
         if self.expenditure_inequality_state:
             self.expenditure_seed = 10
             np.random.seed(self.expenditure_seed)
             self.a_expenditure = self.parameters["a_expenditure"]
             self.b_expenditure = self.parameters["b_expenditure"]
+
+            # Draw from Beta
             expenditure_beta = np.random.beta(self.a_expenditure, self.b_expenditure, size=self.N)
-            self.base_expenditure = (expenditure_beta/np.sum(expenditure_beta))#Total expenditure in the system needs to be 1
+
+            # Compute remaining income to distribute after needs
+            total_expenditure_available = 1.0  # normalized system total
+            total_variable_expenditure = total_expenditure_available - self.min_expenditure_individual * self.N
+            if total_variable_expenditure < 0:
+                raise ValueError("Minimum needs exceed total system expenditure. Adjust h_min.")
+
+            # Normalize beta samples to sum to 1, then scale by remaining variable income
+            normalized_beta = expenditure_beta / np.sum(expenditure_beta)
+            variable_expenditure = normalized_beta * total_variable_expenditure
+
+            # Add minimum need to each agent's expenditure
+            self.base_expenditure = self.min_expenditure_individual + variable_expenditure
         else:
-            self.base_expenditure = 1/self.N
+            # Equal expenditure
+            self.base_expenditure = np.full(self.N, 1.0 / self.N)
+
         self.instant_expenditure = self.base_expenditure
         self.gini_expenditure = self._gini(self.base_expenditure)
 
@@ -203,7 +227,7 @@ class Network_Matrix:
         if self.state_minimum_h:
             self.h_min = np.asarray(self.parameters["h_m"])
             self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
-            self.minimum_expenditure_sum = sum(self.h_min*self.prices_high_carbon_instant)
+            
             print("self.minimum_expenditure_sum", self.minimum_expenditure_sum)
             print("np.min(self.instant_expenditure)", np.min(self.instant_expenditure))
             print("prop expenditure on needs", self.minimum_expenditure_sum/np.min(self.instant_expenditure))
