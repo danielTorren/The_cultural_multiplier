@@ -87,7 +87,7 @@ def emissions_parallel_run_gini(
 ) -> npt.NDArray:
     num_cores = multiprocessing.cpu_count()
     #emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
-    emissions_list = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res)(i) for i in params_dict)
+    #emissions_list = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res)(i) for i in params_dict)
     res = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res_gini)(i) for i in params_dict)
     emissions_list, gini_list, poorest_spend_prop_list, richest_spend_prop_list = zip(
         *res
