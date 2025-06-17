@@ -36,5 +36,5 @@
     "mean_low_carbon_substitutability": 4,
     "width_low_carbon_substitutability": 4,
     "state_minimum_h": 1,
-    "h_m": [1e-7,0]
+    "h_m": [4e-7,0]
     }
