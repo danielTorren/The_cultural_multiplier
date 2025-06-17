@@ -169,6 +169,8 @@ class Network_Matrix:
 
         # Compute minimum expenditure per agent (h_min ⋅ prices)
         if self.state_minimum_h:
+            self.h_min = np.asarray(self.parameters["h_m"])
+            self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
             self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_instant)
             self.min_expenditure_individual = self.minimum_expenditure_sum
         else:
@@ -225,8 +227,6 @@ class Network_Matrix:
 
     def _initialize_consumption(self):
         if self.state_minimum_h:
-            self.h_min = np.asarray(self.parameters["h_m"])
-            self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
             
             print("self.minimum_expenditure_sum", self.minimum_expenditure_sum)
             print("np.min(self.instant_expenditure)", np.min(self.instant_expenditure))
