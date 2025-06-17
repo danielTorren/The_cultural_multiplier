@@ -10,25 +10,36 @@ from package.resources.utility import (
 )
 import networkx as nx
 
-def plot_identity_matrix(fileName, Data, dpi_save,latex_bool = False):
-
-    fig, ax = plt.subplots(figsize=(10,6))
+def plot_identity_matrix(fileName, Data, dpi_save, latex_bool=False):
+    fig, ax = plt.subplots(figsize=(10, 6))
     y_title = r"Identity, $I_{t,n}$"
 
-    Data_preferences_trans = np.asarray(Data.history_identity_vec).T#NOW ITS person then time
+    Data_preferences_trans = np.asarray(Data.history_identity_vec).T  # person then time
+    time = np.asarray(Data.history_time)
 
+    # Plot each individual's identity over time
     for v in range(Data.N):
-        ax.plot(np.asarray(Data.history_time), Data_preferences_trans[v])
-        ax.set_xlabel(r"Time")
-        ax.set_ylabel(r"%s" % y_title)
-        #ax.set_ylim(0, 1)
+        ax.plot(time, Data_preferences_trans[v], alpha=0.5)
+
+    # Compute mean and median across individuals at each time point
+    mean_vals = np.mean(Data_preferences_trans, axis=0)
+    median_vals = np.median(Data_preferences_trans, axis=0)
+
+    # Plot mean (dotted) and median (dashed) lines
+    ax.plot(time, mean_vals, linestyle=':', color='black', linewidth=2, label='Mean')
+    ax.plot(time, median_vals, linestyle='--', color='black', linewidth=2, label='Median')
+
+    ax.set_xlabel(r"Time")
+    ax.set_ylabel(r"%s" % y_title)
+    ax.legend()
 
     plt.tight_layout()
 
     plotName = fileName + "/Plots"
     f = plotName + "/plot_identity_timeseries_matrix"
-    fig.savefig(f + ".eps", dpi=300, format="eps")
-    fig.savefig(f + ".png", dpi=300, format="png")
+    fig.savefig(f + ".eps", dpi=dpi_save, format="eps")
+    fig.savefig(f + ".png", dpi=dpi_save, format="png")
+
 
 
 def plot_preference_timeseries(fileName, Data, dpi_save, latex_bool=False):
