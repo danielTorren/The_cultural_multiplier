@@ -175,6 +175,16 @@ class Network_Matrix:
         else:
             self.base_expenditure = 1/self.N
         self.instant_expenditure = self.base_expenditure
+        self.gini_expenditure = self._gini(self.base_expenditure)
+
+
+    def _gini(self, x):
+        """Compute Gini coefficient of array x (e.g., expenditure)."""
+        x = np.sort(x)
+        n = len(x)
+        cumx = np.cumsum(x)
+        return (n + 1 - 2 * np.sum(cumx) / cumx[-1]) / n
+
 
     def _initialize_sector_preferences(self):
         """Initialize sector-level preference parameters."""

@@ -14,10 +14,11 @@ def plot_means_end_points_emissions_confidence_split_gradient(
     
     cmap = get_cmap(name)
     
-    # Normalize substitutability values to [0,1] for color mapping
-    subs_values = np.array([float(title.split('=')[1]) for title in row_titles])
+    # Normalize the a values (or whatever property varies across rows) directly
+    subs_values = np.array(property_values_list_row)
     norm_subs = (subs_values - subs_values.min()) / (subs_values.max() - subs_values.min())
     colors = [cmap(val) for val in norm_subs]
+
 
     # First figure: Small-world network
     ncols_sw = 1
@@ -66,6 +67,15 @@ def plot_means_end_points_emissions_confidence_split_gradient(
     f_other = plotName_other + "/sbm_scale_free_tau_emissions_confidence"
     fig_other.savefig(f_other + ".png", dpi=300, format="png")
 
+def compute_gini_for_beta(a, b, N=3000, seed=0):
+    np.random.seed(seed)
+    x = np.random.beta(a, b, size=N)
+    x /= np.sum(x)  # Normalize
+    x = np.sort(x)
+    n = len(x)
+    cumx = np.cumsum(x)
+    return (n + 1 - 2 * np.sum(cumx) / cumx[-1]) / n
+
 def main(
     fileName = "results/network_ineq_tau_12_00_32__11_06_2025"
 ) -> None:
@@ -82,6 +92,16 @@ def main(
 
     row_titles = ["a Beta distribution, Expenditure = %s" % (round(i,3)) for i in property_values_list_row]
     name = "plasma"
+
+    base_params = load_object(fileName + "/Data", "base_params")
+    b_expenditure = base_params["b_expenditure"]
+    N = base_params["b_expenditure"]
+    # Compute Gini for each a and build row titles
+    row_titles = []
+    for a in property_values_list_row:
+        gini = compute_gini_for_beta(a, b_expenditure, N)
+        row_titles.append(f"a Beta distribution, Expenditure = {round(a, 3)}, Gini = {round(gini, 3)}")
+
     plot_means_end_points_emissions_confidence_split_gradient(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
     plt.show()
 
