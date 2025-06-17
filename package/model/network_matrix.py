@@ -45,11 +45,12 @@ class Network_Matrix:
         self._initialize_time_params()
         self._initialize_prices()
         self._initialize_social_learning()
+        self._update_carbon_price()
         self._initialize_expenditure()
         self._initialize_sector_preferences()
         self._initialize_preference_coherance()
         self._initialize_intra_sector_preferences()
-        self._update_carbon_price()
+        
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         self._initialize_substitutabilities()
         self._initialize_consumption()
