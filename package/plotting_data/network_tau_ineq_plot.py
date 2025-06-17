@@ -6,6 +6,7 @@ from package.resources.utility import (
 from matplotlib.cm import get_cmap
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import norm
 
 def plot_means_end_points_emissions_confidence_split_gradient(
     fileName, emissions_networks, property_values_list_col, property_values_list_row, network_titles, row_titles, name
@@ -76,12 +77,23 @@ def compute_gini_for_beta(a, b, N=3000, seed=0):
     cumx = np.cumsum(x)
     return (n + 1 - 2 * np.sum(cumx) / cumx[-1]) / n
 
+def calc_bounds_1d(data, confidence=0.95):
+    data = np.array(data)
+    mean = np.mean(data)
+    sem = np.std(data, ddof=1) / np.sqrt(len(data))  # standard error of the mean
+    z = norm.ppf(0.5 + confidence / 2)
+    lower = mean - z * sem
+    upper = mean + z * sem
+    return mean, lower, upper
+
 def main(
     fileName = "results/network_ineq_tau_12_00_32__11_06_2025"
 ) -> None:
 
     emissions_networks = load_object(fileName + "/Data","emissions_data_networks")
-    gini_networks = load_object(fileName + "/Data","gini_networks")
+    gini_networks = load_object(fileName + "/Data","gini_array")
+    poorest_networks = load_object(fileName + "/Data","poorest_spend_prop_array")
+    richest_networks = load_object(fileName + "/Data","richest_spend_prop_array")
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
     
@@ -101,20 +113,21 @@ def main(
     # Compute average Gini and 95% confidence interval for each a value
     row_titles = []
     for i, a in enumerate(property_values_list_row):
-        gini_data = gini_networks[0][i]  # Use network 0 for the Gini label
-        mean_gini, lower_gini, upper_gini = calc_bounds(gini_data, 0.95)
-        lower_err = mean_gini - lower_gini
-        upper_err = upper_gini - mean_gini
-        # Format label with ± error assuming symmetric interval (you can also use asymmetric if needed)
-        avg_err = round((upper_err + lower_err) / 2, 3)
+        gini_samples = gini_networks[0][i][0]  # 1D array
+        poorest_samples = poorest_networks[0][i][0]  # 1D array
+        richest_samples = richest_networks[0][i][0]  # 1D array
+        mean_gini, lower_gini, upper_gini = calc_bounds_1d(gini_samples, 0.95)
+        mean_poorest, _, _ = calc_bounds_1d(poorest_samples, 0.95)
+        mean_richest, _, _ = calc_bounds_1d(richest_samples, 0.95)
         row_titles.append(
-            f"a Beta distribution, Expenditure = {round(a, 3)}, Gini = {round(mean_gini, 3)} ± {avg_err}"
+            f"a Beta distribution, Expenditure = {np.round(a, 3)}, Gini = {np.round(mean_gini, 3)}, Poorest Prop= {np.round(mean_poorest, 3)}, Richest Prop= {np.round(mean_richest, 3)} "
         )
+
 
     plot_means_end_points_emissions_confidence_split_gradient(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/network_ineq_tau_11_50_31__17_06_2025"#network_ineq_tau_10_27_38__17_06_2025"#network_ineq_tau_11_59_40__11_06_2025"
+        fileName= "results/network_ineq_tau_17_24_33__17_06_2025"#network_ineq_tau_11_50_31__17_06_2025"#network_ineq_tau_10_27_38__17_06_2025"#network_ineq_tau_11_59_40__11_06_2025"
     )

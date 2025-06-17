@@ -80,7 +80,7 @@ def emissions_parallel_run(
 
 def generate_emissions_stock_res_gini(params):
     data = generate_data(params)
-    return data.total_carbon_emissions_stock, data.gini_expenditure
+    return data.total_carbon_emissions_stock, data.gini_expenditure, data.poorest_spend_prop, data.richest_spend_prop
 
 def emissions_parallel_run_gini(
         params_dict: list[dict]
@@ -89,10 +89,10 @@ def emissions_parallel_run_gini(
     #emissions_list = [generate_emissions_stock_res(i) for i in params_dict]
     emissions_list = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res)(i) for i in params_dict)
     res = Parallel(n_jobs=num_cores, verbose=10)(delayed(generate_emissions_stock_res_gini)(i) for i in params_dict)
-    emissions_list, gini_list = zip(
+    emissions_list, gini_list, poorest_spend_prop_list, richest_spend_prop_list = zip(
         *res
     )
-    return np.asarray(emissions_list), np.asarray(gini_list)
+    return np.asarray(emissions_list), np.asarray(gini_list), np.asarray(poorest_spend_prop_list), np.asarray(richest_spend_prop_list)
 
 ##############################################################################
 

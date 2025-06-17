@@ -38,9 +38,11 @@ def main(
 
     print("Total runs: ",len(params_list))
 
-    Data_serial, gini_serial = emissions_parallel_run_gini(params_list)
+    Data_serial, gini_serial, poorest_spend_prop_serial, richest_spend_prop_serial = emissions_parallel_run_gini(params_list)
     data_array = Data_serial.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
     gini_array =  gini_serial.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    poorest_spend_prop_array =  poorest_spend_prop_serial.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    richest_spend_prop_array =  richest_spend_prop_serial.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
     
     if print_simu:
         print(
@@ -57,6 +59,8 @@ def main(
     save_object(params, fileName + "/Data", "base_params")
     save_object(variable_parameters_dict, fileName + "/Data", "variable_parameters_dict")
     save_object(gini_array, fileName  + "/Data" , "gini_array")
+    save_object(poorest_spend_prop_array, fileName  + "/Data" , "poorest_spend_prop_array")
+    save_object(richest_spend_prop_array, fileName  + "/Data" , "richest_spend_prop_array")
 
     return fileName
 

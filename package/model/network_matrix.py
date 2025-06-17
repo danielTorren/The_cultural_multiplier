@@ -205,6 +205,9 @@ class Network_Matrix:
         self.instant_expenditure = self.base_expenditure
         self.gini_expenditure = self._gini(self.instant_expenditure)
 
+        self.poorest_spend_prop = self.minimum_expenditure_sum/np.min(self.instant_expenditure)
+        self.richest_spend_prop = self.minimum_expenditure_sum/np.max(self.instant_expenditure)
+
 
     def _gini(self, x):
         """Compute Gini coefficient of array x (e.g., expenditure)."""
