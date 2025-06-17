@@ -52,11 +52,12 @@ class Network_Matrix:
         self._update_carbon_price()
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
         self._initialize_substitutabilities()
-
+        self._initialize_consumption()
         if self.state_minimum_h:
             self.h_min = np.asarray(self.parameters["h_m"])
             self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
             self.minimum_expenditure_sum = sum(self.h_min*self.prices_high_carbon_instant)
+            print(self.h_min, self.prices_high_carbon_instant)
             #print("Minimum expenditure needed:", self.minimum_expenditure_sum)
             #print("Current minimum expenditure", np.min(self.instant_expenditure))
 
@@ -202,6 +203,23 @@ class Network_Matrix:
         self.b_preferences = self.parameters["b_preferences"]
         self.low_carbon_preference_matrix_init = self._generate_init_data_preferences_coherance()
         self.low_carbon_preference_matrix = self.low_carbon_preference_matrix_init
+
+    def _initialize_consumption(self):
+        if self.state_minimum_h:
+            self.h_min = np.asarray(self.parameters["h_m"])
+            self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
+            self.minimum_expenditure_sum = sum(self.h_min*self.prices_high_carbon_instant)
+            print(self.h_min, self.prices_high_carbon_instant)
+            #print("Minimum expenditure needed:", self.minimum_expenditure_sum)
+            #print("Current minimum expenditure", np.min(self.instant_expenditure))
+
+            if np.min(self.instant_expenditure) < self.minimum_expenditure_sum:
+                print("Minimum expenditure needed:", self.minimum_expenditure_sum)
+                print("poorest person expenditure", np.min(self.instant_expenditure))
+                raise Exception("minimum h quantities too high, poorest cannot afford necessities. Lower quantity required.")
+            self._calc_consumption_minimum_h()
+        else:
+            self._calc_consumption()
 
     def _create_network(self):
         """
