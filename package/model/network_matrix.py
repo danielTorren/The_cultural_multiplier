@@ -190,6 +190,8 @@ class Network_Matrix:
 
             # Compute remaining income to distribute after needs
             total_variable_expenditure = 1 - (self.min_expenditure_individual * self.N)
+            print("total_variable_expenditure ",total_variable_expenditure)
+            print("self.min_expenditure_individual", self.min_expenditure_individual)
             if total_variable_expenditure < 0:
                 raise ValueError("Minimum needs exceed total system expenditure. Adjust h_min.")
 
@@ -202,9 +204,10 @@ class Network_Matrix:
         else:
             # Equal expenditure
             self.base_expenditure = np.full(self.N, 1.0 / self.N)
-        self.instant_expenditure = self.base_expenditure
-        self.gini_expenditure = self._gini(self.instant_expenditure)
 
+        self.instant_expenditure = self.base_expenditure
+        
+        self.gini_expenditure = self._gini(self.instant_expenditure)
         self.poorest_spend_prop = self.minimum_expenditure_sum/np.min(self.instant_expenditure)
         self.richest_spend_prop = self.minimum_expenditure_sum/np.max(self.instant_expenditure)
 
