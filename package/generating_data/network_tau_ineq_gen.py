@@ -1,7 +1,7 @@
 # imports
 import time
 import json
-from package.resources.utility import createFolder, produce_name_datetime, save_object, generate_vals_2D, produce_param_list_stochastic_n_double
+from package.resources.utility import createFolder, produce_name_datetime, save_object, generate_vals_2D, produce_param_list_stochastic_n_double, produce_param_list_stochastic_multi
 from package.resources.run import emissions_parallel_run_gini
 
 def main(
@@ -30,6 +30,37 @@ def main(
     seeds_labels = ["preferences_seed", "network_structure_seed", "shuffle_homophily_seed", "shuffle_coherance_seed", "expenditure_seed"]
     #Gen params lists
     networks_list = ["SW","SBM", "SF"]
+
+    createFolder(fileName)
+
+    #######################################################################################################################
+    params["expenditure_inequality_state"] = 0
+    #RUN EQUALITY FOR COMPARISON
+    params_list_ref = []
+    for i in networks_list:
+        params["network_type"] = i
+        params_list_tax = produce_param_list_stochastic_multi(params, variable_parameters_dict["col"]["property_vals"], variable_parameters_dict["col"]["property_varied"])
+        params_list_ref.extend(params_list_tax)
+
+    print("Total runs REFERENCE: ",len(params_list_ref))
+
+    Data_serial_ref, gini_serial_ref, poorest_spend_prop_serial_ref, richest_spend_prop_serial_ref = emissions_parallel_run_gini(params_list_ref)
+    data_array_ref = Data_serial_ref.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    gini_array_ref =  gini_serial_ref.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    poorest_spend_prop_array_ref =  poorest_spend_prop_serial_ref.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    richest_spend_prop_array_ref =  richest_spend_prop_serial_ref.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    
+    save_object(data_array_ref, fileName + "/Data", "emissions_data_networks_ref")
+    save_object(gini_array_ref, fileName  + "/Data" , "gini_array_ref")
+    save_object(poorest_spend_prop_array_ref, fileName  + "/Data" , "poorest_spend_prop_array_ref")
+    save_object(richest_spend_prop_array_ref, fileName  + "/Data" , "richest_spend_prop_array_ref")
+
+    
+    print("DONE REFERENCE RUNS")
+
+
+    #######################################################################################################################
+    params["expenditure_inequality_state"] = 1
     params_list = []
     for i in networks_list:
         params["network_type"] = i
@@ -53,7 +84,6 @@ def main(
     ##################################
     #save data
 
-    createFolder(fileName)
 
     save_object(data_array, fileName + "/Data", "emissions_data_networks")
     save_object(params, fileName + "/Data", "base_params")
@@ -61,6 +91,8 @@ def main(
     save_object(gini_array, fileName  + "/Data" , "gini_array")
     save_object(poorest_spend_prop_array, fileName  + "/Data" , "poorest_spend_prop_array")
     save_object(richest_spend_prop_array, fileName  + "/Data" , "richest_spend_prop_array")
+
+
 
     return fileName
 

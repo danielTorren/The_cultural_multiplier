@@ -23,7 +23,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
 
     # First figure: Small-world network
     ncols_sw = 1
-    fig_sw, ax_sw = plt.subplots(ncols=ncols_sw, nrows=1, figsize=(6,6), constrained_layout=True)
+    fig_sw, ax_sw = plt.subplots(ncols=ncols_sw, nrows=1, figsize=(10,6), constrained_layout=True)
 
     ax_sw.set_title(network_titles[0], fontsize="12")
     for k in range(len(property_values_list_row)):
@@ -86,6 +86,146 @@ def calc_bounds_1d(data, confidence=0.95):
     upper = mean + z * sem
     return mean, lower, upper
 
+import numpy as np
+
+def plot_means_end_points_emissions_confidence_split_gradient_alt(
+    fileName, emissions_networks, property_values_list_col, property_values_list_row, network_titles, row_titles, name
+):
+    cmap = get_cmap(name)
+    col_values = np.array(property_values_list_col)
+    norm_col = (col_values - col_values.min()) / (col_values.max() - col_values.min())
+    colors = [cmap(val) for val in norm_col]
+
+    # First figure: Small-world network
+    fig_sw, ax_sw = plt.subplots(figsize=(10, 6), constrained_layout=True)
+    ax_sw.set_title(network_titles[0], fontsize="12")
+
+    print("Gradients (slopes) for Small-World network:")
+    for j, tau_val in enumerate(property_values_list_col):
+        mu_emissions = [emissions_networks[0][k][j].mean() for k in range(len(property_values_list_row))]
+        lower, upper = [], []
+        for k in range(len(property_values_list_row)):
+            _, l, u = calc_bounds_1d(emissions_networks[0][k][j], 0.95)
+            lower.append(l)
+            upper.append(u)
+
+        # Plot
+        ax_sw.plot(property_values_list_row, mu_emissions, label=f"Carbon Tax = {tau_val:.2f}", c=colors[j])
+        ax_sw.fill_between(property_values_list_row, lower, upper, color=colors[j], alpha=0.3)
+
+        # Fit a line and print the slope
+        slope, intercept = np.polyfit(property_values_list_row, mu_emissions, 1)
+        print(f"  τ = {tau_val:.2f} → slope = {slope:.4f}")
+
+    fig_sw.supxlabel(r"a in Beta distribution", fontsize="12")
+    fig_sw.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
+    ax_sw.legend(fontsize="8")
+    f_sw = f"{fileName}/Plots/small_world_a_emissions_confidence_alt"
+    fig_sw.savefig(f_sw + ".png", dpi=300, format="png")
+
+    # SBM and Scale-Free
+    fig_other, axes_other = plt.subplots(ncols=2, figsize=(12, 6), constrained_layout=True)
+    for i, ax in enumerate(axes_other):
+        ax.set_title(network_titles[i + 1], fontsize="12")
+        print(f"\nGradients (slopes) for {network_titles[i + 1]} network:")
+        for j, tau_val in enumerate(property_values_list_col):
+            mu_emissions = [emissions_networks[i + 1][k][j].mean() for k in range(len(property_values_list_row))]
+            lower, upper = [], []
+            for k in range(len(property_values_list_row)):
+                _, l, u = calc_bounds_1d(emissions_networks[i + 1][k][j], 0.95)
+                lower.append(l)
+                upper.append(u)
+
+            ax.plot(property_values_list_row, mu_emissions, label=f"Carbon Tax = {tau_val:.2f}", c=colors[j])
+            ax.fill_between(property_values_list_row, lower, upper, color=colors[j], alpha=0.3)
+
+            # Fit a line and print the slope
+            slope, intercept = np.polyfit(property_values_list_row, mu_emissions, 1)
+            print(f"  τ = {tau_val:.2f} → slope = {slope:.4f}")
+
+    fig_other.supxlabel(r"a in Beta distribution", fontsize="12")
+    fig_other.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
+    axes_other[1].legend(fontsize="8")
+    f_other = f"{fileName}/Plots/sbm_scale_free_a_emissions_confidence_alt"
+    fig_other.savefig(f_other + ".png", dpi=300, format="png")
+
+
+def plot_emissions_vs_gini_scatter(
+    fileName, emissions_networks, gini_networks, property_values_list_col, property_values_list_row,
+    network_titles, name
+):
+    import matplotlib.pyplot as plt
+    from matplotlib.cm import get_cmap
+    import numpy as np
+
+    cmap = get_cmap(name)
+    col_values = np.array(property_values_list_col)
+    norm_col = (col_values - col_values.min()) / (col_values.max() - col_values.min())
+    colors = [cmap(val) for val in norm_col]
+
+    def extract_mean_emissions_and_gini(network_index, tau_index):
+        x_gini = []
+        y_emissions = []
+        y_lower = []
+        y_upper = []
+        for k in range(len(property_values_list_row)):
+            gini_mean, _, _ = calc_bounds_1d(gini_networks[network_index][k][0])
+            em_data = emissions_networks[network_index][k][tau_index]
+            mu, l, u = calc_bounds_1d(em_data)
+            x_gini.append(gini_mean)
+            y_emissions.append(mu)
+            y_lower.append(l)
+            y_upper.append(u)
+        return np.array(x_gini), np.array(y_emissions), np.array(y_lower), np.array(y_upper)
+
+    # === SMALL-WORLD ===
+    fig, ax = plt.subplots(figsize=(10, 6), constrained_layout=True)
+    ax.set_title(f"{network_titles[0]}", fontsize="12")
+
+    for j, tau_val in enumerate(property_values_list_col):
+        x_gini, y_emissions, y_lower, y_upper = extract_mean_emissions_and_gini(0, j)
+
+        # Scatter + error bars
+        ax.scatter(x_gini, y_emissions, color=colors[j], alpha=0.8)
+        ax.errorbar(x_gini, y_emissions, yerr=[y_emissions - y_lower, y_upper - y_emissions],
+                    fmt='none', color=colors[j], alpha=0.3)
+
+        # Fit and plot line
+        slope, intercept = np.polyfit(x_gini, y_emissions, 1)
+        x_fit = np.linspace(min(x_gini), max(x_gini), 100)
+        y_fit = slope * x_fit + intercept
+        ax.plot(x_fit, y_fit, color=colors[j], linestyle='--',
+                label=f"τ = {tau_val:.2f} (slope = {slope:.2f})")
+
+    ax.set_xlabel("Gini coefficient", fontsize=12)
+    ax.set_ylabel("Cumulative carbon emissions, E", fontsize=12)
+    ax.legend(fontsize=8)
+    fig.savefig(f"{fileName}/Plots/small_world_emissions_vs_gini.png", dpi=300)
+
+    # === SBM and SCALE-FREE ===
+    fig_other, axes = plt.subplots(ncols=2, figsize=(12, 6), constrained_layout=True)
+    for i, ax in enumerate(axes):
+        ax.set_title(f"{network_titles[i+1]}", fontsize="12")
+        for j, tau_val in enumerate(property_values_list_col):
+            x_gini, y_emissions, y_lower, y_upper = extract_mean_emissions_and_gini(i+1, j)
+
+            ax.scatter(x_gini, y_emissions, color=colors[j], alpha=0.8)
+            ax.errorbar(x_gini, y_emissions, yerr=[y_emissions - y_lower, y_upper - y_emissions],
+                        fmt='none', color=colors[j], alpha=0.3)
+
+            slope, intercept = np.polyfit(x_gini, y_emissions, 1)
+            x_fit = np.linspace(min(x_gini), max(x_gini), 100)
+            y_fit = slope * x_fit + intercept
+            ax.plot(x_fit, y_fit, color=colors[j], linestyle='--',
+                    label=f"τ = {tau_val:.2f} (slope = {slope:.2f})")
+
+        ax.set_xlabel("Gini coefficient", fontsize=12)
+        ax.set_ylabel("Cumulative carbon emissions, E", fontsize=12)
+
+    axes[1].legend(fontsize=8)
+    fig_other.savefig(f"{fileName}/Plots/sbm_scale_free_emissions_vs_gini.png", dpi=300)
+
+
 def main(
     fileName = "results/network_ineq_tau_12_00_32__11_06_2025"
 ) -> None:
@@ -125,9 +265,12 @@ def main(
 
 
     plot_means_end_points_emissions_confidence_split_gradient(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
+    plot_means_end_points_emissions_confidence_split_gradient_alt(fileName, emissions_networks, property_values_list_col, property_values_list_row,network_titles,row_titles, name)
+    plot_emissions_vs_gini_scatter(fileName, emissions_networks, gini_networks, property_values_list_col, property_values_list_row,network_titles, name)
+    
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/network_ineq_tau_00_24_35__18_06_2025"#network_ineq_tau_00_14_13__18_06_2025"#network_ineq_tau_17_24_33__17_06_2025"#network_ineq_tau_11_50_31__17_06_2025"#network_ineq_tau_10_27_38__17_06_2025"#network_ineq_tau_11_59_40__11_06_2025"
+        fileName= "results/network_ineq_tau_16_47_17__18_06_2025"#network_ineq_tau_00_14_13__18_06_2025"#network_ineq_tau_17_24_33__17_06_2025"#network_ineq_tau_11_50_31__17_06_2025"#network_ineq_tau_10_27_38__17_06_2025"#network_ineq_tau_11_59_40__11_06_2025"
     )

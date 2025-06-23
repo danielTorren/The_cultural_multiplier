@@ -178,6 +178,7 @@ class Network_Matrix:
             self.min_expenditure_individual = self.minimum_expenditure_sum*2.01#GIVE INDIVIDUALS more than they need,this accoutns for the max carbon price 
         else:
             self.min_expenditure_individual = 0
+            self.minimum_expenditure_sum = 0
 
         if self.expenditure_inequality_state:
             self.expenditure_seed = 10
