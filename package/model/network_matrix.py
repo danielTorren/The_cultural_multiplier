@@ -651,8 +651,8 @@ class Network_Matrix:
         Returns:
             float: Per-agent carbon dividend
         """
-        
-        self.redistribution_state = 0
+
+        self.redistribution_state = 1
 
         if self.redistribution_state:
             total_quantities_m = np.sum(self.H_m_matrix, axis=0)
