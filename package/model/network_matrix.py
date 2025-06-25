@@ -651,10 +651,16 @@ class Network_Matrix:
         Returns:
             float: Per-agent carbon dividend
         """
-        total_quantities_m = np.sum(self.H_m_matrix, axis=0)
-        tax_income_R = np.sum(self.carbon_price_m * total_quantities_m) 
-        carbon_dividend = tax_income_R/self.N
-        #carbon_dividend = 0#TRY WITHOTU 
+        
+        self.redistribution_state = 0
+
+        if self.redistribution_state:
+            total_quantities_m = np.sum(self.H_m_matrix, axis=0)
+            tax_income_R = np.sum(self.carbon_price_m * total_quantities_m) 
+            carbon_dividend = tax_income_R/self.N
+        else:
+            # No redistribution: return individual carbon spending
+            carbon_dividend = np.sum(self.H_m_matrix * self.carbon_price_m, axis=1)
         return carbon_dividend
 
     def _calc_instant_expediture(self) -> float:
