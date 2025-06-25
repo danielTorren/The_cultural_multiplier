@@ -209,8 +209,7 @@ class Network_Matrix:
         self.instant_expenditure = self.base_expenditure
         
         self.gini_expenditure = self._gini(self.instant_expenditure)
-        self.poorest_spend_prop = self.minimum_expenditure_sum/np.min(self.instant_expenditure)
-        self.richest_spend_prop = self.minimum_expenditure_sum/np.max(self.instant_expenditure)
+
 
 
     def _gini(self, x):
@@ -655,6 +654,7 @@ class Network_Matrix:
         total_quantities_m = np.sum(self.H_m_matrix, axis=0)
         tax_income_R = np.sum(self.carbon_price_m * total_quantities_m) 
         carbon_dividend = tax_income_R/self.N
+        carbon_dividend = 0#TRY WITHOTU 
         return carbon_dividend
 
     def _calc_instant_expediture(self) -> float:

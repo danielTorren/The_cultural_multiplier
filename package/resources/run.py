@@ -80,7 +80,9 @@ def emissions_parallel_run(
 
 def generate_emissions_stock_res_gini(params):
     data = generate_data(params)
-    return data.total_carbon_emissions_stock, data.gini_expenditure, data.poorest_spend_prop, data.richest_spend_prop
+    poorest_spend_prop = data.minimum_expenditure_sum/np.min(data.instant_expenditure)
+    richest_spend_prop = data.minimum_expenditure_sum/np.max(data.instant_expenditure)
+    return data.total_carbon_emissions_stock, data.gini_expenditure, poorest_spend_prop, richest_spend_prop
 
 def emissions_parallel_run_gini(
         params_dict: list[dict]
