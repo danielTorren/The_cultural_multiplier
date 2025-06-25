@@ -654,7 +654,7 @@ class Network_Matrix:
         total_quantities_m = np.sum(self.H_m_matrix, axis=0)
         tax_income_R = np.sum(self.carbon_price_m * total_quantities_m) 
         carbon_dividend = tax_income_R/self.N
-        carbon_dividend = 0#TRY WITHOTU 
+        #carbon_dividend = 0#TRY WITHOTU 
         return carbon_dividend
 
     def _calc_instant_expediture(self) -> float:
