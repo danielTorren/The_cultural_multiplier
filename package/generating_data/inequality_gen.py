@@ -39,6 +39,7 @@ def main(
     #NO REDISTRIBUTION ON ANY OF THE RUNS
     params["redistribution_state"] = 0
     params["expenditure_inequality_state"] = 0
+    
     #RUN EQUALITY FOR COMPARISON
     params_list_ref = []
     for i in networks_list:
@@ -64,6 +65,7 @@ def main(
 
 
     #######################################################################################################################
+    params["redistribution_state"] = 0
     params["expenditure_inequality_state"] = 1
     params_list = []
     for i in networks_list:
@@ -127,6 +129,7 @@ def main(
 
 
     ######################################################################################################################
+    params["redistribution_state"] = 1
     params["expenditure_inequality_state"] = 1
     params_list_with_re = []
     for i in networks_list:
