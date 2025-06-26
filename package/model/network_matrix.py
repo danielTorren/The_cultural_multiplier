@@ -81,6 +81,7 @@ class Network_Matrix:
         self.compression_factor_state = self.parameters["compression_factor_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
         self.state_minimum_h = self.parameters["state_minimum_h"]
+        self.redistribution_state = self.parameters["redistribution_state"]
 
         if self.alpha_change_state not in ["dynamic_socially_determined_weights","fixed_preferences","dynamic_identity_determined_weights"]:
             raise ValueError(f"Invalid alpha change state")
@@ -651,8 +652,6 @@ class Network_Matrix:
         Returns:
             float: Per-agent carbon dividend
         """
-
-        self.redistribution_state = 1
 
         if self.redistribution_state:
             total_quantities_m = np.sum(self.H_m_matrix, axis=0)
