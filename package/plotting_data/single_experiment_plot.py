@@ -182,7 +182,8 @@ def main(
 
     Data = load_object(fileName + "/Data", "social_network")
 
-    plot_network(Data)
+    if Data.alpha_change_state != "fixed_preferences":
+        plot_network(Data)
     plot_identity_matrix(fileName, Data, dpi_save)
     plot_preference_timeseries(fileName, Data, dpi_save)
     plot_total_carbon_emissions_timeseries(fileName, Data, dpi_save)

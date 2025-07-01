@@ -66,8 +66,8 @@ class Network_Matrix:
             self.social_component_vector = self.low_carbon_preference_matrix
         else:
             self._select_weighting_matrix()
+            self.social_component_vector = self._calc_social_component_matrix()
 
-        self.social_component_vector = self._calc_social_component_matrix()
         self.carbon_dividend = self._calc_carbon_dividend()
         self.total_carbon_emissions_stock = 0
 
@@ -85,8 +85,7 @@ class Network_Matrix:
         self.save_timeseries_data_state = self.parameters["save_timeseries_data_state"]
         self.compression_factor_state = self.parameters["compression_factor_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
-        print(self.alpha_change_state)
-        #quit()
+
         if self.alpha_change_state not in [
             "dynamic_socially_determined_weights",
             "fixed_preferences",
@@ -94,7 +93,6 @@ class Network_Matrix:
             "dynamic_identity_determined_weights_cosine",
             "dynamic_socially_determined_weights_cosine"
         ]:
-            print("TYIYIIYIY")
             raise ValueError(f"Invalid alpha change state")
 
         self.state_minimum_h = self.parameters["state_minimum_h"]
@@ -206,8 +204,7 @@ class Network_Matrix:
 
             # Compute remaining income to distribute after needs
             total_variable_expenditure = 1 - (self.min_expenditure_individual * self.N)
-            #print("total_variable_expenditure ",total_variable_expenditure)
-            #print("self.min_expenditure_individual", self.min_expenditure_individual)
+
             if total_variable_expenditure < 0:
                 raise ValueError("Minimum needs exceed total system expenditure. Adjust h_min.")
 
@@ -249,9 +246,6 @@ class Network_Matrix:
     def _initialize_consumption(self):
         if self.state_minimum_h:
             
-            #print("self.minimum_expenditure_sum", self.minimum_expenditure_sum)
-            #print("np.min(self.instant_expenditure)", np.min(self.instant_expenditure))
-            #print("prop expenditure on needs", self.minimum_expenditure_sum/np.min(self.instant_expenditure))
             if np.min(self.instant_expenditure) < self.minimum_expenditure_sum_instant:
                 print("Minimum expenditure needed:", self.minimum_expenditure_sum_instant)
                 print("poorest person expenditure", np.min(self.instant_expenditure))
