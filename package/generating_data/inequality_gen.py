@@ -21,7 +21,7 @@ def main(
     # AVERAGE OVER MULTIPLE RUNS
     variable_parameters_dict = generate_vals_2D(variable_parameters_dict)
 
-    root = "network_ineq_tau"
+    root = "inequality_gen"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
 
@@ -39,7 +39,7 @@ def main(
     #NO REDISTRIBUTION ON ANY OF THE RUNS
     params["redistribution_state"] = 0
     params["expenditure_inequality_state"] = 0
-    
+
     #RUN EQUALITY FOR COMPARISON
     params_list_ref = []
     for i in networks_list:

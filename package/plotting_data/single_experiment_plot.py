@@ -152,7 +152,6 @@ def plot_expenditures(fileName: str, Data):
     ax.hist(Data.base_expenditure)
     ax.set_xlabel(r"Expenditure")
     ax.set_ylabel(r"Frequency")
-    print("Data.base_expenditure", Data.base_expenditure[0:100])
 
     fig.tight_layout()
 
@@ -165,7 +164,7 @@ def plot_low_carbon_substitutabilities(fileName: str, Data):
     fig, ax = plt.subplots(figsize=(10,6))
     # bodge
     ax.hist(Data.low_carbon_substitutability_arr)
-    print("Data.low_carbon_substitutability_arr", Data.low_carbon_substitutability_arr[0:100])
+
     ax.set_xlabel(r"Low Carbon Substitutability")
     ax.set_ylabel(r"Frequency")
 

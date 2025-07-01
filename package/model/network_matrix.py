@@ -62,7 +62,12 @@ class Network_Matrix:
                 self.low_carbon_preference_matrix = self._shuffle_preferences_start_mixed()
     
 
-        self._initialize_social_component()
+        if self.alpha_change_state == "fixed_preferences":
+            self.social_component_vector = self.low_carbon_preference_matrix
+        else:
+            self._select_weighting_matrix()
+
+        self.social_component_vector = self._calc_social_component_matrix()
         self.carbon_dividend = self._calc_carbon_dividend()
         self.total_carbon_emissions_stock = 0
 
@@ -80,11 +85,20 @@ class Network_Matrix:
         self.save_timeseries_data_state = self.parameters["save_timeseries_data_state"]
         self.compression_factor_state = self.parameters["compression_factor_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
+        print(self.alpha_change_state)
+        #quit()
+        if self.alpha_change_state not in [
+            "dynamic_socially_determined_weights",
+            "fixed_preferences",
+            "dynamic_identity_determined_weights",
+            "dynamic_identity_determined_weights_cosine",
+            "dynamic_socially_determined_weights_cosine"
+        ]:
+            print("TYIYIIYIY")
+            raise ValueError(f"Invalid alpha change state")
+
         self.state_minimum_h = self.parameters["state_minimum_h"]
         self.redistribution_state = self.parameters["redistribution_state"]
-
-        if self.alpha_change_state not in ["dynamic_socially_determined_weights","fixed_preferences","dynamic_identity_determined_weights"]:
-            raise ValueError(f"Invalid alpha change state")
     
         self.network_type = self.parameters["network_type"]
         
@@ -402,25 +416,20 @@ class Network_Matrix:
             self.low_carbon_substitutability_arr = np.asarray([self.parameters["low_carbon_substitutability"]]*self.N)
 
 
-    def _initialize_social_component(self):
+    def _select_weighting_matrix(self) -> None:
         """
-        Initialize social component based on the alpha change state.
-        
-        Handles different weighting schemes:
-        - Fixed preferences
-        - Uniform network weighting
-        - Static/dynamic culturally determined weights
-        - Static/dynamic socially determined weights
+        Select and compute the weighting matrix (or tensor) depending on alpha_change_state.
         """
-        if self.alpha_change_state == "fixed_preferences":
-            self.social_component_vector = self.low_carbon_preference_matrix
+        if self.alpha_change_state == "dynamic_identity_determined_weights":
+            self.weighting_matrix = self._update_weightings_softmax_identity()
+        elif self.alpha_change_state == "dynamic_identity_determined_weights_cosine":
+            self.weighting_matrix = self._update_weightings_cosine_identity()
+        elif self.alpha_change_state == "dynamic_socially_determined_weights":
+            self.weighting_matrix_tensor = self._update_weightings_softmax_social()
+        elif self.alpha_change_state == "dynamic_socially_determined_weights_cosine":
+            self.weighting_matrix_tensor = self._update_weightings_cosine_social()
         else:
-            if self.alpha_change_state == "dynamic_identity_determined_weights":
-                self.weighting_matrix = self._update_weightings()
-            elif self.alpha_change_state == "dynamic_socially_determined_weights":
-                self.weighting_matrix_tensor = self._update_weightings_list()
-
-            self.social_component_vector = self._calc_social_component_matrix()
+            raise ValueError(f"Unknown alpha_change_state {self.alpha_change_state}")
 
     def _update_preferences(self) -> np.ndarray:
         """
@@ -529,25 +538,6 @@ class Network_Matrix:
         else:
             social_influence = self._calc_ego_influence_degroot()           
         return social_influence
-    
-    def _calc_weighting_matrix_attribute(self, attribute_array: np.ndarray) -> sp.csr_matrix:
-        """
-        Calculate weighting matrix based on attribute similarities.
-        
-        Args:
-            attribute_array (np.ndarray): Array of attributes for calculating weights
-            
-        Returns:
-            sp.csr_matrix: Sparse matrix of normalized weights
-        """
-        differences = attribute_array[self.row_indices_sparse] - attribute_array[self.col_indices_sparse]
-        weights = np.exp(-self.confirmation_bias * np.abs(differences))
-        non_diagonal_weighting_matrix = sp.csr_matrix(
-            (weights, (self.row_indices_sparse, self.col_indices_sparse)),
-            shape=self.adjacency_matrix.shape
-        )
-        norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
-        return norm_weighting_matrix
 
     def _normlize_matrix(self, matrix: sp.csr_matrix) -> sp.csr_matrix:
         """
@@ -605,7 +595,26 @@ class Network_Matrix:
 
         return neighbour_influence
     
-    def _update_weightings(self) -> sp.csr_matrix:
+    def _calc_weighting_matrix_attribute(self, attribute_array: np.ndarray) -> sp.csr_matrix:
+        """
+        Calculate weighting matrix based on attribute similarities.
+        
+        Args:
+            attribute_array (np.ndarray): Array of attributes for calculating weights
+            
+        Returns:
+            sp.csr_matrix: Sparse matrix of normalized weights
+        """
+        differences = attribute_array[self.row_indices_sparse] - attribute_array[self.col_indices_sparse]
+        weights = np.exp(-self.confirmation_bias * np.abs(differences))
+        non_diagonal_weighting_matrix = sp.csr_matrix(
+            (weights, (self.row_indices_sparse, self.col_indices_sparse)),
+            shape=self.adjacency_matrix.shape
+        )
+        norm_weighting_matrix = self._normlize_matrix(non_diagonal_weighting_matrix)
+        return norm_weighting_matrix
+        
+    def _update_weightings_softmax_identity(self) -> sp.csr_matrix:
         """
         Update weighting matrix based on current identities.
         
@@ -616,7 +625,7 @@ class Network_Matrix:
         norm_weighting_matrix = self._calc_weighting_matrix_attribute(self.identity_vec)
         return norm_weighting_matrix
 
-    def _update_weightings_list(self) -> list:
+    def _update_weightings_softmax_social(self) -> list:
         """
         Update weighting matrices for each sector independently.
         
@@ -637,6 +646,54 @@ class Network_Matrix:
             self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
             
             return weighting_matrix_list  
+
+    def _update_weightings_cosine_identity(self) -> sp.csr_matrix:
+        """
+        Compute cosine-similarity-based weighting matrix for the cultural multiplier,
+        modulated by confirmation bias parameter theta.
+        """
+        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+        prefs = self.low_carbon_preference_matrix
+        norms = np.linalg.norm(prefs, axis=1)
+        norms[norms == 0] = 1
+        cos_sims = prefs @ prefs.T / (norms[:, None] * norms[None, :])
+        
+        # Apply confirmation bias
+        weights = np.exp(self.confirmation_bias * cos_sims)
+        
+        # Mask with adjacency
+        weights *= self.adjacency_matrix
+        
+        norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
+        return norm_weighting_matrix
+
+
+    def _update_weightings_cosine_social(self) -> list:
+        """
+        Compute cosine-similarity-based weighting matrices for each sector separately,
+        modulated by confirmation bias parameter theta.
+        """
+        weighting_matrices = []
+        for m in range(self.M):
+            prefs_m = self.low_carbon_preference_matrix[:, m]
+            norms = np.linalg.norm(prefs_m)
+            if norms == 0:
+                norms = 1
+            # outer product gives pairwise cosine for this category
+            cos_sims = np.outer(prefs_m, prefs_m) / (norms**2)
+            
+            # apply confirmation bias to modulate the sharpness
+            weights = np.exp(self.confirmation_bias * cos_sims)
+            
+            # apply adjacency mask
+            weights *= self.adjacency_matrix
+            
+            norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
+            weighting_matrices.append(norm_weighting_matrix)
+
+        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+        return weighting_matrices
+
 
     def _calc_emissions(self):
         """
@@ -710,7 +767,6 @@ class Network_Matrix:
         self.history_low_carbon_preference_matrix.append(self.low_carbon_preference_matrix)
         self.history_identity_vec.append(self.identity_vec)
 
-
     def next_step(self):
         """
         Advance the simulation by one time step.
@@ -738,11 +794,7 @@ class Network_Matrix:
             self._calc_consumption()
 
         if self.alpha_change_state != "fixed_preferences":
-            if self.alpha_change_state == "dynamic_identity_determined_weights":
-                self.weighting_matrix = self._update_weightings()
-            elif self.alpha_change_state == "dynamic_socially_determined_weights":
-                self.weighting_matrix_tensor = self._update_weightings_list()
-
+            self._select_weighting_matrix()
             self.social_component_vector = self._calc_social_component_matrix()
 
         self.carbon_dividend = self._calc_carbon_dividend()
