@@ -125,7 +125,7 @@ def main(
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_alternative_cosine.json",
-        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_alternative_dict.json",
+        VARIABLE_PARAMS_LOAD = "package/constants/oneD_dict_alternative_cosine.json",
         scenarios = ["fixed_preferences","dynamic_socially_determined_weights", "dynamic_identity_determined_weights", "dynamic_socially_determined_weights_cosine", "dynamic_identity_determined_weights_cosine" ],
     )
 
