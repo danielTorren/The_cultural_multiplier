@@ -653,41 +653,13 @@ class Network_Matrix:
         cos_sims = prefs @ prefs.T / (norms[:, None] * norms[None, :])
         
         # Apply confirmation bias
-        weights = np.exp(self.confirmation_bias * cos_sims)
+        weights = np.exp(self.confirmation_bias * ((1 + cos_sims)/2))
         
         # Mask with adjacency
         weights *= self.adjacency_matrix
         
         norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
         return norm_weighting_matrix
-
-
-    def _update_weightings_cosine_social(self) -> list:
-        """
-        Compute cosine-similarity-based weighting matrices for each sector separately,
-        modulated by confirmation bias parameter theta.
-        """
-        weighting_matrices = []
-        for m in range(self.M):
-            prefs_m = self.low_carbon_preference_matrix[:, m]
-            norms = np.linalg.norm(prefs_m)
-            if norms == 0:
-                norms = 1
-            # outer product gives pairwise cosine for this category
-            cos_sims = np.outer(prefs_m, prefs_m) / (norms**2)
-            
-            # apply confirmation bias to modulate the sharpness
-            weights = np.exp(self.confirmation_bias * cos_sims)
-            
-            # apply adjacency mask
-            weights *= self.adjacency_matrix
-            
-            norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
-            weighting_matrices.append(norm_weighting_matrix)
-
-        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
-        return weighting_matrices
-
 
     def _calc_emissions(self):
         """
