@@ -653,7 +653,7 @@ class Network_Matrix:
         cos_sims = prefs @ prefs.T / (norms[:, None] * norms[None, :])
         
         # Apply confirmation bias
-        weights = np.exp(self.confirmation_bias * ((1 + cos_sims)/2))
+        weights = np.exp(self.confirmation_bias * cos_sims)
         
         # Mask with adjacency
         weights *= self.adjacency_matrix
