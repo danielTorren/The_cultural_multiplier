@@ -650,7 +650,8 @@ class Network_Matrix:
         prefs = self.low_carbon_preference_matrix
         norms = np.linalg.norm(prefs, axis=1)
         norms[norms == 0] = 1
-        cos_sims = prefs @ prefs.T / (norms[:, None] * norms[None, :])
+        cos_sims = np.dot(prefs, prefs.T)/ (norms[:, None] * norms[None, :])
+        #cos_sims = prefs @ prefs.T/ (norms[:, None] * norms[None, :])
         
         # Apply confirmation bias
         weights = np.exp(self.confirmation_bias * cos_sims)

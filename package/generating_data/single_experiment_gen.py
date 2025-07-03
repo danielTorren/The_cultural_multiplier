@@ -46,7 +46,7 @@ if __name__ == '__main__':
     "b_expenditure": 4,
     "save_timeseries_data_state": 1,
     "compression_factor_state": 1,
-    "alpha_change_state": "fixed_preferences",#"dynamic_socially_determined_weights_cosine",#"dynamic_identity_determined_weights_cosine",
+    "alpha_change_state": "dynamic_socially_determined_weights",#"dynamic_socially_determined_weights_cosine",#"dynamic_identity_determined_weights_cosine",
     "seed_reps": 3,
     "preferences_seed":8,
     "carbon_price_duration": 360, 
