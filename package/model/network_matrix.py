@@ -91,7 +91,8 @@ class Network_Matrix:
             "fixed_preferences",
             "dynamic_identity_determined_weights",
             "dynamic_identity_determined_weights_cosine",
-            "dynamic_socially_determined_weights_cosine"
+            "dynamic_socially_determined_weights_cosine",
+            "dynamic_identity_determined_weights_euclid"
         ]:
             raise ValueError(f"Invalid alpha change state")
 
@@ -422,6 +423,8 @@ class Network_Matrix:
             self.weighting_matrix_tensor = self._update_weightings_softmax_social()
         elif self.alpha_change_state == "dynamic_socially_determined_weights_cosine":
             self.weighting_matrix_tensor = self._update_weightings_cosine_social()
+        elif self.alpha_change_state == "dynamic_identity_determined_weights_euclid":
+            self.weighting_matrix = self._update_weightings_euclidean_identity()
         else:
             raise ValueError(f"Unknown alpha_change_state {self.alpha_change_state}")
 
@@ -661,6 +664,37 @@ class Network_Matrix:
         
         norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
         return norm_weighting_matrix
+
+    def _update_weightings_euclidean_identity(self) -> sp.csr_matrix:
+        """
+        Compute weighting matrix based on Euclidean distance
+        between agents' preference vectors, modulated by
+        confirmation bias parameter theta.
+
+        Returns:
+            sp.csr_matrix: Normalized weighting matrix
+        """
+        # get each agent's identity vector (average preferences)
+        self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
+
+        # get the full preference matrix for all agents
+        prefs = self.low_carbon_preference_matrix
+
+        # compute pairwise Euclidean distances
+        diff_matrix = prefs[:, None, :] - prefs[None, :, :]  # shape (N,N,M)
+        euclidean_dists = np.linalg.norm(diff_matrix, axis=2)  # shape (N,N)
+
+        # apply the weighting kernel
+        weights = np.exp(-self.confirmation_bias * euclidean_dists)
+
+        # apply adjacency mask (only interact with neighbors)
+        weights *= self.adjacency_matrix
+
+        # normalize rows to sum to one (softmax-like normalization)
+        norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
+
+        return norm_weighting_matrix
+
 
     def _calc_emissions(self):
         """
