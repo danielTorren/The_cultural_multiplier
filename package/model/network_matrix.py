@@ -646,24 +646,31 @@ class Network_Matrix:
 
     def _update_weightings_cosine_identity(self) -> sp.csr_matrix:
         """
-        Compute cosine-similarity-based weighting matrix for the cultural multiplier,
-        modulated by confirmation bias parameter theta.
+        Weighting matrix using cosine similarity with preferences
+        shifted to [-1, 1], rescaled back to [0,1].
         """
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
-        prefs = self.low_carbon_preference_matrix
-        norms = np.linalg.norm(prefs, axis=1)
+            
+        # shift preferences from [0,1] to [-1,1]
+        shifted_prefs = 2 * self.low_carbon_preference_matrix - 1
+        
+        # cosine similarity
+        norms = np.linalg.norm(shifted_prefs, axis=1)
         norms[norms == 0] = 1
-        cos_sims = np.dot(prefs, prefs.T)/ (norms[:, None] * norms[None, :])
-        #cos_sims = prefs @ prefs.T/ (norms[:, None] * norms[None, :])
+        cos_sims = np.dot(shifted_prefs, shifted_prefs.T) / (norms[:, None] * norms[None, :])
         
-        # Apply confirmation bias
-        weights = np.exp(self.confirmation_bias * cos_sims)
+        # rescale to [0,1]
+        rescaled_cos_sims = (cos_sims + 1) / 2
         
-        # Mask with adjacency
+        # apply weighting kernel
+        weights = np.exp(self.confirmation_bias * rescaled_cos_sims)
+        
+        # apply adjacency mask
         weights *= self.adjacency_matrix
         
         norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
         return norm_weighting_matrix
+
 
     def _update_weightings_euclidean_identity(self) -> sp.csr_matrix:
         """

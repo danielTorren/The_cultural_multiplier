@@ -34,17 +34,23 @@ def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
 
     # 7. Run with social learning cosine, Emissions: [S_n]
     if "dynamic_socially_determined_weights_cosine" in scenarios:
-        base_params_copy_5 = deepcopy(base_params_tax_copy)
-        base_params_copy_5["alpha_change_state"] = "dynamic_socially_determined_weights_cosine"
-        params_sub_list_5 = produce_param_list_stochastic_multi(base_params_copy_5, carbon_tax_vals,"carbon_price_increased")
-        params_list.extend(params_sub_list_5)
+        base_params_copy_7 = deepcopy(base_params_tax_copy)
+        base_params_copy_7["alpha_change_state"] = "dynamic_socially_determined_weights_cosine"
+        params_sub_list_7 = produce_param_list_stochastic_multi(base_params_copy_7, carbon_tax_vals,"carbon_price_increased")
+        params_list.extend(params_sub_list_7)
 
     # 8.  Run with cultural learning, cosine, Emissions: [S_n]
     if "dynamic_identity_determined_weights_cosine" in scenarios:
-        base_params_copy_6 = deepcopy(base_params_tax_copy)
-        base_params_copy_6["alpha_change_state"] = "dynamic_identity_determined_weights_cosine"
-        params_sub_list_6 = produce_param_list_stochastic_multi(base_params_copy_6, carbon_tax_vals,"carbon_price_increased")
-        params_list.extend(params_sub_list_6)
+        base_params_copy_8 = deepcopy(base_params_tax_copy)
+        base_params_copy_8["alpha_change_state"] = "dynamic_identity_determined_weights_cosine"
+        params_sub_list_8 = produce_param_list_stochastic_multi(base_params_copy_8, carbon_tax_vals,"carbon_price_increased")
+        params_list.extend(params_sub_list_8)
+
+    if "dynamic_identity_determined_weights_euclid" in scenarios:
+        base_params_copy_9 = deepcopy(base_params_tax_copy)
+        base_params_copy_9["alpha_change_state"] = "dynamic_identity_determined_weights_cosine"
+        params_sub_list_9 = produce_param_list_stochastic_multi(base_params_copy_9, carbon_tax_vals,"carbon_price_increased")
+        params_list.extend(params_sub_list_9)
 
     return params_list
 
