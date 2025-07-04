@@ -156,7 +156,7 @@ def main(
     #####################################################################################################
 
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
-    scenario_labels = ["Social multiplier", "Cultural multiplier", "Cultural multiplier - Cosine", "Cultural multiplier - Euclidean"]
+    scenario_labels = ["Fixed Preferences", "Social multiplier", "Cultural multiplier", "Cultural multiplier - Cosine", "Cultural multiplier - Euclidean"]
 
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
 

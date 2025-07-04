@@ -674,35 +674,31 @@ class Network_Matrix:
 
     def _update_weightings_euclidean_identity(self) -> sp.csr_matrix:
         """
-        Compute weighting matrix based on Euclidean distance
-        between agents' preference vectors, modulated by
-        confirmation bias parameter theta.
-
-        Returns:
-            sp.csr_matrix: Normalized weighting matrix
+        Compute weighting matrix based on Euclidean distance between agents' preference vectors,
+        normalized to [0,1] based on maximum possible distance in M-dimensional space.
         """
-        # get each agent's identity vector (average preferences)
+        # Get each agent's identity vector (average preferences)
         self.identity_vec = self._calc_identity(self.low_carbon_preference_matrix)
 
-        # get the full preference matrix for all agents
+        # Get the full preference matrix (shape: N agents × M dimensions)
         prefs = self.low_carbon_preference_matrix
+        N, M = prefs.shape  # N agents, M dimensions
 
-        # compute pairwise Euclidean distances
+        # Compute pairwise Euclidean distances (shape: N × N)
         diff_matrix = prefs[:, None, :] - prefs[None, :, :]  # shape (N,N,M)
         euclidean_dists = np.linalg.norm(diff_matrix, axis=2)  # shape (N,N)
 
-        # apply adjacency mask (only consider neighbors' distances)
-        masked_dists = euclidean_dists * self.adjacency_matrix
+        # Normalize distances by the theoretical maximum (√M)
+        max_possible_dist = np.sqrt(M)
+        euclidean_dists_normalized = euclidean_dists / max_possible_dist
 
-        # Row-wise normalization to [0,1]
-        row_max = masked_dists.max(axis=1, keepdims=True)
-        row_max[row_max == 0] = 1  # avoid division by zero for rows with all zeros
-        normalized_dists = masked_dists / row_max
+        # Apply the weighting kernel (exp(-θd))
+        weights = np.exp(-self.confirmation_bias * euclidean_dists_normalized)
 
-        # apply the weighting kernel
-        weights = np.exp(-self.confirmation_bias * normalized_dists)
+        # Apply adjacency mask (only interact with neighbors)
+        weights *= self.adjacency_matrix
 
-        # normalize rows to sum to one (softmax-like normalization)
+        # Normalize rows to sum to one (softmax-like)
         norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
 
         return norm_weighting_matrix
