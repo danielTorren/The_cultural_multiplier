@@ -691,17 +691,21 @@ class Network_Matrix:
         diff_matrix = prefs[:, None, :] - prefs[None, :, :]  # shape (N,N,M)
         euclidean_dists = np.linalg.norm(diff_matrix, axis=2)  # shape (N,N)
 
-        # apply the weighting kernel
-        weights = np.exp(-self.confirmation_bias * euclidean_dists)
+        # apply adjacency mask (only consider neighbors' distances)
+        masked_dists = euclidean_dists * self.adjacency_matrix
 
-        # apply adjacency mask (only interact with neighbors)
-        weights *= self.adjacency_matrix
+        # Row-wise normalization to [0,1]
+        row_max = masked_dists.max(axis=1, keepdims=True)
+        row_max[row_max == 0] = 1  # avoid division by zero for rows with all zeros
+        normalized_dists = masked_dists / row_max
+
+        # apply the weighting kernel
+        weights = np.exp(-self.confirmation_bias * normalized_dists)
 
         # normalize rows to sum to one (softmax-like normalization)
         norm_weighting_matrix = self._normlize_matrix(sp.csr_matrix(weights))
 
         return norm_weighting_matrix
-
 
     def _calc_emissions(self):
         """
