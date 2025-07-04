@@ -48,7 +48,7 @@ def arrange_scenarios_tax(base_params_tax, carbon_tax_vals,scenarios):
 
     if "dynamic_identity_determined_weights_euclid" in scenarios:
         base_params_copy_9 = deepcopy(base_params_tax_copy)
-        base_params_copy_9["alpha_change_state"] = "dynamic_identity_determined_weights_cosine"
+        base_params_copy_9["alpha_change_state"] = "dynamic_identity_determined_weights_euclid"
         params_sub_list_9 = produce_param_list_stochastic_multi(base_params_copy_9, carbon_tax_vals,"carbon_price_increased")
         params_list.extend(params_sub_list_9)
 
