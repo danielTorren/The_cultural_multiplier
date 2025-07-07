@@ -156,7 +156,7 @@ def main(
     #####################################################################################################
 
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
-    scenario_labels = ["Fixed Preferences", "Social multiplier", "Cultural multiplier", "Cultural multiplier - Cosine", "Cultural multiplier - Euclidean"]
+    scenario_labels = ["Fixed Preferences", "Social multiplier", "Cultural multiplier", "Euclidean"]
 
     property_values_list = load_object(fileName + "/Data", "property_values_list")       
 
@@ -166,5 +166,5 @@ def main(
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/cosine_alternative_gen_16_48_03__04_07_2025"
+        fileName = "results/cosine_alternative_gen_17_29_22__04_07_2025"
     )

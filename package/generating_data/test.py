@@ -1,103 +1,137 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Parameters
-grid_size = 100
-theta = 5
-M = 2  # number of sectors
+def plot_all_weightings(p1, grid_size=100, theta=5, M=2):
+    """
+    Plot all four weighting schemes in one row of subplots:
+    - Softmax Cultural Multiplier
+    - Cosine Similarity (shifted/rescaled)
+    - Euclidean distance
+    - Cosine Similarity (non-shifted)
+    """
 
-# Grid of agent j's preferences
-p2_x = np.linspace(0, 1, grid_size)
-p2_y = np.linspace(0, 1, grid_size)
-P2_X, P2_Y = np.meshgrid(p2_x, p2_y)
-p2s = np.vstack([P2_X.ravel(), P2_Y.ravel()]).T
+    # -----------------------------------------------------
+    # common grid
+    p2_x = np.linspace(0, 1, grid_size)
+    p2_y = np.linspace(0, 1, grid_size)
+    P2_X, P2_Y = np.meshgrid(p2_x, p2_y)
+    p2s = np.vstack([P2_X.ravel(), P2_Y.ravel()]).T
 
-# Agent i's fixed preference
-p1 = np.array([0.5, 0.5])
+    # -----------------------------------------------------
+    # Softmax Cultural Multiplier (identity difference)
+    I_i = np.mean(p1)
+    I_j = np.mean(p2s, axis=1)
+    diffs = np.abs(I_i - I_j)
+    weights_cm = np.exp(-theta * diffs)
+    weights_cm /= np.sum(weights_cm)
+    weights_cm_grid = weights_cm.reshape(grid_size, grid_size)
 
-# Compute identity of agent i
-I_i = np.mean(p1)
+    # -----------------------------------------------------
+    # Cosine Similarity (shifted/rescaled)
+    shifted_p1 = 2 * p1 - 1
+    shifted_p2s = 2 * p2s - 1
 
-# Compute identity of agent j's preferences on the grid
-I_j = np.mean(p2s, axis=1)
+    norm_shifted_p1 = np.linalg.norm(shifted_p1)
+    if norm_shifted_p1 == 0:
+        norm_shifted_p1 = 1e-6
+    norm_shifted_p2s = np.linalg.norm(shifted_p2s, axis=1)
+    norm_shifted_p2s[norm_shifted_p2s == 0] = 1e-6
 
-# Absolute differences in identity
-diffs = np.abs(I_i - I_j)
+    dot_products = shifted_p2s @ shifted_p1
+    cos_sims_shifted = dot_products / (norm_shifted_p1 * norm_shifted_p2s)
+    rescaled_cos_sims = (cos_sims_shifted + 1) / 2
 
-# Cultural multiplier weights (unnormalized)
-unnormalized_weights = np.exp(-theta * diffs)
-weights = unnormalized_weights / np.sum(unnormalized_weights)
-weights_grid = weights.reshape(grid_size, grid_size)
+    weights_cos_shifted = np.exp(theta * rescaled_cos_sims)
+    weights_cos_shifted /= np.sum(weights_cos_shifted)
+    weights_cos_shifted_grid = weights_cos_shifted.reshape(grid_size, grid_size)
 
-# Cosine similarity between p1 and each p2
-norm_p1 = np.linalg.norm(p1)
-norms_p2 = np.linalg.norm(p2s, axis=1)
-norms_p2[norms_p2 == 0] = 1e-6  # avoid division by zero
-dot_products = p2s @ p1
-cos_sims = dot_products / (norm_p1 * norms_p2)
+    # -----------------------------------------------------
+    # Euclidean distance
+    diffs = p2s - p1
+    dists = np.linalg.norm(diffs, axis=1)
+    max_possible_dist = np.sqrt(M)
+    dists_normalized = dists / max_possible_dist
 
-unnormalized_cosine_weights = np.exp(theta * cos_sims)
-cosine_weights = unnormalized_cosine_weights / np.sum(unnormalized_cosine_weights)
-cosine_weights_grid = cosine_weights.reshape(grid_size, grid_size)
+    weights_euc = np.exp(-theta * dists_normalized)
+    weights_euc /= np.sum(weights_euc)
+    weights_euc_grid = weights_euc.reshape(grid_size, grid_size)
 
-# determine shared vmin/vmax
-vmin = min(weights_grid.min(), cosine_weights_grid.min())
-vmax = max(weights_grid.max(), cosine_weights_grid.max())
+    # -----------------------------------------------------
+    # Cosine Similarity (non-shifted)
+    norm_p1 = np.linalg.norm(p1)
+    if norm_p1 == 0:
+        norm_p1 = 1e-6
+    norm_p2s = np.linalg.norm(p2s, axis=1)
+    norm_p2s[norm_p2s == 0] = 1e-6
 
-# ---------- FIRST FIGURE: heatmaps of the weighting matrices ----------
-fig, axes = plt.subplots(1, 2, figsize=(14, 7))
+    dot_products_ns = p2s @ p1
+    cos_sims_ns = dot_products_ns / (norm_p1 * norm_p2s)
+    rescaled_cos_sims_ns = (cos_sims_ns + 1) / 2  # optional rescale to [0,1]
 
-im0 = axes[0].imshow(weights_grid, extent=[0,1,0,1], origin="lower", vmin=vmin, vmax=vmax)
-axes[0].set_title(r"Softmax Cultural Multiplier")
-axes[0].set_xlabel("Preference Sector 1")
-axes[0].set_ylabel("Preference Sector 2")
+    weights_cos_ns = np.exp(theta * rescaled_cos_sims_ns)
+    weights_cos_ns /= np.sum(weights_cos_ns)
+    weights_cos_ns_grid = weights_cos_ns.reshape(grid_size, grid_size)
 
-im1 = axes[1].imshow(cosine_weights_grid, extent=[0,1,0,1], origin="lower", vmin=vmin, vmax=vmax)
-axes[1].set_title(r"Softmax Cultural Cosine")
-axes[1].set_xlabel("Preference Sector 1")
-axes[1].set_ylabel("Preference Sector 2")
+    # -----------------------------------------------------
+    # Plot all four in a single row of subplots
+    vmin = min(weights_cm_grid.min(), weights_cos_shifted_grid.min(),
+               weights_euc_grid.min(), weights_cos_ns_grid.min())
+    vmax = max(weights_cm_grid.max(), weights_cos_shifted_grid.max(),
+               weights_euc_grid.max(), weights_cos_ns_grid.max())
 
-# colorbar
-cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
-cbar = fig.colorbar(im1, cax=cbar_ax)
-cbar.set_label("Interaction Strength")
+    fig, axes = plt.subplots(1, 4, figsize=(24,6), constrained_layout=True)
 
-# Add equations below
-axes[0].text(
-    0.5, -0.15,
-    r"$\alpha^{CM}_{i,j} = \frac{ \exp\left( -\theta | I_i - I_j | \right) }{ \sum_j \exp\left( -\theta | I_i - I_j | \right) }$",
-    ha="center", va="center", transform=axes[0].transAxes, fontsize=11
-)
+    im0 = axes[0].imshow(weights_cm_grid, extent=[0,1,0,1], origin="lower", vmin=vmin, vmax=vmax)
+    axes[0].set_title("Softmax")
+    axes[0].set_xlabel("Preference Sector 1")
+    axes[0].set_ylabel("Preference Sector 2")
+    axes[0].text(
+        0.5, -0.25,
+        r"$\alpha^{SM}_{i,j} = \frac{ \exp\left( -\theta |I_i - I_j| \right) }{ \sum }$",
+        ha="center", va="center", transform=axes[0].transAxes, fontsize=11
+    )
 
-axes[1].text(
-    0.5, -0.15,
-    r"$\alpha^{cos}_{i,j} = \frac{ \exp\left( \theta \, \mathrm{cos\_sim}(p_i, p_j) \right) }{ \sum_j \exp\left( \theta \, \mathrm{cos\_sim}(p_i, p_j) \right) }$",
-    ha="center", va="center", transform=axes[1].transAxes, fontsize=11
-)
+    im1 = axes[1].imshow(weights_cos_shifted_grid, extent=[0,1,0,1], origin="lower", vmin=vmin, vmax=vmax)
+    axes[1].set_title("Cosine Similarity (shifted)")
+    axes[1].set_xlabel("Preference Sector 1")
+    axes[1].set_ylabel("Preference Sector 2")
+    axes[1].text(
+        0.5, -0.25,
+        r"$\alpha^{cos}_{i,j} = \frac{ \exp\left( \theta \, \frac{\cos(2p_i-1,2p_j-1)+1}{2} \right) }{ \sum }$",
+        ha="center", va="center", transform=axes[1].transAxes, fontsize=11
+    )
 
-plt.tight_layout(rect=[0, 0, 0.9, 1])
+    im2 = axes[2].imshow(weights_euc_grid, extent=[0,1,0,1], origin="lower", vmin=vmin, vmax=vmax)
+    axes[2].set_title("Euclidean")
+    axes[2].set_xlabel("Preference Sector 1")
+    axes[2].set_ylabel("Preference Sector 2")
+    axes[2].text(
+        0.5, -0.25,
+        r"$\alpha^{E}_{i,j} = \frac{ \exp\left( -\theta \, \frac{||p_i - p_j||}{\sqrt{M}} \right) }{ \sum }$",
+        ha="center", va="center", transform=axes[2].transAxes, fontsize=11
+    )
 
+    im3 = axes[3].imshow(weights_cos_ns_grid, extent=[0,1,0,1], origin="lower", vmin=vmin, vmax=vmax)
+    axes[3].set_title("Cosine Similarity (non-shifted)")
+    axes[3].set_xlabel("Preference Sector 1")
+    axes[3].set_ylabel("Preference Sector 2")
+    axes[3].text(
+        0.5, -0.25,
+        r"$\alpha^{cos}_{i,j} = \frac{ \exp\left( \theta \, \frac{\cos(p_i,p_j)+1}{2} \right) }{ \sum }$",
+        ha="center", va="center", transform=axes[3].transAxes, fontsize=11
+    )
 
-# ---------- SECOND FIGURE: raw terms ----------
-diffs_grid = diffs.reshape(grid_size, grid_size)
-cos_sims_grid = cos_sims.reshape(grid_size, grid_size)
+    # shared colorbar
+    cbar = fig.colorbar(im3, ax=axes.ravel(), shrink=0.8)
+    cbar.set_label("Interaction Strength")
 
-fig2, axes2 = plt.subplots(1, 2, figsize=(14, 7))
+    plt.show()
 
-im2 = axes2[0].imshow(-diffs_grid, extent=[0,1,0,1], origin="lower")
-axes2[0].set_title(r"Absolute Identity Difference $|I_i - I_j|$")
-axes2[0].set_xlabel("Preference Sector 1")
-axes2[0].set_ylabel("Preference Sector 2")
+# ------------------ Example call ------------------
 
-im3 = axes2[1].imshow(cos_sims_grid, extent=[0,1,0,1], origin="lower")
-axes2[1].set_title(r"Cosine Similarity $\mathrm{cos\_sim}(p_i, p_j)$")
-axes2[1].set_xlabel("Preference Sector 1")
-axes2[1].set_ylabel("Preference Sector 2")
+if __name__ == "__main__":
+    p1 = np.array([0.5, 0.5])
+    theta = 5
+    grid_size = 100
 
-# shared colorbar for second figure
-cbar_ax2 = fig2.add_axes([0.92, 0.15, 0.02, 0.7])
-cbar2 = fig2.colorbar(im3, cax=cbar_ax2)
-cbar2.set_label("Value")
-
-plt.tight_layout(rect=[0, 0, 0.9, 1])
-plt.show()
+    plot_all_weightings(p1, grid_size, theta, M=2)
