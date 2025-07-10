@@ -15,8 +15,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
     property_values_list_row,
     network_titles,
     row_titles,
-    name,
-    emissions_networks_ref=None  # Reference case added here
+    name
 ):
     # Create color mapping based on substitutability values
     cmap = get_cmap(name)
@@ -38,12 +37,6 @@ def plot_means_end_points_emissions_confidence_split_gradient(
 
         mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
         ax_sw.fill_between(property_values_list_col, lower_bound, upper_bound, color=colors[k], alpha=0.3)
-
-    # Plot reference line for Small-World
-    if emissions_networks_ref is not None:
-        ref_data = emissions_networks_ref[0]
-        mu_ref = ref_data.mean(axis=1)
-        ax_sw.plot(property_values_list_col, mu_ref, linestyle='--', color='black', label='Reference')
 
     fig_sw.supxlabel(r"Carbon tax, $\tau$", fontsize="12")
     fig_sw.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
@@ -68,12 +61,6 @@ def plot_means_end_points_emissions_confidence_split_gradient(
             mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
             axes_other[j-1].fill_between(property_values_list_col, lower_bound, upper_bound, color=colors[k], alpha=0.3)
 
-        # Plot reference line
-        if emissions_networks_ref is not None:
-            ref_data = emissions_networks_ref[j]
-            mu_ref = ref_data.mean(axis=1)
-            axes_other[j-1].plot(property_values_list_col, mu_ref, linestyle='--', color='black', label='Reference')
-
     fig_other.supxlabel(r"Carbon tax, $\tau$", fontsize="12")
     fig_other.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
     axes_other[1].legend(fontsize="8")
@@ -90,7 +77,6 @@ def main(
     emissions_networks = load_object(fileName + "/Data","emissions_data_networks")
     network_titles = ["Small-World", "Stochastic Block Model", "Scale-Free"]
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
-    emissions_networks_ref = load_object(fileName + "/Data","emissions_data_networks_ref")
 
     col_dict = variable_parameters_dict["col"]
     row_dict = variable_parameters_dict["row"]
@@ -103,11 +89,11 @@ def main(
 
     plot_means_end_points_emissions_confidence_split_gradient(
         fileName, emissions_networks, property_values_list_col, property_values_list_row,
-        network_titles, row_titles, name, emissions_networks_ref=emissions_networks_ref
+        network_titles, row_titles, name
     )
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName= "results/sub_dist_tax_sweep_19_19_41__07_07_2025"#sub_dist_tax_sweep_11_43_29__16_06_2025"
+        fileName= "results/sub_dist_tax_sweep_19_19_41__07_07_2025"
     )

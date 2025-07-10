@@ -178,18 +178,55 @@ class Network_Matrix:
         self.homophily_state = self.parameters["homophily_state"]
         self.shuffle_reps_homophily = int(round((self.N * (1 - self.homophily_state)) ** self.shuffle_intensity))
 
+    def _calculate_h_min_for_share(self, min_expenditure_share, price_vector):
+        """
+        Calculate the h_min vector such that h_min ⋅ price_vector = min_expenditure_share.
+        
+        Assumes equal proportions across all goods (can be customized).
+
+        Args:
+            min_expenditure_share (float): Target share of budget to allocate to minimum expenditure (e.g., 0.3).
+            price_vector (np.ndarray): Prices of high-carbon goods.
+
+        Returns:
+            h_min (np.ndarray): Vector of minimum quantities per good.
+        """
+        price_vector = np.asarray(price_vector)
+
+        # Start with equal allocation across goods (can be adjusted)
+        h_min_unit = np.ones_like(price_vector)
+        
+        # Normalize such that h_min_unit ⋅ price_vector = 1
+        norm_factor = np.dot(h_min_unit, price_vector)
+        h_min_unit_normalized = h_min_unit / norm_factor
+
+        # Scale to match the desired min_expenditure_share
+        h_min_scaled = h_min_unit_normalized * min_expenditure_share
+
+        return h_min_scaled
+
+
     def _initialize_expenditure(self):
         """Initialize agent expenditure parameters with inequality and minimum needs."""
         self.expenditure_inequality_state = self.parameters["expenditure_inequality_state"]
 
         # Compute minimum expenditure per agent (h_min ⋅ prices)
         if self.state_minimum_h:
-            self.h_min = np.asarray(self.parameters["h_m"])
-            self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
-            self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_m)
-            self.minimum_expenditure_sum_instant = sum(self.h_min * self.prices_high_carbon_instant)
-            
-            self.min_expenditure_individual = self.minimum_expenditure_sum*2.01#GIVE INDIVIDUALS more than they need,this accoutns for the max carbon price 
+            self.minimum_h_expenditure_state = self.parameters["minimum_h_expenditure_state"]
+            if self.minimum_h_expenditure_state:
+                min_expenditure_share = self.parameters.get("min_expenditure_share", 0)
+                self.h_min = self._calculate_h_min_for_share(min_expenditure_share, self.prices_high_carbon_m)
+                self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_m)
+                self.min_expenditure_individual = self.minimum_expenditure_sum
+                self.minimum_h_matrix = np.tile(self.h_min, (self.N, 1)) 
+
+            else:
+                self.h_min = np.asarray(self.parameters["h_m"])
+                self.minimum_h_matrix = np.tile(self.h_min, (self.N,1))
+                self.minimum_expenditure_sum = sum(self.h_min * self.prices_high_carbon_m)
+                self.minimum_expenditure_sum_instant = sum(self.h_min * self.prices_high_carbon_instant)
+                
+                self.min_expenditure_individual = self.minimum_expenditure_sum*2.01#GIVE INDIVIDUALS more than they need,this accoutns for the max carbon price 
         else:
             self.min_expenditure_individual = 0
             self.minimum_expenditure_sum = 0
