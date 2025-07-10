@@ -17,7 +17,7 @@ def plot_emissions_vs_min_expenditure(fileName):
     # Load data
     emissions_data = load_object(fileName + "/Data", "emissions_data_min_expenditure")
     variable_parameters_dict = load_object(fileName + "/Data", "variable_parameters_dict")
-    min_expenditure_shares = variable_parameters_dict["col"]["property_vals"]
+    min_expenditure_shares = variable_parameters_dict["property_vals"]
     network_labels = ["Small-World", "SBM", "Scale-Free"]
 
     num_networks = len(emissions_data)
@@ -52,4 +52,4 @@ def plot_emissions_vs_min_expenditure(fileName):
 
 # Example usage
 if __name__ == "__main__":
-    plot_emissions_vs_min_expenditure("results/simple_h_min_expenditure_10_07_2025")  # adjust path as needed
+    plot_emissions_vs_min_expenditure("results/simple_h_min_expenditure_12_21_57__10_07_2025")  # adjust path as needed

@@ -36,7 +36,7 @@
     "low_carbon_substitutability_beta_b": 3,
     "mean_low_carbon_substitutability": 4,
     "width_low_carbon_substitutability": 1,
-    "state_minimum_h": 0,
+    "state_minimum_h": 1,
     "h_m": [1e-6,1e-6],
     "redistribution_state": 1
     }
