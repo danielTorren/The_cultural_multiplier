@@ -64,4 +64,4 @@ def plot_emissions_vs_min_expenditure(fileName):
 
 # Example usage
 if __name__ == "__main__":
-    plot_emissions_vs_min_expenditure("results/simple_h_min_expenditure_13_09_57__10_07_2025")
+    plot_emissions_vs_min_expenditure("results/simple_h_min_expenditure_13_19_48__10_07_2025")
