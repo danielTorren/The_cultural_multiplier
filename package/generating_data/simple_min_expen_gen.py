@@ -16,9 +16,6 @@ def main(
     variable_parameters_dict = json.load(f_variable_parameters)
     f_variable_parameters.close()
 
-    # Convert 1D variable parameters
-    variable_parameters_dict = generate_vals_2D(variable_parameters_dict)
-
     root = "simple_h_min_expenditure"
     fileName = produce_name_datetime(root)
     print("fileName: ", fileName)
