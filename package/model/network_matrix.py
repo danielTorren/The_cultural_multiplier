@@ -446,7 +446,6 @@ class Network_Matrix:
                 self.carbon_price_m = self.carbon_price_increased_m
 
         self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
-        print(self.t, ": ", self.prices_high_carbon_instant)
 
     def _initialize_substitutabilities(self):
         """
