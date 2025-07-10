@@ -34,7 +34,8 @@ def main(
 
 if __name__ == '__main__':
     base_params = {
-    "carbon_price_increased": 0,
+    "carbon_price_increased": 1,
+    "linear_carbon_price_state": 0,
     "network_type": "SW",
     "shuffle_homophily_seed": 99,
     "shuffle_coherance_seed'": 77,
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     "SBM_network_density_input_inter_block": 0.005,
     "SW_network_density": 0.1,
     "SW_prob_rewire": 0.1,
-    "low_carbon_substitutability_dist_state": 1,
+    "low_carbon_substitutability_dist_state": 0,
     "low_carbon_substitutability_seed": 77,
     "low_carbon_substitutability_beta_a": 3,
     "low_carbon_substitutability_beta_b": 3,

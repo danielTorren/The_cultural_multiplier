@@ -84,6 +84,7 @@ class Network_Matrix:
         """Initialize state attributes from parameters."""
         self.save_timeseries_data_state = self.parameters["save_timeseries_data_state"]
         self.compression_factor_state = self.parameters["compression_factor_state"]
+        self.linear_carbon_price_state = self.parameters["linear_carbon_price_state"]
         self.alpha_change_state = self.parameters["alpha_change_state"]
 
         if self.alpha_change_state not in [
@@ -430,11 +431,21 @@ class Network_Matrix:
     
     def _update_carbon_price(self):
         """
-        Update carbon price if simulation has reached the burn-in duration.
+        Update the carbon price based on linear or constant pricing policy.
         """
-        if self.t == self.burn_in_duration:
-            self.carbon_price_m = self.carbon_price_increased_m
-            self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
+        if self.t < self.burn_in_duration:
+            self.carbon_price_m = 0  # No tax during burn-in
+        else:
+            if self.linear_carbon_price_state:
+                # Linear increase over total carbon_price_duration
+                time_since_burnin = self.t - self.burn_in_duration
+                progress = min(time_since_burnin / self.carbon_price_duration, 1.0)
+                self.carbon_price_m = self.carbon_price_increased_m * progress
+            else:
+                # Constant carbon price after burn-in
+                self.carbon_price_m = self.carbon_price_increased_m
+
+        self.prices_high_carbon_instant = self.prices_high_carbon_m + self.carbon_price_m
 
     def _initialize_substitutabilities(self):
         """
