@@ -163,16 +163,10 @@ def main(
 
     plot_emissions_confidence_two(fileName, emissions_networks, scenario_labels, property_values_list, network_titles,colors_scenarios)
 
-    if MULTIPLIER:
-        list_M_networks = load_object(fileName + "/Data","list_M_networks")
-        scenario_labels_M = ["Social multiplier", "Cultural multiplier"]
-        
-        plot_multiplier_confidence_two(fileName,list_M_networks, scenario_labels_M, property_values_list, network_titles, colors_scenarios)
-
     plt.show()
 
 if __name__ == '__main__':
     plots = main(
-        fileName = "results/tax_sweep_networks_01_23_14__30_10_2024",#tax_sweep_networks_14_40_25__28_10_2024",#tax_sweep_networks_15_57_56__22_08_2024",#",#tax_sweep_networks_15_40_36__13_09_2024
-        MULTIPLIER = 1
+        fileName = "results/linear_price_15_43_11__10_07_2025",#tax_sweep_networks_14_40_25__28_10_2024",#tax_sweep_networks_15_57_56__22_08_2024",#",#tax_sweep_networks_15_40_36__13_09_2024
+        MULTIPLIER = 0
     )
