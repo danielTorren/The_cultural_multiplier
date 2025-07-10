@@ -45,7 +45,7 @@ def main(
     # Run the model
     Data_serial = emissions_parallel_run(params_list)
 
-    data_array = Data_serial.reshape(len(networks_list), variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
+    data_array = Data_serial.reshape(len(networks_list), len(variable_parameters_dict["property_vals"]), params["seed_reps"])
     # Save results
     save_object(data_array, fileName + "/Data", "emissions_data_min_expenditure")
     save_object(params, fileName + "/Data", "base_params")
