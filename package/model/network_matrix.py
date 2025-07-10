@@ -404,8 +404,8 @@ class Network_Matrix:
             self.low_carbon_substitutability_beta_b = self.parameters["low_carbon_substitutability_beta_b"]
             self.mean_low_carbon_substitutability = self.parameters["mean_low_carbon_substitutability"]
             self.width_low_carbon_substitutability = self.parameters["width_low_carbon_substitutability"]
-            if self.mean_low_carbon_substitutability- 0.5*self.width_low_carbon_substitutability < 1:
-                raise Exception("scale too large or mean substitituabilty too low, as some distribution values can be < 1")
+            #if self.mean_low_carbon_substitutability- 0.5*self.width_low_carbon_substitutability < 1:
+            #    raise Exception("scale too large or mean substitituabilty too low, as some distribution values can be < 1")
             self.low_carbon_substitutability_arr =  self.mean_low_carbon_substitutability - 0.5*self.width_low_carbon_substitutability + self.width_low_carbon_substitutability*np.random.beta(self.low_carbon_substitutability_beta_a, self.low_carbon_substitutability_beta_b, size=self.N)
         else:
             self.low_carbon_substitutability_arr = np.asarray([self.parameters["low_carbon_substitutability"]]*self.N)
