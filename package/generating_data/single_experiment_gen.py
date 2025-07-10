@@ -34,8 +34,8 @@ def main(
 
 if __name__ == '__main__':
     base_params = {
-    "carbon_price_increased": 1,
-    "linear_carbon_price_state": 0,
+    "carbon_price_increased": 2,
+    "linear_carbon_price_state": 1,
     "network_type": "SW",
     "shuffle_homophily_seed": 99,
     "shuffle_coherance_seed'": 77,
