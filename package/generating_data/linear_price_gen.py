@@ -109,6 +109,7 @@ def main(
 
     return fileName
 
+
 if __name__ == '__main__':
     fileName_Figure_1 = main(
         BASE_PARAMS_LOAD = "package/constants/base_params_linear_price.json",
