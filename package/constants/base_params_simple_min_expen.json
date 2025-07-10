@@ -1,4 +1,5 @@
 {
+    "minimum_h_expenditure_state":1,
     "carbon_price_increased": 0,
     "expenditure_inequality_state": 0,
     "expenditure_seed": 31,
