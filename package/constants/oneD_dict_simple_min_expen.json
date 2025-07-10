@@ -1,5 +1,5 @@
 {
     "property_varied": "min_expenditure_share",
-    "property_vals": [0.1, 0.2, 0.4, 0.6, 0.8],
+    "property_vals": [0.0, 0.2, 0.4, 0.6, 0.8],
     "property_reps": 5
 }

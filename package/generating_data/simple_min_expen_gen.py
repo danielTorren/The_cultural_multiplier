@@ -23,11 +23,37 @@ def main(
         start_time = time.time()
 
     createFolder(fileName)
-
+############################################################################################################
     # Core settings
     params["redistribution_state"] = 0
     params["expenditure_inequality_state"] = 0  # Still allow inequality to test interaction?
+    params["alpha_change_state"] =  "fixed_preferences"
+    networks_list = ["SW", "SBM", "SF"]
+    params_list_ref = []
 
+    for network in networks_list:
+        params["network_type"] = network
+        param_list_net_ref = produce_param_list_stochastic_multi(
+            params,
+            variable_parameters_dict["property_vals"],
+            variable_parameters_dict["property_varied"]
+        )
+        params_list_ref.extend(param_list_net_ref)
+
+    print("Total runs REF: ", len(params_list_ref))
+
+    # Run the model
+    Data_serial_ref = emissions_parallel_run(params_list_ref)
+
+    data_array_ref = Data_serial_ref.reshape(len(networks_list), len(variable_parameters_dict["property_vals"]), params["seed_reps"])
+    # Save results
+    save_object(data_array_ref, fileName + "/Data", "emissions_data_min_expenditure_ref")
+
+############################################################################################################
+    # Core settings
+    params["redistribution_state"] = 0
+    params["expenditure_inequality_state"] = 0  # Still allow inequality to test interaction?
+    params["alpha_change_state"] =  "dynamic_identity_determined_weights"
     networks_list = ["SW", "SBM", "SF"]
     params_list = []
 
