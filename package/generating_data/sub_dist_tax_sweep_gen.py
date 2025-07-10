@@ -34,26 +34,6 @@ def main(
 
     createFolder(fileName)
 
-    #######################################################################################################################
-    params["low_carbon_substitutability_dist_state"] = 0
-    #RUN EQUALITY FOR COMPARISON
-    params_list_ref = []
-    #print(variable_parameters_dict["col"]["property_vals"],  variable_parameters_dict["col"]["property_varied"])
-    #quit()
-    for i in networks_list:
-        params["network_type"] = i
-        params_list_tax = produce_param_list_stochastic_multi(params, variable_parameters_dict["col"]["property_vals"], variable_parameters_dict["col"]["property_varied"])
-        params_list_ref.extend(params_list_tax)
-
-    print("Total runs REFERENCE: ",len(params_list_ref))
-
-    Data_serial_ref = emissions_parallel_run(params_list_ref)
-    data_array_ref = Data_serial_ref.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
-
-    save_object(data_array_ref, fileName + "/Data", "emissions_data_networks_ref")
-
-    print("DONE REFERENCE RUNS")
-
 
     #######################################################################################################################
 
