@@ -105,7 +105,6 @@ def main(
     save_object(property_values_list, fileName + "/Data", "property_values_list")
     save_object(scenarios, fileName + "/Data", "scenarios")
 
-    calc_multiplier(fileName, RUN = 1)
 
     return fileName
 

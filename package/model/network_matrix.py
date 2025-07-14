@@ -439,7 +439,7 @@ class Network_Matrix:
             if self.linear_carbon_price_state:
                 # Linear increase over total carbon_price_duration
                 time_since_burnin = self.t - self.burn_in_duration
-                progress = min(time_since_burnin / self.carbon_price_duration, 1.0)
+                progress = time_since_burnin / self.carbon_price_duration
                 self.carbon_price_m = self.carbon_price_increased_m * progress
             else:
                 # Constant carbon price after burn-in
@@ -471,12 +471,8 @@ class Network_Matrix:
         """
         if self.alpha_change_state == "dynamic_identity_determined_weights":
             self.weighting_matrix = self._update_weightings_softmax_identity()
-        elif self.alpha_change_state == "dynamic_identity_determined_weights_cosine":
-            self.weighting_matrix = self._update_weightings_cosine_identity()
         elif self.alpha_change_state == "dynamic_socially_determined_weights":
             self.weighting_matrix_tensor = self._update_weightings_softmax_social()
-        elif self.alpha_change_state == "dynamic_socially_determined_weights_cosine":
-            self.weighting_matrix_tensor = self._update_weightings_cosine_social()
         elif self.alpha_change_state == "dynamic_identity_determined_weights_euclid":
             self.weighting_matrix = self._update_weightings_euclidean_identity()
         else:
