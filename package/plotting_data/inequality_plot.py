@@ -211,5 +211,5 @@ def main(
 
 if __name__ == '__main__':
     main(
-        fileName="results/network_ineq_tau_20_01_25__26_06_2025"
+        fileName="results/inequality_gen_19_07_22__14_07_2025"
     )

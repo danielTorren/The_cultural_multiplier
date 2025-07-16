@@ -36,7 +36,7 @@ def main(
     #######################################################################################################################
     #######################################################################################################################
     #######################################################################################################################
-    #NO REDISTRIBUTION ON ANY OF THE RUNS
+    #NO REDISTRIBUTION ON ANY OF THE RUNS, AND NO EXPENDITURE INEQUATLITY
     params["redistribution_state"] = 0
     params["expenditure_inequality_state"] = 0
 
@@ -44,10 +44,10 @@ def main(
     params_list_ref = []
     for i in networks_list:
         params["network_type"] = i
-        params_list_tax = produce_param_list_stochastic_multi(params, variable_parameters_dict["col"]["property_vals"], variable_parameters_dict["col"]["property_varied"])
-        params_list_ref.extend(params_list_tax)
+        params_list_tax_ref = produce_param_list_stochastic_multi(params, variable_parameters_dict["col"]["property_vals"], variable_parameters_dict["col"]["property_varied"])
+        params_list_ref.extend(params_list_tax_ref)
 
-    print("Total runs REFERENCE: ",len(params_list_ref))
+    print("Total runs REFERENCE NO REDIS and NO EXPENDITURE INEQUALITY: ",len(params_list_ref))
 
     Data_serial_ref, gini_serial_ref, poorest_spend_prop_serial_ref, richest_spend_prop_serial_ref = emissions_parallel_run_gini(params_list_ref)
     data_array_ref = Data_serial_ref.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
@@ -59,14 +59,15 @@ def main(
     save_object(gini_array_ref, fileName  + "/Data" , "gini_array_ref")
     save_object(poorest_spend_prop_array_ref, fileName  + "/Data" , "poorest_spend_prop_array_ref")
     save_object(richest_spend_prop_array_ref, fileName  + "/Data" , "richest_spend_prop_array_ref")
-
     
     print("DONE REFERENCE RUNS")
 
 
     #######################################################################################################################
+    #NO REDISTRIBUTION BUT WITH INEQUALITY
     params["redistribution_state"] = 0
     params["expenditure_inequality_state"] = 1
+
     params_list = []
     for i in networks_list:
         params["network_type"] = i
@@ -105,15 +106,15 @@ def main(
     params["expenditure_inequality_state"] = 0
 
     #RUN EQUALITY FOR COMPARISON
-    params_list_ref_with_re = []
+    params_list_ref_with_re_ref = []
     for i in networks_list:
         params["network_type"] = i
-        params_list_tax_with_re = produce_param_list_stochastic_multi(params, variable_parameters_dict["col"]["property_vals"], variable_parameters_dict["col"]["property_varied"])
-        params_list_ref_with_re.extend(params_list_tax_with_re)
+        params_list_tax_with_re_ref = produce_param_list_stochastic_multi(params, variable_parameters_dict["col"]["property_vals"], variable_parameters_dict["col"]["property_varied"])
+        params_list_ref_with_re_ref.extend(params_list_tax_with_re_ref)
 
-    print("Total runs REFERENCE: ",len(params_list_ref_with_re))
+    print("Total runs REFERENCE: ",len(params_list_ref_with_re_ref))
 
-    Data_serial_ref_with_re, gini_serial_ref_with_re, poorest_spend_prop_serial_ref_with_re, richest_spend_prop_serial_ref_with_re = emissions_parallel_run_gini(params_list_ref_with_re)
+    Data_serial_ref_with_re, gini_serial_ref_with_re, poorest_spend_prop_serial_ref_with_re, richest_spend_prop_serial_ref_with_re = emissions_parallel_run_gini(params_list_ref_with_re_ref)
     data_array_ref_with_re = Data_serial_ref_with_re.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
     gini_array_ref_with_re =  gini_serial_ref_with_re.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
     poorest_spend_prop_array_ref_with_re =  poorest_spend_prop_serial_ref_with_re.reshape(len(networks_list),variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
@@ -125,10 +126,12 @@ def main(
     save_object(richest_spend_prop_array_ref_with_re, fileName  + "/Data" , "richest_spend_prop_array_ref_with_re")
 
     
-    print("DONE REFERENCE RUNS WITH REDISTRIBUTION with redistribution")
+    print("DONE REFERENCE RUNS with redistribution")
 
 
     ######################################################################################################################
+    #REDISTRIBUTION AN INEQUALITY
+
     params["redistribution_state"] = 1
     params["expenditure_inequality_state"] = 1
     params_list_with_re = []
@@ -139,7 +142,7 @@ def main(
 
     print("Total runs _with_re: ",len(params_list_with_re))
 
-    Data_serial_with_re, gini_serial_with_re, poorest_spend_prop_serial_with_re, richest_spend_prop_serial_with_re = emissions_parallel_run_gini(params_list)
+    Data_serial_with_re, gini_serial_with_re, poorest_spend_prop_serial_with_re, richest_spend_prop_serial_with_re = emissions_parallel_run_gini(params_list_with_re)
     data_array_with_re = Data_serial_with_re.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
     gini_array_with_re =  gini_serial_with_re.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
     poorest_spend_prop_array_with_re =  poorest_spend_prop_serial_with_re.reshape(len(networks_list),variable_parameters_dict["row"]["property_reps"], variable_parameters_dict["col"]["property_reps"], params["seed_reps"])
