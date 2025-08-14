@@ -33,7 +33,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
         mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
         ax_sw.fill_between(property_values_list_col, lower_bound, upper_bound, color=colors[k], alpha=0.3)
 
-    fig_sw.supxlabel(r"Carbon tax, $\tau$", fontsize="12")
+    fig_sw.supxlabel(r"Carbon price, $\tau$", fontsize="12")
     fig_sw.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
     ax_sw.legend(fontsize="8")
 
@@ -57,7 +57,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
             mu_emissions, lower_bound, upper_bound = calc_bounds(Data, 0.95)
             axes_other[j-1].fill_between(property_values_list_col, lower_bound, upper_bound, color=colors[k], alpha=0.3)
 
-    fig_other.supxlabel(r"Carbon tax, $\tau$", fontsize="12")
+    fig_other.supxlabel(r"Carbon price, $\tau$", fontsize="12")
     fig_other.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
     axes_other[1].legend(fontsize="8")
 

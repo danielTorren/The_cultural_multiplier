@@ -131,7 +131,7 @@ def plot_emissions_vs_gini_dual_broken(
     no_items = [item for item in legend_items if item[1].startswith("No")]
     sorted_handles, sorted_labels = zip(*(with_items + no_items))
 
-    ax2.legend(sorted_handles, sorted_labels, fontsize=8, ncol=2)
+    ax2.legend(sorted_handles, sorted_labels, fontsize=11, ncol=2)
     fig.savefig(f"{fileName}/Plots/small_world_emissions_vs_gini_dual.png", dpi=300)
 
     # === SBM and Scale-Free Combined Plot ===
@@ -159,7 +159,7 @@ def plot_emissions_vs_gini_dual_broken(
     no_items = [item for item in legend_items if item[1].startswith("No")]
     sorted_handles, sorted_labels = zip(*(with_items + no_items))
 
-    axes[3].legend(sorted_handles, sorted_labels, fontsize=8, ncol=2)
+    axes[3].legend(sorted_handles, sorted_labels, fontsize=12, ncol=2)
     fig.savefig(f"{fileName}/Plots/sbm_scale_free_emissions_vs_gini_dual.png", dpi=300)
 
 def main(
@@ -211,5 +211,5 @@ def main(
 
 if __name__ == '__main__':
     main(
-        fileName="results/inequality_gen_19_07_22__14_07_2025"
+        fileName="results/inequality_gen_13_01_18__16_07_2025"
     )

@@ -54,8 +54,8 @@ def plot_emissions_vs_min_expenditure(fileName):
 
     ax.set_xlabel("Minimum expenditure share (h_min ⋅ prices)", fontsize=12)
     ax.set_ylabel("Cumulative carbon emissions, E", fontsize=12)
-    ax.set_title("Emissions vs. Minimum Expenditure Share", fontsize=14)
-    ax.legend(title="Network Structure")
+    #ax.set_title("Emissions vs. Minimum Expenditure Share", fontsize=14)
+    ax.legend(title="Network Structure", fontsize=12)
     ax.grid(True)
     fig.tight_layout()
 

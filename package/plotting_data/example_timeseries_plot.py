@@ -24,8 +24,8 @@ def plot_identity_matrix_2(fileName, Data_1, Data_2):
     axes[0].set_xlabel(r"Timestep")
     axes[1].set_xlabel(r"Timestep")
 
-    axes[0].set_title(r"Carbon tax, $\tau = 0$")
-    axes[1].set_title(r"Carbon tax, $\tau = 0.15$")
+    axes[0].set_title(r"Carbon price, $\tau = 0$")
+    axes[1].set_title(r"Carbon price, $\tau = 0.15$")
 
     axes[0].set_ylabel(r"Environmental identity, $I_{t,i}$")
 
@@ -37,19 +37,23 @@ def plot_identity_matrix_2(fileName, Data_1, Data_2):
     fig.savefig(f + ".png", dpi=300, format="png")
 
 def main(
-    fileName = "results/single_shot_11_52_34__05_01_2023",
+    fileName_1 = "results/single_experiment_23_19_49__13_08_2025",
+    fileName_2 = "results/single_experiment_23_20_42__13_08_2025",
     ) -> None: 
 
-    Data_no = load_object(fileName + "/Data", "Data_no")
-    Data_high = load_object(fileName + "/Data", "data_high")
+    Data_no = load_object(fileName_1 + "/Data", "social_network")
+    Data_high = load_object(fileName_2 + "/Data", "social_network")
     
-    plot_identity_matrix_2(fileName, Data_no,  Data_high)
+    plot_identity_matrix_2(fileName_1, Data_no,  Data_high)
+    plot_identity_matrix_2(fileName_2, Data_no,  Data_high)
 
     plt.show()
 
 if __name__ == '__main__':
+    #JUST RUN 2 single runs at different prices and paste the location here
     plots = main(
-        fileName = "results/single_experiment_11_02_44__19_02_2024",
+        fileName_1 = "results/single_experiment_23_19_49__13_08_2025",
+        fileName_2 = "results/single_experiment_23_20_42__13_08_2025",
     )
 
 

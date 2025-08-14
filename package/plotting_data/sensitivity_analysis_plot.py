@@ -260,7 +260,7 @@ if __name__ == '__main__':
         },
         titles = [    
             "Social suseptability, $\\phi$",
-            "Carbon tax, $\\tau$",
+            "Carbon price, $\\tau$",
             "Number of individuals, $N$",
             "Number of sectors, $M$",
             "Sector substitutability, $\\nu$",

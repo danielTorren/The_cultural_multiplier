@@ -42,7 +42,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
         mu_ref = ref_data.mean(axis=1)
         ax_sw.plot(property_values_list_col, mu_ref, linestyle='--', color='black', label='Reference')
 
-    fig_sw.supxlabel(r"Carbon tax, $\tau$", fontsize="12")
+    fig_sw.supxlabel(r"Carbon price, $\tau$", fontsize="12")
     fig_sw.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
     ax_sw.legend(fontsize="8")
 
@@ -69,7 +69,7 @@ def plot_means_end_points_emissions_confidence_split_gradient(
             mu_ref = ref_data.mean(axis=1)
             ax.plot(property_values_list_col, mu_ref, linestyle='--', color='black', label='Reference')
 
-    fig_other.supxlabel(r"Carbon tax, $\tau$", fontsize="12")
+    fig_other.supxlabel(r"Carbon price, $\tau$", fontsize="12")
     fig_other.supylabel(r"Cumulative carbon emissions, E", fontsize="12")
     axes_other[1].legend(fontsize="8")
 
